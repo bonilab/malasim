@@ -1,0 +1,13 @@
+# Doxyfile configuration for Doxygen
+
+# Project related configuration options
+PROJECT_NAME           = "malasim"
+PROJECT_NUMBER         = "1.0"
+OUTPUT_DIRECTORY       = "docs/Doxygen"
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+# Build related configuration options
+EXTRACT_ALL            = YES
+INPUT                  = ./src ./include
+RECURSIVE              = YES

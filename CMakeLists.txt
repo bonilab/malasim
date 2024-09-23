@@ -1,0 +1,24 @@
+cmake_minimum_required(VERSION 3.10)
+
+# Include vcpkg
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  message(STATUS "VCPKG_ROOT=$ENV{VCPKG_ROOT}")
+  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        CACHE STRING "")
+endif()
+
+project(malasim)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Enable testing
+enable_testing()
+
+# Add subdirectories
+add_subdirectory(src)
+add_subdirectory(tests)
+

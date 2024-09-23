@@ -1,32 +1,41 @@
-# Prerequisites
-*.d
+# clangd cache
+.cache*
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Ignore IDE directories
+.idea
+.vscode
+.vs
+.DS_Store
 
-# Precompiled Headers
-*.gch
-*.pch
+# Ignore R artifacts
+.RData
+.Rhistory
+.Rproj.user
+_book
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# Ignore build artifacts
+build/
+bin/
+Testing/
+cmake-*
+compile_commands.json
 
-# Fortran module files
-*.mod
-*.smod
+# Ignore test binaries
+tests/runTests
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# Ignore documentation output
+docs/html/
 
-# Executables
-*.exe
-*.out
-*.app
+# Ignore the backups of diagrams
+documentation/diagrams/*.~vsdx
+
+# Ignore default output and data files
+out
+monthly_data\.txt
+reporter\.txt
+
+# Ignore temporary Excel files
+~$*.xlsx
+
+# Ignore log files
+*.log
