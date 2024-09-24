@@ -36,7 +36,7 @@ public:
    *
    * @param external_rng Pointer to an external GSL RNG. Defaults to nullptr.
    */
-  explicit Random(gsl_rng* external_rng = nullptr);
+  explicit Random(gsl_rng* external_rng = nullptr, uint64_t seed = 0);
 
   /**
    * @brief Destructor.

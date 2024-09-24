@@ -10,10 +10,11 @@
 #include <gsl/gsl_randist.h>
 
 #include <cmath>
+#include <cstdint>
 #include <random>
 
 // Constructor
-Random::Random(gsl_rng* rng) : seed_(0) {
+Random::Random(gsl_rng* rng, uint64_t seed) : seed_(seed) {
   if (rng != nullptr) {
     // If an external RNG is provided, take ownership using the unique_ptr
     rng_.reset(rng);
