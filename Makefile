@@ -21,7 +21,7 @@ build b:
 	cmake --build build --config $(BUILD_TYPE) -j 6
 
 test t: build
-	cd build && ctest --output-on-failure --verbose
+	cd build && ctest --output-on-failure
 
 run r: build 
 	./$(APP_EXECUTABLE)

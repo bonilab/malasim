@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['example_2ecpp_0',['example.cpp',['../example_8cpp.html',1,'']]],
-  ['example_2eh_1',['example.h',['../example_8h.html',1,'']]]
+  ['beta_20distribution_0',['Beta Distribution',['../md_src_2_core_2_random_2_r_e_a_d_m_e.html#autotoc_md11',1,'']]],
+  ['binomial_20distribution_1',['Binomial Distribution',['../md_src_2_core_2_random_2_r_e_a_d_m_e.html#autotoc_md13',1,'']]]
 ];
