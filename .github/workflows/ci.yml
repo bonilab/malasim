@@ -1,0 +1,64 @@
+name: C++ CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake g++ make
+
+    - name: Build
+      run: |
+        mkdir build && cd build
+        cmake ..
+        make
+
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install clang-format
+      run: sudo apt-get install -y clang-format
+
+    - name: Run clang-format
+      run: |
+        find src tests -name '*.cpp' -o -name '*.h' | xargs clang-format -i --style=file
+        git diff --exit-code
+
+  clang-tidy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake g++ make clang-tidy
+
+    - name: Generate compile_commands.json
+      run: |
+        mkdir build && cd build
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+
+    - name: Run clang-tidy
+      run: |
+        find src tests -name '*.cpp' -o -name '*.h' | xargs clang-tidy -p build

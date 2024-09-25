@@ -73,85 +73,12 @@ uint64_t Random::random_uniform(uint64_t upper_bound) {
   return gsl_rng_uniform_int(rng_.get(), upper_bound);
 }
 
-// Generates a uniform random integer in [from, to)
-uint64_t Random::random_uniform(uint64_t lower_bound, uint64_t upper_bound) {
-  if (lower_bound >= upper_bound) {
-    throw std::invalid_argument("Parameter 'from' must be less than 'to'.");
-  }
-  if (!rng_) {
-    throw std::runtime_error("Random number generator not initialized.");
-  }
-  return lower_bound
-         + gsl_rng_uniform_int(rng_.get(), upper_bound - lower_bound);
-}
-
-// Generates a uniform random double in [from, to)
-double Random::random_uniform(double from, double to) {
-  if (from >= to) {
-    throw std::invalid_argument("Parameter 'from' must be less than 'to'.");
-  }
-  if (!rng_) {
-    throw std::runtime_error("Random number generator not initialized.");
-  }
-  return gsl_ran_flat(rng_.get(), from, to);
-}
-
 // Generates a uniform random double in [0, 1)
 double Random::random_uniform() {
   if (!rng_) {
     throw std::runtime_error("Random number generator not initialized.");
   }
   return gsl_rng_uniform(rng_.get());
-}
-
-// Generates a normally distributed random double with given mean and standard
-// deviation
-double Random::random_normal(double mean, double standard_deviation) {
-  if (!rng_) {
-    throw std::runtime_error("Random number generator not initialized.");
-  }
-  return mean + gsl_ran_gaussian(rng_.get(), standard_deviation);
-}
-
-// Generates a normally distributed random integer with given mean and standard
-// deviation
-int Random::random_normal(int mean, int standard_deviation) {
-  if (!rng_) {
-    throw std::runtime_error("Random number generator not initialized.");
-  }
-  return static_cast<int>(
-      mean
-      + std::round(gsl_ran_gaussian(rng_.get(),
-                                    static_cast<double>(standard_deviation))));
-}
-
-// Generates a truncated normally distributed random double within ±3 standard
-// deviations
-double Random::random_normal_truncated(double mean, double standard_deviation) {
-  if (!rng_) {
-    throw std::runtime_error("Random number generator not initialized.");
-  }
-  double value = gsl_ran_gaussian(rng_.get(), standard_deviation);
-  while (std::abs(value) > TRUNCATION_LIMIT * standard_deviation) {
-    value = gsl_ran_gaussian(rng_.get(), standard_deviation);
-  }
-  return mean + value;
-}
-
-// Generates a truncated normally distributed random integer within ±3 standard
-// deviations
-int Random::random_normal_truncated(int mean, int standard_deviation) {
-  if (!rng_) {
-    throw std::runtime_error("Random number generator not initialized.");
-  }
-  double value =
-      gsl_ran_gaussian(rng_.get(), static_cast<double>(standard_deviation));
-  while (std::abs(value) > TRUNCATION_LIMIT * standard_deviation) {
-    // Regenerate the value until it falls within the truncation limit
-    value =
-        gsl_ran_gaussian(rng_.get(), static_cast<double>(standard_deviation));
-  }
-  return static_cast<int>(mean + std::round(value));
 }
 
 // Generates a Beta-distributed random double
@@ -192,12 +119,6 @@ double Random::cdf_gamma_distribution_inverse(double probability, double alpha,
     throw std::runtime_error("Random number generator not initialized.");
   }
   return gsl_cdf_gamma_Pinv(probability, alpha, beta);
-}
-
-// Generates a flat-distributed random double in [from, to)
-double Random::random_flat(double from, double to) {
-  // This is identical to randomUniformDouble
-  return random_uniform(from, to);
 }
 
 // Generates multinomially distributed random numbers

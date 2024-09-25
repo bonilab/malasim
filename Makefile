@@ -49,8 +49,11 @@ generate-ninja gn:
 generate-test gt:
 	@$(MAKE) generate BUILD_TESTS=ON
 
-format f:
-	fd "\.(h|cpp|hxx)$$" src -x clang-format -i
+format:
+	find src tests -name '*.cpp' -o -name '*.h' | xargs clang-format -i --style=file
+
+lint: build
+	find src tests -name '*.cpp' -o -name '*.h' | xargs clang-tidy -p build
 
 docs:
 	@echo "Generating documentation..."
@@ -65,6 +68,7 @@ help h:
 	@echo "  all                  : Default target, builds the project."
 	@echo "  build (b)            : Build the project with specified BUILD_TYPE (default: Release)."
 	@echo "  format (f)           : Format the source code using clang-format."
+	@echo "  lint                 : Run clang-tidy on the source code."
 	@echo "  test                 : Rebuild and run tests."
 	@echo "  run [path]           : Rebuild and run the executable. Provide path to override default."
 	@echo "  clean                : Remove the build directory."
@@ -75,3 +79,4 @@ help h:
 	@echo "  generate-test (gt)   : Generate the build system with tests."
 	@echo "  docs                 : Generate Doxygen documentation into $(DOCS_OUTPUT_DIR)."
 	@echo "  help                 : Show this help message."
+

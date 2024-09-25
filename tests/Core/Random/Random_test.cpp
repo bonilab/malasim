@@ -21,7 +21,7 @@ protected:
 
 // Test default constructor initializes RNG
 TEST_F(RandomTest, DefaultConstructorInitializesRNG) {
-  Random rng;
+  Random const rng;
   EXPECT_NE(rng.get_seed(), 0);
 }
 
@@ -157,10 +157,10 @@ TEST_F(RandomTest, RandomNormalInt) {
   // Check that the values are integers
   // Since the method returns int, this is implicit
   // Alternatively, check if they are within a reasonable range
-  EXPECT_GE(normal1, mean - 3 * std_dev);
-  EXPECT_LE(normal1, mean + 3 * std_dev);
-  EXPECT_GE(normal2, mean - 3 * std_dev);
-  EXPECT_LE(normal2, mean + 3 * std_dev);
+  EXPECT_GE(normal1, mean - (3 * std_dev));
+  EXPECT_LE(normal1, mean + (3 * std_dev));
+  EXPECT_GE(normal2, mean - (3 * std_dev));
+  EXPECT_LE(normal2, mean + (3 * std_dev));
 }
 
 // Test random_beta

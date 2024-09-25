@@ -3,6 +3,7 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
+#include <gsl/gsl_randist.h>
 #include <gsl/gsl_rng.h>
 
 #include <cstddef>
@@ -82,30 +83,6 @@ public:
   uint64_t random_uniform(uint64_t upper_bound);
 
   /**
-   * @brief Generates a uniform random integer in [lower_bound, upper_bound).
-   *
-   * @param lower_bound The inclusive lower bound.
-   * @param upper_bound The exclusive upper bound.
-   * @return uint64_t A uniformly distributed random integer.
-   *
-   * @throws std::invalid_argument If lower_bound is not less than upper_bound.
-   * @throws std::runtime_error If RNG is not initialized.
-   */
-  uint64_t random_uniform(uint64_t lower_bound, uint64_t upper_bound);
-
-  /**
-   * @brief Generates a uniform random double in [from, to).
-   *
-   * @param from The inclusive lower bound.
-   * @param to The exclusive upper bound.
-   * @return double A uniformly distributed random double.
-   *
-   * @throws std::invalid_argument If from is not less than to.
-   * @throws std::runtime_error If RNG is not initialized.
-   */
-  double random_uniform(double from, double to);
-
-  /**
    * @brief Generates a uniform random double in [0, 1).
    *
    * @return double A uniformly distributed random double.
@@ -115,17 +92,87 @@ public:
   double random_uniform();
 
   /**
-   * @brief Generates a normally distributed random double with given mean and
+   * @brief Generates a uniformly distributed random number within a specified
+   * range.
+   *
+   * This function returns a random number of type `T` that is uniformly
+   * distributed between the specified `from` and `to` values. The range is
+   * inclusive of `from` and exclusive of `to`. It supports both integral and
+   * floating-point types.
+   *
+   * @tparam T The numeric type of the random number to generate. Must be an
+   * arithmetic type.
+   *
+   * @param from The lower bound of the range. Must be less than `to`.
+   * @param to The upper bound of the range. Must be greater than `from`.
+   *
+   * @return A random number of type `T` uniformly distributed in [from, to).
+   *
+   * @throws std::runtime_error If the random number generator is not
+   * initialized.
+   * @throws std::invalid_argument If `from` is not less than `to`.
+   *
+   * @note Ensure that the random number generator (`rng_`) is properly
+   * initialized before invoking this function.
+   */
+  template <typename T>
+  T random_uniform(T from, T to) {
+    static_assert(std::is_arithmetic<T>::value,
+                  "Template parameter T must be numeric.");
+
+    if (!rng_) {
+      throw std::runtime_error("Random number generator not initialized.");
+    }
+
+    if (from >= to) {
+      throw std::invalid_argument("Parameter 'from' must be less than 'to'.");
+    }
+
+    if constexpr (std::is_integral<T>::value) {
+      // gsl_rng_uniform_int takes an unsigned long as upper bound
+      // Ensure that (to - from) does not exceed the maximum value of unsigned
+      // long
+      unsigned long range = static_cast<unsigned long>(to - from);
+      // Note: gsl_rng_uniform_int handles range values up to the maximum of
+      // unsigned long
+      unsigned long value = gsl_rng_uniform_int(rng_.get(), range);
+      return static_cast<T>(from + value);
+    } else {
+      double value = gsl_ran_flat(rng_.get(), static_cast<double>(from),
+                                  static_cast<double>(to));
+      return static_cast<T>(value);
+    }
+  }
+
+  /**
+   * @brief Generates a normally distributed random number with given mean and
    * standard deviation.
    *
+   * @tparam T The return type, typically `double` or `int`.
    * @param mean The mean of the normal distribution.
    * @param standard_deviation The standard deviation of the normal
    * distribution.
-   * @return double A random number following the normal distribution.
+   * @return T A random number following the normal distribution.
    *
    * @throws std::runtime_error If RNG is not initialized.
    */
-  double random_normal(double mean, double standard_deviation);
+  template <typename T>
+  T random_normal(T mean, double standard_deviation) {
+    static_assert(std::is_arithmetic<T>::value,
+                  "Template parameter T must be numeric.");
+
+    if (!rng_) {
+      throw std::runtime_error("Random number generator not initialized.");
+    }
+
+    double value = mean + gsl_ran_gaussian(rng_.get(), standard_deviation);
+
+    if constexpr (std::is_integral<T>::value) {
+      return static_cast<T>(std::round(value));
+    } else {
+      return static_cast<T>(value);
+    }
+  }
 
   /**
    * @brief Generates a truncated normally distributed random double within ±3
@@ -134,24 +181,13 @@ public:
    * @param mean The mean of the normal distribution.
    * @param standard_deviation The standard deviation of the normal
    * distribution.
+   * @param truncation_limit The number of standard deviations to truncate.
    * @return double A truncated normally distributed random double.
    *
    * @throws std::runtime_error If RNG is not initialized.
    */
-  double random_normal_truncated(double mean, double standard_deviation);
-
-  /**
-   * @brief Generates a normally distributed random integer with given mean and
-   * standard deviation.
-   *
-   * @param mean The mean of the normal distribution.
-   * @param standard_deviation The standard deviation of the normal
-   * distribution.
-   * @return int A random integer following the normal distribution.
-   *
-   * @throws std::runtime_error If RNG is not initialized.
-   */
-  int random_normal(int mean, int standard_deviation);
+  double random_normal_truncated(double mean, double standard_deviation,
+                                 double truncation_limit = 3.0);
 
   /**
    * @brief Generates a truncated normally distributed random integer within ±3
@@ -160,11 +196,61 @@ public:
    * @param mean The mean of the normal distribution.
    * @param standard_deviation The standard deviation of the normal
    * distribution.
+   * @param truncation_limit The number of standard deviations to truncate.
    * @return int A truncated normally distributed random integer.
    *
    * @throws std::runtime_error If RNG is not initialized.
    */
-  int random_normal_truncated(int mean, int standard_deviation);
+  int random_normal_truncated(int mean, int standard_deviation,
+                              double truncation_limit = 3.0);
+
+  /**
+   * @brief Generates a truncated normally distributed random number within a
+   * specified number of standard deviations.
+   *
+   * The function repeatedly generates normally distributed random numbers until
+   * one falls within the range [mean - truncation_limit * standard_deviation,
+   * mean + truncation_limit * standard_deviation]. To prevent potential
+   * infinite loops, a maximum number of attempts is enforced.
+   *
+   * @tparam T The return type, typically `double` or `int`.
+   * @param mean The mean of the normal distribution.
+   * @param standard_deviation The standard deviation of the normal
+   * distribution.
+   * @param truncation_limit The number of standard deviations to truncate
+   * (default is 3.0).
+   * @param max_attempts The maximum number of attempts to generate a valid
+   * truncated value (default is 1000).
+   * @return T A truncated normally distributed random number.
+   *
+   * @throws std::runtime_error If RNG is not initialized or if a valid
+   * truncated value cannot be generated within the maximum attempts.
+   */
+  template <typename T>
+  T random_normal_truncated(T mean, double standard_deviation,
+                            double truncation_limit = 3.0,  // NOLINT
+                            int max_attempts = 1000) {
+    static_assert(std::is_arithmetic<T>::value,
+                  "Template parameter T must be numeric.");
+    if (!rng_) {
+      throw std::runtime_error("Random number generator not initialized.");
+    }
+    double value = gsl_ran_gaussian(rng_.get(), standard_deviation);
+    int attempts = 0;
+    while (std::abs(value) > truncation_limit * standard_deviation) {
+      if (attempts++ >= max_attempts) {
+        throw std::runtime_error(
+            "Failed to generate a truncated normal value within the maximum "
+            "number of attempts.");
+      }
+      value = gsl_ran_gaussian(rng_.get(), standard_deviation);
+    }
+    if constexpr (std::is_integral<T>::value) {
+      return static_cast<T>(mean + std::round(value));
+    } else {
+      return static_cast<T>(mean + value);
+    }
+  }
 
   /**
    * @brief Generates a Beta-distributed random double.
@@ -213,17 +299,6 @@ public:
    */
   double cdf_gamma_distribution_inverse(double probability, double alpha,
                                         double beta);
-
-  /**
-   * @brief Generates a flat-distributed random double in [from, to).
-   *
-   * This is identical to `random_uniform_double`.
-   *
-   * @param from The inclusive lower bound.
-   * @param to The exclusive upper bound.
-   * @return double A flat-distributed random double.
-   */
-  double random_flat(double from, double to);
 
   /**
    * @brief Generates multinomial random variables.
@@ -275,7 +350,6 @@ public:
 
 private:
   uint64_t seed_;
-  static constexpr double TRUNCATION_LIMIT = 3.0;
 
   // Custom deleter for gsl_rng
   struct GslRngDeleter {

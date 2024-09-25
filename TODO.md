@@ -1,8 +1,9 @@
 # Random class
 
-- [] Review all the unit tests
+- [ ] Random unit tests
 
 # Project wide
 
-- add gcov
-- add CI/Coverage
+- [ ] add gcov
+- [ ] add CI/Coverage
+- [ ] choose a logging library

@@ -13,12 +13,40 @@ The `Random` class encapsulates random number generation functionalities using t
 - **Shuffling Capabilities:** Shuffle elements in an array using the current random generator.
 - **Resource Management:** Utilizes `std::unique_ptr` with a custom deleter to manage the GSL RNG resource.
 - **Seed Control:** Allows setting and retrieving the RNG seed for reproducibility.
-- **Move Semantics:** Supports move construction and move assignment for flexible resource management.
+- **Templated Methods:** Provides templated methods for generating uniformly and normally distributed random numbers with flexible types.
 
 ## Dependencies
 
 - [GNU Scientific Library (GSL)](https://www.gnu.org/software/gsl/)
 - [fmt](https://fmt.dev/) (Optional, used for formatting logs)
+
+## Installation
+
+### Prerequisites
+
+Ensure that the following dependencies are installed on your system:
+
+- **GNU Scientific Library (GSL):**
+  ```bash
+  sudo apt-get install libgsl-dev
+  ```
+- **fmt Library:** (Optional, only if you intend to use logging features)
+  ```bash
+  sudo apt-get install libfmt-dev
+  ```
+
+### Building the Project
+
+Assuming you're using CMake for your project, ensure that you link against GSL and fmt (if used):
+
+```cmake
+find_package(GSL REQUIRED)
+find_package(fmt REQUIRED) # Optional
+
+add_executable(your_executable main.cpp Random.cpp)
+target_include_directories(your_executable PRIVATE ${GSL_INCLUDE_DIRS})
+target_link_libraries(your_executable PRIVATE ${GSL_LIBRARIES} fmt::fmt) # fmt is optional
+```
 
 ## Usage
 
@@ -51,7 +79,7 @@ int poisson_sample = rng.random_poisson(lambda);
 uint64_t uniform_int = rng.random_uniform(100);
 
 // Uniform integer in [50, 150)
-uint64_t uniform_int_range = rng.random_uniform(50, 150);
+uint64_t uniform_int_range = rng.random_uniform<uint64_t>(50, 150);
 
 // Uniform double in [0.0, 1.0)
 double uniform_double = rng.random_uniform();
@@ -73,7 +101,7 @@ double normal_sample = rng.random_normal(mean, std_dev);
 double truncated_normal = rng.random_normal_truncated(mean, std_dev);
 
 // Normal integer
-int normal_int = rng.random_normal(5, 2);
+int normal_int = rng.random_normal<int>(5, 2);
 
 // Truncated normal integer within ±3 standard deviations
 int truncated_normal_int = rng.random_normal_truncated(5, 2);
@@ -147,11 +175,13 @@ rng.set_seed(123456789);
 
 ### Move Semantics
 
+> **Note:** The `Random` class **does not** support move construction or move assignment. Both copy and move operations are deleted to ensure unique ownership of the RNG resource.
+
 ```cpp
 Random rng1;
-Random rng2 = std::move(rng1); // Move constructor
-Random rng3;
-rng3 = std::move(rng2); // Move assignment
+// The following operations are **not** allowed and will result in a compile-time error
+// Random rng2 = std::move(rng1); // Move constructor - Deleted
+// rng2 = std::move(rng1); // Move assignment - Deleted
 ```
 
 ## Example
@@ -205,3 +235,22 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 
 - [GNU Scientific Library (GSL)](https://www.gnu.org/software/gsl/)
 - [fmt Library](https://fmt.dev/)
+
+---
+
+### Changelog
+
+#### v1.1.0
+
+- **Removed Move Semantics:** The `Random` class no longer supports move construction or move assignment to ensure unique ownership of the RNG resource.
+- **Added Templated Methods:** Introduced templated methods `random_uniform` and `random_normal` for greater flexibility in generating random numbers of different types.
+- **Updated Documentation:** Revised the README to accurately reflect the class's capabilities and limitations.
+- **Dependency Clarifications:** Specified that the `fmt` library is optional and primarily used for logging purposes.
+
+#### v1.0.0
+
+- Initial release with comprehensive random number generation functionalities using GSL.
+
+---
+
+_This README was generated and updated by ChatGPT based on the provided `Random.cpp` and `Random.h` implementations._

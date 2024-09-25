@@ -3,4 +3,4 @@
 
 int add(int a, int b);
 
-#endif // EXAMPLE_H
+#endif  // EXAMPLE_H
