@@ -22,5 +22,7 @@ target_link_libraries(runTests PRIVATE
   MalaSimCore
 )
 
+set_property(TARGET runTests PROPERTY CXX_STANDARD 20)
+
 # Add tests
 add_test(NAME malasim_test COMMAND ${CMAKE_BINARY_DIR}/bin/runTests)

@@ -22,6 +22,8 @@ target_link_libraries(MalaSimCore PUBLIC
   GSL::gsl GSL::gslcblas
 )
 
+set_property(TARGET MalaSimCore PROPERTY CXX_STANDARD 20)
+
 # Add the main executable
 add_executable(MalaSim
     Simulation/main.cpp
@@ -33,6 +35,8 @@ add_dependencies(MalaSim MalaSimCore)
 target_link_libraries(MalaSim PRIVATE
   MalaSimCore
 )
+
+set_property(TARGET MalaSim PROPERTY CXX_STANDARD 20)
 
 
 

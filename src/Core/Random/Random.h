@@ -6,6 +6,7 @@
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_rng.h>
 
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <memory>

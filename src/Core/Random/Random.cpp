@@ -10,8 +10,10 @@
 #include <gsl/gsl_randist.h>
 
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <random>
+#include <stdexcept>
 
 // Constructor
 Random::Random(gsl_rng* rng, uint64_t seed) : seed_(seed) {
