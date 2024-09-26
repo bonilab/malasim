@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <random>
 #include <stdexcept>
+#include <vector>
 
 // Constructor
 Random::Random(gsl_rng* rng, uint64_t seed) : seed_(seed) {
@@ -88,6 +89,10 @@ double Random::random_beta(double alpha, double beta) {
   if (!rng_) {
     throw std::runtime_error("Random number generator not initialized.");
   }
+  if (alpha <= 0.0 || beta < 0) {
+    throw std::invalid_argument(
+        "Parameters 'alpha' and 'beta' must be greater than 0.");
+  }
   if (beta == 0.0) { return alpha; }
   return gsl_ran_beta(rng_.get(), alpha, beta);
 }
@@ -97,8 +102,41 @@ double Random::random_gamma(double shape, double scale) {
   if (!rng_) {
     throw std::runtime_error("Random number generator not initialized.");
   }
+  if (shape <= 0.0 || scale < 0) {
+    throw std::invalid_argument(
+        "Parameters 'shape' and 'scale' must be greater than 0.");
+  }
   if (scale == 0) { return shape; }
   return gsl_ran_gamma(rng_.get(), shape, scale);
+}
+
+// Generates multinomially distributed random numbers
+void Random::random_multinomial(std::size_t categories, unsigned trials,
+                                const std::vector<double>& probabilities,
+                                std::vector<unsigned>& results) {
+  if (!rng_) {
+    throw std::runtime_error("Random number generator not initialized.");
+  }
+  if (categories == 0) {
+    throw std::invalid_argument(
+        "Parameter 'categories' must be greater than 0.");
+  }
+  if (probabilities.size() != categories || results.size() != categories) {
+    throw std::invalid_argument("Size of 'probabilities' and 'results' must match 'categories'.");
+  }
+  gsl_ran_multinomial(rng_.get(), static_cast<unsigned int>(categories), trials,
+                      probabilities.data(), results.data());
+}
+
+// Generates a binomially distributed random integer
+unsigned int Random::random_binomial(double probability, unsigned int trials) {
+  if (!rng_) {
+    throw std::runtime_error("Random number generator not initialized.");
+  }
+  if (probability < 0.0 || probability > 1.0) {
+    throw std::invalid_argument("Parameter 'probability' must be in [0, 1].");
+  }
+  return gsl_ran_binomial(rng_.get(), probability, trials);
 }
 
 // Computes the CDF of the Gamma distribution
@@ -123,26 +161,6 @@ double Random::cdf_gamma_distribution_inverse(double probability, double alpha,
   return gsl_cdf_gamma_Pinv(probability, alpha, beta);
 }
 
-// Generates multinomially distributed random numbers
-
-void Random::random_multinomial(std::size_t categories, unsigned trials,
-                                const double* probabilities,
-                                unsigned* results) {
-  if (!rng_) {
-    throw std::runtime_error("Random number generator not initialized.");
-  }
-  if (categories == 0) {
-    throw std::invalid_argument(
-        "Parameter 'categories' must be greater than 0.");
-  }
-  if (probabilities == nullptr || results == nullptr) {
-    throw std::invalid_argument(
-        "Parameters 'probabilities' and 'results' must not be null.");
-  }
-  gsl_ran_multinomial(rng_.get(), static_cast<unsigned int>(categories), trials,
-                      probabilities, results);
-}
-
 // Computes the CDF of the standard normal distribution
 double Random::cdf_standard_normal_distribution(double value) {
   if (!rng_) {
@@ -151,25 +169,3 @@ double Random::cdf_standard_normal_distribution(double value) {
   return gsl_cdf_ugaussian_P(value);
 }
 
-// Generates a binomially distributed random integer
-unsigned int Random::random_binomial(double probability, unsigned int trials) {
-  if (!rng_) {
-    throw std::runtime_error("Random number generator not initialized.");
-  }
-  if (probability < 0.0 || probability > 1.0) {
-    throw std::invalid_argument("Parameter 'probability' must be in [0, 1].");
-  }
-  return gsl_ran_binomial(rng_.get(), probability, trials);
-}
-
-// Shuffles elements in a range using the current random generator
-void Random::shuffle(void* array, std::size_t element_count,
-                     std::size_t element_size) const {
-  if (!rng_) {
-    throw std::runtime_error("Random number generator not initialized.");
-  }
-  if (array == nullptr) {
-    throw std::invalid_argument("Parameter 'array' must not be null.");
-  }
-  gsl_ran_shuffle(rng_.get(), array, element_count, element_size);
-}

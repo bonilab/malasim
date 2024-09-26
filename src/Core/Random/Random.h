@@ -166,6 +166,10 @@ public:
       throw std::runtime_error("Random number generator not initialized.");
     }
 
+    if (standard_deviation <= 0) {
+      throw std::invalid_argument(
+          "Parameters 'standard_deviation' must be greater than 0.");
+    }
     double value = mean + gsl_ran_gaussian(rng_.get(), standard_deviation);
 
     if constexpr (std::is_integral<T>::value) {
@@ -174,36 +178,6 @@ public:
       return static_cast<T>(value);
     }
   }
-
-  /**
-   * @brief Generates a truncated normally distributed random double within ±3
-   * standard deviations.
-   *
-   * @param mean The mean of the normal distribution.
-   * @param standard_deviation The standard deviation of the normal
-   * distribution.
-   * @param truncation_limit The number of standard deviations to truncate.
-   * @return double A truncated normally distributed random double.
-   *
-   * @throws std::runtime_error If RNG is not initialized.
-   */
-  double random_normal_truncated(double mean, double standard_deviation,
-                                 double truncation_limit = 3.0);
-
-  /**
-   * @brief Generates a truncated normally distributed random integer within ±3
-   * standard deviations.
-   *
-   * @param mean The mean of the normal distribution.
-   * @param standard_deviation The standard deviation of the normal
-   * distribution.
-   * @param truncation_limit The number of standard deviations to truncate.
-   * @return int A truncated normally distributed random integer.
-   *
-   * @throws std::runtime_error If RNG is not initialized.
-   */
-  int random_normal_truncated(int mean, int standard_deviation,
-                              double truncation_limit = 3.0);
 
   /**
    * @brief Generates a truncated normally distributed random number within a
@@ -306,15 +280,16 @@ public:
    *
    * @param categories Number of categories.
    * @param trials Number of trials.
-   * @param probabilities Pointer to array of probabilities (size `categories`).
-   * @param results Pointer to array where results will be stored (size
-   * `categories`).
+   * @param probabilities Vector of probabilities (size `categories`),
+   * does not need to normalize (or sum can be different than 1).
+   * @param results Vector where results will be stored (size `categories`).
    *
    * @throws std::invalid_argument If `categories` is zero.
    * @throws std::runtime_error If RNG is not initialized.
    */
   void random_multinomial(std::size_t categories, unsigned trials,
-                          const double* probabilities, unsigned* results);
+                          const std::vector<double>& probabilities,
+                          std::vector<unsigned>& results);
 
   /**
    * @brief Computes the CDF of the standard normal distribution.
@@ -338,16 +313,51 @@ public:
   unsigned int random_binomial(double probability, unsigned int trials);
 
   /**
-   * @brief Shuffles elements in an array using the current random generator.
+   * @brief Shuffles the elements of a vector in place using the current random
+   *number generator.
    *
-   * @param array Pointer to the first element of the array.
-   * @param element_count Number of elements in the array.
-   * @param element_size Size of each element in bytes.
+   * This templated function randomizes the order of elements within the
+   *provided `std::vector<T>` using GSL's `gsl_ran_shuffle` function. It ensures
+   *that the shuffling process maintains the integrity of the data, meaning no
+   *elements are lost or duplicated during the operation.
    *
-   * @throws std::runtime_error If RNG is not initialized.
-   */
-  void shuffle(void* array, std::size_t element_count,
-               std::size_t element_size) const;
+   * @tparam T The type of elements stored in the vector. Can be any copyable
+   *and movable type.
+   *
+   * @param vec A reference to the `std::vector<T>` whose elements are to be
+   *shuffled. Must not be empty.
+   *
+   * @throws std::runtime_error If the random number generator (`rng_`) is not
+   *initialized.
+   * @throws std::invalid_argument If the provided vector `vec` is empty.
+   *
+   * @note
+   * - The function requires that the random number generator (`rng_`) is
+   *properly initialized.
+   * - The randomness of the shuffle is dependent on the underlying RNG's
+   *quality and seeding.
+   *
+   * @warning
+   * - Ensure that the `Random` class instance has been initialized with a valid
+   *RNG before calling this function.
+   **/
+  // NOTE:: return a new vector (functional style) or modify in place
+  // (imperative style)
+  template <typename T>
+  void shuffle(std::vector<T> &vec) const {
+    // Check if RNG is initialized
+    if (!rng_) {
+      throw std::runtime_error("Random number generator not initialized.");
+    }
+
+    // Check if the vector is empty
+    if (vec.empty()) {
+      throw std::invalid_argument("Vector must not be empty.");
+    }
+
+    // Shuffle using gsl_ran_shuffle
+    gsl_ran_shuffle(rng_.get(), vec.data(), vec.size(), sizeof(T));
+  }
 
 private:
   uint64_t seed_;
