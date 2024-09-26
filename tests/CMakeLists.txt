@@ -3,8 +3,12 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 # Find Google Test
 find_package(GTest REQUIRED)
 
+include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR}/tests)
+
 file(GLOB_RECURSE MALASIM_TEST_SOURCES
   "*.cpp"
+  "helpers/*.cpp"
   "Core/Random/*.cpp"
 )
 

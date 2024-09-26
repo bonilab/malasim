@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <vector>
 
 /**
  * @class Random
@@ -288,8 +289,8 @@ public:
    * @throws std::runtime_error If RNG is not initialized.
    */
   void random_multinomial(std::size_t categories, unsigned trials,
-                          const std::vector<double>& probabilities,
-                          std::vector<unsigned>& results);
+                          const std::vector<double> &probabilities,
+                          std::vector<unsigned> &results);
 
   /**
    * @brief Computes the CDF of the standard normal distribution.

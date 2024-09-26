@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['uniform_20distribution_0',['Uniform Distribution',['../md_src_2_core_2_random_2_r_e_a_d_m_e.html#autotoc_md12',1,'']]],
-  ['usage_1',['Usage',['../md_src_2_core_2_random_2_r_e_a_d_m_e.html#autotoc_md8',1,'']]],
-  ['utility_2',['Reporters Utility',['../md_src_2_reporters_2_utility_2_r_e_a_d_m_e.html',1,'']]]
+  ['v1_200_200_0',['v1.0.0',['../md_src_2_core_2_random_2_r_e_a_d_m_e.html#autotoc_md22',1,'']]],
+  ['v1_201_200_1',['v1.1.0',['../md_src_2_core_2_random_2_r_e_a_d_m_e.html#autotoc_md21',1,'']]],
+  ['vector_2',['Shuffling a Vector',['../md_src_2_core_2_random_2_r_e_a_d_m_e.html#autotoc_md12',1,'']]]
 ];

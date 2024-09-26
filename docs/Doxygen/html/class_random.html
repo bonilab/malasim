@@ -135,12 +135,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a009517397b44059077ec585ee547ce30"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a009517397b44059077ec585ee547ce30">random_normal</a> (T mean, double standard_deviation)</td></tr>
 <tr class="memdesc:a009517397b44059077ec585ee547ce30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a normally distributed random number with given mean and standard deviation.  <br /></td></tr>
 <tr class="separator:a009517397b44059077ec585ee547ce30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af174f1fc344ad70f36802cc70a9705fa" id="r_af174f1fc344ad70f36802cc70a9705fa"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af174f1fc344ad70f36802cc70a9705fa">random_normal_truncated</a> (double mean, double standard_deviation, double truncation_limit=3.0)</td></tr>
-<tr class="memdesc:af174f1fc344ad70f36802cc70a9705fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a truncated normally distributed random double within ±3 standard deviations.  <br /></td></tr>
-<tr class="separator:af174f1fc344ad70f36802cc70a9705fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae53503a588170b663d1bade39a9a6859" id="r_ae53503a588170b663d1bade39a9a6859"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae53503a588170b663d1bade39a9a6859">random_normal_truncated</a> (int mean, int standard_deviation, double truncation_limit=3.0)</td></tr>
-<tr class="memdesc:ae53503a588170b663d1bade39a9a6859"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a truncated normally distributed random integer within ±3 standard deviations.  <br /></td></tr>
-<tr class="separator:ae53503a588170b663d1bade39a9a6859"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66e47a5cf6f27249346f9ffe461d6931" id="r_a66e47a5cf6f27249346f9ffe461d6931"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a66e47a5cf6f27249346f9ffe461d6931"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a66e47a5cf6f27249346f9ffe461d6931">random_normal_truncated</a> (T mean, double standard_deviation, double truncation_limit=3.0, int max_attempts=1000)</td></tr>
 <tr class="memdesc:a66e47a5cf6f27249346f9ffe461d6931"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a truncated normally distributed random number within a specified number of standard deviations.  <br /></td></tr>
@@ -157,18 +151,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a066762251255ef0a05a40485fb4e8ad6" id="r_a066762251255ef0a05a40485fb4e8ad6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a066762251255ef0a05a40485fb4e8ad6">cdf_gamma_distribution_inverse</a> (double probability, double alpha, double beta)</td></tr>
 <tr class="memdesc:a066762251255ef0a05a40485fb4e8ad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the inverse CDF (quantile function) of the Gamma distribution.  <br /></td></tr>
 <tr class="separator:a066762251255ef0a05a40485fb4e8ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24e7da13ca24af291ab4211af6d7271f" id="r_a24e7da13ca24af291ab4211af6d7271f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a24e7da13ca24af291ab4211af6d7271f">random_multinomial</a> (std::size_t categories, unsigned trials, const double *probabilities, unsigned *results)</td></tr>
-<tr class="memdesc:a24e7da13ca24af291ab4211af6d7271f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates multinomial random variables.  <br /></td></tr>
-<tr class="separator:a24e7da13ca24af291ab4211af6d7271f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae026d48d7f961011ba6dc81e60ab0f16" id="r_ae026d48d7f961011ba6dc81e60ab0f16"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae026d48d7f961011ba6dc81e60ab0f16">random_multinomial</a> (std::size_t categories, unsigned trials, const std::vector&lt; double &gt; &amp;probabilities, std::vector&lt; unsigned &gt; &amp;results)</td></tr>
+<tr class="memdesc:ae026d48d7f961011ba6dc81e60ab0f16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates multinomial random variables.  <br /></td></tr>
+<tr class="separator:ae026d48d7f961011ba6dc81e60ab0f16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d78ababaed7accace227a0774b4b0b9" id="r_a9d78ababaed7accace227a0774b4b0b9"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9d78ababaed7accace227a0774b4b0b9">cdf_standard_normal_distribution</a> (double value)</td></tr>
 <tr class="memdesc:a9d78ababaed7accace227a0774b4b0b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the CDF of the standard normal distribution.  <br /></td></tr>
 <tr class="separator:a9d78ababaed7accace227a0774b4b0b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acbedd794d18a26d89f21176e719af267" id="r_acbedd794d18a26d89f21176e719af267"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acbedd794d18a26d89f21176e719af267">random_binomial</a> (double probability, unsigned int trials)</td></tr>
 <tr class="memdesc:acbedd794d18a26d89f21176e719af267"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a binomially distributed random integer.  <br /></td></tr>
 <tr class="separator:acbedd794d18a26d89f21176e719af267"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af619db47493e6d63fa43611e18615f55" id="r_af619db47493e6d63fa43611e18615f55"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af619db47493e6d63fa43611e18615f55">shuffle</a> (void *array, std::size_t element_count, std::size_t element_size) const</td></tr>
-<tr class="memdesc:af619db47493e6d63fa43611e18615f55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shuffles elements in an array using the current random generator.  <br /></td></tr>
-<tr class="separator:af619db47493e6d63fa43611e18615f55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f1ec60f2f218e0cbfcc0c81fedb6ef5" id="r_a7f1ec60f2f218e0cbfcc0c81fedb6ef5"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a7f1ec60f2f218e0cbfcc0c81fedb6ef5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a7f1ec60f2f218e0cbfcc0c81fedb6ef5">shuffle</a> (std::vector&lt; T &gt; &amp;vec) const</td></tr>
+<tr class="memdesc:a7f1ec60f2f218e0cbfcc0c81fedb6ef5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shuffles the elements of a vector in place using the current random number generator.  <br /></td></tr>
+<tr class="separator:a7f1ec60f2f218e0cbfcc0c81fedb6ef5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Encapsulates random number generation functionalities using GSL. </p>
@@ -598,8 +593,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a24e7da13ca24af291ab4211af6d7271f" name="a24e7da13ca24af291ab4211af6d7271f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24e7da13ca24af291ab4211af6d7271f">&#9670;&#160;</a></span>random_multinomial()</h2>
+<a id="ae026d48d7f961011ba6dc81e60ab0f16" name="ae026d48d7f961011ba6dc81e60ab0f16"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae026d48d7f961011ba6dc81e60ab0f16">&#9670;&#160;</a></span>random_multinomial()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -617,12 +612,12 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const double *</td>          <td class="paramname"><span class="paramname"><em>probabilities</em></span>, </td>
+          <td class="paramtype">const std::vector&lt; double &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>probabilities</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned *</td>          <td class="paramname"><span class="paramname"><em>results</em></span>&#160;)</td>
+          <td class="paramtype">std::vector&lt; unsigned &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>results</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -632,8 +627,8 @@ Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">categories</td><td>Number of categories. </td></tr>
     <tr><td class="paramname">trials</td><td>Number of trials. </td></tr>
-    <tr><td class="paramname">probabilities</td><td>Pointer to array of probabilities (size <code>categories</code>). </td></tr>
-    <tr><td class="paramname">results</td><td>Pointer to array where results will be stored (size <code>categories</code>).</td></tr>
+    <tr><td class="paramname">probabilities</td><td>Vector of probabilities (size <code>categories</code>), does not need to normalize (or sum can be different than 1). </td></tr>
+    <tr><td class="paramname">results</td><td>Vector where results will be stored (size <code>categories</code>).</td></tr>
   </table>
   </dd>
 </dl>
@@ -700,94 +695,8 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="af174f1fc344ad70f36802cc70a9705fa" name="af174f1fc344ad70f36802cc70a9705fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af174f1fc344ad70f36802cc70a9705fa">&#9670;&#160;</a></span>random_normal_truncated() <span class="overload">[1/3]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double Random::random_normal_truncated </td>
-          <td>(</td>
-          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>mean</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>standard_deviation</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>truncation_limit</em></span><span class="paramdefsep"> = </span><span class="paramdefval">3.0</span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Generates a truncated normally distributed random double within ±3 standard deviations. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">mean</td><td>The mean of the normal distribution. </td></tr>
-    <tr><td class="paramname">standard_deviation</td><td>The standard deviation of the normal distribution. </td></tr>
-    <tr><td class="paramname">truncation_limit</td><td>The number of standard deviations to truncate. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>double A truncated normally distributed random double.</dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If RNG is not initialized. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ae53503a588170b663d1bade39a9a6859" name="ae53503a588170b663d1bade39a9a6859"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae53503a588170b663d1bade39a9a6859">&#9670;&#160;</a></span>random_normal_truncated() <span class="overload">[2/3]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int Random::random_normal_truncated </td>
-          <td>(</td>
-          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>mean</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>standard_deviation</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>truncation_limit</em></span><span class="paramdefsep"> = </span><span class="paramdefval">3.0</span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Generates a truncated normally distributed random integer within ±3 standard deviations. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">mean</td><td>The mean of the normal distribution. </td></tr>
-    <tr><td class="paramname">standard_deviation</td><td>The standard deviation of the normal distribution. </td></tr>
-    <tr><td class="paramname">truncation_limit</td><td>The number of standard deviations to truncate. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>int A truncated normally distributed random integer.</dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If RNG is not initialized. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="a66e47a5cf6f27249346f9ffe461d6931" name="a66e47a5cf6f27249346f9ffe461d6931"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a66e47a5cf6f27249346f9ffe461d6931">&#9670;&#160;</a></span>random_normal_truncated() <span class="overload">[3/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a66e47a5cf6f27249346f9ffe461d6931">&#9670;&#160;</a></span>random_normal_truncated()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1023,45 +932,61 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a id="af619db47493e6d63fa43611e18615f55" name="af619db47493e6d63fa43611e18615f55"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af619db47493e6d63fa43611e18615f55">&#9670;&#160;</a></span>shuffle()</h2>
+<a id="a7f1ec60f2f218e0cbfcc0c81fedb6ef5" name="a7f1ec60f2f218e0cbfcc0c81fedb6ef5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f1ec60f2f218e0cbfcc0c81fedb6ef5">&#9670;&#160;</a></span>shuffle()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Random::shuffle </td>
           <td>(</td>
-          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>array</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>element_count</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>element_size</em></span>&#160;) const</td>
+          <td class="paramtype">std::vector&lt; T &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>vec</em></span></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Shuffles elements in an array using the current random generator. </p>
+<p>Shuffles the elements of a vector in place using the current random number generator. </p>
+<p>This templated function randomizes the order of elements within the provided <code>std::vector&lt;T&gt;</code> using GSL's <code>gsl_ran_shuffle</code> function. It ensures that the shuffling process maintains the integrity of the data, meaning no elements are lost or duplicated during the operation.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>The type of elements stored in the vector. Can be any copyable and movable type.</td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">array</td><td>Pointer to the first element of the array. </td></tr>
-    <tr><td class="paramname">element_count</td><td>Number of elements in the array. </td></tr>
-    <tr><td class="paramname">element_size</td><td>Size of each element in bytes.</td></tr>
+    <tr><td class="paramname">vec</td><td>A reference to the <code>std::vector&lt;T&gt;</code> whose elements are to be shuffled. Must not be empty.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">std::runtime_error</td><td>If RNG is not initialized. </td></tr>
+    <tr><td class="paramname">std::runtime_error</td><td>If the random number generator (<code>rng_</code>) is not initialized. </td></tr>
+    <tr><td class="paramname">std::invalid_argument</td><td>If the provided vector <code>vec</code> is empty.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section note"><dt>Note</dt><dd><ul>
+<li>The function requires that the random number generator (<code>rng_</code>) is properly initialized.</li>
+<li>The randomness of the shuffle is dependent on the underlying RNG's quality and seeding.</li>
+</ul>
+</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd><ul>
+<li>Ensure that the <code><a class="el" href="class_random.html" title="Encapsulates random number generation functionalities using GSL.">Random</a></code> class instance has been initialized with a valid RNG before calling this function. </li>
+</ul>
+</dd></dl>
 
 </div>
 </div>

@@ -1,3 +1,4 @@
+````markdown
 # Core Random
 
 ## Overview
@@ -10,7 +11,7 @@ The `Random` class encapsulates random number generation functionalities using t
 - **Truncated Normal Distribution:** Generate normally distributed numbers truncated within ±3 standard deviations to avoid extreme values.
 - **Multinomial Distribution:** Generate multinomially distributed random variables.
 - **CDF Computations:** Compute the Cumulative Distribution Function (CDF) and its inverse for the Gamma distribution and the standard normal distribution.
-- **Shuffling Capabilities:** Shuffle elements in an array using the current random generator.
+- **Shuffling Capabilities:** Shuffle elements in a `std::vector` using the current random generator.
 - **Resource Management:** Utilizes `std::unique_ptr` with a custom deleter to manage the GSL RNG resource.
 - **Seed Control:** Allows setting and retrieving the RNG seed for reproducibility.
 - **Templated Methods:** Provides templated methods for generating uniformly and normally distributed random numbers with flexible types.
@@ -30,6 +31,8 @@ Ensure that the following dependencies are installed on your system:
   ```bash
   sudo apt-get install libgsl-dev
   ```
+````
+
 - **fmt Library:** (Optional, only if you intend to use logging features)
   ```bash
   sudo apt-get install libfmt-dev
@@ -142,25 +145,28 @@ unsigned int binomial_sample = rng.random_binomial(probability, trials);
 ```cpp
 std::size_t categories = 3;
 unsigned trials = 100;
-double probabilities[] = {0.2, 0.5, 0.3};
-unsigned results[3];
+std::vector<double> probabilities = {0.2, 0.5, 0.3};
+std::vector<unsigned> results(categories);
 
 rng.random_multinomial(categories, trials, probabilities, results);
 
 // results now contains the number of occurrences in each category
 ```
 
-#### Shuffling an Array
+#### Shuffling a Vector
 
 ```cpp
-#include <algorithm>
-#include <array>
-#include <cstddef>
+#include <vector>
+#include <iostream>
 
-std::array<int, 5> arr = {1, 2, 3, 4, 5};
-rng.shuffle(arr.data(), arr.size(), sizeof(int));
+std::vector<int> vec = {1, 2, 3, 4, 5};
+rng.shuffle(vec);
 
-// arr is now shuffled
+// vec is now shuffled
+for (const auto& num : vec) {
+    std::cout << num << ' ';
+}
+std::cout << std::endl;
 ```
 
 ### Seed Management
@@ -189,6 +195,7 @@ Random rng1;
 ```cpp
 #include "Random.h"
 #include <iostream>
+#include <vector>
 
 int main() {
     try {
@@ -207,10 +214,10 @@ int main() {
         double normal = rng.random_normal(0.0, 1.0);
         std::cout << "Normal sample: " << normal << std::endl;
 
-        // Shuffle an array
-        int data[] = {1, 2, 3, 4, 5};
-        rng.shuffle(data, 5, sizeof(int));
-        std::cout << "Shuffled array: ";
+        // Shuffle a vector
+        std::vector<int> data = {1, 2, 3, 4, 5};
+        rng.shuffle(data);
+        std::cout << "Shuffled vector: ";
         for (const auto& num : data) {
             std::cout << num << ' ';
         }
@@ -254,3 +261,7 @@ Contributions are welcome! Please fork the repository and submit a pull request 
 ---
 
 _This README was generated and updated by ChatGPT based on the provided `Random.cpp` and `Random.h` implementations._
+
+```
+
+```

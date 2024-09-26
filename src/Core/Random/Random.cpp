@@ -112,8 +112,8 @@ double Random::random_gamma(double shape, double scale) {
 
 // Generates multinomially distributed random numbers
 void Random::random_multinomial(std::size_t categories, unsigned trials,
-                                const std::vector<double>& probabilities,
-                                std::vector<unsigned>& results) {
+                                const std::vector<double> &probabilities,
+                                std::vector<unsigned> &results) {
   if (!rng_) {
     throw std::runtime_error("Random number generator not initialized.");
   }
@@ -122,7 +122,8 @@ void Random::random_multinomial(std::size_t categories, unsigned trials,
         "Parameter 'categories' must be greater than 0.");
   }
   if (probabilities.size() != categories || results.size() != categories) {
-    throw std::invalid_argument("Size of 'probabilities' and 'results' must match 'categories'.");
+    throw std::invalid_argument(
+        "Size of 'probabilities' and 'results' must match 'categories'.");
   }
   gsl_ran_multinomial(rng_.get(), static_cast<unsigned int>(categories), trials,
                       probabilities.data(), results.data());
@@ -157,6 +158,9 @@ double Random::cdf_gamma_distribution_inverse(double probability, double alpha,
                                               double beta) {
   if (!rng_) {
     throw std::runtime_error("Random number generator not initialized.");
+  }
+  if (probability < 0.0 || probability > 1.0) {
+    throw std::invalid_argument("Parameter 'probability' must be in [0, 1].");
   }
   return gsl_cdf_gamma_Pinv(probability, alpha, beta);
 }
