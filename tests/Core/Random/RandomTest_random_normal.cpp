@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "RandomTestBase.h"
+#include "helpers/test_helpers.h"
 
 // Exception Tests
 TEST_F(RandomTest, random_normal_ThrowsWhenStdDevNonPositive_Integral) {

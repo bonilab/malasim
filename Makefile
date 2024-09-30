@@ -27,7 +27,7 @@ run r: build
 	./$(APP_EXECUTABLE)
 
 clean:
-	rm -rf build $(DOCS_OUTPUT_DIR)
+	rm -rf build
 
 setup-vcpkg:
 	if [ -n "$(VCPKG_ROOT)" ] && [ ! -x "$(VCPKG_EXEC)" ]; then \

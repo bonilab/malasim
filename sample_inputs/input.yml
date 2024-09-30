@@ -8,17 +8,16 @@
 # 1. Execution Settings
 # ---------------------------------------------------------------
 execution_settings:
-  # Number of model days between updates to the user
-  days_between_notifications: 30
-  
-  # Initial seed number for random number generator; set to 0 or comment out to use a random seed
-  initial_seed_number: 0
-  
+  # The number of days between each output to the standard output (stdout).
+  # This variable defines the frequency at which notifications or logs
+  # are sent to stdout, measured in days.
+  days_between_stdout_output: 30
+
+  # Initial seed number for random number generator; set to -1 or comment out to use a random seed
+  initial_seed_number: -1
+
   # Record the genomic data (set to true for a real run)
   record_genome_db: true
-  
-  # Frequency (in days) to report to GUI and console
-  report_frequency: 30
 
 # ---------------------------------------------------------------
 # 2. Simulation Timeframe
@@ -26,76 +25,125 @@ execution_settings:
 simulation_timeframe:
   # Simulation starting date (calibration year minus 11 years of burn-in)
   starting_date: 2000/1/1
-  
+
   # Start of comparison period (mutations start in 2010)
   start_of_comparison_period: 2010/1/1
-  
+
   # Simulation ending date
   ending_date: 2030/1/1
-  
-  # Day to start collecting data (discard the first five years of data)
+
+  # Day to start collecting data
   start_collect_data_day: 0
-  
-  # Number of days to keep track of the total number of parasites in the population
-  number_of_tracking_days: 11
 
 # ---------------------------------------------------------------
 # 3. Transmission Settings
 # ---------------------------------------------------------------
 transmission_settings:
-  # Transmission parameter based on data; adjusts the odds that an individual will be infected when challenged by sporozoites
+  # Transmission parameter based on data; adjusts the odds that an individual
+  # will be infected when challenged by sporozoites
+  # NOTE: this from Robert's sporozoites challenged, Kien to review this
   transmission_parameter: 0.55
-  
+
   # Probability that an infectious bite on a human causes a blood-stage malaria infection
   p_infection_from_an_infectious_bite: 0.1
 
 # ---------------------------------------------------------------
 # 4. Population Structure
 # ---------------------------------------------------------------
-population_structure:
+population_demographic:
   # Number of age classes used for reporting age-specific mortality calculations
   number_of_age_classes: 15
-  
+
   # Age structure used for reporting (in years)
   age_structure: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 20, 60, 100]
-  
+
   # Initial age structure used when initializing the model at T=0
   initial_age_structure: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 25, 35, 45, 55, 65, 100]
-  
+
+  # Crude birth rate (to be updated with specific country data)
+  birth_rate: 0.0288
+
+  # Malaria-adjusted all-cause death rate by age class (to be updated with specific country data)
+  death_rate_by_age_class:
+    - [0.02641, 0.00202, 0.00202, 0.00202, 0.00198, 0.00247, 0.00247, 0.00247, 0.00247, 0.00247, 0.00247, 0.00247, 0.00455, 0.00455, 0.05348]
+
+  # Probability of death for patients who are not treated or experience a treatment failure
+  # When receiving treatment, this rate drops by a factor of 10 in the code
+  mortality_when_treatment_fail_by_age_class:
+    - [0.040, 0.020, 0.020, 0.020, 0.020, 0.004, 0.004, 0.004, 0.004, 0.004, 0.004, 0.001, 0.001, 0.001, 0.001]
   # Scaling factor for the population in the model (based on data)
   artificial_rescaling_of_population_size: 0.25
 
 # ---------------------------------------------------------------
 # 5. Raster and Geographic Settings
 # ---------------------------------------------------------------
-raster_settings:
-  # Adjusted population raster to account for burn-in up to 2009 start
-  population_raster: "../input/kag_init_pop.asc"
-  
-  # Raster files defining the country districts
-  district_raster: "../input/kag_district.asc"
-  
-  # Raster files defining treatment probabilities (comment these out for beta calibration)
-  pr_treatment_under5: "../input/kag_treatment.asc"
-  pr_treatment_over5: "../input/kag_treatment.asc"
-  
-  # Raster file containing the calibrated beta value
-  beta_raster: "../input/kag_beta_r1.asc"
-  
-  # Cell size used by raster, in square kilometers
-  cell_size: 5
-  
-  # Approximate national age distribution (to be updated with specific country data)
-  age_distribution_by_location:
-    - [0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0]
-  
-  # Probability that an infected and symptomatic person receives treatment; single value for the entire country
-  # If set to '-1', these values are read from 'pr_treatment_under5' and 'pr_treatment_over5' above
-  p_treatment_for_less_than_5_by_location: [-1]
-  p_treatment_for_more_than_5_by_location: [-1]
-  
-  # Will be overridden by beta_raster
-  beta_by_location: [-1]
+spatial_settings:
+  mode: "grid_based" # or "location_based"
+  grid_based:
+    # Adjusted population raster to account for burn-in up to 2009 start
+    population_raster: "../input/kag_init_pop.asc"
+
+    # Raster files defining the country districts
+    district_raster: "../input/kag_district.asc"
+
+    # Raster files defining treatment probabilities (comment these out for beta calibration)
+    p_treatment_under_5: "../input/kag_treatment.asc"
+    p_treatment_over_5: "../input/kag_treatment.asc"
+
+    # Probability that an infected and symptomatic person receives treatment; single value for the entire country
+    # If set to '-1', these values are read from 'pr_treatment_under5' and 'pr_treatment_over5' above
+    p_treatment_under_5_by_location: [-1]
+    p_treatment_over_5_by_location: [-1]
+
+    # Raster file containing the calibrated beta value
+    beta_raster: "../input/kag_beta_r1.asc"
+    # Will be overridden by beta_raster
+    beta_by_location: [-1]
+
+    # Cell size used by raster, in square kilometers
+    cell_size: 5
+
+    # Approximate national age distribution (to be updated with specific country data)
+    age_distribution_by_location:
+      - [0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0]
+  location_based:
+    location_db:
+      #id, latitude, longitude
+      location_info:
+        - [0, 0, 0]
+        - [1, 0, 1]
+        - [2, 0, 2]
+        - [3, 1, 0]
+        - [4, 1, 1]
+        - [5, 1, 2]
+        - [6, 2, 0]
+        - [7, 2, 1]
+        - [8, 2, 2]
+
+      #if the number of values less than number of locations, the first value will be applied for all locations
+      age_distribution_by_location:
+        - [0.0334, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
+        - [0.0334, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
+        - [0.0335, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
+        - [0.0335, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
+        - [0.0336, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
+        - [0.0336, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
+        - [0.0337, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
+        - [0.0337, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
+        - [0.0338, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
+
+      # probability that a symptomatic and infected individual seeks and receives antimalarial treatment
+      #if the number of values less than number of locations, the first value will be applied for all locations
+      # this is the initial value, the modification values can be change by setting in events node
+      p_treatment_for_less_than_5_by_location: [0.600000]
+      p_treatment_for_more_than_5_by_location: [0.500000]
+
+      #transmission intensity
+      #if the number of values less than number of locations, the first value will be applied for all locations
+      beta_by_location: [0.05]
+
+      #if the number of values less than number of locations, the first value will be applied for all locations
+      population_size_by_location: [1000, 10020, 10030, 10040, 10050, 10060, 10070, 10080, 10090]
 
 # ---------------------------------------------------------------
 # 6. Seasonality Settings
@@ -107,6 +155,11 @@ seasonality_settings:
   rainfall:
     filename: "rwa_adjustment.csv"
     period: 365
+  simple:
+    a: [1]
+    phi: [250]
+    min_value: [0.1]
+    period: 365
 
 # ---------------------------------------------------------------
 # 7. Movement and Spatial Model
@@ -115,12 +168,16 @@ movement_settings:
   # Country-specific movement model and calibration
   spatial_model:
     name: "Wesolowski"
+    Barabasi:
+      r_g_0: 5.8
+      beta_r: 1.65
+      kappa: 350
     Wesolowski:
       kappa: 0.01093251
       alpha: 0.22268982
       beta: 0.14319618
       gamma: 0.83741484
-  
+
   # Settings that determine how long an individual stays in a given location
   circulation_info:
     max_relative_moving_value: 35
@@ -130,28 +187,12 @@ movement_settings:
       Gamma:
         mean: 5
         sd: 10
-    
+
     # Percentage of the population selected for movement outside of their cell each timestep
-    circulation_percent: 0.0
+    circulation_percent: 0.00336
     length_of_stay:
       mean: 5
       sd: 10
-
-# ---------------------------------------------------------------
-# 8. Demographic Parameters
-# ---------------------------------------------------------------
-demographic_parameters:
-  # Crude birth rate (to be updated with specific country data)
-  birth_rate: 0.0288
-  
-  # Malaria-adjusted all-cause death rate by age class (to be updated with specific country data)
-  death_rate_by_age_class:
-    - [0.02641, 0.00202, 0.00202, 0.00202, 0.00198, 0.00247, 0.00247, 0.00247, 0.00247, 0.00247, 0.00247, 0.00247, 0.00455, 0.00455, 0.05348]
-  
-  # Probability of death for patients who are not treated or experience a treatment failure
-  # When receiving treatment, this rate drops by a factor of 10 in the code
-  mortality_when_treatment_fail_by_age_class:
-    - [0.040, 0.020, 0.020, 0.020, 0.020, 0.004, 0.004, 0.004, 0.004, 0.004, 0.004, 0.001, 0.001, 0.001, 0.001]
 
 # ---------------------------------------------------------------
 # 9. Parasite Parameters
@@ -159,20 +200,20 @@ demographic_parameters:
 parasite_parameters:
   parasite_density_levels:
     # Standard values used in other models
-    log_parasite_density_cured: -4.699       # Corresponds to 100 total parasites (0.00002 per μl)
-    log_parasite_density_from_liver: -2.000  # Corresponds to 50,000 total parasites (0.01 per μl)
-    log_parasite_density_asymptomatic: 3     # Corresponds to 1,000 parasites per μl of blood
-    log_parasite_density_clinical: 4.301     # Corresponds to 20,000 parasites per μl of blood
-    log_parasite_density_clinical_from: 3.301  # Corresponds to 2,000 parasites per μl of blood
-    log_parasite_density_clinical_to: 5.301    # Corresponds to 200,000 parasites per μl of blood
-    log_parasite_density_detectable: 1.000     # Corresponds to 10 parasites per μl of blood
+    log_parasite_density_cured: -4.699 # Corresponds to 100 total parasites (0.00002 per μl)
+    log_parasite_density_from_liver: -2.000 # Corresponds to 50,000 total parasites (0.01 per μl)
+    log_parasite_density_asymptomatic: 3 # Corresponds to 1,000 parasites per μl of blood
+    log_parasite_density_clinical: 4.301 # Corresponds to 20,000 parasites per μl of blood
+    log_parasite_density_clinical_from: 3.301 # Corresponds to 2,000 parasites per μl of blood
+    log_parasite_density_clinical_to: 5.301 # Corresponds to 200,000 parasites per μl of blood
+    log_parasite_density_detectable: 1.000 # Corresponds to 10 parasites per μl of blood
     log_parasite_density_detectable_pfpr: 1.699 # Corresponds to 100 parasites per μl of blood
-    log_parasite_density_pyrogenic: 3.398      # Corresponds to 2,500 parasites per μl of blood
+    log_parasite_density_pyrogenic: 3.398 # Corresponds to 2,500 parasites per μl of blood
 
   recombination_parameters:
     # Within-chromosome recombination rate
     within_chromosome_recombination_rate: 0.1
-    
+
     # Free recombination among the drug resistance loci
     using_free_recombination: true
 
@@ -181,64 +222,64 @@ parasite_parameters:
 # ---------------------------------------------------------------
 immune_system_parameters:
   # Parameters governing the immune response
-  b1: 0.00125  # Rate at which antimalarial immune function increases when a host is parasitemic
-  b2: 0.0025   # Rate at which antimalarial immune function decreases when a host is parasitemic
-  duration_for_naive: 300        # Duration of infection for naive hosts
-  duration_for_fully_immune: 60  # Duration of infection for fully immune hosts
-  mean_initial_condition: 0.1    # Initial immune function mean at time zero
-  sd_initial_condition: 0.1      # Initial immune function standard deviation at time zero
-  immune_inflation_rate: 0.01    # Age-dependent faster acquisition of immunity from age 1 to age 10 (per year)
+  b1: 0.00125 # Rate at which antimalarial immune function increases when a host is parasitemic
+  b2: 0.0025 # Rate at which antimalarial immune function decreases when a host is parasitemic
+  duration_for_naive: 300 # Duration of infection for naive hosts
+  duration_for_fully_immune: 60 # Duration of infection for fully immune hosts
+  mean_initial_condition: 0.1 # Initial immune function mean at time zero
+  sd_initial_condition: 0.1 # Initial immune function standard deviation at time zero
+  immune_inflation_rate: 0.01 # Age-dependent faster acquisition of immunity from age 1 to age 10 (per year)
   min_clinical_probability: 0.05 # Minimum probability of experiencing symptoms from a new infection
   max_clinical_probability: 0.99 # Maximum probability of experiencing symptoms from a new infection
   immune_effect_on_progression_to_clinical: 5.4 # Slope of the sigmoidal probability vs. immunity function
-  age_mature_immunity: 10        # Age at which immune function is mature
+  age_mature_immunity: 10 # Age at which immune function is mature
   factor_effect_age_mature_immunity: 0.3 # Adjusts the inflection point in the curve
-  midpoint: 0.4                  # Midpoint for the immunity curve
+  midpoint: 0.4 # Midpoint for the immunity curve
 
 # ---------------------------------------------------------------
 # 11. Mutation and Genotype Parameters
 # ---------------------------------------------------------------
-mutation_and_genotype_parameters:
+genotype_parameters:
   # Mutation mask indicating positions of genetic mutations
   mutation_mask: "||||111||1111111,0||||||000000000010|1"
-  
+
   # Daily probability that a parasite will mutate at a given locus when drug concentration is not zero
   mutation_probability_by_locus: 0.001
-  
+
   pf_genotype_info:
     - chromosome: 5
       genes:
         - name: "Pfmdr1"
           max_copies: 2
           # copy number variation cost of resistances
-          cnv_daily_crs: [ 0, 0.0005 ]
+          cnv_daily_crs: [0, 0.0005]
           cnv_multiplicative_effect_on_EC50:
             - drug_id: 4
-              factors: [ 1, 2.44444444 ]
+              factors: [1, 2.44444444]
             - drug_id: 1
-              factors: [ 1, 1.3 ]
+              factors: [1, 1.3]
           multiplicative_effect_on_EC50_for_2_or_more_mutations:
             - drug_id: 1
               factor: 1.05
           aa_positions:
             - position: 86
-              amino_acids: [ 'N', 'Y' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["N", "Y"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 6
-                  factors: [ 1, 1.25 ]
+                  factors: [1, 1.25]
                 - drug_id: 1
-                  factors: [ 1.25, 1 ]
+                  factors: [1.25, 1]
                 - drug_id: 2
-                  factors: [ 1, 1.42 ]
+                  factors: [1, 1.42]
             - position: 184
-              amino_acids: [ 'Y', 'F' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["Y", "F"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 1
-                  factors: [ 1, 1.25 ] # base*1.25*1.25 0.9375 > 0.8xxx (old value)
+                  factors: [1, 1.25] # base*1.25*1.25 0.9375 > 0.8xxx (old value)
                 - drug_id: 2
-                  factors: [ 1.2, 1 ]
+                  factors: [1.2, 1]
     - chromosome: 7
       genes:
         - name: "Pfcrt"
@@ -249,59 +290,59 @@ mutation_and_genotype_parameters:
           # 0.1290 is average of (0.1169,0.0081,0.2621 -  converted from fitness (2.19,2.46,1.83)) from Small-Sander PLOS 2019 paper (Mar 1 23 slides)
           aa_positions:
             - position: 76
-              amino_acids: [ 'K', 'T' ]
-              daily_crs: [ 0, 0.003875969 ]
+              amino_acids: ["K", "T"]
+              daily_crs: [0, 0.003875969]
               multiplicative_effect_on_EC50:
                 - drug_id: 6
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
                 - drug_id: 1å
-                  factors: [ 1.1, 1 ]
+                  factors: [1.1, 1]
                 - drug_id: 2
-                  factors: [ 1, 1.2 ]
+                  factors: [1, 1.2]
             - position: 93
-              amino_acids: [ 'T', 'S' ]
-              daily_crs: [ 0, 0.0002433748 ] #0.0000313953492  = (0.0081/0.1290)*0.0005
+              amino_acids: ["T", "S"]
+              daily_crs: [0, 0.0002433748] #0.0000313953492  = (0.0081/0.1290)*0.0005
               multiplicative_effect_on_EC50:
                 - drug_id: 3
-                  factors: [ 1, 1.6648 ]
+                  factors: [1, 1.6648]
             - position: 97
-              amino_acids: [ 'H', 'Y' ]
-              daily_crs: [ 0, 0.003875969 ] #0.000500000001
+              amino_acids: ["H", "Y"]
+              daily_crs: [0, 0.003875969] #0.000500000001
               multiplicative_effect_on_EC50:
                 - drug_id: 3
-                  factors: [ 1, 1.6648 ]
+                  factors: [1, 1.6648]
             - position: 145
-              amino_acids: [ 'F', 'I' ]
-              daily_crs: [ 0, 0.0078751277 ] #0.0010158914733  = (0.2621/0.1290)*0.0005
+              amino_acids: ["F", "I"]
+              daily_crs: [0, 0.0078751277] #0.0010158914733  = (0.2621/0.1290)*0.0005
               multiplicative_effect_on_EC50:
                 - drug_id: 3
-                  factors: [ 1, 2.2226 ]
+                  factors: [1, 2.2226]
             - position: 218
-              amino_acids: [ 'I', 'F' ]
-              daily_crs: [ 0, 0.0035124091 ] #0.0004531007739 = (0.1169/0.1290)*0.0005
+              amino_acids: ["I", "F"]
+              daily_crs: [0, 0.0035124091] #0.0004531007739 = (0.1169/0.1290)*0.0005
               multiplicative_effect_on_EC50:
                 - drug_id: 3
-                  factors: [ 1, 1.6648 ]
+                  factors: [1, 1.6648]
             - position: 343
-              amino_acids: [ 'M', 'L' ]
-              daily_crs: [ 0, 0.003875969 ] #0.000500000001
+              amino_acids: ["M", "L"]
+              daily_crs: [0, 0.003875969] #0.000500000001
               multiplicative_effect_on_EC50:
                 - drug_id: 3
-                  factors: [ 1, 1.0 ]
+                  factors: [1, 1.0]
             - position: 353
-              amino_acids: [ 'G', 'V' ]
-              daily_crs: [ 0, 0.003875969 ] #0.000500000001
+              amino_acids: ["G", "V"]
+              daily_crs: [0, 0.003875969] #0.000500000001
               multiplicative_effect_on_EC50:
                 - drug_id: 3
-                  factors: [ 1, 1.0 ]
+                  factors: [1, 1.0]
         - name: "Pfkaf"
           aa_positions:
             - position: 500
-              amino_acids: [ 'x', 'X' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["x", "X"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 7
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
     - chromosome: 13
       genes:
         - name: "Pfkelch13"
@@ -310,87 +351,87 @@ mutation_and_genotype_parameters:
               factor: 1.1
           aa_positions:
             - position: 446
-              amino_acids: [ 'F', 'I' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["F", "I"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 0
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
             - position: 458
-              amino_acids: [ 'N', 'Y' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["N", "Y"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 0
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
             - position: 469
-              amino_acids: [ 'C', 'Y' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["C", "Y"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 0
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
             - position: 476
-              amino_acids: [ 'M', 'I' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["M", "I"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 0
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
             - position: 493
-              amino_acids: [ 'Y', 'H' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["Y", "H"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 0
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
             - position: 539
-              amino_acids: [ 'R', 'T' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["R", "T"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 0
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
             - position: 543
-              amino_acids: [ 'I', 'T' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["I", "T"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 0
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
             - position: 553
-              amino_acids: [ 'P', 'L' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["P", "L"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 0
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
             - position: 561
-              amino_acids: [ 'R', 'H' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["R", "H"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 0
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
             - position: 574
-              amino_acids: [ 'P', 'L' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["P", "L"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 0
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
             - position: 580
-              amino_acids: [ 'C', 'Y' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["C", "Y"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 0
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
             - position: 675
-              amino_acids: [ 'A', 'V' ]
-              daily_crs: [ 0, 0.0005 ]
+              amino_acids: ["A", "V"]
+              daily_crs: [0, 0.0005]
               multiplicative_effect_on_EC50:
                 - drug_id: 0
-                  factors: [ 1, 1.6 ]
+                  factors: [1, 1.6]
     - chromosome: 14
       genes:
         - name: "Pfplasmepsin"
           max_copies: 2
-          cnv_daily_crs: [ 0, 0.0005 ]
+          cnv_daily_crs: [0, 0.0005]
           cnv_multiplicative_effect_on_EC50:
             - drug_id: 3
               #            factors: [ 1, 2.4137931 ]
-              factors: [ 1, 1.37 ]
-          aa_positions: [ ]
+              factors: [1, 1.37]
+          aa_positions: []
 
   override_ec50_patterns:
     - pattern: "||||NY1||K......,.||||||............|."
@@ -465,9 +506,9 @@ mutation_and_genotype_parameters:
     - pattern: "||||YF.||T......,.||||||............|."
       drug_id: 2
       ec50: 0.82
-      
+
   initial_parasite_info:
-    - location_id: -1  # -1 indicates all locations
+    - location_id: -1 # -1 indicates all locations
       parasite_info:
         - aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
           prevalence: 0.05
@@ -478,17 +519,13 @@ mutation_and_genotype_parameters:
 # 12. Drug Parameters
 # ---------------------------------------------------------------
 drug_parameters:
-  # IDs for specific drugs
-  artemisinin_drug_id: 0
-  lumefantrine_drug_id: 4
-  
   drug_db:
     0:
       name: "artemisinin"
       half_life: 0.0
       maximum_parasite_killing_rate: 0.999
       n: 25
-      age_specific_drug_concentration_sd: [ 0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4 ]
+      age_specific_drug_concentration_sd: [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
       k: 4
       base_EC50: 0.75
     1:
@@ -496,8 +533,8 @@ drug_parameters:
       half_life: 4.5
       maximum_parasite_killing_rate: 0.99
       n: 20
-      age_specific_drug_concentration_sd: [ 0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4 ]
-      age_specific_drug_absorption: [ 0.7,0.7,0.85,0.85,0.85,0.85,0.85,0.85,0.85,0.85,1.0,1.0,1.0,1.0,1.0 ]
+      age_specific_drug_concentration_sd: [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
+      age_specific_drug_absorption: [0.7, 0.7, 0.85, 0.85, 0.85, 0.85, 0.85, 0.85, 0.85, 0.85, 1.0, 1.0, 1.0, 1.0, 1.0]
       k: 4
       base_EC50: 0.6
     2:
@@ -505,7 +542,7 @@ drug_parameters:
       half_life: 9.0
       maximum_parasite_killing_rate: 0.95
       n: 19
-      age_specific_drug_concentration_sd: [ 0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4 ]
+      age_specific_drug_concentration_sd: [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
       k: 4
       base_EC50: 0.5
     3:
@@ -513,7 +550,7 @@ drug_parameters:
       half_life: 28.0
       maximum_parasite_killing_rate: 0.9
       n: 15
-      age_specific_drug_concentration_sd: [ 0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4 ]
+      age_specific_drug_concentration_sd: [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
       k: 4
       base_EC50: 0.58
     #MQ
@@ -522,25 +559,25 @@ drug_parameters:
       half_life: 21.0
       maximum_parasite_killing_rate: 0.9
       n: 15
-      age_specific_drug_concentration_sd: [ 0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4 ]
+      age_specific_drug_concentration_sd: [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
       k: 4
       base_EC50: 0.45
-      resistant_genes: [ "Pfmdr1" ]
+      resistant_genes: ["Pfmdr1"]
     5:
       name: "SP"
       half_life: 6.5
       maximum_parasite_killing_rate: 0.9
-      age_specific_drug_concentration_sd: [ 0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4 ]
+      age_specific_drug_concentration_sd: [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
       n: 15
       k: 4
       base_EC50: 1.08
-      resistant_genes: [ ]
+      resistant_genes: []
     6:
       name: "CQ"
       half_life: 10
       maximum_parasite_killing_rate: 0.95
       n: 19
-      age_specific_drug_concentration_sd: [ 0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4 ]
+      age_specific_drug_concentration_sd: [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
       k: 4
       base_EC50: 0.72
     7:
@@ -548,7 +585,7 @@ drug_parameters:
       half_life: 1.6
       maximum_parasite_killing_rate: 0.99
       n: 15
-      age_specific_drug_concentration_sd: [ 0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4 ]
+      age_specific_drug_concentration_sd: [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
       k: 4
       base_EC50: 0.55
     8:
@@ -556,7 +593,7 @@ drug_parameters:
       half_life: 7
       maximum_parasite_killing_rate: 0.8
       n: 15
-      age_specific_drug_concentration_sd: [ 0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4,0.4 ]
+      age_specific_drug_concentration_sd: [0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
       k: 4
       base_EC50: 0.68
 
@@ -566,10 +603,10 @@ drug_parameters:
 therapy_parameters:
   # Testing day for determining if treatment failed
   tf_testing_day: 28
-  
+
   # Treatment failure rate used to determine whether a therapy is "useful"
   tf_rate: 0.1
-  
+
   therapy_db:
     #mono as
     0:
@@ -597,27 +634,27 @@ therapy_parameters:
       dosing_days: [3]
     #AL
     6:
-      drug_id: [0,1]
+      drug_id: [0, 1]
       dosing_days: [3]
     #AS-AQ
     7:
-      drug_id: [0,2]
+      drug_id: [0, 2]
       dosing_days: [3]
     # DHA-PPQ
     8:
-      drug_id: [0,3]
+      drug_id: [0, 3]
       dosing_days: [3]
     #AS-MQ
     9:
-      drug_id: [0,4]
+      drug_id: [0, 4]
       dosing_days: [3]
     #TACT DHA-PPQ-MQ
     10:
-      drug_id: [0,3,4]
+      drug_id: [0, 3, 4]
       dosing_days: [3]
     #TACT AL-AQ
     11:
-      drug_id: [0,1,2]
+      drug_id: [0, 1, 2]
       dosing_days: [3]
     #CQ
     12:
@@ -632,15 +669,12 @@ therapy_parameters:
 # 14. Treatment Strategy Parameters
 # ---------------------------------------------------------------
 strategy_parameters:
-  # Initial treatment strategy ID
-  initial_strategy_id: 15
-  
   strategy_db:
     0:
       name: SP-AQ-CQ-AL-MFTStrategy
       type: MFT
-      therapy_ids: [5,2,12,6]
-      distribution: [0.3,0.3,0.3,0.1]
+      therapy_ids: [5, 2, 12, 6]
+      distribution: [0.3, 0.3, 0.3, 0.1]
     1:
       name: AL-SFTStrategy
       type: SFT
@@ -652,39 +686,39 @@ strategy_parameters:
     3:
       name: CyclingStrategy
       type: Cycling
-      therapy_ids: [8,7,6]
+      therapy_ids: [8, 7, 6]
       cycling_time: 1825
     4:
       name: AdaptiveCyclingStrategy
       type: AdaptiveCycling
-      therapy_ids: [8,7,6]
+      therapy_ids: [8, 7, 6]
       trigger_value: 0.1
       delay_until_actual_trigger: 365
       turn_off_days: 365
     5:
       name: MFTStrategy
       type: MFT
-      therapy_ids: [8,7,6]
-      distribution: [0.333333,0.333333,0.333334]
+      therapy_ids: [8, 7, 6]
+      distribution: [0.333333, 0.333333, 0.333334]
     6:
       name: AL-ASAQ-DP-MFTRebalancingStrategy1
       type: MFTRebalancing
-      therapy_ids: [8,7,6]
-      distribution: [0.333333,0.333333,0.333334]
+      therapy_ids: [8, 7, 6]
+      distribution: [0.333333, 0.333333, 0.333334]
       delay_until_actual_trigger: 365
       update_duration_after_rebalancing: 365
     7:
       name: AL-ASAQ-DP-MFTRebalancingStrategy2
       type: MFTRebalancing
-      therapy_ids: [8,7,6]
-      distribution: [0.333333,0.333333,0.333334]
+      therapy_ids: [8, 7, 6]
+      distribution: [0.333333, 0.333333, 0.333334]
       delay_until_actual_trigger: 365
       update_duration_after_rebalancing: 730
     8:
       name: AL-ASAQ-DP-MFTRebalancingStrategy4
       type: MFTRebalancing
-      therapy_ids: [8,7,6]
-      distribution: [0.333333,0.333333,0.333334]
+      therapy_ids: [8, 7, 6]
+      distribution: [0.333333, 0.333333, 0.333334]
       delay_until_actual_trigger: 365
       update_duration_after_rebalancing: 1460
     9:
@@ -698,23 +732,23 @@ strategy_parameters:
     11:
       name: AL-BaseLineStrategy
       type: NestedMFT
-      strategy_ids: [1,0]
+      strategy_ids: [1, 0]
       start_distribution: [0.05, 0.95]
-      peak_distribution: [0.8,0.2]
+      peak_distribution: [0.8, 0.2]
       peak_after: 3650
     12:
       name: ASAQ-BaseLineStrategy
       type: NestedMFT
-      strategy_ids: [2,0]
+      strategy_ids: [2, 0]
       start_distribution: [0.05, 0.95]
-      peak_distribution: [0.8,0.2]
+      peak_distribution: [0.8, 0.2]
       peak_after: 3650
     13:
       name: BaseLineStrategy
       type: NestedMFTMultiLocation
-      strategy_ids: [0,1]
+      strategy_ids: [0, 1]
       start_distribution: [[0.05, 0.95]]
-      peak_distribution: [[0.8,0.2]]
+      peak_distribution: [[0.8, 0.2]]
       peak_after: 3650
     14:
       name: DHAPPQ-SFTStrategy
@@ -725,25 +759,44 @@ strategy_parameters:
       type: SFT
       therapy_id: 13
 
+  # Initial treatment strategy ID
+  initial_strategy_id: 15
+
+  # this is second line treatment for recurrence cases
+  # -1 means use the same first line treatment for second line treatment
+  recurrent_therapy_id: -1
+
+  mass_drug_administration:
+    # NOTE: This should be set with events to schedule rounds for MDA
+    enable: false
+    mda_therapy_id: 8
+    age_bracket_prob_individual_present_at_mda: [10, 40]
+    mean_prob_individual_present_at_mda: [0.85, 0.75, 0.85]
+    sd_prob_individual_present_at_mda: [0.3, 0.3, 0.3]
 # ---------------------------------------------------------------
 # 15. Epidemiological Parameters
 # ---------------------------------------------------------------
 epidemiological_parameters:
+  # number of days to keep track total number of parasites in population
+  # in other words, the simulation stores 11 days of mosquitoes-biting-on-humans history
+  # if an individual is infected today, the infection type and probability will be based
+  # on the biting that took place 11 days ago
+  number_of_tracking_days: 11
   # Days from end of liver-stage infection to appearance of symptoms
   days_to_clinical_under_five: 4
   days_to_clinical_over_five: 6
-  
+
   # Days for parasites to develop mature gametocytes after exiting liver stage
   # Note: There are no explicit gametocytes in version 3.0.2 of the simulation
   days_mature_gametocyte_under_five: 4
   days_mature_gametocyte_over_five: 6
-  
+
   # Probability that a patient completes a course of treatment
   p_compliance: 1
-  
+
   # Guarantees that the minimum number of dosing days for a poorly complying patient is still 1
   min_dosing_days: 1
-  
+
   # Relative biting rates for individuals
   relative_biting_info:
     max_relative_biting_value: 35
@@ -754,39 +807,40 @@ epidemiological_parameters:
       Gamma:
         mean: 5
         sd: 10
-  
+
   # Gametocyte levels under artemisinin action and when full
   gametocyte_level_under_artemisinin_action: 1.0
   gametocyte_level_full: 1.0
-  
+
   # Parameters determining the probability a mosquito becomes infected based on the host's parasitemia level
   relative_infectivity:
     sigma: 3.91
     ro: 0.00031
-    blood_meal_volume: 3  # Average blood meal volume in microliters
-  
+    blood_meal_volume: 3 # Average blood meal volume in microliters
+
   # Probability of relapse after no treatment or treatment failure
   p_relapse: 0.01
-  
+
   # Number of days before a relapse can occur
   relapse_duration: 30
-  
+
   # Relapse rate used to increase parasite density after treatment failure
   # Multiply by sqrt(20) per day
   relapseRate: 4.4721
-  
+
   # Minimum update frequency for a host's attributes (especially parasite density)
+  # NOTE: consider remove this value as Person will be updated daily
   update_frequency: 7
-  
+
   # Allows new co-infections to cause symptoms in infected but asymptomatic hosts
   allow_new_coinfection_to_cause_symptoms: true
-  
+
   # Window size for observing treatment failure rates
   tf_window_size: 60
-  
+
   # Fraction of mosquitoes experiencing interrupted feeding
   fraction_mosquitoes_interrupted_feeding: 0.0
-  
+
   # Inflation factor for certain calculations
   inflation_factor: 0.01
 
@@ -797,7 +851,7 @@ mosquito_parameters:
   mosquito_config:
     interrupted_feeding_rate: [0.19]
     prmc_size: 100
-  
+
   # Within-host induced free recombination
   within_host_induced_free_recombination: true
 

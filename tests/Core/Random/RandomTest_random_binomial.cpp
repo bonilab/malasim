@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "RandomTestBase.h"
+#include "helpers/test_helpers.h"
 
 // Test that random_binomial throws when probability is less than 0.0
 TEST_F(RandomTest, random_binomial_ThrowsWhenProbabilityLessThanZero) {

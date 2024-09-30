@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "RandomTestBase.h"
+#include "helpers/test_helpers.h"
 
 // Test that random_beta throws when alpha is non-positive
 TEST_F(RandomTest, random_beta_ThrowsWhenAlphaNonPositive) {

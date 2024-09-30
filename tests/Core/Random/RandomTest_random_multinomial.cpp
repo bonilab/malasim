@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "RandomTestBase.h"
+#include "helpers/test_helpers.h"
 
 // Test that random_multinomial throws when categories is zero
 TEST_F(RandomTest, random_multinomial_ThrowsWhenCategoriesZero) {

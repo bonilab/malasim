@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include "RandomTestBase.h"
+#include "helpers/test_helpers.h"
 
 // Test that random_gamma throws when shape is non-positive
 TEST_F(RandomTest, random_gamma_ThrowsWhenShapeNonPositive) {

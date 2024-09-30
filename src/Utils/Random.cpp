@@ -9,12 +9,13 @@
 #include <gsl/gsl_cdf.h>
 #include <gsl/gsl_randist.h>
 
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <random>
 #include <stdexcept>
 #include <vector>
+
+using namespace Utils;
 
 // Constructor
 Random::Random(gsl_rng* rng, uint64_t seed) : seed_(seed) {
@@ -42,7 +43,7 @@ void Random::initialize(uint64_t initial_seed) {
 
   // Use std::random_device to generate a random seed if seed is 0
   std::random_device rd;
-  seed_ = (initial_seed == 0) ? rd() : initial_seed;
+  seed_ = (initial_seed == -1) ? rd() : initial_seed;
 
   // Log the seed value
   // LOG(INFO) << fmt::format("Random initializing with seed: {}", seed_);

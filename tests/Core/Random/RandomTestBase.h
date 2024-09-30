@@ -5,13 +5,12 @@
 
 #include <gtest/gtest.h>
 
-#include "Core/Random/Random.h"
-#include "helpers/test_helpers.h"
+#include "Utils/Random.h"
 
 // Test fixture for Random class
 class RandomTest : public ::testing::Test {
 protected:
-  Random rng;
+  Utils::Random rng;
   void SetUp() override {
     // Optional: Initialize any shared resources
   }

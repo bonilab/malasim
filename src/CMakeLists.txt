@@ -1,5 +1,6 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(GSL REQUIRED)
+find_package(yaml-cpp CONFIG REQUIRED)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
@@ -7,7 +8,8 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 # Add source files for the core library
 file(GLOB_RECURSE MALASIM_CORE_SOURCES
   "*.cpp"
-  "Core/Random/*.cpp"
+  "Config/*.cpp"
+  "Utils/*.cpp"
 )
 
 # Add source files for the core library
@@ -20,6 +22,7 @@ add_library(MalaSimCore STATIC
 target_link_libraries(MalaSimCore PUBLIC
   fmt::fmt
   GSL::gsl GSL::gslcblas
+  yaml-cpp::yaml-cpp
 )
 
 set_property(TARGET MalaSimCore PROPERTY CXX_STANDARD 20)

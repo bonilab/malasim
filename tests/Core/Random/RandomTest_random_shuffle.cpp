@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "RandomTestBase.h"
+#include "helpers/test_helpers.h"
 
 // test that random_shuffle throws when the input vector is empty
 TEST_F(RandomTest, random_shuffle_ThrowsWhenInputEmpty) {

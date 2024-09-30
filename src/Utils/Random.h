@@ -12,6 +12,7 @@
 #include <memory>
 #include <vector>
 
+namespace Utils {
 /**
  * @class Random
  * @brief Encapsulates random number generation functionalities using GSL.
@@ -39,7 +40,7 @@ public:
    *
    * @param external_rng Pointer to an external GSL RNG. Defaults to nullptr.
    */
-  explicit Random(gsl_rng* external_rng = nullptr, uint64_t seed = 0);
+  explicit Random(gsl_rng* external_rng = nullptr, uint64_t seed = -1);
 
   /**
    * @brief Destructor.
@@ -385,6 +386,6 @@ private:
    */
   void initialize(uint64_t initial_seed = 0);
 };
-
+}  // namespace Utils
 #endif  // RANDOM_H
 
