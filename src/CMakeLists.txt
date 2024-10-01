@@ -8,7 +8,7 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 # Add source files for the core library
 file(GLOB_RECURSE MALASIM_CORE_SOURCES
   "*.cpp"
-  "Config/*.cpp"
+  "Configuration/*.cpp"
   "Utils/*.cpp"
 )
 

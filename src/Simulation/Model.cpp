@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "Config/Config.h"  // Assuming Config is defined here
+#include "Configuration/Config.h"  // Assuming Config is defined here
 
 // Private constructor: creates the Config instance
 Model::Model()

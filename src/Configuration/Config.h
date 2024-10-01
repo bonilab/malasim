@@ -48,6 +48,8 @@ public:
   // Load configuration from a YAML file
   void Load(const std::string &filename);
 
+  bool ValidateNode(const YAML::Node &node, const YAML::Node &schema);
+
   // Reload configuration (useful for dynamic updates)
   void Reload();
 
