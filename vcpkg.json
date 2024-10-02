@@ -3,6 +3,10 @@
     "fmt",
     "gsl",
     "gtest",
-    "yaml-cpp"
+    "lua",
+    "sol2",
+    "spdlog",
+    "yaml-cpp",
+    "date"
   ]
 }

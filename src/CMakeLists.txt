@@ -1,8 +1,15 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(GSL REQUIRED)
 find_package(yaml-cpp CONFIG REQUIRED)
+find_package(sol2 CONFIG REQUIRED)
+find_package(Lua REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(date CONFIG REQUIRED)
 
-include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(
+  ${PROJECT_SOURCE_DIR}/src
+  ${LUA_INCLUDE_DIR}
+)
 
 # craete source files
 # Add source files for the core library
@@ -23,6 +30,10 @@ target_link_libraries(MalaSimCore PUBLIC
   fmt::fmt
   GSL::gsl GSL::gslcblas
   yaml-cpp::yaml-cpp
+  ${LUA_LIBRARIES}
+  sol2
+  spdlog::spdlog
+  date::date date::date-tz
 )
 
 set_property(TARGET MalaSimCore PROPERTY CXX_STANDARD 20)

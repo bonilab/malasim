@@ -1,0 +1,129 @@
+#include <gtest/gtest.h>
+#include <yaml-cpp/yaml.h>
+
+#include "Configuration/PopulationDemographic.h"
+#include "Configuration/YAMLConverters.h"
+
+// Test Fixture Class
+class PopulationDemographicTest : public ::testing::Test {
+protected:
+  PopulationDemographic default_demographic;
+
+  void SetUp() override {
+    // Initialize default PopulationDemographic object
+    default_demographic.number_of_age_classes = 5;
+    default_demographic.age_structure = {100, 150, 200, 150, 100};
+    default_demographic.initial_age_structure = {100, 150, 200, 150, 100};
+    default_demographic.birth_rate = 0.02;
+    default_demographic.death_rate_by_age_class = {0.01, 0.015, 0.02, 0.015,
+                                                   0.01};
+    default_demographic.mortality_when_treatment_fail_by_age_class = {
+        0.05, 0.07, 0.1, 0.07, 0.05};
+    default_demographic.artificial_rescaling_of_population_size = 1.0;
+  }
+};
+
+// Test encoding functionality
+TEST_F(PopulationDemographicTest, EncodePopulationDemographic) {
+  YAML::Node node =
+      YAML::convert<PopulationDemographic>::encode(default_demographic);
+
+  EXPECT_EQ(node["number_of_age_classes"].as<int>(),
+            default_demographic.number_of_age_classes);
+  EXPECT_EQ(node["age_structure"].as<std::vector<int>>(),
+            default_demographic.age_structure);
+  EXPECT_EQ(node["initial_age_structure"].as<std::vector<int>>(),
+            default_demographic.initial_age_structure);
+  EXPECT_DOUBLE_EQ(node["birth_rate"].as<double>(),
+                   default_demographic.birth_rate);
+  EXPECT_EQ(node["death_rate_by_age_class"].as<std::vector<double>>(),
+            default_demographic.death_rate_by_age_class);
+  EXPECT_EQ(node["mortality_when_treatment_fail_by_age_class"]
+                .as<std::vector<double>>(),
+            default_demographic.mortality_when_treatment_fail_by_age_class);
+  EXPECT_DOUBLE_EQ(node["artificial_rescaling_of_population_size"].as<double>(),
+                   default_demographic.artificial_rescaling_of_population_size);
+}
+
+// Test decoding functionality
+TEST_F(PopulationDemographicTest, DecodePopulationDemographic) {
+  YAML::Node node;
+  node["number_of_age_classes"] = 5;
+  node["age_structure"] = std::vector<int>{100, 150, 200, 150, 100};
+  node["initial_age_structure"] = std::vector<int>{100, 150, 200, 150, 100};
+  node["birth_rate"] = 0.02;
+  node["death_rate_by_age_class"] =
+      std::vector<double>{0.01, 0.015, 0.02, 0.015, 0.01};
+  node["mortality_when_treatment_fail_by_age_class"] =
+      std::vector<double>{0.05, 0.07, 0.1, 0.07, 0.05};
+  node["artificial_rescaling_of_population_size"] = 1.0;
+
+  PopulationDemographic decoded_demographic;
+  EXPECT_NO_THROW(
+      YAML::convert<PopulationDemographic>::decode(node, decoded_demographic));
+
+  EXPECT_EQ(decoded_demographic.number_of_age_classes, 5);
+  EXPECT_EQ(decoded_demographic.age_structure,
+            std::vector<int>({100, 150, 200, 150, 100}));
+  EXPECT_EQ(decoded_demographic.initial_age_structure,
+            std::vector<int>({100, 150, 200, 150, 100}));
+  EXPECT_DOUBLE_EQ(decoded_demographic.birth_rate, 0.02);
+  EXPECT_EQ(decoded_demographic.death_rate_by_age_class,
+            std::vector<double>({0.01, 0.015, 0.02, 0.015, 0.01}));
+  EXPECT_EQ(decoded_demographic.mortality_when_treatment_fail_by_age_class,
+            std::vector<double>({0.05, 0.07, 0.1, 0.07, 0.05}));
+  EXPECT_DOUBLE_EQ(decoded_demographic.artificial_rescaling_of_population_size,
+                   1.0);
+}
+
+// Test decoding with missing fields
+TEST_F(PopulationDemographicTest, DecodePopulationDemographicMissingField) {
+  YAML::Node node;
+  node["number_of_age_classes"] = 5;
+  // Intentionally omit other fields to trigger exceptions
+
+  PopulationDemographic decoded_demographic;
+  EXPECT_THROW(
+      YAML::convert<PopulationDemographic>::decode(node, decoded_demographic),
+      std::runtime_error);
+}
+
+// Test decoding with partial missing fields
+TEST_F(PopulationDemographicTest,
+       DecodePopulationDemographicPartialMissingFields) {
+  YAML::Node node;
+  node["number_of_age_classes"] = 5;
+  node["age_structure"] = std::vector<int>{100, 150, 200, 150, 100};
+  // Missing 'initial_age_structure' and other fields
+
+  PopulationDemographic decoded_demographic;
+  EXPECT_THROW(
+      YAML::convert<PopulationDemographic>::decode(node, decoded_demographic),
+      std::runtime_error);
+}
+
+// Test encoding and then decoding to ensure consistency
+TEST_F(PopulationDemographicTest, EncodeDecodeConsistency) {
+  YAML::Node node =
+      YAML::convert<PopulationDemographic>::encode(default_demographic);
+
+  PopulationDemographic decoded_demographic;
+  EXPECT_NO_THROW(
+      YAML::convert<PopulationDemographic>::decode(node, decoded_demographic));
+
+  EXPECT_EQ(decoded_demographic.number_of_age_classes,
+            default_demographic.number_of_age_classes);
+  EXPECT_EQ(decoded_demographic.age_structure,
+            default_demographic.age_structure);
+  EXPECT_EQ(decoded_demographic.initial_age_structure,
+            default_demographic.initial_age_structure);
+  EXPECT_DOUBLE_EQ(decoded_demographic.birth_rate,
+                   default_demographic.birth_rate);
+  EXPECT_EQ(decoded_demographic.death_rate_by_age_class,
+            default_demographic.death_rate_by_age_class);
+  EXPECT_EQ(decoded_demographic.mortality_when_treatment_fail_by_age_class,
+            default_demographic.mortality_when_treatment_fail_by_age_class);
+  EXPECT_DOUBLE_EQ(decoded_demographic.artificial_rescaling_of_population_size,
+                   default_demographic.artificial_rescaling_of_population_size);
+}
+

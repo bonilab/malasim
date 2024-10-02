@@ -10,6 +10,7 @@ file(GLOB_RECURSE MALASIM_TEST_SOURCES
   "*.cpp"
   "helpers/*.cpp"
   "Core/Random/*.cpp"
+  "Configuration/*.cpp"
 )
 
 
