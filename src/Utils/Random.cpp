@@ -15,7 +15,7 @@
 #include <stdexcept>
 #include <vector>
 
-using namespace Utils;
+using utils::Random;
 
 // Constructor
 Random::Random(gsl_rng* rng, uint64_t seed) : seed_(seed) {
@@ -62,11 +62,11 @@ void Random::set_seed(uint64_t new_seed) {
 }
 
 // Generates a Poisson-distributed random number
-int Random::random_poisson(double poissonMean) {
+int Random::random_poisson(double poisson_mean) {
   if (!rng_) {
     throw std::runtime_error("Random number generator not initialized.");
   }
-  return static_cast<int>(gsl_ran_poisson(rng_.get(), poissonMean));
+  return static_cast<int>(gsl_ran_poisson(rng_.get(), poisson_mean));
 }
 
 // Generates a uniform random integer in [0, range)

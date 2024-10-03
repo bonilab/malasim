@@ -10,7 +10,7 @@
 // Test fixture for Random class
 class RandomTest : public ::testing::Test {
 protected:
-  Utils::Random rng;
+  utils::Random rng;
   void SetUp() override {
     // Optional: Initialize any shared resources
   }

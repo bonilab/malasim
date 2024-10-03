@@ -10,22 +10,22 @@ class Config;
 class Model {
 public:
   // Provides global access to the singleton instance
-  static Model &Instance() {
+  static Model &instance() {
     static Model instance;
     return instance;
   }
 
   // Initialize the model
-  void Initialize();
+  void initialize();
 
   // Run the simulation
-  void Run();
+  void run() const;
 
   // Finalize and clean up resources
-  void Finalize();
+  void finalize();
 
   // Access configuration in a controlled manner
-  const Config* GetConfig() const {
+  [[nodiscard]] const Config* get_config() const {
     if (!config_) {
       throw std::runtime_error(
           "Model not initialized. Call Initialize() first.");

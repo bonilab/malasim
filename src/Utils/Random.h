@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 
-namespace Utils {
+namespace utils {
 /**
  * @class Random
  * @brief Encapsulates random number generation functionalities using GSL.
@@ -120,7 +120,7 @@ public:
    */
   template <typename T>
   T random_uniform(T from, T to) {
-    static_assert(std::is_arithmetic<T>::value,
+    static_assert(std::is_arithmetic_v<T>,
                   "Template parameter T must be numeric.");
 
     if (!rng_) {
@@ -131,14 +131,14 @@ public:
       throw std::invalid_argument("Parameter 'from' must be less than 'to'.");
     }
 
-    if constexpr (std::is_integral<T>::value) {
+    if constexpr (std::is_integral_v<T>) {
       // gsl_rng_uniform_int takes an unsigned long as upper bound
       // Ensure that (to - from) does not exceed the maximum value of unsigned
       // long
-      unsigned long range = static_cast<unsigned long>(to - from);
+      auto range = static_cast<uint64_t>(to - from);
       // Note: gsl_rng_uniform_int handles range values up to the maximum of
       // unsigned long
-      unsigned long value = gsl_rng_uniform_int(rng_.get(), range);
+      uint64_t value = gsl_rng_uniform_int(rng_.get(), range);
       return static_cast<T>(from + value);
     } else {
       double value = gsl_ran_flat(rng_.get(), static_cast<double>(from),
@@ -161,7 +161,7 @@ public:
    */
   template <typename T>
   T random_normal(T mean, double standard_deviation) {
-    static_assert(std::is_arithmetic<T>::value,
+    static_assert(std::is_arithmetic_v<T>,
                   "Template parameter T must be numeric.");
 
     if (!rng_) {
@@ -174,7 +174,7 @@ public:
     }
     double value = mean + gsl_ran_gaussian(rng_.get(), standard_deviation);
 
-    if constexpr (std::is_integral<T>::value) {
+    if constexpr (std::is_integral_v<T>) {
       return static_cast<T>(std::round(value));
     } else {
       return static_cast<T>(value);
@@ -207,7 +207,7 @@ public:
   T random_normal_truncated(T mean, double standard_deviation,
                             double truncation_limit = 3.0,  // NOLINT
                             int max_attempts = 1000) {
-    static_assert(std::is_arithmetic<T>::value,
+    static_assert(std::is_arithmetic_v<T>,
                   "Template parameter T must be numeric.");
     if (!rng_) {
       throw std::runtime_error("Random number generator not initialized.");
@@ -222,7 +222,7 @@ public:
       }
       value = gsl_ran_gaussian(rng_.get(), standard_deviation);
     }
-    if constexpr (std::is_integral<T>::value) {
+    if constexpr (std::is_integral_v<T>) {
       return static_cast<T>(mean + std::round(value));
     } else {
       return static_cast<T>(mean + value);
@@ -386,6 +386,6 @@ private:
    */
   void initialize(uint64_t initial_seed = 0);
 };
-}  // namespace Utils
+}  // namespace utils
 #endif  // RANDOM_H
 

@@ -1,16 +1,28 @@
 Checks: >
-  -*,
-  bugprone-*,             # Enable bug-prone checks
-  cppcoreguidelines-*,    # Enable C++ Core Guidelines checks
-  modernize-*,            # Enable modernization checks
-  readability-*,          # Enable readability checks
-  performance-*           # Enable performance checks
-
-# Optionally, disable specific checks that are not relevant
-# For example, if you don't use certain C++ features or have specific project constraints
-# -*.fuchsia-*
-# -*.llvmlibc-*
-# -*.llvm-*
+  cppcoreguidelines-*,
+  performance-*,
+  modernize-*,
+  google-*,
+  misc-*
+  cert-*,
+  readability-*,
+  clang-analyzer-*,
+  -performance-unnecessary-value-param,
+  -modernize-use-trailing-return-type,
+  -google-runtime-references,
+  -misc-non-private-member-variables-in-classes,
+  -readability-braces-around-statements,
+  -google-readability-braces-around-statements,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-magic-numbers,
+  -readability-magic-numbers,
+  -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-avoid-c-arrays,
+  -modernize-avoid-c-arrays,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -readability-named-parameter,
+  -cert-env33-c
 
 WarningsAsErrors: "*"
 
@@ -25,13 +37,10 @@ CheckOptions:
 
   # Naming Conventions
   # Namespaces
-  - { key: readability-identifier-naming.NamespaceCase, value: snake_case }
+  - { key: readability-identifier-naming.NamespaceCase, value: lower_case }
 
   # Macros
-  - {
-      key: readability-identifier-naming.MacroDefinitionCase,
-      value: UPPER_CASE,
-    }
+  - { key: readability-identifier-naming.MacroDefinitionCase, value: UPPER_CASE }
 
   # Types
   - { key: readability-identifier-naming.ClassCase, value: CamelCase }
@@ -43,34 +52,28 @@ CheckOptions:
   - { key: readability-identifier-naming.UnionCase, value: CamelCase }
 
   # Functions
-  - { key: readability-identifier-naming.FunctionCase, value: snake_case }
-  - { key: readability-identifier-naming.GlobalFunctionCase, value: snake_case }
+  - { key: readability-identifier-naming.FunctionCase, value: lower_case }
+  - { key: readability-identifier-naming.GlobalFunctionCase, value: lower_case }
 
   # Variables
-  - { key: readability-identifier-naming.GlobalVariableCase, value: snake_case }
-  - { key: readability-identifier-naming.LocalVariableCase, value: snake_case }
-  - { key: readability-identifier-naming.ParameterCase, value: snake_case }
+  - { key: readability-identifier-naming.GlobalVariableCase, value: lower_case }
+  - { key: readability-identifier-naming.LocalVariableCase, value: lower_case }
+  - { key: readability-identifier-naming.ParameterCase, value: lower_case }
 
   # Class Members and Methods
-  - { key: readability-identifier-naming.ClassMemberCase, value: snake_case_ }
-  - { key: readability-identifier-naming.ClassMethodCase, value: snake_case }
-
-  # General Methods
-  - { key: readability-identifier-naming.MethodCase, value: snake_case }
-  - { key: readability-identifier-naming.PrivateMethodCase, value: snake_case }
+  - { key: readability-identifier-naming.ClassMemberCase, value: lower_case_ }
+  - { key: readability-identifier-naming.ClassMethodCase, value: lower_case }
+  - { key: readability-identifier-naming.PrivateMethodCase, value: lower_case }
 
   # Members
-  - { key: readability-identifier-naming.MemberCase, value: snake_case_ }
-  - { key: readability-identifier-naming.PrivateMemberCase, value: snake_case_ }
+  - { key: readability-identifier-naming.MemberCase, value: lower_case_ }
+  - { key: readability-identifier-naming.PrivateMemberCase, value: lower_case_ }
   - { key: readability-identifier-naming.PrivateMemberSuffix, value: "_" }
 
   # Variables
-  - { key: readability-identifier-naming.VariableCase, value: snake_case }
-  - { key: readability-identifier-naming.StaticVariableCase, value: snake_case }
-  - {
-      key: readability-identifier-naming.ConstexprVariableCase,
-      value: UPPER_CASE,
-    }
+  - { key: readability-identifier-naming.VariableCase, value: lower_case }
+  - { key: readability-identifier-naming.StaticVariableCase, value: lower_case }
+  - { key: readability-identifier-naming.ConstexprVariableCase, value: UPPER_CASE }
 
   # Constants
   - { key: readability-identifier-naming.GlobalConstantCase, value: UPPER_CASE }
@@ -78,13 +81,6 @@ CheckOptions:
   - { key: readability-identifier-naming.StaticConstantCase, value: UPPER_CASE }
 
   # Template Parameters
-  - {
-      key: readability-identifier-naming.TemplateParameterCase,
-      value: CamelCase,
-    }
-
+  - { key: readability-identifier-naming.TemplateParameterCase, value: CamelCase }
   # Magic Numbers
-  - {
-      key: readability-magic-numbers.IgnoredIntegerValues,
-      value: "-1;0;1;2;3;4;5;10;100",
-}
+  - { key: readability-magic-numbers.IgnoredIntegerValues, value: "-1;0;1;2;3;4;5;10;100" }

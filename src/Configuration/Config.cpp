@@ -7,7 +7,7 @@
 
 #include "YAMLConverters.h"
 
-void Config::Load(const std::string &filename) {
+void Config::load(const std::string &filename) {
   std::shared_lock lock(mutex_);
   config_file_path_ = filename;
   YAML::Node config = YAML::LoadFile(filename);
@@ -16,17 +16,17 @@ void Config::Load(const std::string &filename) {
       config["TransmissionSettings"].as<TransmissionSettings>();
   config_data_.population_demographic =
       config["PopulationDemographic"].as<PopulationDemographic>();
-  NotifyObservers();
+  notify_observers();
 }
 
-void Config::Reload() { Load(config_file_path_); }
+void Config::reload() { load(config_file_path_); }
 
-void Config::RegisterObserver(ConfigObserver observer) {
+void Config::register_observer(ConfigObserver observer) {
   std::unique_lock lock(mutex_);
   observers_.push_back(observer);
 }
 
-void Config::NotifyObservers() {
+void Config::notify_observers() {
   for (const auto &observer : observers_) { observer(config_data_); }
 }
 

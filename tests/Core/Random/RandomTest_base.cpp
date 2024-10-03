@@ -2,8 +2,9 @@
 #include <gtest/gtest.h>
 
 #include "RandomTestBase.h"
+#include "Utils/Random.h"
 
-using namespace Utils;
+using utils::Random;
 // Test default constructor initializes RNG
 TEST_F(RandomTest, DefaultConstructorInitializesRNG) {
   Random const rng;

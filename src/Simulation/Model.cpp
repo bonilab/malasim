@@ -14,13 +14,13 @@ Model::Model()
   // Initialization is deferred to the Initialize() method
 }
 
-void Model::Initialize() {
+void Model::initialize() {
   if (!config_file_path_.empty()) {
     // Load the configuration file
-    config_->Load(config_file_path_);
+    config_->load(config_file_path_);
 
     // Register an observer to handle dynamic configuration changes
-    config_->RegisterObserver([this](const ConfigData &new_config) {
+    config_->register_observer([this](const ConfigData &new_config) {
       // Handle configuration changes, e.g., adjust simulation parameters
       std::cout << "Model received updated configuration.\n";
       // Update internal state based on new_config if necessary
@@ -36,7 +36,7 @@ void Model::Initialize() {
   }
 }
 
-void Model::Run() {
+void Model::run() const {
   if (!is_initialized_) {
     throw std::runtime_error(
         "Model is not initialized. Call Initialize() first.");
@@ -44,7 +44,7 @@ void Model::Run() {
   // Simulation run code
 }
 
-void Model::Finalize() {
+void Model::finalize() {
   if (!is_initialized_) {
     throw std::runtime_error("Model is not initialized or already finalized.");
   }

@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <shared_mutex>
+#include <string>
 #include <vector>
 
 #include "ConfigData.h"
@@ -23,18 +24,24 @@ public:
   Config() = default;
   ~Config() = default;
 
+  // delete copy and move constructors and assign operators
+  Config(const Config &) = delete;
+  Config &operator=(const Config &) = delete;
+  Config(Config &&) = delete;
+  Config &operator=(Config &&) = delete;
+
   // Load configuration from a YAML file
-  void Load(const std::string &filename);
+  void load(const std::string &filename);
 
   // Reload configuration (useful for dynamic updates)
-  void Reload();
+  void reload();
 
   // Register an observer for configuration changes
-  void RegisterObserver(ConfigObserver observer);
+  void register_observer(ConfigObserver observer);
 
 private:
   // Internal Method to Notify Observers
-  void NotifyObservers();
+  void notify_observers();
 
   // Configuration Data
   ConfigData config_data_;
