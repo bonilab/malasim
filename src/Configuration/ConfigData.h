@@ -6,9 +6,9 @@
 #include "TransmissionSettings.h"
 
 struct ConfigData {
-  ModelSettings model_settings;
-  TransmissionSettings transmission_settings;
-  PopulationDemographic population_demographic;
+  ModelSettings model_settings{};
+  TransmissionSettings transmission_settings{};
+  PopulationDemographic population_demographic{};
 };
 
 #endif  // CONFIG_DATA_H

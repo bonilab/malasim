@@ -19,15 +19,6 @@ void Model::initialize() {
     // Load the configuration file
     config_->load(config_file_path_);
 
-    // Register an observer to handle dynamic configuration changes
-    config_->register_observer([this](const ConfigData &new_config) {
-      // Handle configuration changes, e.g., adjust simulation parameters
-      std::cout << "Model received updated configuration.\n";
-      // Update internal state based on new_config if necessary
-      // For example:
-      // this->simulation_params = new_config.simulation;
-    });
-
     std::cout << "Model initialized with configuration file: "
               << config_file_path_ << "\n";
     is_initialized_ = true;

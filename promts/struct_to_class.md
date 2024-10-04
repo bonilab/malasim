@@ -1,8 +1,16 @@
-#ifndef POPULATION_DEMOGRAPHIC_H
-#define POPULATION_DEMOGRAPHIC_H
+```
+Here is an example of conversion a struct into class:
 
-#include <stdexcept>
-#include <vector>
+
+struct PopulationDemographic {
+  int number_of_age_classes;
+  std::vector<int> age_structure;
+  std::vector<int> initial_age_structure;
+  double birth_rate;
+  std::vector<double> death_rate_by_age_class;
+  std::vector<double> mortality_when_treatment_fail_by_age_class;
+  double artificial_rescaling_of_population_size;
+};
 
 class PopulationDemographic {
 public:
@@ -91,5 +99,11 @@ private:
   double artificial_rescaling_of_population_size_;
 };
 
-#endif  // POPULATION_DEMOGRAPHIC_H
 
+
+As an expert C++ developer, would you mind help me convert the following struct.
+Requirments:
+  The getter and setter should be in pair, next to each other.
+
+
+```
