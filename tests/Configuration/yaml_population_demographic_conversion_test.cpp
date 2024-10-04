@@ -2,7 +2,6 @@
 #include <yaml-cpp/yaml.h>
 
 #include "Configuration/PopulationDemographic.h"
-#include "Configuration/YAMLConverters.h"
 
 // Test Fixture Class
 class PopulationDemographicTest : public ::testing::Test {

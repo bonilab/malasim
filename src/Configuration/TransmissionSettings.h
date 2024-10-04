@@ -1,6 +1,8 @@
 #ifndef TRANSMISSION_SETTINGS_H
 #define TRANSMISSION_SETTINGS_H
 
+#include <yaml-cpp/yaml.h>
+
 #include <stdexcept>
 
 class TransmissionSettings {
@@ -35,5 +37,36 @@ private:
   double transmission_parameter_;
   double p_infection_from_an_infectious_bite_;
 };
+
+namespace YAML {
+
+template <>
+struct convert<TransmissionSettings> {
+  static Node encode(const TransmissionSettings &rhs) {
+    Node node;
+    node["transmission_parameter"] = rhs.get_transmission_parameter();
+    node["p_infection_from_an_infectious_bite"] =
+        rhs.get_p_infection_from_an_infectious_bite();
+    return node;
+  }
+
+  static bool decode(const Node &node, TransmissionSettings &rhs) {
+    if (!node["transmission_parameter"]) {
+      throw std::runtime_error("Missing 'transmission_parameter' field.");
+    }
+    if (!node["p_infection_from_an_infectious_bite"]) {
+      throw std::runtime_error(
+          "Missing 'p_infection_from_an_infectious_bite' field.");
+    }
+
+    rhs.set_transmission_parameter(node["transmission_parameter"].as<double>());
+    rhs.set_p_infection_from_an_infectious_bite(
+        node["p_infection_from_an_infectious_bite"].as<double>());
+    return true;
+  }
+};
+
+}  // namespace YAML
+
 #endif  // TRANSMISSION_SETTINGS_H
 

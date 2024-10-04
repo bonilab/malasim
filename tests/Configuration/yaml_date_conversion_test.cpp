@@ -4,8 +4,7 @@
 
 #include <stdexcept>
 
-// Include the converter you're testing
-#include "Configuration/YAMLConverters.h"
+#include "Configuration/ModelSettings.h"
 
 class YamlDateConversionTest : public ::testing::Test {
 protected:

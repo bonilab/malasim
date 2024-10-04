@@ -3,10 +3,6 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include <mutex>
-
-#include "YAMLConverters.h"
-
 void Config::load(const std::string &filename) {
   config_file_path_ = filename;
   YAML::Node config = YAML::LoadFile(filename);

@@ -9,17 +9,6 @@
 
 #include "ConfigData.h"
 
-#define GETTER(Type, StructName, FieldName, Validator)   \
-  [[nodiscard]] Type get_##FieldName() const {           \
-    return get_field(config_data_.StructName.FieldName); \
-  }
-
-#define SETTER(Type, StructName, FieldName, Validator)       \
-  void set_##FieldName(Type FieldName) {                     \
-    Validator(FieldName);                                    \
-    set_field(config_data_.StructName.FieldName, FieldName); \
-  }
-
 class Config {
 public:
   // Constructor and Destructor

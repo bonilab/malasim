@@ -1,6 +1,8 @@
 #ifndef POPULATION_DEMOGRAPHIC_H
 #define POPULATION_DEMOGRAPHIC_H
 
+#include <yaml-cpp/yaml.h>
+
 #include <stdexcept>
 #include <vector>
 
@@ -90,6 +92,79 @@ private:
   std::vector<double> mortality_when_treatment_fail_by_age_class_;
   double artificial_rescaling_of_population_size_;
 };
+
+namespace YAML {
+template <>
+struct convert<PopulationDemographic> {
+  static Node encode(const PopulationDemographic &rhs) {
+    Node node;
+    node["number_of_age_classes"] = rhs.get_number_of_age_classes();
+    node["age_structure"] = rhs.get_age_structure();
+    node["initial_age_structure"] = rhs.get_initial_age_structure();
+    node["birth_rate"] = rhs.get_birth_rate();
+    node["death_rate_by_age_class"] = rhs.get_death_rate_by_age_class();
+    node["mortality_when_treatment_fail_by_age_class"] =
+        rhs.get_mortality_when_treatment_fail_by_age_class();
+    node["artificial_rescaling_of_population_size"] =
+        rhs.get_artificial_rescaling_of_population_size();
+    return node;
+  }
+
+  static bool decode(const Node &node, PopulationDemographic &rhs) {
+    if (!node["number_of_age_classes"]) {
+      throw std::runtime_error("Missing 'number_of_age_classes' field.");
+    }
+    if (!node["age_structure"]) {
+      throw std::runtime_error("Missing 'age_structure' field.");
+    }
+    if (!node["initial_age_structure"]) {
+      throw std::runtime_error("Missing 'initial_age_structure' field.");
+    }
+    if (!node["birth_rate"]) {
+      throw std::runtime_error("Missing 'birth_rate' field.");
+    }
+    if (!node["death_rate_by_age_class"]) {
+      throw std::runtime_error("Missing 'death_rate_by_age_class' field.");
+    }
+    if (!node["mortality_when_treatment_fail_by_age_class"]) {
+      throw std::runtime_error(
+          "Missing 'mortality_when_treatment_fail_by_age_class' field.");
+    }
+    if (!node["artificial_rescaling_of_population_size"]) {
+      throw std::runtime_error(
+          "Missing 'artificial_rescaling_of_population_size' field.");
+    }
+
+    int number_of_age_classes = node["number_of_age_classes"].as<int>();
+    rhs.set_number_of_age_classes(number_of_age_classes);
+
+    // Validate and assign age structure vectors
+    auto age_structure = node["age_structure"].as<std::vector<int>>();
+    rhs.set_age_structure(age_structure);
+
+    auto initial_age_structure =
+        node["initial_age_structure"].as<std::vector<int>>();
+    rhs.set_initial_age_structure(initial_age_structure);
+
+    rhs.set_birth_rate(node["birth_rate"].as<double>());
+
+    auto death_rate_by_age_class =
+        node["death_rate_by_age_class"].as<std::vector<double>>();
+    rhs.set_death_rate_by_age_class(death_rate_by_age_class);
+
+    auto mortality_when_treatment_fail_by_age_class =
+        node["mortality_when_treatment_fail_by_age_class"]
+            .as<std::vector<double>>();
+    rhs.set_mortality_when_treatment_fail_by_age_class(
+        mortality_when_treatment_fail_by_age_class);
+
+    rhs.set_artificial_rescaling_of_population_size(
+        node["artificial_rescaling_of_population_size"].as<double>());
+
+    return true;
+  }
+};
+}  // namespace YAML
 
 #endif  // POPULATION_DEMOGRAPHIC_H
 

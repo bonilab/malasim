@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 
 #include "Configuration/ModelSettings.h"
-#include "Configuration/YAMLConverters.h"
 
 class ModelSettingsTest : public ::testing::Test {
 protected:
