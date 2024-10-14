@@ -7,7 +7,7 @@
 # ---------------------------------------------------------------
 # 1. Execution Settings
 # ---------------------------------------------------------------
-execution_settings:
+model_settings:
   # The number of days between each output to the standard output (stdout).
   # This variable defines the frequency at which notifications or logs
   # are sent to stdout, measured in days.
@@ -87,8 +87,8 @@ spatial_settings:
     district_raster: "../input/kag_district.asc"
 
     # Raster files defining treatment probabilities (comment these out for beta calibration)
-    p_treatment_under_5: "../input/kag_treatment.asc"
-    p_treatment_over_5: "../input/kag_treatment.asc"
+    p_treatment_under_5_raster: "../input/kag_treatment.asc"
+    p_treatment_over_5_raster: "../input/kag_treatment.asc"
 
     # Probability that an infected and symptomatic person receives treatment; single value for the entire country
     # If set to '-1', these values are read from 'pr_treatment_under5' and 'pr_treatment_over5' above
@@ -244,7 +244,7 @@ genotype_parameters:
   mutation_mask: "||||111||1111111,0||||||000000000010|1"
 
   # Daily probability that a parasite will mutate at a given locus when drug concentration is not zero
-  mutation_probability_by_locus: 0.001
+  mutation_probability_per_locus: 0.001
 
   pf_genotype_info:
     - chromosome: 5
@@ -826,7 +826,7 @@ epidemiological_parameters:
 
   # Relapse rate used to increase parasite density after treatment failure
   # Multiply by sqrt(20) per day
-  relapseRate: 4.4721
+  relapse_rate: 4.4721
 
   # Minimum update frequency for a host's attributes (especially parasite density)
   # NOTE: consider remove this value as Person will be updated daily
