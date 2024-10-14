@@ -74,7 +74,7 @@ private:
 namespace YAML {
 // ParasiteDensityLevels YAML conversion
 template<>
-struct YAML::convert<ParasiteDensityLevels> {
+struct convert<ParasiteDensityLevels> {
     static Node encode(const ParasiteDensityLevels& rhs) {
         Node node;
         node["log_parasite_density_cured"] = rhs.get_log_parasite_density_cured();
@@ -112,7 +112,7 @@ struct YAML::convert<ParasiteDensityLevels> {
 
 // RecombinationParameters YAML conversion
 template<>
-struct YAML::convert<RecombinationParameters> {
+struct convert<RecombinationParameters> {
     static Node encode(const RecombinationParameters& rhs) {
         Node node;
         node["within_chromosome_recombination_rate"] = rhs.get_within_chromosome_recombination_rate();
@@ -132,7 +132,7 @@ struct YAML::convert<RecombinationParameters> {
 
 // ParasiteParameters YAML conversion
 template<>
-struct YAML::convert<ParasiteParameters> {
+struct convert<ParasiteParameters> {
     static Node encode(const ParasiteParameters& rhs) {
         Node node;
         node["parasite_density_levels"] = rhs.get_parasite_density_levels();

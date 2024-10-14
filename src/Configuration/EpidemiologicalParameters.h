@@ -158,7 +158,7 @@ namespace YAML {
 
 // GammaDistribution YAML conversion
 template<>
-struct YAML::convert<BitingLevelDistributionGamma> {
+struct convert<BitingLevelDistributionGamma> {
     static Node encode(const BitingLevelDistributionGamma& rhs) {
         Node node;
         node["mean"] = rhs.get_mean();
@@ -178,7 +178,7 @@ struct YAML::convert<BitingLevelDistributionGamma> {
 
 // BitingLevelDistribution YAML conversion
 template<>
-struct YAML::convert<BitingLevelDistribution> {
+struct convert<BitingLevelDistribution> {
     static Node encode(const BitingLevelDistribution& rhs) {
         Node node;
         node["distribution"] = rhs.get_distribution();
@@ -198,7 +198,7 @@ struct YAML::convert<BitingLevelDistribution> {
 
 // RelativeBitingInfo YAML conversion
 template<>
-struct YAML::convert<RelativeBitingInfo> {
+struct convert<RelativeBitingInfo> {
     static Node encode(const RelativeBitingInfo& rhs) {
         Node node;
         node["max_relative_biting_value"] = rhs.get_max_relative_biting_value();
@@ -223,7 +223,7 @@ struct YAML::convert<RelativeBitingInfo> {
 
 // RelativeInfectivity YAML conversion
 template<>
-struct YAML::convert<RelativeInfectivity> {
+struct convert<RelativeInfectivity> {
     static Node encode(const RelativeInfectivity& rhs) {
         Node node;
         node["sigma"] = rhs.get_sigma();
@@ -245,7 +245,7 @@ struct YAML::convert<RelativeInfectivity> {
 
 // EpidemiologicalParameters YAML conversion
 template<>
-struct YAML::convert<EpidemiologicalParameters> {
+struct convert<EpidemiologicalParameters> {
     static Node encode(const EpidemiologicalParameters& rhs) {
         Node node;
         node["number_of_tracking_days"] = rhs.get_number_of_tracking_days();

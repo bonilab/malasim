@@ -143,7 +143,7 @@ private:
 namespace YAML {
 // BarabasiSettings YAML conversion
 template<>
-struct YAML::convert<BarabasiSettings> {
+struct convert<BarabasiSettings> {
     static Node encode(const BarabasiSettings& rhs) {
         Node node;
         node["r_g_0"] = rhs.get_r_g_0();
@@ -165,7 +165,7 @@ struct YAML::convert<BarabasiSettings> {
 
 // WesolowskiSettings YAML conversion
 template<>
-struct YAML::convert<WesolowskiSettings> {
+struct convert<WesolowskiSettings> {
     static Node encode(const WesolowskiSettings& rhs) {
         Node node;
         node["kappa"] = rhs.get_kappa();
@@ -189,7 +189,7 @@ struct YAML::convert<WesolowskiSettings> {
 
 // SpatialModel YAML conversion
 template<>
-struct YAML::convert<SpatialModel> {
+struct convert<SpatialModel> {
     static Node encode(const SpatialModel& rhs) {
         Node node;
         node["name"] = rhs.get_name();
@@ -211,7 +211,7 @@ struct YAML::convert<SpatialModel> {
 
 // GammaDistribution YAML conversion
 template<>
-struct YAML::convert<MovingLevelDistributionGamma> {
+struct convert<MovingLevelDistributionGamma> {
     static Node encode(const MovingLevelDistributionGamma& rhs) {
         Node node;
         node["mean"] = rhs.get_mean();
@@ -231,7 +231,7 @@ struct YAML::convert<MovingLevelDistributionGamma> {
 
 // MovingLevelDistribution YAML conversion
 template<>
-struct YAML::convert<MovingLevelDistribution> {
+struct convert<MovingLevelDistribution> {
     static Node encode(const MovingLevelDistribution& rhs) {
         Node node;
         node["distribution"] = rhs.get_distribution();
@@ -251,7 +251,7 @@ struct YAML::convert<MovingLevelDistribution> {
 
 // CirculationInfo YAML conversion
 template<>
-struct YAML::convert<CirculationInfo> {
+struct convert<CirculationInfo> {
     static Node encode(const CirculationInfo& rhs) {
         Node node;
         node["max_relative_moving_value"] = rhs.get_max_relative_moving_value();
@@ -279,7 +279,7 @@ struct YAML::convert<CirculationInfo> {
 
 // MovementSettings YAML conversion
 template<>
-struct YAML::convert<MovementSettings> {
+struct convert<MovementSettings> {
     static Node encode(const MovementSettings& rhs) {
         Node node;
         node["spatial_model"] = rhs.get_spatial_model();

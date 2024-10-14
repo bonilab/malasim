@@ -77,7 +77,7 @@ private:
 namespace YAML{
 // ImmuneSystemParameters YAML conversion
 template<>
-struct YAML::convert<ImmuneSystemParameters> {
+struct convert<ImmuneSystemParameters> {
     static Node encode(const ImmuneSystemParameters& rhs) {
         Node node;
         node["b1"] = rhs.get_b1();

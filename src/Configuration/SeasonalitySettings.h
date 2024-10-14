@@ -126,7 +126,7 @@ private:
 namespace YAML {
 // Convert specialization for RainfallSettings
 template <>
-struct YAML::convert<RainfallSettings> {
+struct convert<RainfallSettings> {
   static Node encode(const RainfallSettings &rhs) {
     Node node;
     node["filename"] = rhs.get_filename();
@@ -146,7 +146,7 @@ struct YAML::convert<RainfallSettings> {
 
 // Convert specialization for SimpleSettings
 template <>
-struct YAML::convert<SimpleSettings> {
+struct convert<SimpleSettings> {
   static Node encode(const SimpleSettings &rhs) {
     Node node;
     node["a"] = rhs.get_a();
@@ -170,7 +170,7 @@ struct YAML::convert<SimpleSettings> {
 
 // Convert specialization for SeasonalitySettings
 template <>
-struct YAML::convert<SeasonalitySettings> {
+struct convert<SeasonalitySettings> {
   static Node encode(const SeasonalitySettings &rhs) {
     Node node;
     node["enable"] = rhs.get_enable();

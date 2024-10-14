@@ -69,7 +69,7 @@ date::year_month_day parseDate(const std::string& date_str) {
     return ymd;
 }
 
-// Specialization of YAML::convert for the SimulationTimeframe class
+// Specialization of convert for the SimulationTimeframe class
 namespace YAML {
 template <>
 struct convert<SimulationTimeframe> {

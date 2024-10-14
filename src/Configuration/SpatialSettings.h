@@ -235,7 +235,7 @@ private:
 namespace YAML {
 // Conversion for GridBased class
 template <>
-struct YAML::convert<GridBased> {
+struct convert<GridBased> {
     static Node encode(const GridBased &rhs) {
         Node node;
         node["population_raster"] = rhs.get_population_raster();
@@ -273,7 +273,7 @@ struct YAML::convert<GridBased> {
 
 // Conversion for LocationInfo class
 template <>
-struct YAML::convert<LocationInfo> {
+struct convert<LocationInfo> {
     static Node encode(const LocationInfo &rhs) {
         Node node;
         node.push_back(rhs.get_id());
@@ -295,7 +295,7 @@ struct YAML::convert<LocationInfo> {
 
 // Conversion for LocationBased class
 template <>
-struct YAML::convert<LocationBased> {
+struct convert<LocationBased> {
     static Node encode(const LocationBased &rhs) {
         Node node;
         node["location_info"] = rhs.get_location_info();
@@ -326,7 +326,7 @@ struct YAML::convert<LocationBased> {
 
 // Conversion for SpatialSettings class
 template <>
-struct YAML::convert<SpatialSettings> {
+struct convert<SpatialSettings> {
     static Node encode(const SpatialSettings &rhs) {
         Node node;
         node["mode"] = rhs.get_mode();
