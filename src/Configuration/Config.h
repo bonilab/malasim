@@ -31,12 +31,35 @@ public:
   [[nodiscard]] const ModelSettings &get_model_settings() const {
     return config_data_.model_settings;
   }
+  [[nodiscard]] const SimulationTimeframe &get_simulation_timeframe() const {
+    return config_data_.simulation_timeframe;
+  }
+  [[nodiscard]] const SpatialSettings &get_spatial_settings() const {
+    return config_data_.spatial_settings;
+  }
   [[nodiscard]] const TransmissionSettings &get_transmission_settings() const {
     return config_data_.transmission_settings;
   }
   [[nodiscard]] const PopulationDemographic &get_population_demographic()
       const {
     return config_data_.population_demographic;
+  }
+  [[nodiscard]] const SeasonalitySettings &get_seasonality_settings() const {
+    return config_data_.seasonality_settings;
+  }
+  [[nodiscard]] const MovementSettings &get_movement_settings() const {
+    return config_data_.movement_settings;
+  }
+  [[nodiscard]] const ParasiteParameters &get_parasite_parameters() const {
+    return config_data_.parasite_parameters;
+  }
+  [[nodiscard]] const ImmuneSystemParameters &get_immune_system_parameters()
+      const {
+    return config_data_.immune_system_parameters;
+  }
+  [[nodiscard]] const EpidemiologicalParameters &get_epidemiological_parameters()
+      const {
+    return config_data_.epidemiological_parameters;
   }
 
   // Validate all cross-field validations
