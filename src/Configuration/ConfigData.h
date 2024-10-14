@@ -9,7 +9,7 @@
 #include "PopulationDemographic.h"
 #include "SeasonalitySettings.h"
 #include "TransmissionSettings.h"
-#include "SimulationTimeFrame.h"
+#include "SimulationTimeframe.h"
 #include "SpatialSettings.h"
 
 struct ConfigData {
