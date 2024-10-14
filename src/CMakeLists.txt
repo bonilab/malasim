@@ -23,13 +23,6 @@ file(GLOB_RECURSE MALASIM_CORE_SOURCES
 add_library(MalaSimCore STATIC
     # Add your source files here
     ${MALASIM_CORE_SOURCES}
-        Configuration/SimulationTimeFrame.h
-        Configuration/SpatialSettings.h
-        Configuration/SeasonalitySettings.h
-        Configuration/MovementSettings.h
-        Configuration/ParasiteParameters.h
-        Configuration/ImmuneSystemParameters.h
-        Configuration/EpidemiologicalParameters.h
 )
 
 # Link the core library and fmt to the main executable
