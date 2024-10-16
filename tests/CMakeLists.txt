@@ -17,13 +17,6 @@ file(GLOB_RECURSE MALASIM_TEST_SOURCES
 # Add test executable
 add_executable(runTests
   ${MALASIM_TEST_SOURCES}
-        Configuration/yaml_simulation_timeframe_conversion_test.cpp
-        Configuration/yaml_spatial_settings_conversion_test.cpp
-        Configuration/yaml_seasonality_settings_conversion_test.cpp
-        Configuration/yaml_movement_settings_conversion_test.cpp
-        Configuration/yaml_parasite_parameters_conversion_test.cpp
-        Configuration/yaml_immune_system_parameters_conversion_test.cpp
-        Configuration/yaml_epidemiological_parameters_conversion_test.cpp
 )
 
 add_dependencies(runTests MalaSimCore)
