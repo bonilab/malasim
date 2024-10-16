@@ -295,7 +295,7 @@ genotype_parameters:
               multiplicative_effect_on_EC50:
                 - drug_id: 6
                   factors: [1, 1.6]
-                - drug_id: 1å
+                - drug_id: 1
                   factors: [1.1, 1]
                 - drug_id: 2
                   factors: [1, 1.2]
@@ -849,8 +849,13 @@ epidemiological_parameters:
 # ---------------------------------------------------------------
 mosquito_parameters:
   mosquito_config:
-    interrupted_feeding_rate: [0.19]
-    prmc_size: 100
+    mode: "grid_based" # or "location_based"
+    grid_based:
+      interrupted_feeding_rate_raster: "../input/kag_mosquito_ifr.asc"
+      prmc_size_raster: "../input/kag_mosquito_size.asc"
+    location_based:
+      interrupted_feeding_rate: [0.19]
+      prmc_size: [100]
 
   # Within-host induced free recombination
   within_host_induced_free_recombination: true
