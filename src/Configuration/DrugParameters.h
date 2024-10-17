@@ -1,0 +1,119 @@
+#ifndef DRUGPARAMETERS_H
+#define DRUGPARAMETERS_H
+#include <yaml-cpp/yaml.h>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+class DrugParameters {
+public:
+    // Inner class: DrugInfo
+    class DrugInfo {
+    public:
+        // Getters and Setters
+        [[nodiscard]] const std::string& get_name() const { return name_; }
+        void set_name(const std::string& value) { name_ = value; }
+
+        [[nodiscard]] double get_half_life() const { return half_life_; }
+        void set_half_life(double value) { half_life_ = value; }
+
+        [[nodiscard]] double get_maximum_parasite_killing_rate() const { return maximum_parasite_killing_rate_; }
+        void set_maximum_parasite_killing_rate(double value) { maximum_parasite_killing_rate_ = value; }
+
+        [[nodiscard]] int get_n() const { return n_; }
+        void set_n(int value) { n_ = value; }
+
+        [[nodiscard]] const std::vector<double>& get_age_specific_drug_concentration_sd() const { return age_specific_drug_concentration_sd_; }
+        void set_age_specific_drug_concentration_sd(const std::vector<double>& value) { age_specific_drug_concentration_sd_ = value; }
+
+        [[nodiscard]] const std::vector<double>& get_age_specific_drug_absorption() const { return age_specific_drug_absorption_; }
+        void set_age_specific_drug_absorption(const std::vector<double>& value) { age_specific_drug_absorption_ = value; }
+
+        [[nodiscard]] int get_k() const { return k_; }
+        void set_k(int value) { k_ = value; }
+
+        [[nodiscard]] double get_base_EC50() const { return base_EC50_; }
+        void set_base_EC50(double value) { base_EC50_ = value; }
+
+    private:
+        std::string name_;
+        double half_life_;
+        double maximum_parasite_killing_rate_;
+        int n_;
+        std::vector<double> age_specific_drug_concentration_sd_;
+        std::vector<double> age_specific_drug_absorption_;
+        int k_;
+        double base_EC50_;
+    };
+
+    // Getters and Setters for DrugParameters
+    [[nodiscard]] const std::vector<DrugInfo>& get_drug_db() const { return drug_db_; }
+    void set_drug_db(const std::vector<DrugInfo>& value) { drug_db_ = value; }
+
+private:
+    std::vector<DrugInfo> drug_db_;
+};
+
+namespace YAML {
+
+// DrugParameters::DrugInfo YAML conversion
+template<>
+struct convert<DrugParameters::DrugInfo> {
+    static Node encode(const DrugParameters::DrugInfo& rhs) {
+        Node node;
+        node["name"] = rhs.get_name();
+        node["half_life"] = rhs.get_half_life();
+        node["maximum_parasite_killing_rate"] = rhs.get_maximum_parasite_killing_rate();
+        node["n"] = rhs.get_n();
+        node["age_specific_drug_concentration_sd"] = rhs.get_age_specific_drug_concentration_sd();
+        node["age_specific_drug_absorption"] = rhs.get_age_specific_drug_absorption();
+        node["k"] = rhs.get_k();
+        node["base_EC50"] = rhs.get_base_EC50();
+        return node;
+    }
+
+    static bool decode(const Node& node, DrugParameters::DrugInfo& rhs) {
+        if (!node["name"] || !node["half_life"] || !node["maximum_parasite_killing_rate"] || !node["n"]
+            || !node["age_specific_drug_concentration_sd"] || !node["k"] || !node["base_EC50"]) {
+            throw std::runtime_error("Missing fields in DrugParameters::DrugInfo");
+        }
+        rhs.set_name(node["name"].as<std::string>());
+        rhs.set_half_life(node["half_life"].as<double>());
+        rhs.set_maximum_parasite_killing_rate(node["maximum_parasite_killing_rate"].as<double>());
+        rhs.set_n(node["n"].as<int>());
+        rhs.set_age_specific_drug_concentration_sd(node["age_specific_drug_concentration_sd"].as<std::vector<double>>());
+        if(node["age_specific_drug_absorption"])
+            rhs.set_age_specific_drug_absorption(node["age_specific_drug_absorption"].as<std::vector<double>>());
+        rhs.set_k(node["k"].as<int>());
+        rhs.set_base_EC50(node["base_EC50"].as<double>());
+        return true;
+    }
+};
+
+// DrugParameters YAML conversion
+template<>
+struct convert<DrugParameters> {
+    static Node encode(const DrugParameters& rhs) {
+        Node node;
+        for (const auto& value : rhs.get_drug_db()) {
+            node["drug_db"].push_back(value);
+        }
+        return node;
+    }
+
+    static bool decode(const Node& node, DrugParameters& rhs) {
+        if (!node["drug_db"]) {
+            throw std::runtime_error("Missing 'drug_db' field in DrugParameters");
+        }
+        std::vector<DrugParameters::DrugInfo> drug_db;
+        for (const auto& element : node["drug_db"]) {
+            drug_db.push_back(element.as<DrugParameters::DrugInfo>());
+        }
+        rhs.set_drug_db(drug_db);
+        return true;
+    }
+};
+
+}  // namespace YAML
+
+#endif //DRUGPARAMETERS_H
