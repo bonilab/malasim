@@ -182,16 +182,16 @@ struct convert<BitingLevelDistribution> {
     static Node encode(const BitingLevelDistribution& rhs) {
         Node node;
         node["distribution"] = rhs.get_distribution();
-        node["gamma"] = rhs.get_gamma();
+        node["Gamma"] = rhs.get_gamma();
         return node;
     }
 
     static bool decode(const Node& node, BitingLevelDistribution& rhs) {
-        if (!node["distribution"] || !node["gamma"]) {
+        if (!node["distribution"] || !node["Gamma"]) {
             throw std::runtime_error("Missing fields in BitingLevelDistribution");
         }
         rhs.set_distribution(node["distribution"].as<std::string>());
-        rhs.set_gamma(node["gamma"].as<BitingLevelDistributionGamma>());
+        rhs.set_gamma(node["Gamma"].as<BitingLevelDistributionGamma>());
         return true;
     }
 };

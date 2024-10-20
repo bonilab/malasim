@@ -1,7 +1,9 @@
 #include <yaml-cpp/yaml.h>
 #include <date/date.h>
-#include <sstream>
 #include <stdexcept>
+#include <spdlog/spdlog.h>
+
+#include "Utils/YamlFile.h"
 
 // Class to hold the simulation timeframe data
 class SimulationTimeframe {
@@ -58,17 +60,6 @@ private:
   int start_collect_data_day_;
 };
 
-// Helper function to parse a date in "YYYY/MM/DD" format using Howard Hinnant's date library
-date::year_month_day parseDate(const std::string& date_str) {
-    std::istringstream in{date_str};
-    date::year_month_day ymd;
-    in >> date::parse("%Y/%m/%d", ymd);
-    if (in.fail()) {
-        throw std::runtime_error("Failed to parse date: " + date_str);
-    }
-    return ymd;
-}
-
 // Specialization of convert for the SimulationTimeframe class
 namespace YAML {
 template <>
@@ -97,9 +88,9 @@ struct convert<SimulationTimeframe> {
     }
 
     // Parsing and assigning the values
-    rhs.set_starting_date(parseDate(node["starting_date"].as<std::string>()));
-    rhs.set_start_of_comparison_period(parseDate(node["start_of_comparison_period"].as<std::string>()));
-    rhs.set_ending_date(parseDate(node["ending_date"].as<std::string>()));
+    rhs.set_starting_date(node["starting_date"].as<date::year_month_day>());
+    rhs.set_start_of_comparison_period(node["start_of_comparison_period"].as<date::year_month_day>());
+    rhs.set_ending_date(node["ending_date"].as<date::year_month_day>());
     rhs.set_start_collect_data_day(node["start_collect_data_day"].as<int>());
 
     return true;

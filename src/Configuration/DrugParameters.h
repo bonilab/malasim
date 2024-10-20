@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <map>
 
 class DrugParameters {
 public:
@@ -47,11 +48,11 @@ public:
     };
 
     // Getters and Setters for DrugParameters
-    [[nodiscard]] const std::vector<DrugInfo>& get_drug_db() const { return drug_db_; }
-    void set_drug_db(const std::vector<DrugInfo>& value) { drug_db_ = value; }
+    [[nodiscard]] const std::map<int, DrugInfo>& get_drug_db() const { return drug_db_; }
+    void set_drug_db(const std::map<int, DrugInfo>& value) { drug_db_ = value; }
 
 private:
-    std::vector<DrugInfo> drug_db_;
+    std::map<int, DrugInfo> drug_db_;
 };
 
 namespace YAML {
@@ -95,8 +96,8 @@ template<>
 struct convert<DrugParameters> {
     static Node encode(const DrugParameters& rhs) {
         Node node;
-        for (const auto& value : rhs.get_drug_db()) {
-            node["drug_db"].push_back(value);
+        for (const auto& [key, value] : rhs.get_drug_db()) {
+            node["drug_db"][key] = value;
         }
         return node;
     }
@@ -105,9 +106,10 @@ struct convert<DrugParameters> {
         if (!node["drug_db"]) {
             throw std::runtime_error("Missing 'drug_db' field in DrugParameters");
         }
-        std::vector<DrugParameters::DrugInfo> drug_db;
+        std::map<int, DrugParameters::DrugInfo> drug_db;
         for (const auto& element : node["drug_db"]) {
-            drug_db.push_back(element.as<DrugParameters::DrugInfo>());
+            int key = element.first.as<int>();
+            drug_db[key] = element.second.as<DrugParameters::DrugInfo>();
         }
         rhs.set_drug_db(drug_db);
         return true;

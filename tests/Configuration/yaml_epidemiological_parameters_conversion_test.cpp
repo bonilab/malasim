@@ -81,9 +81,9 @@ TEST_F(EpidemiologicalParametersYAMLTest, DecodeEpidemiologicalParameters) {
     node["relative_biting_info"]["max_relative_biting_value"] = 10;
     node["relative_biting_info"]["min_relative_biting_value"] = 0.5;
     node["relative_biting_info"]["number_of_biting_levels"] = 3;
-    node["relative_biting_info"]["biting_level_distribution"]["distribution"] = "gamma";
-    node["relative_biting_info"]["biting_level_distribution"]["gamma"]["mean"] = 5.0;
-    node["relative_biting_info"]["biting_level_distribution"]["gamma"]["sd"] = 1.5;
+    node["relative_biting_info"]["biting_level_distribution"]["distribution"] = "Gamma";
+    node["relative_biting_info"]["biting_level_distribution"]["Gamma"]["mean"] = 5.0;
+    node["relative_biting_info"]["biting_level_distribution"]["Gamma"]["sd"] = 1.5;
     node["gametocyte_level_under_artemisinin_action"] = 1.0;
     node["gametocyte_level_full"] = 1.0;
     node["relative_infectivity"]["sigma"] = 1.2;

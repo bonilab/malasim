@@ -16,8 +16,8 @@ protected:
   void SetUp() override {
     valid_date =
         date::year_month_day{date::year{2023}, date::month{10}, date::day{2}};
-    valid_node = YAML::Node("2023-10-02");
-    invalid_format_node = YAML::Node("invalid-date-format");
+    valid_node = YAML::Node("2023/10/02");
+    invalid_format_node = YAML::Node("invalid date format (should be yyyy/mm/dd)");
     non_scalar_node = YAML::Node(YAML::NodeType::Sequence);  // Non-scalar node
   }
 
@@ -30,7 +30,7 @@ TEST_F(YamlDateConversionTest, EncodeValidDate) {
   YAML::Node node = YAML::convert<date::year_month_day>::encode(valid_date);
 
   // Check if the encoded date is correct
-  EXPECT_EQ(node.as<std::string>(), "2023-10-02");
+  EXPECT_EQ(node.as<std::string>(), "2023/10/02");
 }
 
 TEST_F(YamlDateConversionTest, DecodeValidDate) {

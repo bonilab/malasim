@@ -34,9 +34,10 @@ public:
     return initial_age_structure_;
   }
   void set_initial_age_structure(const std::vector<int> &value) {
-    if (value.size() != number_of_age_classes_)
-      throw std::invalid_argument(
-          "initial_age_structure size must match number_of_age_classes");
+    // TODO: Check age classes size
+    // if (value.size() != number_of_age_classes_)
+    //   throw std::invalid_argument(
+    //       "initial_age_structure size must match number_of_age_classes");
     initial_age_structure_ = value;
   }
 

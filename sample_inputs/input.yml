@@ -5,7 +5,7 @@
 # The drug is deployed in year 2010.
 
 # ---------------------------------------------------------------
-# 1. Execution Settings
+# 1. Model Settings
 # ---------------------------------------------------------------
 model_settings:
   # The number of days between each output to the standard output (stdout).
@@ -48,7 +48,7 @@ transmission_settings:
   p_infection_from_an_infectious_bite: 0.1
 
 # ---------------------------------------------------------------
-# 4. Population Structure
+# 4. Population Demographic
 # ---------------------------------------------------------------
 population_demographic:
   # Number of age classes used for reporting age-specific mortality calculations
@@ -64,13 +64,11 @@ population_demographic:
   birth_rate: 0.0288
 
   # Malaria-adjusted all-cause death rate by age class (to be updated with specific country data)
-  death_rate_by_age_class:
-    - [0.02641, 0.00202, 0.00202, 0.00202, 0.00198, 0.00247, 0.00247, 0.00247, 0.00247, 0.00247, 0.00247, 0.00247, 0.00455, 0.00455, 0.05348]
+  death_rate_by_age_class: [0.02641, 0.00202, 0.00202, 0.00202, 0.00198, 0.00247, 0.00247, 0.00247, 0.00247, 0.00247, 0.00247, 0.00247, 0.00455, 0.00455, 0.05348]
 
   # Probability of death for patients who are not treated or experience a treatment failure
   # When receiving treatment, this rate drops by a factor of 10 in the code
-  mortality_when_treatment_fail_by_age_class:
-    - [0.040, 0.020, 0.020, 0.020, 0.020, 0.004, 0.004, 0.004, 0.004, 0.004, 0.004, 0.001, 0.001, 0.001, 0.001]
+  mortality_when_treatment_fail_by_age_class: [0.040, 0.020, 0.020, 0.020, 0.020, 0.004, 0.004, 0.004, 0.004, 0.004, 0.004, 0.001, 0.001, 0.001, 0.001]
   # Scaling factor for the population in the model (based on data)
   artificial_rescaling_of_population_size: 0.25
 
@@ -81,14 +79,14 @@ spatial_settings:
   mode: "grid_based" # or "location_based"
   grid_based:
     # Adjusted population raster to account for burn-in up to 2009 start
-    population_raster: "../input/kag_init_pop.asc"
+    population_raster: "../../sample_inputs/kag_init_pop.asc"
 
     # Raster files defining the country districts
-    district_raster: "../input/kag_district.asc"
+    district_raster: "../../sample_inputs/kag_district.asc"
 
     # Raster files defining treatment probabilities (comment these out for beta calibration)
-    p_treatment_under_5_raster: "../input/kag_treatment.asc"
-    p_treatment_over_5_raster: "../input/kag_treatment.asc"
+    p_treatment_under_5_raster: "../../sample_inputs/kag_treatment.asc"
+    p_treatment_over_5_raster: "../../sample_inputs/kag_treatment.asc"
 
     # Probability that an infected and symptomatic person receives treatment; single value for the entire country
     # If set to '-1', these values are read from 'pr_treatment_under5' and 'pr_treatment_over5' above
@@ -96,7 +94,7 @@ spatial_settings:
     p_treatment_over_5_by_location: [-1]
 
     # Raster file containing the calibrated beta value
-    beta_raster: "../input/kag_beta_r1.asc"
+    beta_raster: "../../sample_inputs/kag_beta_r1.asc"
     # Will be overridden by beta_raster
     beta_by_location: [-1]
 
@@ -195,7 +193,7 @@ movement_settings:
       sd: 10
 
 # ---------------------------------------------------------------
-# 9. Parasite Parameters
+# 8. Parasite Parameters
 # ---------------------------------------------------------------
 parasite_parameters:
   parasite_density_levels:
@@ -218,7 +216,7 @@ parasite_parameters:
     using_free_recombination: true
 
 # ---------------------------------------------------------------
-# 10. Immune System Parameters
+# 9. Immune System Parameters
 # ---------------------------------------------------------------
 immune_system_parameters:
   # Parameters governing the immune response
@@ -237,7 +235,7 @@ immune_system_parameters:
   midpoint: 0.4 # Midpoint for the immunity curve
 
 # ---------------------------------------------------------------
-# 11. Mutation and Genotype Parameters
+# 10. Mutation and Genotype Parameters
 # ---------------------------------------------------------------
 genotype_parameters:
   # Mutation mask indicating positions of genetic mutations
@@ -507,16 +505,16 @@ genotype_parameters:
       drug_id: 2
       ec50: 0.82
 
-  initial_parasite_info:
+  initial_genotype_info:
     - location_id: -1 # -1 indicates all locations
-      parasite_info:
+      genotype_info:
         - aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
           prevalence: 0.05
         - aa_sequence: "||||NY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
           prevalence: 0.05
 
 # ---------------------------------------------------------------
-# 12. Drug Parameters
+# 11. Drug Parameters
 # ---------------------------------------------------------------
 drug_parameters:
   drug_db:
@@ -598,7 +596,7 @@ drug_parameters:
       base_EC50: 0.68
 
 # ---------------------------------------------------------------
-# 13. Therapy Parameters
+# 12. Therapy Parameters
 # ---------------------------------------------------------------
 therapy_parameters:
   # Testing day for determining if treatment failed
@@ -610,63 +608,63 @@ therapy_parameters:
   therapy_db:
     #mono as
     0:
-      drug_id: [0]
+      drug_ids: [0]
       dosing_days: [3]
     #mono Lumefaltrine
     1:
-      drug_id: [1]
+      drug_ids: [1]
       dosing_days: [3]
     #mono AQ
     2:
-      drug_id: [2]
+      drug_ids: [2]
       dosing_days: [3]
     #mono PPQ
     3:
-      drug_id: [3]
+      drug_ids: [3]
       dosing_days: [3]
     #mono MQ
     4:
-      drug_id: [4]
+      drug_ids: [4]
       dosing_days: [3]
     #mono SP
     5:
-      drug_id: [5]
+      drug_ids: [5]
       dosing_days: [3]
     #AL
     6:
-      drug_id: [0, 1]
+      drug_ids: [0, 1]
       dosing_days: [3]
     #AS-AQ
     7:
-      drug_id: [0, 2]
+      drug_ids: [0, 2]
       dosing_days: [3]
     # DHA-PPQ
     8:
-      drug_id: [0, 3]
+      drug_ids: [0, 3]
       dosing_days: [3]
     #AS-MQ
     9:
-      drug_id: [0, 4]
+      drug_ids: [0, 4]
       dosing_days: [3]
     #TACT DHA-PPQ-MQ
     10:
-      drug_id: [0, 3, 4]
+      drug_ids: [0, 3, 4]
       dosing_days: [3]
     #TACT AL-AQ
     11:
-      drug_id: [0, 1, 2]
+      drug_ids: [0, 1, 2]
       dosing_days: [3]
     #CQ
     12:
-      drug_id: [6]
+      drug_ids: [6]
       dosing_days: [3]
     #Generic for Burn-in
     13:
-      drug_id: [8]
+      drug_ids: [8]
       dosing_days: [3]
 
 # ---------------------------------------------------------------
-# 14. Treatment Strategy Parameters
+# 13. Treatment Strategy Parameters
 # ---------------------------------------------------------------
 strategy_parameters:
   strategy_db:
@@ -678,11 +676,11 @@ strategy_parameters:
     1:
       name: AL-SFTStrategy
       type: SFT
-      therapy_id: 6
+      therapy_ids: [6]
     2:
       name: ASAQ-SFTStrategy
       type: SFT
-      therapy_id: 7
+      therapy_ids: [7]
     3:
       name: CyclingStrategy
       type: Cycling
@@ -724,11 +722,11 @@ strategy_parameters:
     9:
       name: DPM-SFTStrategy
       type: SFT
-      therapy_id: 10
+      therapy_ids: [10]
     10:
       name: AL-AQ-SFTStrategy
       type: SFT
-      therapy_id: 11
+      therapy_ids: [11]
     11:
       name: AL-BaseLineStrategy
       type: NestedMFT
@@ -747,17 +745,17 @@ strategy_parameters:
       name: BaseLineStrategy
       type: NestedMFTMultiLocation
       strategy_ids: [0, 1]
-      start_distribution: [[0.05, 0.95]]
-      peak_distribution: [[0.8, 0.2]]
+      start_distribution_by_location: [[0.05, 0.95]]
+      peak_distribution_by_location: [[0.8, 0.2]]
       peak_after: 3650
     14:
       name: DHAPPQ-SFTStrategy
       type: SFT
-      therapy_id: 8
+      therapy_ids: [8]
     15:
       name: Burnin-SFTStrategy
       type: SFT
-      therapy_id: 13
+      therapy_ids: [13]
 
   # Initial treatment strategy ID
   initial_strategy_id: 15
@@ -774,7 +772,7 @@ strategy_parameters:
     mean_prob_individual_present_at_mda: [0.85, 0.75, 0.85]
     sd_prob_individual_present_at_mda: [0.3, 0.3, 0.3]
 # ---------------------------------------------------------------
-# 15. Epidemiological Parameters
+# 14. Epidemiological Parameters
 # ---------------------------------------------------------------
 epidemiological_parameters:
   # number of days to keep track total number of parasites in population
@@ -845,14 +843,14 @@ epidemiological_parameters:
   inflation_factor: 0.01
 
 # ---------------------------------------------------------------
-# 16. Mosquito Parameters (default is location based)
+# 15. Mosquito Parameters (default is location based)
 # ---------------------------------------------------------------
 mosquito_parameters:
   mosquito_config:
     mode: "location_based" # or "grid_based"
     grid_based:
-      interrupted_feeding_rate_raster: "../input/kag_mosquito_ifr.asc"
-      prmc_size_raster: "../input/kag_mosquito_size.asc"
+      interrupted_feeding_rate_raster: "../sample_inputs/kag_mosquito_ifr.asc"
+      prmc_size_raster: "../sample_inputs/kag_mosquito_size.asc"
     location_based:
       interrupted_feeding_rate: [0.19]
       prmc_size: [100]
@@ -861,156 +859,161 @@ mosquito_parameters:
   within_host_induced_free_recombination: true
 
 # ---------------------------------------------------------------
-# 17. Population Events (all events are optional)
+# 16. Population Events (all events are optional)
 # ---------------------------------------------------------------
 population_events:
   - name: change_within_host_induced_recombination
     info:
       date: 2000/1/1
       value: false
-  - name: change_within_host_induced_recombination
+  - name: change_mutation_probability_per_locus
     info:
-      date: 2010/1/1
-      value: true
-
-  - name: turn_off_mutation
-    info:
-      - date: 2000/1/1
-  - name: turn_on_mutation
-    info:
-      - date: 2010/1/1
-
-  - name: introduce_plas2_parasites
-    info:
-      - location: 0
-        date: 1990/3/20
-        fraction: 0.01
-
-  - name: introduce_parasites
-    info:
-      - location: 0
-        parasite_info:
-          - date: 1990/3/20
-            genotype_id: 1
-            number_of_cases: 5
-          - date: 1990/4/15
-            genotype_id: 2
-            number_of_cases: 5
-      - location: 1
-        parasite_info:
-          - date: 1990/8/25
-            genotype_id: 4
-            number_of_cases: 5
-          - date: 1990/10/20
-            genotype_id: 8
-            number_of_cases: 5
-
-  - name: introduce_parasites_periodically
-    info:
-      - location: 0
-        parasite_info:
-          - duration: 10
-            genotype_id: -1
-            number_of_cases: 1
-            start_date: 1990/6/2
-
-  - name: introduce_parasites_periodically_v2
-    info:
-      - location: 0
-        parasite_info:
-          - duration: 10
-            number_of_cases: 1
-            start_date: 2008/2/1
-            end_date: 2008/2/1
-            allele_distributions:
-              - position: 0
-                distribution: [ 0.5, 0.5 ]
-              - position: 1
-                distribution: [ 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 ]
-              - position: 2
-                distribution: [ 0.5, 0.5 ]
-              - position: 3
-                distribution: [ 0.5, 0.5 ]
-              - position: 4
-                distribution: [ 0.5, 0.5 ]
-
-  - name: change_treatment_coverage
-    info:
-      - type: SteadyTCM
-        date: 1990/2/1
-        p_treatment_for_less_than_5_by_location: [ 0.600000 ]
-        p_treatment_for_more_than_5_by_location: [ 0.550000 ]
-      - type: InflatedTCM
-        date: 1990/3/1
-        annual_inflation_rate: 0.01
-      - type: LinearTCM
-        from_date: 1990/6/1
-        to_date: 1990/12/1
-        p_treatment_for_less_than_5_by_location_to: [ 0.900000 ]
-        p_treatment_for_more_than_5_by_location_to: [ 0.90000 ]
-
-  - name: change_treatment_strategy
-    info:
-      - date: 1990/3/2
-        strategy_id: 2
-      - date: 1990/6/2
-        strategy_id: 3
-      - date: 1990/9/2
-        strategy_id: 4
-
-  - name: single_round_MDA
-    info:
-      - date: 2020/1/1
-        fraction_population_targeted: [ 1.0 ]
-        days_to_complete_all_treatments: 14
-      - date: 2020/2/8
-        fraction_population_targeted: [ 0.03333333 ]
-        days_to_complete_all_treatments: 14
-      - date: 2020/3/14
-        fraction_population_targeted: [ 0.7 ]
-        days_to_complete_all_treatments: 14
-
-  - name: modify_nested_mft_strategy
-    info:
-      - date: 2015/5/1
-        strategy_id: 5
-
-  - name: introduce_580Y_parasites
-    info:
-      - location: 2
-        date: 2005/7/15
-        fraction: 0.02
-
-  - name: introduce_aq_mutant_parasites
-    info:
-      - location: 3
-        date: 2007/4/30
-        fraction: 0.05
-
-  - name: introduce_lumefantrine_mutant_parasites
-    info:
-      - location: 4
-        date: 2012/10/12
-        fraction: 0.03
-
-  - name: introduce_triple_mutant_to_dpm_parasites
-    info:
-      - location: 1
-        date: 2013/12/20
-        fraction: 0.04
-
-  - name: change_interrupted_feeding_rate
-    info:
-      - location: 5
-        date: 2001/6/1
-        rate: 0.5
-      - location: 6
-        date: 2002/8/15
-        rate: 0.7
-
-  - name: change_mutation_probability_by_locus
-    info:
-      - date: 2008/9/10
-        value: 0.001
+      date: 2000/1/1
+      value: false
+#  - name: change_within_host_induced_recombination
+#    info:
+#      day: 2010/1/1
+#      value: true
+#
+#  - name: turn_off_mutation
+#    info:
+#      - day: 2000/1/1
+#  - name: turn_on_mutation
+#    info:
+#      - day: 2010/1/1
+#
+#  - name: change_treatment_coverage
+#    info:
+#      - type: SteadyTCM
+#        date: 1990/2/1
+#        p_treatment_for_less_than_5_by_location: [ 0.600000 ]
+#        p_treatment_for_more_than_5_by_location: [ 0.550000 ]
+#      - type: InflatedTCM
+#        date: 1990/3/1
+#        annual_inflation_rate: 0.01
+#      - type: LinearTCM
+#        from_date: 1990/6/1
+#        to_date: 1990/12/1
+#        p_treatment_for_less_than_5_by_location_to: [ 0.900000 ]
+#        p_treatment_for_more_than_5_by_location_to: [ 0.90000 ]
+#
+#  - name: change_treatment_strategy
+#    info:
+#      - date: 1990/3/2
+#        strategy_id: 2
+#      - date: 1990/6/2
+#        strategy_id: 3
+#      - date: 1990/9/2
+#        strategy_id: 4
+#
+#  - name: single_round_MDA
+#    info:
+#      - date: 2020/1/1
+#        fraction_population_targeted: [ 1.0 ]
+#        days_to_complete_all_treatments: 14
+#      - date: 2020/2/8
+#        fraction_population_targeted: [ 0.03333333 ]
+#        days_to_complete_all_treatments: 14
+#      - date: 2020/3/14
+#        fraction_population_targeted: [ 0.7 ]
+#        days_to_complete_all_treatments: 14
+#
+#  - name: modify_nested_mft_strategy
+#    info:
+#      - date: 2015/5/1
+#        strategy_id: 5
+#
+#  - name: introduce_plas2_parasites
+#    info:
+#      - location: 0
+#        date: 1990/3/20
+#        fraction: 0.01
+#
+#  - name: introduce_parasites
+#    info:
+#      - location: 0
+#        parasite_info:
+#          - date: 1990/3/20
+#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
+#            number_of_cases: 5
+#          - date: 1990/4/15
+#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
+#            number_of_cases: 5
+#      - location: 1
+#        parasite_info:
+#          - date: 1990/8/25
+#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
+#            number_of_cases: 5
+#          - date: 1990/10/20
+#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
+#            number_of_cases: 5
+#
+#  - name: introduce_parasites_periodically
+#    info:
+#      - location: 0
+#        parasite_info:
+#          - duration: 10
+#            genotype_aa_sequence: -1
+#            number_of_cases: 1
+#            start_date: 1990/6/2
+#
+#  - name: introduce_580Y_parasites
+#    info:
+#      - location: 2
+#        date: 2005/7/15
+#        fraction: 0.02
+#
+#  - name: introduce_aq_mutant_parasites
+#    info:
+#      - location: 3
+#        date: 2007/4/30
+#        fraction: 0.05
+#
+#  - name: introduce_lumefantrine_mutant_parasites
+#    info:
+#      - location: 4
+#        date: 2012/10/12
+#        fraction: 0.03
+#
+#  - name: introduce_triple_mutant_to_dpm_parasites
+#    info:
+#      - location: 1
+#        date: 2013/12/20
+#        fraction: 0.04
+#
+#  - name: change_interrupted_feeding_rate
+#    info:
+#      - location: 5
+#        date: 2001/6/1
+#        interrupted_feeding_rate: 0.5
+#      - location: 6
+#        date: 2002/8/15
+#        interrupted_feeding_rate: 0.7
+#
+#  - name: change_mutation_probability_per_locus
+#    info:
+#      - date: 2008/9/10
+#        mutation_probability_per_locus: 0.001
+#
+#  # TODO: change this event to match new genotype format
+##  - name: introduce_parasites_periodically_v2
+##    info:
+##      - location: 0
+##        parasite_info:
+##          - duration: 10
+##            number_of_cases: 1
+##            start_date: 2008/2/1
+##            end_date: 2008/2/1
+##            allele_distributions:
+##              - position: 0
+##                distribution: [ 0.5, 0.5 ]
+##              - position: 1
+##                distribution: [ 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 ]
+##              - position: 2
+##                distribution: [ 0.5, 0.5 ]
+##              - position: 3
+##                distribution: [ 0.5, 0.5 ]
+##              - position: 4
+##                distribution: [ 0.5, 0.5 ]
 
 

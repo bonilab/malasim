@@ -50,8 +50,8 @@ TEST_F(MovementSettingsTest, EncodeMovementSettings) {
 
     // Check if spatial_model fields are encoded correctly
     EXPECT_EQ(node["spatial_model"]["name"].as<std::string>(), "TestModel");
-    EXPECT_EQ(node["spatial_model"]["barabasi"]["r_g_0"].as<double>(), 1.0);
-    EXPECT_EQ(node["spatial_model"]["wesolowski"]["kappa"].as<double>(), 2.0);
+    EXPECT_EQ(node["spatial_model"]["Barabasi"]["r_g_0"].as<double>(), 1.0);
+    EXPECT_EQ(node["spatial_model"]["Wesolowski"]["kappa"].as<double>(), 2.0);
 
     // Check if circulation_info fields are encoded correctly
     EXPECT_EQ(node["circulation_info"]["max_relative_moving_value"].as<int>(), 10);
@@ -63,18 +63,18 @@ TEST_F(MovementSettingsTest, EncodeMovementSettings) {
 TEST_F(MovementSettingsTest, DecodeMovementSettings) {
     YAML::Node node;
     node["spatial_model"]["name"] = "TestModel";
-    node["spatial_model"]["barabasi"]["r_g_0"] = 1.0;
-    node["spatial_model"]["barabasi"]["beta_r"] = 0.5;
-    node["spatial_model"]["barabasi"]["kappa"] = 3;
-    node["spatial_model"]["wesolowski"]["kappa"] = 2.0;
-    node["spatial_model"]["wesolowski"]["alpha"] = 0.1;
-    node["spatial_model"]["wesolowski"]["beta"] = 0.2;
-    node["spatial_model"]["wesolowski"]["gamma"] = 0.3;
+    node["spatial_model"]["Barabasi"]["r_g_0"] = 1.0;
+    node["spatial_model"]["Barabasi"]["beta_r"] = 0.5;
+    node["spatial_model"]["Barabasi"]["kappa"] = 3;
+    node["spatial_model"]["Wesolowski"]["kappa"] = 2.0;
+    node["spatial_model"]["Wesolowski"]["alpha"] = 0.1;
+    node["spatial_model"]["Wesolowski"]["beta"] = 0.2;
+    node["spatial_model"]["Wesolowski"]["gamma"] = 0.3;
     node["circulation_info"]["max_relative_moving_value"] = 10;
     node["circulation_info"]["number_of_moving_levels"] = 3;
-    node["circulation_info"]["moving_level_distribution"]["distribution"] = "gamma";
-    node["circulation_info"]["moving_level_distribution"]["gamma"]["mean"] = 5.0;
-    node["circulation_info"]["moving_level_distribution"]["gamma"]["sd"] = 2.0;
+    node["circulation_info"]["moving_level_distribution"]["distribution"] = "Gamma";
+    node["circulation_info"]["moving_level_distribution"]["Gamma"]["mean"] = 5.0;
+    node["circulation_info"]["moving_level_distribution"]["Gamma"]["sd"] = 2.0;
     node["circulation_info"]["circulation_percent"] = 50.0;
     node["circulation_info"]["length_of_stay"]["mean"] = 5.0;
     node["circulation_info"]["length_of_stay"]["sd"] = 2.0;

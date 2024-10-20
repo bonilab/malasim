@@ -193,18 +193,18 @@ struct convert<SpatialModel> {
     static Node encode(const SpatialModel& rhs) {
         Node node;
         node["name"] = rhs.get_name();
-        node["barabasi"] = rhs.get_barabasi();
-        node["wesolowski"] = rhs.get_wesolowski();
+        node["Barabasi"] = rhs.get_barabasi();
+        node["Wesolowski"] = rhs.get_wesolowski();
         return node;
     }
 
     static bool decode(const Node& node, SpatialModel& rhs) {
-        if(!node["name"] || !node["barabasi"] || !node["wesolowski"])
-            throw std::runtime_error("Missing fields in SpatialModel");
+        if(!node["name"] || !node["Barabasi"] || !node["Wesolowski"])
+            throw std::runtime_error("Missing fields in MovementSettings/SpatialModel");
 
         rhs.set_name(node["name"].as<std::string>());
-        rhs.set_barabasi(node["barabasi"].as<BarabasiSettings>());
-        rhs.set_wesolowski(node["wesolowski"].as<WesolowskiSettings>());
+        rhs.set_barabasi(node["Barabasi"].as<BarabasiSettings>());
+        rhs.set_wesolowski(node["Wesolowski"].as<WesolowskiSettings>());
         return true;
     }
 };
@@ -235,16 +235,16 @@ struct convert<MovingLevelDistribution> {
     static Node encode(const MovingLevelDistribution& rhs) {
         Node node;
         node["distribution"] = rhs.get_distribution();
-        node["gamma"] = rhs.get_gamma();
+        node["Gamma"] = rhs.get_gamma();
         return node;
     }
 
     static bool decode(const Node& node, MovingLevelDistribution& rhs) {
-        if(!node["distribution"] || !node["gamma"])
+        if(!node["distribution"] || !node["Gamma"])
             throw std::runtime_error("Missing fields in MovingLevelDistribution");
 
         rhs.set_distribution(node["distribution"].as<std::string>());
-        rhs.set_gamma(node["gamma"].as<MovingLevelDistributionGamma>());
+        rhs.set_gamma(node["Gamma"].as<MovingLevelDistributionGamma>());
         return true;
     }
 };

@@ -1,7 +1,7 @@
-
-#include "Config.h"
-
 #include <yaml-cpp/yaml.h>
+#include "Config.h"
+#include "Utils/AscFile.h"
+#include "Utils/Logger.h"
 
 void Config::load(const std::string &filename) {
   config_file_path_ = filename;
@@ -32,13 +32,73 @@ void Config::load(const std::string &filename) {
   config_data_.immune_system_parameters =
     config["immune_system_parameters"].as<ImmuneSystemParameters>();
 
+  config_data_.genotype_parameters =
+    config["genotype_parameters"].as<GenotypeParameters>();
+
+  config_data_.drug_parameters =
+    config["drug_parameters"].as<DrugParameters>();
+
+  config_data_.therapy_parameters =
+    config["therapy_parameters"].as<TherapyParameters>();
+
+  config_data_.strategy_parameters =
+    config["strategy_parameters"].as<StrategyParameters>();
+
   config_data_.epidemiological_parameters =
     config["epidemiological_parameters"].as<EpidemiologicalParameters>();
 
+  config_data_.mosquito_parameters =
+    config["mosquito_parameters"].as<MosquitoParameters>();
+
+  config_data_.population_events =
+    config["population_events"].as<PopulationEvents>();
 
   // Validate all cross field validations
   validate_all_cross_field_validations();
 }
+
+void Config::validate_all_cross_field_validations() {
+  if(config_data_.spatial_settings.get_mode() == "grid_based") {
+    // Validate all raster file paths
+    AscFile *asc_file = new AscFile();
+    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_population_raster(),
+                          AscFile::Type::Population)) {
+      std::cout << "Population raster file validated successfully" << std::endl;
+    }
+    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_district_raster(),
+                           AscFile::Type::District)) {
+      std::cout << "District raster file validated successfully" << std::endl;
+    }
+    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_beta_raster(),
+                           AscFile::Type::Beta)) {
+      std::cout << "Beta raster file validated successfully" << std::endl;
+    }
+    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_p_treatment_over_5_raster(),
+                            AscFile::Type::Treatment)) {
+      std::cout << "P treatment over 5 raster file validated successfully" << std::endl;
+    }
+    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_p_treatment_under_5_raster(),
+                            AscFile::Type::Treatment)) {
+      std::cout << "P treatment under 5 raster file validated successfully" << std::endl;
+    }
+  }
+  if(config_data_.mosquito_parameters.get_mosquito_config().get_mode() == "grid_based") {
+    // Validate all raster file paths
+    AscFile *asc_file = new AscFile();
+    if(asc_file->load_and_validate(config_data_.mosquito_parameters.get_mosquito_config().get_grid_based().get_interrupted_feeding_rate_raster(),
+                                    AscFile::Type::Mosquito_IFR)) {
+      std::cout << "Interrupted feeding rate raster file validated successfully" << std::endl;
+    }
+    if(asc_file->load_and_validate(config_data_.mosquito_parameters.get_mosquito_config().get_grid_based().get_prmc_size_raster(),
+                           AscFile::Type::Mosquito_Size)) {
+      std::cout << "PRMC size raster file validated successfully" << std::endl;
+    }
+  }
+  // Validate model settings
+
+
+}
+
 
 void Config::reload() { load(config_file_path_); }
 

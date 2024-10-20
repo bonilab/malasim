@@ -3,10 +3,7 @@
 #define CONFIG_H
 
 #include <date/date.h>
-#include <yaml-cpp/yaml.h>
-
 #include <string>
-
 #include "ConfigData.h"
 
 class Config {
@@ -27,6 +24,9 @@ public:
   // Reload configuration (useful for dynamic updates)
   void reload();
 
+  // Validate all cross-field validations
+  void validate_all_cross_field_validations();
+
   // Getters for entire configuration structures
   [[nodiscard]] const ModelSettings &get_model_settings() const {
     return config_data_.model_settings;
@@ -34,15 +34,15 @@ public:
   [[nodiscard]] const SimulationTimeframe &get_simulation_timeframe() const {
     return config_data_.simulation_timeframe;
   }
-  [[nodiscard]] const SpatialSettings &get_spatial_settings() const {
-    return config_data_.spatial_settings;
-  }
   [[nodiscard]] const TransmissionSettings &get_transmission_settings() const {
     return config_data_.transmission_settings;
   }
   [[nodiscard]] const PopulationDemographic &get_population_demographic()
       const {
     return config_data_.population_demographic;
+  }
+  [[nodiscard]] const SpatialSettings &get_spatial_settings() const {
+    return config_data_.spatial_settings;
   }
   [[nodiscard]] const SeasonalitySettings &get_seasonality_settings() const {
     return config_data_.seasonality_settings;
@@ -57,13 +57,34 @@ public:
       const {
     return config_data_.immune_system_parameters;
   }
+  [[nodiscard]] const GenotypeParameters &get_genotype_parameters()
+      const {
+    return config_data_.genotype_parameters;
+  }
+  [[nodiscard]] const DrugParameters &get_drug_parameters()
+      const {
+    return config_data_.drug_parameters;
+  }
+  [[nodiscard]] const TherapyParameters &get_therapy_parameters()
+      const {
+    return config_data_.therapy_parameters;
+  }
+  [[nodiscard]] const StrategyParameters &get_strategy_parameters()
+      const {
+    return config_data_.strategy_parameters;
+  }
   [[nodiscard]] const EpidemiologicalParameters &get_epidemiological_parameters()
       const {
     return config_data_.epidemiological_parameters;
   }
-
-  // Validate all cross-field validations
-  void validate_all_cross_field_validations();
+  [[nodiscard]] const MosquitoParameters &get_mosquito_parameters()
+      const {
+    return config_data_.mosquito_parameters;
+  }
+  [[nodiscard]] const PopulationEvents &get_population_events()
+      const {
+    return config_data_.population_events;
+  }
 
 private:
   // Template method for getting a field

@@ -39,20 +39,20 @@ protected:
         override_ec50.set_ec50(0.8);
 
         // Set up initial parasite info
-        GenotypeParameters::ParasiteInfo parasite_info;
-        parasite_info.set_aa_sequence("||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1");
-        parasite_info.set_prevalence(0.05);
+        GenotypeParameters::GenotypeInfo genotype_info;
+        genotype_info.set_aa_sequence("||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1");
+        genotype_info.set_prevalence(0.05);
 
-        GenotypeParameters::InitialParasiteInfo initial_parasite_info;
-        initial_parasite_info.set_location_id(-1);
-        initial_parasite_info.set_parasite_info({parasite_info});
+        GenotypeParameters::InitialGenotypeInfo initial_genotype_info;
+        initial_genotype_info.set_location_id(-1);
+        initial_genotype_info.set_genotype_info({genotype_info});
 
         // Set up genotype parameters
         genotype_parameters.set_mutation_mask("||||111||1111111,0||||||000000000010|1");
         genotype_parameters.set_mutation_probability_per_locus(0.001);
         genotype_parameters.set_pf_genotype_info({chromosome_info});
         genotype_parameters.set_override_ec50_patterns({override_ec50});
-        genotype_parameters.set_initial_parasite_info({initial_parasite_info});
+        genotype_parameters.set_initial_genotype_info({initial_genotype_info});
     }
 };
 
@@ -67,7 +67,7 @@ TEST_F(GenotypeParametersTest, EncodeGenotypeParameters) {
     EXPECT_EQ(node["pf_genotype_info"][0]["genes"][0]["name"].as<std::string>(), "Pfmdr1");
     EXPECT_EQ(node["pf_genotype_info"][0]["genes"][0]["aa_positions"][0]["position"].as<int>(), 86);
     EXPECT_EQ(node["override_ec50_patterns"][0]["pattern"].as<std::string>(), "||||NY1||1111111,0||||||000000000010|1");
-    EXPECT_EQ(node["initial_parasite_info"][0]["location_id"].as<int>(), -1);
+    EXPECT_EQ(node["initial_genotype_info"][0]["location_id"].as<int>(), -1);
 }
 
 // Test decoding functionality for GenotypeParameters
@@ -135,9 +135,9 @@ TEST_F(GenotypeParametersTest, DecodeGenotypeParameters) {
     node["override_ec50_patterns"][0]["ec50"] = 0.8;
 
     // Initial parasite info
-    node["initial_parasite_info"][0]["location_id"] = -1;
-    node["initial_parasite_info"][0]["parasite_info"][0]["aa_sequence"] = "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1";
-    node["initial_parasite_info"][0]["parasite_info"][0]["prevalence"] = 0.05;
+    node["initial_genotype_info"][0]["location_id"] = -1;
+    node["initial_genotype_info"][0]["genotype_info"][0]["aa_sequence"] = "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1";
+    node["initial_genotype_info"][0]["genotype_info"][0]["prevalence"] = 0.05;
 
     GenotypeParameters decoded_parameters;
     EXPECT_NO_THROW(YAML::convert<GenotypeParameters>::decode(node, decoded_parameters));
@@ -147,7 +147,7 @@ TEST_F(GenotypeParametersTest, DecodeGenotypeParameters) {
     EXPECT_EQ(decoded_parameters.get_mutation_probability_per_locus(), 0.001);
     EXPECT_EQ(decoded_parameters.get_pf_genotype_info()[0].get_chromosome(), 5);
     EXPECT_EQ(decoded_parameters.get_override_ec50_patterns()[0].get_pattern(), "||||NY1||1111111,0||||||000000000010|1");
-    EXPECT_EQ(decoded_parameters.get_initial_parasite_info()[0].get_location_id(), -1);
+    EXPECT_EQ(decoded_parameters.get_initial_genotype_info()[0].get_location_id(), -1);
 
     // Validate Chromosome 5
     EXPECT_EQ(decoded_parameters.get_pf_genotype_info()[0].get_chromosome(), 5);
@@ -221,7 +221,7 @@ TEST_F(GenotypeParametersTest, DecodeGenotypeParametersMissingField) {
     node1["mutation_mask"] = "||||111||1111111,0||||||000000000010|1";  // Missing mutation_probability_per_locus
     node1["pf_genotype_info"] = YAML::Node();
     node1["override_ec50_patterns"] = YAML::Node();
-    node1["initial_parasite_info"] = YAML::Node();
+    node1["initial_genotype_info"] = YAML::Node();
 
     GenotypeParameters decoded_parameters1;
     EXPECT_THROW(YAML::convert<GenotypeParameters>::decode(node1, decoded_parameters1), std::runtime_error);
@@ -231,7 +231,7 @@ TEST_F(GenotypeParametersTest, DecodeGenotypeParametersMissingField) {
     node2["mutation_mask"] = "||||111||1111111,0||||||000000000010|1";
     node2["mutation_probability_per_locus"] = 0.001;  // Missing pf_genotype_info
     node2["override_ec50_patterns"] = YAML::Node();
-    node2["initial_parasite_info"] = YAML::Node();
+    node2["initial_genotype_info"] = YAML::Node();
 
     GenotypeParameters decoded_parameters2;
     EXPECT_THROW(YAML::convert<GenotypeParameters>::decode(node2, decoded_parameters2), std::runtime_error);
@@ -241,17 +241,17 @@ TEST_F(GenotypeParametersTest, DecodeGenotypeParametersMissingField) {
     node3["mutation_mask"] = "||||111||1111111,0||||||000000000010|1";
     node3["mutation_probability_per_locus"] = 0.001;
     node3["pf_genotype_info"] = YAML::Node();  // Missing override_ec50_patterns
-    node3["initial_parasite_info"] = YAML::Node();
+    node3["initial_genotype_info"] = YAML::Node();
 
     GenotypeParameters decoded_parameters3;
     EXPECT_THROW(YAML::convert<GenotypeParameters>::decode(node3, decoded_parameters3), std::runtime_error);
 
-    // Test case: Missing initial_parasite_info
+    // Test case: Missing initial_genotype_info
     YAML::Node node4;
     node4["mutation_mask"] = "||||111||1111111,0||||||000000000010|1";
     node4["mutation_probability_per_locus"] = 0.001;
     node4["pf_genotype_info"] = YAML::Node();
-    node4["override_ec50_patterns"] = YAML::Node();  // Missing initial_parasite_info
+    node4["override_ec50_patterns"] = YAML::Node();  // Missing initial_genotype_info
 
     GenotypeParameters decoded_parameters4;
     EXPECT_THROW(YAML::convert<GenotypeParameters>::decode(node4, decoded_parameters4), std::runtime_error);
@@ -262,7 +262,7 @@ TEST_F(GenotypeParametersTest, DecodeGenotypeParametersMissingField) {
     node5["mutation_probability_per_locus"] = 0.001;
     node5["pf_genotype_info"] = YAML::Node();  // Empty pf_genotype_info
     node5["override_ec50_patterns"] = YAML::Node();
-    node5["initial_parasite_info"] = YAML::Node();
+    node5["initial_genotype_info"] = YAML::Node();
 
     GenotypeParameters decoded_parameters5;
     EXPECT_THROW(YAML::convert<GenotypeParameters>::decode(node5, decoded_parameters5), std::runtime_error);
@@ -273,7 +273,7 @@ TEST_F(GenotypeParametersTest, DecodeGenotypeParametersMissingField) {
     node6["mutation_probability_per_locus"] = 0.001;
     node6["pf_genotype_info"][0]["chromosome"] = 5;  // Missing genes in pf_genotype_info
     node6["override_ec50_patterns"] = YAML::Node();
-    node6["initial_parasite_info"] = YAML::Node();
+    node6["initial_genotype_info"] = YAML::Node();
 
     GenotypeParameters decoded_parameters6;
     EXPECT_THROW(YAML::convert<GenotypeParameters>::decode(node6, decoded_parameters6), std::runtime_error);
