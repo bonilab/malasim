@@ -4,6 +4,8 @@
 #include <sstream>
 #include <limits>
 
+using utils::AscFile;
+
 // Constructor
 AscFile::AscFile() {
     ncols_ = 0;

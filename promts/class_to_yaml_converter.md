@@ -106,9 +106,6 @@ struct convert<ModelSettings> {
     if (!node["start_collect_data_day"]) {
       throw std::runtime_error("Missing 'start_collect_data_day' field.");
     }
-
-    // TODO: Add more error checking for each field
-
     rhs.set_days_between_stdout_output(
         node["days_between_stdout_output"].as<int>());
     rhs.set_initial_seed_number(node["initial_seed_number"].as<int>());

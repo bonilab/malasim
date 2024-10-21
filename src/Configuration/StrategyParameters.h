@@ -132,19 +132,32 @@ struct convert<StrategyParameters::StrategyInfo> {
         Node node;
         node["name"] = rhs.get_name();
         node["type"] = rhs.get_type();
-        node["therapy_ids"] = rhs.get_therapy_ids();
-        node["distribution"] = rhs.get_distribution();
-        node["cycling_time"] = rhs.get_cycling_time();
-        node["trigger_value"] = rhs.get_trigger_value();
-        node["delay_until_actual_trigger"] = rhs.get_delay_until_actual_trigger();
-        node["turn_off_days"] = rhs.get_turn_off_days();
-        node["update_duration_after_rebalancing"] = rhs.get_update_duration_after_rebalancing();
-        node["strategy_ids"] = rhs.get_strategy_ids();
-        node["start_distribution"] = rhs.get_start_distribution();
-        node["peak_distribution"] = rhs.get_peak_distribution();
-        node["start_distribution_by_location"] = rhs.get_start_distribution_by_location();
-        node["peak_distribution_by_location"] = rhs.get_peak_distribution_by_location();
-        node["peak_after"] = rhs.get_peak_after();
+        if(!rhs.get_therapy_ids().empty())
+            node["therapy_ids"] = rhs.get_therapy_ids();
+        if(!rhs.get_distribution().empty())
+            node["distribution"] = rhs.get_distribution();
+        if(rhs.get_cycling_time() >= 0)
+            node["cycling_time"] = rhs.get_cycling_time();
+        if(rhs.get_trigger_value()>= 0)
+            node["trigger_value"] = rhs.get_trigger_value();
+        if(rhs.get_delay_until_actual_trigger()>= 0)
+            node["delay_until_actual_trigger"] = rhs.get_delay_until_actual_trigger();
+        if(rhs.get_turn_off_days() >= 0)
+            node["turn_off_days"] = rhs.get_turn_off_days();
+        if(rhs.get_update_duration_after_rebalancing() >= 0)
+            node["update_duration_after_rebalancing"] = rhs.get_update_duration_after_rebalancing();
+        if(!rhs.get_strategy_ids().empty())
+            node["strategy_ids"] = rhs.get_strategy_ids();
+        if(!rhs.get_start_distribution().empty())
+            node["start_distribution"] = rhs.get_start_distribution();
+        if(!rhs.get_peak_distribution().empty())
+            node["peak_distribution"] = rhs.get_peak_distribution();
+        if(!rhs.get_start_distribution_by_location().empty())
+            node["start_distribution_by_location"] = rhs.get_start_distribution_by_location();
+        if(!rhs.get_peak_distribution_by_location().empty())
+            node["peak_distribution_by_location"] = rhs.get_peak_distribution_by_location();
+        if(rhs.get_peak_after() >= 0)
+            node["peak_after"] = rhs.get_peak_after();
         return node;
     }
 

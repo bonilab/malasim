@@ -2,9 +2,9 @@
 #include <yaml-cpp/yaml.h>
 #include "Configuration/SpatialSettings.h"
 
-// Helper function to compare std::array<double, 21>
-template <typename T, size_t N>
-void CompareArrays(const std::array<T, N>& expected, const std::array<T, N>& actual) {
+// Helper function to compare std::vector<double>
+template <typename T>
+void CompareVectors(const std::vector<T>& expected, const std::vector<T>& actual, const int N) {
     for (size_t i = 0; i < N; ++i) {
         EXPECT_EQ(expected[i], actual[i]);
     }
@@ -17,7 +17,7 @@ protected:
     void SetUp() override {
         default_settings.set_mode("grid_based");
 
-        GridBased grid;
+        SpatialSettings::GridBased grid;
         grid.set_population_raster("../sample_inputs/kag_init_pop.asc");
         grid.set_district_raster("../sample_inputs/kag_district.asc");
         grid.set_p_treatment_under_5_raster("../sample_inputs/kag_treatment.asc");
@@ -46,8 +46,8 @@ TEST_F(SpatialSettingsTest, EncodeSpatialSettings) {
 
     // Use helper function for comparing arrays
     for (size_t i = 0; i < grid.get_age_distribution_by_location().size(); ++i) {
-        CompareArrays(grid.get_age_distribution_by_location()[i],
-                      node["grid_based"]["age_distribution_by_location"].as<std::vector<std::array<double, 21>>>()[i]);
+        CompareVectors(grid.get_age_distribution_by_location()[i],
+                      node["grid_based"]["age_distribution_by_location"].as<std::vector<std::vector<double>>>()[i], 21);
     }
 }
 
@@ -64,7 +64,7 @@ TEST_F(SpatialSettingsTest, DecodeSpatialSettings) {
     node["grid_based"]["beta_raster"] = "../sample_inputs/kag_beta_r1.asc";
     node["grid_based"]["beta_by_location"] = std::vector<double>{-1};
     node["grid_based"]["cell_size"] = 5.0;
-    node["grid_based"]["age_distribution_by_location"] = std::vector<std::array<double, 21>>{
+    node["grid_based"]["age_distribution_by_location"] = std::vector<std::vector<double>>{
         {0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0}};
 
     SpatialSettings decoded_settings;
@@ -79,8 +79,35 @@ TEST_F(SpatialSettingsTest, DecodeSpatialSettings) {
     EXPECT_EQ(grid.get_p_treatment_over_5_raster(), "../sample_inputs/kag_treatment.asc");
 
     for (size_t i = 0; i < grid.get_age_distribution_by_location().size(); ++i) {
-        CompareArrays(grid.get_age_distribution_by_location()[i], 
-                      std::vector<std::array<double, 21>>{{0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0}}[i]);
+        CompareVectors(grid.get_age_distribution_by_location()[i],
+                      std::vector<std::vector<double>>{{0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0}}[i], 21);
+    }
+
+    //Test for location_based mode
+    node = YAML::Node();
+    node["mode"] = "location_based";
+    node["location_based"]["location_info"] = std::vector<std::vector<double>>{{0,0,0}};
+    node["location_based"]["age_distribution_by_location"] = std::vector<std::vector<double>>{
+            {0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0}};
+    node["location_based"]["p_treatment_under_5_by_location"] = std::vector<double>{0.5};
+    node["location_based"]["p_treatment_over_5_by_location"] = std::vector<double>{0.5};
+    node["location_based"]["beta_by_location"] = std::vector<double>{0.05};
+    node["location_based"]["population_size_by_location"] = std::vector<double>{1000};
+
+    EXPECT_NO_THROW(YAML::convert<SpatialSettings>::decode(node, decoded_settings));
+    EXPECT_EQ(decoded_settings.get_mode(), "location_based");
+    const auto &location = decoded_settings.get_location_based();
+    EXPECT_EQ(location.get_population_size_by_location(), std::vector<int>{1000});
+    EXPECT_EQ(location.get_p_treatment_under_5_by_location(), std::vector<double>{0.5});
+    EXPECT_EQ(location.get_p_treatment_over_5_by_location(), std::vector<double>{0.5});
+    for (size_t i = 0; i < location.get_location_info().size(); ++i) {
+      EXPECT_EQ(location.get_location_info()[i].get_id(),0);
+      EXPECT_EQ(location.get_location_info()[i].get_latitude(),0);
+      EXPECT_EQ(location.get_location_info()[i].get_longitude(),0);
+    }
+    for (size_t i = 0; i < location.get_age_distribution_by_location().size(); ++i) {
+      CompareVectors(location.get_age_distribution_by_location()[i],
+                    std::vector<std::vector<double>>{{0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0}}[i], 21);
     }
 }
 

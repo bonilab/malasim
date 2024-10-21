@@ -25,11 +25,11 @@ public:
   }
   void set_initial_seed_number(int value) {
     if (value < 0) {
-      spdlog::warn("Initial seed number is non-negative. Using random seed instead.");
-      //TODO: Implement random seed generation
+      spdlog::info("Using random seed number");
     }
     else {
       initial_seed_number_ = value;
+      spdlog::info("Using predefined seed number: {}", value);
     }
   }
   [[nodiscard]] bool get_record_genome_db() const { return record_genome_db_; }
@@ -62,8 +62,6 @@ struct convert<ModelSettings> {
     if (!node["record_genome_db"]) {
       throw std::runtime_error("Missing 'record_genome_db' field.");
     }
-
-    // TODO: Add more error checking for each field
 
     rhs.set_days_between_stdout_output(
         node["days_between_stdout_output"].as<int>());

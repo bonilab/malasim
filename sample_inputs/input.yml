@@ -105,43 +105,26 @@ spatial_settings:
     age_distribution_by_location:
       - [0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0]
   location_based:
-    location_db:
-      #id, latitude, longitude
-      location_info:
-        - [0, 0, 0]
-        - [1, 0, 1]
-        - [2, 0, 2]
-        - [3, 1, 0]
-        - [4, 1, 1]
-        - [5, 1, 2]
-        - [6, 2, 0]
-        - [7, 2, 1]
-        - [8, 2, 2]
+    #id, latitude, longitude
+    location_info:
+      - [0, 0, 0]
 
-      #if the number of values less than number of locations, the first value will be applied for all locations
-      age_distribution_by_location:
-        - [0.0334, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
-        - [0.0334, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
-        - [0.0335, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
-        - [0.0335, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
-        - [0.0336, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
-        - [0.0336, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
-        - [0.0337, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
-        - [0.0337, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
-        - [0.0338, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
+    #if the number of values less than number of locations, the first value will be applied for all locations
+    age_distribution_by_location:
+      - [0.0334, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
 
-      # probability that a symptomatic and infected individual seeks and receives antimalarial treatment
-      #if the number of values less than number of locations, the first value will be applied for all locations
-      # this is the initial value, the modification values can be change by setting in events node
-      p_treatment_for_less_than_5_by_location: [0.600000]
-      p_treatment_for_more_than_5_by_location: [0.500000]
+    # probability that a symptomatic and infected individual seeks and receives antimalarial treatment
+    #if the number of values less than number of locations, the first value will be applied for all locations
+    # this is the initial value, the modification values can be change by setting in events node
+    p_treatment_under_5_by_location: [0.600000]
+    p_treatment_over_5_by_location: [0.500000]
 
-      #transmission intensity
-      #if the number of values less than number of locations, the first value will be applied for all locations
-      beta_by_location: [0.05]
+    #transmission intensity
+    #if the number of values less than number of locations, the first value will be applied for all locations
+    beta_by_location: [0.05]
 
-      #if the number of values less than number of locations, the first value will be applied for all locations
-      population_size_by_location: [1000, 10020, 10030, 10040, 10050, 10060, 10070, 10080, 10090]
+    #if the number of values less than number of locations, the first value will be applied for all locations
+    population_size_by_location: [1000]
 
 # ---------------------------------------------------------------
 # 6. Seasonality Settings
@@ -151,7 +134,7 @@ seasonality_settings:
   enable: false
   mode: rainfall
   rainfall:
-    filename: "rwa_adjustment.csv"
+    filename: "../../sample_inputs/kag_seasonality.csv"
     period: 365
   simple:
     a: [1]
@@ -886,16 +869,16 @@ population_events:
 #    info:
 #      - type: SteadyTCM
 #        date: 1990/2/1
-#        p_treatment_for_less_than_5_by_location: [ 0.600000 ]
-#        p_treatment_for_more_than_5_by_location: [ 0.550000 ]
+#        p_treatment_under_5_by_location: [ 0.600000 ]
+#        p_treatment_over_5_by_location: [ 0.550000 ]
 #      - type: InflatedTCM
 #        date: 1990/3/1
 #        annual_inflation_rate: 0.01
 #      - type: LinearTCM
 #        from_date: 1990/6/1
 #        to_date: 1990/12/1
-#        p_treatment_for_less_than_5_by_location_to: [ 0.900000 ]
-#        p_treatment_for_more_than_5_by_location_to: [ 0.90000 ]
+#        p_treatment_under_5_by_location_to: [ 0.900000 ]
+#        p_treatment_over_5_by_location_to: [ 0.90000 ]
 #
 #  - name: change_treatment_strategy
 #    info:

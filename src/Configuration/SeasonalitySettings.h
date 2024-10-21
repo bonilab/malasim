@@ -5,83 +5,83 @@
 #include <vector>
 #include "date/date.h"
 
-// Class to hold the 'rainfall' settings
-class RainfallSettings {
-public:
-  // Getters
-  [[nodiscard]] const std::string &get_filename() const {
-    return filename_;
-  }
-
-  // Setters
-  void set_filename(const std::string &value) {
-    filename_ = value;
-  }
-
-  [[nodiscard]] const date::days &get_period() const {
-    return period_;
-  }
-
-  void set_period(const date::days &value) {
-    if (value.count() <= 0)
-      throw std::invalid_argument("Period must be greater than 0");
-    period_ = value;
-  }
-
-private:
-  std::string filename_;
-  date::days period_;
-};
-
-// Class to hold the 'simple' settings
-class SimpleSettings {
-public:
-  // Getters
-  [[nodiscard]] const std::vector<double> &get_a() const {
-    return a_;
-  }
-
-  // Setters
-  void set_a(const std::vector<double> &value) {
-    a_ = value;
-  }
-
-  [[nodiscard]] const std::vector<int> &get_phi() const {
-    return phi_;
-  }
-
-  void set_phi(const std::vector<int> &value) {
-    phi_ = value;
-  }
-
-  [[nodiscard]] const std::vector<double> &get_min_value() const {
-    return min_value_;
-  }
-
-  void set_min_value(const std::vector<double> &value) {
-    min_value_ = value;
-  }
-
-  [[nodiscard]] const date::days &get_period() const {
-    return period_;
-  }
-
-  void set_period(const date::days &value) {
-    if (value.count() <= 0)
-      throw std::invalid_argument("Period must be greater than 0");
-    period_ = value;
-  }
-
-private:
-  std::vector<double> a_;
-  std::vector<int> phi_;
-  std::vector<double> min_value_;
-  date::days period_;
-};
-
 // Class to hold seasonality settings, combining RainfallSettings and SimpleSettings
 class SeasonalitySettings {
 public:
+  // Class to hold the 'rainfall' settings
+  class RainfallSettings {
+  public:
+    // Getters
+    [[nodiscard]] const std::string &get_filename() const {
+      return filename_;
+    }
+
+    // Setters
+    void set_filename(const std::string &value) {
+      filename_ = value;
+    }
+
+    [[nodiscard]] const date::days &get_period() const {
+      return period_;
+    }
+
+    void set_period(const date::days &value) {
+      if (value.count() <= 0)
+        throw std::invalid_argument("Period must be greater than 0");
+      period_ = value;
+    }
+
+  private:
+    std::string filename_;
+    date::days period_;
+  };
+
+  // Class to hold the 'simple' settings
+  class SimpleSettings {
+  public:
+    // Getters
+    [[nodiscard]] const std::vector<double> &get_a() const {
+      return a_;
+    }
+
+    // Setters
+    void set_a(const std::vector<double> &value) {
+      a_ = value;
+    }
+
+    [[nodiscard]] const std::vector<int> &get_phi() const {
+      return phi_;
+    }
+
+    void set_phi(const std::vector<int> &value) {
+      phi_ = value;
+    }
+
+    [[nodiscard]] const std::vector<double> &get_min_value() const {
+      return min_value_;
+    }
+
+    void set_min_value(const std::vector<double> &value) {
+      min_value_ = value;
+    }
+
+    [[nodiscard]] const date::days &get_period() const {
+      return period_;
+    }
+
+    void set_period(const date::days &value) {
+      if (value.count() <= 0)
+        throw std::invalid_argument("Period must be greater than 0");
+      period_ = value;
+    }
+
+  private:
+    std::vector<double> a_;
+    std::vector<int> phi_;
+    std::vector<double> min_value_;
+    date::days period_;
+  };
+
   // Getters
   [[nodiscard]] bool get_enable() const {
     return enable_;
@@ -126,15 +126,15 @@ private:
 namespace YAML {
 // Convert specialization for RainfallSettings
 template <>
-struct convert<RainfallSettings> {
-  static Node encode(const RainfallSettings &rhs) {
+struct convert<SeasonalitySettings::RainfallSettings> {
+  static Node encode(const SeasonalitySettings::RainfallSettings &rhs) {
     Node node;
     node["filename"] = rhs.get_filename();
     node["period"] = static_cast<int>(rhs.get_period().count()); // Storing period as an int (days)
     return node;
   }
 
-  static bool decode(const Node &node, RainfallSettings &rhs) {
+  static bool decode(const Node &node, SeasonalitySettings::RainfallSettings &rhs) {
     if (!node["filename"] || !node["period"]) {
       throw std::runtime_error("Missing fields in RainfallSettings");
     }
@@ -146,8 +146,8 @@ struct convert<RainfallSettings> {
 
 // Convert specialization for SimpleSettings
 template <>
-struct convert<SimpleSettings> {
-  static Node encode(const SimpleSettings &rhs) {
+struct convert<SeasonalitySettings::SimpleSettings> {
+  static Node encode(const SeasonalitySettings::SimpleSettings &rhs) {
     Node node;
     node["a"] = rhs.get_a();
     node["phi"] = rhs.get_phi();
@@ -156,7 +156,7 @@ struct convert<SimpleSettings> {
     return node;
   }
 
-  static bool decode(const Node &node, SimpleSettings &rhs) {
+  static bool decode(const Node &node, SeasonalitySettings::SimpleSettings &rhs) {
     if (!node["a"] || !node["phi"] || !node["min_value"] || !node["period"]) {
       throw std::runtime_error("Missing fields in SimpleSettings");
     }
@@ -187,8 +187,8 @@ struct convert<SeasonalitySettings> {
 
     rhs.set_enable(node["enable"].as<bool>());
     rhs.set_mode(node["mode"].as<std::string>());
-    rhs.set_rainfall(node["rainfall"].as<RainfallSettings>());
-    rhs.set_simple(node["simple"].as<SimpleSettings>());
+    rhs.set_rainfall(node["rainfall"].as<SeasonalitySettings::RainfallSettings>());
+    rhs.set_simple(node["simple"].as<SeasonalitySettings::SimpleSettings>());
     return true;
   }
 };

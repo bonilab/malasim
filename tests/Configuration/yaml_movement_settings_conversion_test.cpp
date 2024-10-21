@@ -8,31 +8,31 @@ protected:
 
     void SetUp() override {
         // Initialize the movement settings object
-        BarabasiSettings barabasi;
+        MovementSettings::BarabasiSettings barabasi;
         barabasi.set_r_g_0(1.0);
         barabasi.set_beta_r(0.5);
         barabasi.set_kappa(3);
 
-        WesolowskiSettings wesolowski;
+        MovementSettings::WesolowskiSettings wesolowski;
         wesolowski.set_kappa(2.0);
         wesolowski.set_alpha(0.1);
         wesolowski.set_beta(0.2);
         wesolowski.set_gamma(0.3);
 
-        SpatialModel spatial_model;
+        MovementSettings::SpatialModel spatial_model;
         spatial_model.set_name("TestModel");
         spatial_model.set_barabasi(barabasi);
         spatial_model.set_wesolowski(wesolowski);
 
-        MovingLevelDistributionGamma gamma;
+        MovementSettings::MovingLevelDistributionGamma gamma;
         gamma.set_mean(5.0);
         gamma.set_sd(2.0);
 
-        MovingLevelDistribution moving_level_dist;
+        MovementSettings::MovingLevelDistribution moving_level_dist;
         moving_level_dist.set_distribution("gamma");
         moving_level_dist.set_gamma(gamma);
 
-        CirculationInfo circulation_info;
+        MovementSettings::CirculationInfo circulation_info;
         circulation_info.set_max_relative_moving_value(10);
         circulation_info.set_number_of_moving_levels(3);
         circulation_info.set_moving_level_distribution(moving_level_dist);

@@ -1,63 +1,63 @@
 #ifndef PARASITEPARAMETERS_H
 #define PARASITEPARAMETERS_H
 
-class ParasiteDensityLevels {
-public:
-    // Getters and Setters
-    [[nodiscard]] double get_log_parasite_density_cured() const { return log_parasite_density_cured_; }
-    void set_log_parasite_density_cured(double value) { log_parasite_density_cured_ = value; }
-
-    [[nodiscard]] double get_log_parasite_density_from_liver() const { return log_parasite_density_from_liver_; }
-    void set_log_parasite_density_from_liver(double value) { log_parasite_density_from_liver_ = value; }
-
-    [[nodiscard]] double get_log_parasite_density_asymptomatic() const { return log_parasite_density_asymptomatic_; }
-    void set_log_parasite_density_asymptomatic(double value) { log_parasite_density_asymptomatic_ = value; }
-
-    [[nodiscard]] double get_log_parasite_density_clinical() const { return log_parasite_density_clinical_; }
-    void set_log_parasite_density_clinical(double value) { log_parasite_density_clinical_ = value; }
-
-    [[nodiscard]] double get_log_parasite_density_clinical_from() const { return log_parasite_density_clinical_from_; }
-    void set_log_parasite_density_clinical_from(double value) { log_parasite_density_clinical_from_ = value; }
-
-    [[nodiscard]] double get_log_parasite_density_clinical_to() const { return log_parasite_density_clinical_to_; }
-    void set_log_parasite_density_clinical_to(double value) { log_parasite_density_clinical_to_ = value; }
-
-    [[nodiscard]] double get_log_parasite_density_detectable() const { return log_parasite_density_detectable_; }
-    void set_log_parasite_density_detectable(double value) { log_parasite_density_detectable_ = value; }
-
-    [[nodiscard]] double get_log_parasite_density_detectable_pfpr() const { return log_parasite_density_detectable_pfpr_; }
-    void set_log_parasite_density_detectable_pfpr(double value) { log_parasite_density_detectable_pfpr_ = value; }
-
-    [[nodiscard]] double get_log_parasite_density_pyrogenic() const { return log_parasite_density_pyrogenic_; }
-    void set_log_parasite_density_pyrogenic(double value) { log_parasite_density_pyrogenic_ = value; }
-
-private:
-    double log_parasite_density_cured_;
-    double log_parasite_density_from_liver_;
-    double log_parasite_density_asymptomatic_;
-    double log_parasite_density_clinical_;
-    double log_parasite_density_clinical_from_;
-    double log_parasite_density_clinical_to_;
-    double log_parasite_density_detectable_;
-    double log_parasite_density_detectable_pfpr_;
-    double log_parasite_density_pyrogenic_;
-};
-
-class RecombinationParameters {
-public:
-    // Getters and Setters
-    [[nodiscard]] double get_within_chromosome_recombination_rate() const { return within_chromosome_recombination_rate_; }
-    void set_within_chromosome_recombination_rate(double value) { within_chromosome_recombination_rate_ = value; }
-
-    [[nodiscard]] bool get_using_free_recombination() const { return using_free_recombination_; }
-    void set_using_free_recombination(bool value) { using_free_recombination_ = value; }
-
-private:
-    double within_chromosome_recombination_rate_;
-    bool using_free_recombination_;
-};
-
 class ParasiteParameters {
+public:
+    class ParasiteDensityLevels {
+    public:
+        // Getters and Setters
+        [[nodiscard]] double get_log_parasite_density_cured() const { return log_parasite_density_cured_; }
+        void set_log_parasite_density_cured(double value) { log_parasite_density_cured_ = value; }
+
+        [[nodiscard]] double get_log_parasite_density_from_liver() const { return log_parasite_density_from_liver_; }
+        void set_log_parasite_density_from_liver(double value) { log_parasite_density_from_liver_ = value; }
+
+        [[nodiscard]] double get_log_parasite_density_asymptomatic() const { return log_parasite_density_asymptomatic_; }
+        void set_log_parasite_density_asymptomatic(double value) { log_parasite_density_asymptomatic_ = value; }
+
+        [[nodiscard]] double get_log_parasite_density_clinical() const { return log_parasite_density_clinical_; }
+        void set_log_parasite_density_clinical(double value) { log_parasite_density_clinical_ = value; }
+
+        [[nodiscard]] double get_log_parasite_density_clinical_from() const { return log_parasite_density_clinical_from_; }
+        void set_log_parasite_density_clinical_from(double value) { log_parasite_density_clinical_from_ = value; }
+
+        [[nodiscard]] double get_log_parasite_density_clinical_to() const { return log_parasite_density_clinical_to_; }
+        void set_log_parasite_density_clinical_to(double value) { log_parasite_density_clinical_to_ = value; }
+
+        [[nodiscard]] double get_log_parasite_density_detectable() const { return log_parasite_density_detectable_; }
+        void set_log_parasite_density_detectable(double value) { log_parasite_density_detectable_ = value; }
+
+        [[nodiscard]] double get_log_parasite_density_detectable_pfpr() const { return log_parasite_density_detectable_pfpr_; }
+        void set_log_parasite_density_detectable_pfpr(double value) { log_parasite_density_detectable_pfpr_ = value; }
+
+        [[nodiscard]] double get_log_parasite_density_pyrogenic() const { return log_parasite_density_pyrogenic_; }
+        void set_log_parasite_density_pyrogenic(double value) { log_parasite_density_pyrogenic_ = value; }
+
+    private:
+        double log_parasite_density_cured_;
+        double log_parasite_density_from_liver_;
+        double log_parasite_density_asymptomatic_;
+        double log_parasite_density_clinical_;
+        double log_parasite_density_clinical_from_;
+        double log_parasite_density_clinical_to_;
+        double log_parasite_density_detectable_;
+        double log_parasite_density_detectable_pfpr_;
+        double log_parasite_density_pyrogenic_;
+    };
+
+    class RecombinationParameters {
+    public:
+        // Getters and Setters
+        [[nodiscard]] double get_within_chromosome_recombination_rate() const { return within_chromosome_recombination_rate_; }
+        void set_within_chromosome_recombination_rate(double value) { within_chromosome_recombination_rate_ = value; }
+
+        [[nodiscard]] bool get_using_free_recombination() const { return using_free_recombination_; }
+        void set_using_free_recombination(bool value) { using_free_recombination_ = value; }
+
+    private:
+        double within_chromosome_recombination_rate_;
+        bool using_free_recombination_;
+    };
 public:
     // Getters and Setters
     [[nodiscard]] const ParasiteDensityLevels& get_parasite_density_levels() const { return parasite_density_levels_; }
@@ -74,8 +74,8 @@ private:
 namespace YAML {
 // ParasiteDensityLevels YAML conversion
 template<>
-struct convert<ParasiteDensityLevels> {
-    static Node encode(const ParasiteDensityLevels& rhs) {
+struct convert<ParasiteParameters::ParasiteDensityLevels> {
+    static Node encode(const ParasiteParameters::ParasiteDensityLevels& rhs) {
         Node node;
         node["log_parasite_density_cured"] = rhs.get_log_parasite_density_cured();
         node["log_parasite_density_from_liver"] = rhs.get_log_parasite_density_from_liver();
@@ -89,7 +89,7 @@ struct convert<ParasiteDensityLevels> {
         return node;
     }
 
-    static bool decode(const Node& node, ParasiteDensityLevels& rhs) {
+    static bool decode(const Node& node, ParasiteParameters::ParasiteDensityLevels& rhs) {
         if(!node["log_parasite_density_cured"] || !node["log_parasite_density_from_liver"] ||
            !node["log_parasite_density_asymptomatic"] || !node["log_parasite_density_clinical"] ||
            !node["log_parasite_density_clinical_from"] || !node["log_parasite_density_clinical_to"] ||
@@ -112,15 +112,15 @@ struct convert<ParasiteDensityLevels> {
 
 // RecombinationParameters YAML conversion
 template<>
-struct convert<RecombinationParameters> {
-    static Node encode(const RecombinationParameters& rhs) {
+struct convert<ParasiteParameters::RecombinationParameters> {
+    static Node encode(const ParasiteParameters::RecombinationParameters& rhs) {
         Node node;
         node["within_chromosome_recombination_rate"] = rhs.get_within_chromosome_recombination_rate();
         node["using_free_recombination"] = rhs.get_using_free_recombination();
         return node;
     }
 
-    static bool decode(const Node& node, RecombinationParameters& rhs) {
+    static bool decode(const Node& node, ParasiteParameters::RecombinationParameters& rhs) {
         if (!node["within_chromosome_recombination_rate"] || !node["using_free_recombination"])
             throw std::runtime_error("Missing fields in RecombinationParameters");
 
@@ -144,8 +144,8 @@ struct convert<ParasiteParameters> {
         if (!node["parasite_density_levels"] || !node["recombination_parameters"])
             throw std::runtime_error("Missing fields in ParasiteParameters");
 
-        rhs.set_parasite_density_levels(node["parasite_density_levels"].as<ParasiteDensityLevels>());
-        rhs.set_recombination_parameters(node["recombination_parameters"].as<RecombinationParameters>());
+        rhs.set_parasite_density_levels(node["parasite_density_levels"].as<ParasiteParameters::ParasiteDensityLevels>());
+        rhs.set_recombination_parameters(node["recombination_parameters"].as<ParasiteParameters::RecombinationParameters>());
         return true;
     }
 };
