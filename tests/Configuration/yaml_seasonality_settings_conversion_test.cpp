@@ -8,11 +8,11 @@ protected:
 
     void SetUp() override {
         // Initialize default SeasonalitySettings object using setters
-        RainfallSettings rainfall;
+        SeasonalitySettings::RainfallSettings rainfall;
         rainfall.set_filename("test.csv");
         rainfall.set_period(date::days{365});
 
-        SimpleSettings simple;
+        SeasonalitySettings::SimpleSettings simple;
         simple.set_a({1.0});
         simple.set_phi({250});
         simple.set_min_value({0.1});

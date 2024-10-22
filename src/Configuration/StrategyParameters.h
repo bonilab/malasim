@@ -3,6 +3,7 @@
 
 #include <yaml-cpp/yaml.h>
 #include <stdexcept>
+#include <map>
 #include <vector>
 #include <string>
 
@@ -48,6 +49,12 @@ public:
         [[nodiscard]] const std::vector<double>& get_peak_distribution() const { return peak_distribution_; }
         void set_peak_distribution(const std::vector<double>& value) { peak_distribution_ = value; }
 
+        [[nodiscard]] const std::vector<std::vector<double>>& get_start_distribution_by_location() const { return start_distribution_by_location_; }
+        void set_start_distribution_by_location(const std::vector<std::vector<double>>& value) { start_distribution_by_location_ = value; }
+
+        [[nodiscard]] const std::vector<std::vector<double>>& get_peak_distribution_by_location() const { return peak_distribution_by_location_; }
+        void set_peak_distribution_by_location(const std::vector<std::vector<double>>& value) { peak_distribution_by_location_ = value; }
+
         [[nodiscard]] int get_peak_after() const { return peak_after_; }
         void set_peak_after(int value) { peak_after_ = value; }
 
@@ -64,6 +71,8 @@ public:
         std::vector<int> strategy_ids_;
         std::vector<double> start_distribution_;
         std::vector<double> peak_distribution_;
+        std::vector<std::vector<double>> start_distribution_by_location_;
+        std::vector<std::vector<double>> peak_distribution_by_location_;
         int peak_after_ = 0;
     };
 
@@ -95,8 +104,8 @@ public:
     };
 
     // Getters and Setters for StrategyParameters
-    [[nodiscard]] const std::vector<StrategyInfo>& get_strategy_db() const { return strategy_db_; }
-    void set_strategy_db(const std::vector<StrategyInfo>& value) { strategy_db_ = value; }
+    [[nodiscard]] const std::map<int, StrategyInfo>& get_strategy_db() const { return strategy_db_; }
+    void set_strategy_db(const std::map<int, StrategyInfo>& value) { strategy_db_ = value; }
 
     [[nodiscard]] int get_initial_strategy_id() const { return initial_strategy_id_; }
     void set_initial_strategy_id(int value) { initial_strategy_id_ = value; }
@@ -108,7 +117,7 @@ public:
     void set_mass_drug_administration(const MassDrugAdministration& value) { mass_drug_administration_ = value; }
 
 private:
-    std::vector<StrategyInfo> strategy_db_;
+    std::map<int, StrategyInfo> strategy_db_;  // Changed from vector to map
     int initial_strategy_id_;
     int recurrent_therapy_id_;
     MassDrugAdministration mass_drug_administration_;
@@ -123,27 +132,43 @@ struct convert<StrategyParameters::StrategyInfo> {
         Node node;
         node["name"] = rhs.get_name();
         node["type"] = rhs.get_type();
-        node["therapy_ids"] = rhs.get_therapy_ids();
-        node["distribution"] = rhs.get_distribution();
-        node["cycling_time"] = rhs.get_cycling_time();
-        node["trigger_value"] = rhs.get_trigger_value();
-        node["delay_until_actual_trigger"] = rhs.get_delay_until_actual_trigger();
-        node["turn_off_days"] = rhs.get_turn_off_days();
-        node["update_duration_after_rebalancing"] = rhs.get_update_duration_after_rebalancing();
-        node["strategy_ids"] = rhs.get_strategy_ids();
-        node["start_distribution"] = rhs.get_start_distribution();
-        node["peak_distribution"] = rhs.get_peak_distribution();
-        node["peak_after"] = rhs.get_peak_after();
+        if(!rhs.get_therapy_ids().empty())
+            node["therapy_ids"] = rhs.get_therapy_ids();
+        if(!rhs.get_distribution().empty())
+            node["distribution"] = rhs.get_distribution();
+        if(rhs.get_cycling_time() >= 0)
+            node["cycling_time"] = rhs.get_cycling_time();
+        if(rhs.get_trigger_value()>= 0)
+            node["trigger_value"] = rhs.get_trigger_value();
+        if(rhs.get_delay_until_actual_trigger()>= 0)
+            node["delay_until_actual_trigger"] = rhs.get_delay_until_actual_trigger();
+        if(rhs.get_turn_off_days() >= 0)
+            node["turn_off_days"] = rhs.get_turn_off_days();
+        if(rhs.get_update_duration_after_rebalancing() >= 0)
+            node["update_duration_after_rebalancing"] = rhs.get_update_duration_after_rebalancing();
+        if(!rhs.get_strategy_ids().empty())
+            node["strategy_ids"] = rhs.get_strategy_ids();
+        if(!rhs.get_start_distribution().empty())
+            node["start_distribution"] = rhs.get_start_distribution();
+        if(!rhs.get_peak_distribution().empty())
+            node["peak_distribution"] = rhs.get_peak_distribution();
+        if(!rhs.get_start_distribution_by_location().empty())
+            node["start_distribution_by_location"] = rhs.get_start_distribution_by_location();
+        if(!rhs.get_peak_distribution_by_location().empty())
+            node["peak_distribution_by_location"] = rhs.get_peak_distribution_by_location();
+        if(rhs.get_peak_after() >= 0)
+            node["peak_after"] = rhs.get_peak_after();
         return node;
     }
 
     static bool decode(const Node& node, StrategyParameters::StrategyInfo& rhs) {
-        if (!node["name"] || !node["type"] || !node["therapy_ids"] ) {
+        if (!node["name"] || !node["type"] ) {
             throw std::runtime_error("Missing fields in StrategyParameters::StrategyInfo");
         }
         rhs.set_name(node["name"].as<std::string>());
         rhs.set_type(node["type"].as<std::string>());
-        rhs.set_therapy_ids(node["therapy_ids"].as<std::vector<int>>());
+        if(node["therapy_ids"])
+            rhs.set_therapy_ids(node["therapy_ids"].as<std::vector<int>>());
         if(node["distribution"])
             rhs.set_distribution(node["distribution"].as<std::vector<double>>());
         if(node["cycling_time"])
@@ -162,6 +187,10 @@ struct convert<StrategyParameters::StrategyInfo> {
             rhs.set_start_distribution(node["start_distribution"].as<std::vector<double>>());
         if(node["peak_distribution"])
             rhs.set_peak_distribution(node["peak_distribution"].as<std::vector<double>>());
+        if(node["start_distribution_by_location"])
+            rhs.set_start_distribution_by_location(node["start_distribution_by_location"].as<std::vector<std::vector<double>>>());
+        if(node["peak_distribution_by_location"])
+            rhs.set_peak_distribution_by_location(node["peak_distribution_by_location"].as<std::vector<std::vector<double>>>());
         if(node["peak_after"])
             rhs.set_peak_after(node["peak_after"].as<int>());
         return true;
@@ -200,7 +229,14 @@ template<>
 struct convert<StrategyParameters> {
     static Node encode(const StrategyParameters& rhs) {
         Node node;
-        node["strategy_db"] = rhs.get_strategy_db();
+
+        // Encode strategy_db as a map
+        Node strategy_db_node;
+        for (const auto& [key, value] : rhs.get_strategy_db()) {
+            strategy_db_node[key] = value;
+        }
+        node["strategy_db"] = strategy_db_node;
+
         node["initial_strategy_id"] = rhs.get_initial_strategy_id();
         node["recurrent_therapy_id"] = rhs.get_recurrent_therapy_id();
         node["mass_drug_administration"] = rhs.get_mass_drug_administration();
@@ -211,7 +247,15 @@ struct convert<StrategyParameters> {
         if (!node["strategy_db"] || !node["initial_strategy_id"] || !node["recurrent_therapy_id"] || !node["mass_drug_administration"]) {
             throw std::runtime_error("Missing fields in StrategyParameters");
         }
-        rhs.set_strategy_db(node["strategy_db"].as<std::vector<StrategyParameters::StrategyInfo>>());
+
+        // Decode strategy_db as a map
+        std::map<int, StrategyParameters::StrategyInfo> strategy_db;
+        for (const auto& element : node["strategy_db"]) {
+            int key = element.first.as<int>();
+            strategy_db[key] = element.second.as<StrategyParameters::StrategyInfo>();
+        }
+        rhs.set_strategy_db(strategy_db);
+
         rhs.set_initial_strategy_id(node["initial_strategy_id"].as<int>());
         rhs.set_recurrent_therapy_id(node["recurrent_therapy_id"].as<int>());
         rhs.set_mass_drug_administration(node["mass_drug_administration"].as<StrategyParameters::MassDrugAdministration>());

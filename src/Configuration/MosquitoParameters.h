@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <yaml-cpp/yaml.h>
 
 class MosquitoParameters {
 public:
@@ -68,13 +69,7 @@ private:
     MosquitoConfig mosquito_config_;
 };
 
-#include <yaml-cpp/yaml.h>
-#include <stdexcept>
-#include <string>
-#include <vector>
-
 namespace YAML {
-
 // MosquitoParameters::GridBased YAML conversion
 template<>
 struct convert<MosquitoParameters::GridBased> {

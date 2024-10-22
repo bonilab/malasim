@@ -130,8 +130,8 @@ public:
         double ec50_;
     };
 
-    // Inner class: ParasiteInfo
-    class ParasiteInfo {
+    // Inner class: GenotypeInfo
+    class GenotypeInfo {
     public:
         // Getters and Setters
         [[nodiscard]] const std::string& get_aa_sequence() const { return aa_sequence_; }
@@ -145,19 +145,19 @@ public:
         double prevalence_;
     };
 
-    // Inner class: InitialParasiteInfo
-    class InitialParasiteInfo {
+    // Inner class: InitialGenotypeInfo
+    class InitialGenotypeInfo {
     public:
         // Getters and Setters
         [[nodiscard]] int get_location_id() const { return location_id_; }
         void set_location_id(int value) { location_id_ = value; }
 
-        [[nodiscard]] const std::vector<ParasiteInfo>& get_parasite_info() const { return parasite_info_; }
-        void set_parasite_info(const std::vector<ParasiteInfo>& value) { parasite_info_ = value; }
+        [[nodiscard]] const std::vector<GenotypeInfo>& get_genotype_info() const { return genotype_info_; }
+        void set_genotype_info(const std::vector<GenotypeInfo>& value) { genotype_info_ = value; }
 
     private:
         int location_id_;
-        std::vector<ParasiteInfo> parasite_info_;
+        std::vector<GenotypeInfo> genotype_info_;
     };
 
     // Getters and Setters for GenotypeParameters
@@ -173,15 +173,15 @@ public:
     [[nodiscard]] const std::vector<OverrideEC50Pattern>& get_override_ec50_patterns() const { return override_ec50_patterns_; }
     void set_override_ec50_patterns(const std::vector<OverrideEC50Pattern>& value) { override_ec50_patterns_ = value; }
 
-    [[nodiscard]] const std::vector<InitialParasiteInfo>& get_initial_parasite_info() const { return initial_parasite_info_; }
-    void set_initial_parasite_info(const std::vector<InitialParasiteInfo>& value) { initial_parasite_info_ = value; }
+    [[nodiscard]] const std::vector<InitialGenotypeInfo>& get_initial_genotype_info() const { return initial_genotype_info_; }
+    void set_initial_genotype_info(const std::vector<InitialGenotypeInfo>& value) { initial_genotype_info_ = value; }
 
 private:
     std::string mutation_mask_;
     double mutation_probability_per_locus_;
     std::vector<ChromosomeInfo> pf_genotype_info_;
     std::vector<OverrideEC50Pattern> override_ec50_patterns_;
-    std::vector<InitialParasiteInfo> initial_parasite_info_;
+    std::vector<InitialGenotypeInfo> initial_genotype_info_;
 };
 
 namespace YAML {
@@ -329,19 +329,19 @@ struct convert<GenotypeParameters::OverrideEC50Pattern> {
     }
 };
 
-// GenotypeParameters::ParasiteInfo YAML conversion
+// GenotypeParameters::GenotypeInfo YAML conversion
 template<>
-struct convert<GenotypeParameters::ParasiteInfo> {
-    static Node encode(const GenotypeParameters::ParasiteInfo& rhs) {
+struct convert<GenotypeParameters::GenotypeInfo> {
+    static Node encode(const GenotypeParameters::GenotypeInfo& rhs) {
         Node node;
         node["aa_sequence"] = rhs.get_aa_sequence();
         node["prevalence"] = rhs.get_prevalence();
         return node;
     }
 
-    static bool decode(const Node& node, GenotypeParameters::ParasiteInfo& rhs) {
+    static bool decode(const Node& node, GenotypeParameters::GenotypeInfo& rhs) {
         if (!node["aa_sequence"] || !node["prevalence"]) {
-            throw std::runtime_error("Missing fields in GenotypeParameters::ParasiteInfo");
+            throw std::runtime_error("Missing fields in GenotypeParameters::GenotypeInfo");
         }
         rhs.set_aa_sequence(node["aa_sequence"].as<std::string>());
         rhs.set_prevalence(node["prevalence"].as<double>());
@@ -349,22 +349,22 @@ struct convert<GenotypeParameters::ParasiteInfo> {
     }
 };
 
-// GenotypeParameters::InitialParasiteInfo YAML conversion
+// GenotypeParameters::InitialGenotypeInfo YAML conversion
 template<>
-struct convert<GenotypeParameters::InitialParasiteInfo> {
-    static Node encode(const GenotypeParameters::InitialParasiteInfo& rhs) {
+struct convert<GenotypeParameters::InitialGenotypeInfo> {
+    static Node encode(const GenotypeParameters::InitialGenotypeInfo& rhs) {
         Node node;
         node["location_id"] = rhs.get_location_id();
-        node["parasite_info"] = rhs.get_parasite_info();
+        node["genotype_info"] = rhs.get_genotype_info();
         return node;
     }
 
-    static bool decode(const Node& node, GenotypeParameters::InitialParasiteInfo& rhs) {
-        if (!node["location_id"] || !node["parasite_info"]) {
-            throw std::runtime_error("Missing fields in GenotypeParameters::InitialParasiteInfo");
+    static bool decode(const Node& node, GenotypeParameters::InitialGenotypeInfo& rhs) {
+        if (!node["location_id"] || !node["genotype_info"]) {
+            throw std::runtime_error("Missing fields in GenotypeParameters::InitialGenotypeInfo");
         }
         rhs.set_location_id(node["location_id"].as<int>());
-        rhs.set_parasite_info(node["parasite_info"].as<std::vector<GenotypeParameters::ParasiteInfo>>());
+        rhs.set_genotype_info(node["genotype_info"].as<std::vector<GenotypeParameters::GenotypeInfo>>());
         return true;
     }
 };
@@ -378,20 +378,20 @@ struct convert<GenotypeParameters> {
         node["mutation_probability_per_locus"] = rhs.get_mutation_probability_per_locus();
         node["pf_genotype_info"] = rhs.get_pf_genotype_info();
         node["override_ec50_patterns"] = rhs.get_override_ec50_patterns();
-        node["initial_parasite_info"] = rhs.get_initial_parasite_info();
+        node["initial_genotype_info"] = rhs.get_initial_genotype_info();
         return node;
     }
 
     static bool decode(const Node& node, GenotypeParameters& rhs) {
         if (!node["mutation_mask"] || !node["mutation_probability_per_locus"] || !node["pf_genotype_info"]
-            || !node["override_ec50_patterns"] || !node["initial_parasite_info"]) {
+            || !node["override_ec50_patterns"] || !node["initial_genotype_info"]) {
             throw std::runtime_error("Missing fields in GenotypeParameters");
         }
         rhs.set_mutation_mask(node["mutation_mask"].as<std::string>());
         rhs.set_mutation_probability_per_locus(node["mutation_probability_per_locus"].as<double>());
         rhs.set_pf_genotype_info(node["pf_genotype_info"].as<std::vector<GenotypeParameters::ChromosomeInfo>>());
         rhs.set_override_ec50_patterns(node["override_ec50_patterns"].as<std::vector<GenotypeParameters::OverrideEC50Pattern>>());
-        rhs.set_initial_parasite_info(node["initial_parasite_info"].as<std::vector<GenotypeParameters::InitialParasiteInfo>>());
+        rhs.set_initial_genotype_info(node["initial_genotype_info"].as<std::vector<GenotypeParameters::InitialGenotypeInfo>>());
         return true;
     }
 };

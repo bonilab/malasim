@@ -1,75 +1,75 @@
 #ifndef EPIDEMIOLOGICALPARAMETERS_H
 #define EPIDEMIOLOGICALPARAMETERS_H
 
-class BitingLevelDistributionGamma {
-public:
-    // Getters and Setters
-    [[nodiscard]] double get_mean() const { return mean_; }
-    void set_mean(double value) { mean_ = value; }
-
-    [[nodiscard]] double get_sd() const { return sd_; }
-    void set_sd(double value) { sd_ = value; }
-
-private:
-    double mean_;
-    double sd_;
-};
-
-class BitingLevelDistribution {
-public:
-    // Getters and Setters
-    [[nodiscard]] const std::string& get_distribution() const { return distribution_; }
-    void set_distribution(const std::string& value) { distribution_ = value; }
-
-    [[nodiscard]] const BitingLevelDistributionGamma& get_gamma() const { return gamma_; }
-    void set_gamma(const BitingLevelDistributionGamma& value) { gamma_ = value; }
-
-private:
-    std::string distribution_;
-    BitingLevelDistributionGamma gamma_;
-};
-
-class RelativeBitingInfo {
-public:
-    // Getters and Setters
-    [[nodiscard]] int get_max_relative_biting_value() const { return max_relative_biting_value_; }
-    void set_max_relative_biting_value(int value) { max_relative_biting_value_ = value; }
-
-    [[nodiscard]] double get_min_relative_biting_value() const { return min_relative_biting_value_; }
-    void set_min_relative_biting_value(double value) { min_relative_biting_value_ = value; }
-
-    [[nodiscard]] int get_number_of_biting_levels() const { return number_of_biting_levels_; }
-    void set_number_of_biting_levels(int value) { number_of_biting_levels_ = value; }
-
-    [[nodiscard]] const BitingLevelDistribution& get_biting_level_distribution() const { return biting_level_distribution_; }
-    void set_biting_level_distribution(const BitingLevelDistribution& value) { biting_level_distribution_ = value; }
-
-private:
-    int max_relative_biting_value_;
-    double min_relative_biting_value_;
-    int number_of_biting_levels_;
-    BitingLevelDistribution biting_level_distribution_;
-};
-
-class RelativeInfectivity {
-public:
-    // Getters and Setters
-    [[nodiscard]] double get_sigma() const { return sigma_; }
-    void set_sigma(double value) { sigma_ = value; }
-
-    [[nodiscard]] double get_ro() const { return ro_; }
-    void set_ro(double value) { ro_ = value; }
-
-    [[nodiscard]] double get_blood_meal_volume() const { return blood_meal_volume_; }
-    void set_blood_meal_volume(double value) { blood_meal_volume_ = value; }
-
-private:
-    double sigma_;
-    double ro_;
-    double blood_meal_volume_;
-};
-
 class EpidemiologicalParameters {
+public:
+    class BitingLevelDistributionGamma {
+    public:
+        // Getters and Setters
+        [[nodiscard]] double get_mean() const { return mean_; }
+        void set_mean(double value) { mean_ = value; }
+
+        [[nodiscard]] double get_sd() const { return sd_; }
+        void set_sd(double value) { sd_ = value; }
+
+    private:
+        double mean_;
+        double sd_;
+    };
+
+    class BitingLevelDistribution {
+    public:
+        // Getters and Setters
+        [[nodiscard]] const std::string& get_distribution() const { return distribution_; }
+        void set_distribution(const std::string& value) { distribution_ = value; }
+
+        [[nodiscard]] const BitingLevelDistributionGamma& get_gamma() const { return gamma_; }
+        void set_gamma(const BitingLevelDistributionGamma& value) { gamma_ = value; }
+
+    private:
+        std::string distribution_;
+        BitingLevelDistributionGamma gamma_;
+    };
+
+    class RelativeBitingInfo {
+    public:
+        // Getters and Setters
+        [[nodiscard]] int get_max_relative_biting_value() const { return max_relative_biting_value_; }
+        void set_max_relative_biting_value(int value) { max_relative_biting_value_ = value; }
+
+        [[nodiscard]] double get_min_relative_biting_value() const { return min_relative_biting_value_; }
+        void set_min_relative_biting_value(double value) { min_relative_biting_value_ = value; }
+
+        [[nodiscard]] int get_number_of_biting_levels() const { return number_of_biting_levels_; }
+        void set_number_of_biting_levels(int value) { number_of_biting_levels_ = value; }
+
+        [[nodiscard]] const BitingLevelDistribution& get_biting_level_distribution() const { return biting_level_distribution_; }
+        void set_biting_level_distribution(const BitingLevelDistribution& value) { biting_level_distribution_ = value; }
+
+    private:
+        int max_relative_biting_value_;
+        double min_relative_biting_value_;
+        int number_of_biting_levels_;
+        BitingLevelDistribution biting_level_distribution_;
+    };
+
+    class RelativeInfectivity {
+    public:
+        // Getters and Setters
+        [[nodiscard]] double get_sigma() const { return sigma_; }
+        void set_sigma(double value) { sigma_ = value; }
+
+        [[nodiscard]] double get_ro() const { return ro_; }
+        void set_ro(double value) { ro_ = value; }
+
+        [[nodiscard]] double get_blood_meal_volume() const { return blood_meal_volume_; }
+        void set_blood_meal_volume(double value) { blood_meal_volume_ = value; }
+
+    private:
+        double sigma_;
+        double ro_;
+        double blood_meal_volume_;
+    };
 public:
     // Getters and Setters
     [[nodiscard]] int get_number_of_tracking_days() const { return number_of_tracking_days_; }
@@ -158,15 +158,15 @@ namespace YAML {
 
 // GammaDistribution YAML conversion
 template<>
-struct convert<BitingLevelDistributionGamma> {
-    static Node encode(const BitingLevelDistributionGamma& rhs) {
+struct convert<EpidemiologicalParameters::BitingLevelDistributionGamma> {
+    static Node encode(const EpidemiologicalParameters::BitingLevelDistributionGamma& rhs) {
         Node node;
         node["mean"] = rhs.get_mean();
         node["sd"] = rhs.get_sd();
         return node;
     }
 
-    static bool decode(const Node& node, BitingLevelDistributionGamma& rhs) {
+    static bool decode(const Node& node, EpidemiologicalParameters::BitingLevelDistributionGamma& rhs) {
         if (!node["mean"] || !node["sd"]) {
             throw std::runtime_error("Missing fields in GammaDistribution");
         }
@@ -178,28 +178,28 @@ struct convert<BitingLevelDistributionGamma> {
 
 // BitingLevelDistribution YAML conversion
 template<>
-struct convert<BitingLevelDistribution> {
-    static Node encode(const BitingLevelDistribution& rhs) {
+struct convert<EpidemiologicalParameters::BitingLevelDistribution> {
+    static Node encode(const EpidemiologicalParameters::BitingLevelDistribution& rhs) {
         Node node;
         node["distribution"] = rhs.get_distribution();
-        node["gamma"] = rhs.get_gamma();
+        node["Gamma"] = rhs.get_gamma();
         return node;
     }
 
-    static bool decode(const Node& node, BitingLevelDistribution& rhs) {
-        if (!node["distribution"] || !node["gamma"]) {
+    static bool decode(const Node& node, EpidemiologicalParameters::BitingLevelDistribution& rhs) {
+        if (!node["distribution"] || !node["Gamma"]) {
             throw std::runtime_error("Missing fields in BitingLevelDistribution");
         }
         rhs.set_distribution(node["distribution"].as<std::string>());
-        rhs.set_gamma(node["gamma"].as<BitingLevelDistributionGamma>());
+        rhs.set_gamma(node["Gamma"].as<EpidemiologicalParameters::BitingLevelDistributionGamma>());
         return true;
     }
 };
 
 // RelativeBitingInfo YAML conversion
 template<>
-struct convert<RelativeBitingInfo> {
-    static Node encode(const RelativeBitingInfo& rhs) {
+struct convert<EpidemiologicalParameters::RelativeBitingInfo> {
+    static Node encode(const EpidemiologicalParameters::RelativeBitingInfo& rhs) {
         Node node;
         node["max_relative_biting_value"] = rhs.get_max_relative_biting_value();
         node["min_relative_biting_value"] = rhs.get_min_relative_biting_value();
@@ -208,7 +208,7 @@ struct convert<RelativeBitingInfo> {
         return node;
     }
 
-    static bool decode(const Node& node, RelativeBitingInfo& rhs) {
+    static bool decode(const Node& node, EpidemiologicalParameters::RelativeBitingInfo& rhs) {
         if (!node["max_relative_biting_value"] || !node["min_relative_biting_value"]
             || !node["number_of_biting_levels"] || !node["biting_level_distribution"]) {
             throw std::runtime_error("Missing fields in RelativeBitingInfo");
@@ -216,15 +216,15 @@ struct convert<RelativeBitingInfo> {
         rhs.set_max_relative_biting_value(node["max_relative_biting_value"].as<int>());
         rhs.set_min_relative_biting_value(node["min_relative_biting_value"].as<double>());
         rhs.set_number_of_biting_levels(node["number_of_biting_levels"].as<int>());
-        rhs.set_biting_level_distribution(node["biting_level_distribution"].as<BitingLevelDistribution>());
+        rhs.set_biting_level_distribution(node["biting_level_distribution"].as<EpidemiologicalParameters::BitingLevelDistribution>());
         return true;
     }
 };
 
 // RelativeInfectivity YAML conversion
 template<>
-struct convert<RelativeInfectivity> {
-    static Node encode(const RelativeInfectivity& rhs) {
+struct convert<EpidemiologicalParameters::RelativeInfectivity> {
+    static Node encode(const EpidemiologicalParameters::RelativeInfectivity& rhs) {
         Node node;
         node["sigma"] = rhs.get_sigma();
         node["ro"] = rhs.get_ro();
@@ -232,7 +232,7 @@ struct convert<RelativeInfectivity> {
         return node;
     }
 
-    static bool decode(const Node& node, RelativeInfectivity& rhs) {
+    static bool decode(const Node& node, EpidemiologicalParameters::RelativeInfectivity& rhs) {
         if (!node["sigma"] || !node["ro"] || !node["blood_meal_volume"]) {
             throw std::runtime_error("Missing fields in RelativeInfectivity");
         }
@@ -288,10 +288,10 @@ struct convert<EpidemiologicalParameters> {
         rhs.set_days_mature_gametocyte_over_five(node["days_mature_gametocyte_over_five"].as<int>());
         rhs.set_p_compliance(node["p_compliance"].as<double>());
         rhs.set_min_dosing_days(node["min_dosing_days"].as<int>());
-        rhs.set_relative_biting_info(node["relative_biting_info"].as<RelativeBitingInfo>());
+        rhs.set_relative_biting_info(node["relative_biting_info"].as<EpidemiologicalParameters::RelativeBitingInfo>());
         rhs.set_gametocyte_level_under_artemisinin_action(node["gametocyte_level_under_artemisinin_action"].as<double>());
         rhs.set_gametocyte_level_full(node["gametocyte_level_full"].as<double>());
-        rhs.set_relative_infectivity(node["relative_infectivity"].as<RelativeInfectivity>());
+        rhs.set_relative_infectivity(node["relative_infectivity"].as<EpidemiologicalParameters::RelativeInfectivity>());
         rhs.set_p_relapse(node["p_relapse"].as<double>());
         rhs.set_relapse_duration(node["relapse_duration"].as<int>());
         rhs.set_relapse_rate(node["relapse_rate"].as<double>());

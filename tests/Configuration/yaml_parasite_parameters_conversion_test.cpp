@@ -8,7 +8,7 @@ protected:
 
     void SetUp() override {
         // Initialize ParasiteDensityLevels
-        ParasiteDensityLevels density_levels;
+        ParasiteParameters::ParasiteDensityLevels density_levels;
         density_levels.set_log_parasite_density_cured(1.1);
         density_levels.set_log_parasite_density_from_liver(2.2);
         density_levels.set_log_parasite_density_asymptomatic(3.3);
@@ -20,7 +20,7 @@ protected:
         density_levels.set_log_parasite_density_pyrogenic(9.9);
 
         // Initialize RecombinationParameters
-        RecombinationParameters recombination;
+        ParasiteParameters::RecombinationParameters recombination;
         recombination.set_within_chromosome_recombination_rate(0.1);
         recombination.set_using_free_recombination(true);
 

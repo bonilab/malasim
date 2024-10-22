@@ -8,24 +8,24 @@ protected:
 
     void SetUp() override {
         // Initialize GammaDistribution
-        BitingLevelDistributionGamma gamma;
+        EpidemiologicalParameters::BitingLevelDistributionGamma gamma;
         gamma.set_mean(5.0);
         gamma.set_sd(1.5);
 
         // Initialize BitingLevelDistribution
-        BitingLevelDistribution biting_level;
+        EpidemiologicalParameters::BitingLevelDistribution biting_level;
         biting_level.set_distribution("gamma");
         biting_level.set_gamma(gamma);
 
         // Initialize RelativeBitingInfo
-        RelativeBitingInfo biting_info;
+        EpidemiologicalParameters::RelativeBitingInfo biting_info;
         biting_info.set_max_relative_biting_value(10);
         biting_info.set_min_relative_biting_value(0.5);
         biting_info.set_number_of_biting_levels(3);
         biting_info.set_biting_level_distribution(biting_level);
 
         // Initialize RelativeInfectivity
-        RelativeInfectivity infectivity;
+        EpidemiologicalParameters::RelativeInfectivity infectivity;
         infectivity.set_sigma(1.2);
         infectivity.set_ro(0.8);
         infectivity.set_blood_meal_volume(2.0);
@@ -81,9 +81,9 @@ TEST_F(EpidemiologicalParametersYAMLTest, DecodeEpidemiologicalParameters) {
     node["relative_biting_info"]["max_relative_biting_value"] = 10;
     node["relative_biting_info"]["min_relative_biting_value"] = 0.5;
     node["relative_biting_info"]["number_of_biting_levels"] = 3;
-    node["relative_biting_info"]["biting_level_distribution"]["distribution"] = "gamma";
-    node["relative_biting_info"]["biting_level_distribution"]["gamma"]["mean"] = 5.0;
-    node["relative_biting_info"]["biting_level_distribution"]["gamma"]["sd"] = 1.5;
+    node["relative_biting_info"]["biting_level_distribution"]["distribution"] = "Gamma";
+    node["relative_biting_info"]["biting_level_distribution"]["Gamma"]["mean"] = 5.0;
+    node["relative_biting_info"]["biting_level_distribution"]["Gamma"]["sd"] = 1.5;
     node["gametocyte_level_under_artemisinin_action"] = 1.0;
     node["gametocyte_level_full"] = 1.0;
     node["relative_infectivity"]["sigma"] = 1.2;
