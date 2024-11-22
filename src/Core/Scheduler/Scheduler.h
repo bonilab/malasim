@@ -5,15 +5,11 @@
 #include "date/date.h"
 #include "Simulation/Model.h" // Assuming Model is defined in a separate header file
 
-class Model;
-
 class Scheduler {
- private:
+public:
   // Disable copy and assignment
   Scheduler(const Scheduler&) = delete;
   Scheduler& operator=(const Scheduler&) = delete;
-
-  // Disable move
   Scheduler(Scheduler&&) = delete;
   Scheduler& operator=(Scheduler&&) = delete;
 
@@ -22,7 +18,6 @@ class Scheduler {
   Model* model_;
   bool is_force_stop_;
 
- public:
   date::sys_days calendar_date;
 
   explicit Scheduler(Model *model = nullptr);
@@ -30,19 +25,19 @@ class Scheduler {
   virtual ~Scheduler();
 
   // Getter and Setter for current_time
-  int current_time() const { return current_time_; }
+  [[nodiscard]] int current_time() const { return current_time_; }
   void set_current_time(int time) { current_time_ = time; }
 
   // Getter and Setter for total_available_time
-  int total_available_time() const { return total_available_time_; }
+  [[nodiscard]] int total_available_time() const { return total_available_time_; }
   void set_total_available_time(int total_time) { total_available_time_ = total_time; }
 
   // Getter and Setter for model
-  Model* model() const { return model_; }
+  [[nodiscard]] Model* model() const { return model_; }
   void set_model(Model* model) { model_ = model; }
 
   // Getter and Setter for is_force_stop
-  bool is_force_stop() const { return is_force_stop_; }
+  [[nodiscard]] bool is_force_stop() const { return is_force_stop_; }
   void set_is_force_stop(bool force_stop) { is_force_stop_ = force_stop; }
 
   void extend_total_time(int new_total_time);
@@ -69,21 +64,21 @@ class Scheduler {
 
   void end_time_step() const;
 
-  bool can_stop() const;
+  [[nodiscard]] bool can_stop() const;
 
-  int current_day_in_year() const;
+  [[nodiscard]] int current_day_in_year() const;
 
-  int current_month_in_year() const;
+  [[nodiscard]] int current_month_in_year() const;
 
-  bool is_today_last_day_of_month() const;
+  [[nodiscard]] bool is_today_last_day_of_month() const;
 
-  bool is_today_first_day_of_month() const;
+  [[nodiscard]] bool is_today_first_day_of_month() const;
 
-  bool is_today_first_day_of_year() const;
+  [[nodiscard]] bool is_today_first_day_of_year() const;
 
-  bool is_today_last_day_of_year() const;
+  [[nodiscard]] bool is_today_last_day_of_year() const;
 
-  void daily_update();
+  void daily_update() const;
 };
 
 #endif  /* SCHEDULER_H */

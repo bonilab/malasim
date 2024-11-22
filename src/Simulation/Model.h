@@ -1,9 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <memory>
 #include <string>
-#include <Utils/Random.h>
 
 // Forward declaration
 class Config;
@@ -37,6 +35,15 @@ public:
     return config_.get();
   }
 
+  // Access scheduler in a controlled manner
+  [[nodiscard]] const Scheduler* get_scheduler() const {
+    if (!scheduler_) {
+      throw std::runtime_error(
+          "Model not initialized. Call Initialize() first.");
+    }
+    return scheduler_.get();
+  }
+
   // Prevent copying and moving
   Model(const Model &) = delete;
   Model(Model &&) = delete;
@@ -51,12 +58,19 @@ private:
   // Configuration managed by a smart pointer
   std::shared_ptr<Config> config_;
 
-  Scheduler *scheduler_;
+  std::shared_ptr<Scheduler> scheduler_;
 
   // Configuration file path with default value
   std::string config_file_path_;
 
   bool is_initialized_;
+public:
+  void begin_time_step();
+  void end_time_step();
+  void daily_update();
+  void monthly_update();
+  void yearly_update();
+
 };
 
 #endif  // MODEL_H

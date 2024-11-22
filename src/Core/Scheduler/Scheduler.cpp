@@ -2,10 +2,6 @@
 
 #include <Configuration/Config.h>
 
-#include <vector>
-
-using namespace date;
-
 Scheduler::Scheduler(Model* model)
     : current_time_(-1), total_available_time_(-1), model_(model), is_force_stop_(false) {}
 
@@ -31,40 +27,40 @@ void Scheduler::clear_all_events() {
 void Scheduler::initialize(const date::year_month_day& starting_date, const int& total_time) {
   set_total_available_time(total_time + 720); // Prevent scheduling at the end of simulation
   set_current_time(0);
-  calendar_date = sys_days(starting_date);
+  calendar_date = date::sys_days(starting_date);
 }
 
 // Methods not declared in the header have been removed
 
 void Scheduler::run() {
-  // LOG(INFO) << "Simulation is running";
   current_time_ = 0;
-
   for (current_time_ = 0; !can_stop(); current_time_++) {
-    spdlog::info("Day: {}", current_time_);
+    if (current_time_ % model_->get_config()->get_model_settings().get_days_between_stdout_output() == 0) {
+      spdlog::info("Day: {}", current_time_);
+    }
     begin_time_step();
     daily_update();
     end_time_step();
-    calendar_date += days{1};
+    calendar_date += date::days{1};
   }
 }
 
 void Scheduler::begin_time_step() const {
   if (model_ != nullptr) {
-    // model_->begin_time_step();
+    model_->begin_time_step();
   }
 }
 
-void Scheduler::daily_update() {
+void Scheduler::daily_update() const {
   if (model_ != nullptr) {
-    // model_->daily_update();
+    model_->daily_update();
 
     if (is_today_first_day_of_month()) {
-      // model_->monthly_update();
+      model_->monthly_update();
     }
 
     if (is_today_first_day_of_year()) {
-      // model_->yearly_update();
+      model_->yearly_update();
     }
 
     // Executing population-related events
@@ -77,7 +73,7 @@ void Scheduler::daily_update() {
 
 void Scheduler::end_time_step() const {
   if (model_ != nullptr) {
-    // model_->end_time_step();
+    model_->end_time_step();
   }
 }
 
@@ -94,22 +90,22 @@ int Scheduler::current_month_in_year() const {
 }
 
 bool Scheduler::is_today_last_day_of_year() const {
-  year_month_day ymd{calendar_date};
-  return ymd.month() == month{12} && ymd.day() == day{31};
+  date::year_month_day ymd{calendar_date};
+  return ymd.month() == date::month{12} && ymd.day() == date::day{31};
 }
 
 bool Scheduler::is_today_first_day_of_month() const {
-  year_month_day ymd{calendar_date};
-  return ymd.day() == day{1};
+  date::year_month_day ymd{calendar_date};
+  return ymd.day() == date::day{1};
 }
 
 bool Scheduler::is_today_first_day_of_year() const {
-  year_month_day ymd{calendar_date};
-  return ymd.month() == month{1} && ymd.day() == day{1};
+  date::year_month_day ymd{calendar_date};
+  return ymd.month() == date::month{1} && ymd.day() == date::day{1};
 }
 
 bool Scheduler::is_today_last_day_of_month() const {
-  const auto next_date = calendar_date + days{1};
-  year_month_day ymd{next_date};
-  return ymd.day() == day{1};
+  const auto next_date = calendar_date + date::days{1};
+  date::year_month_day ymd{next_date};
+  return ymd.day() == date::day{1};
 }
