@@ -5,6 +5,7 @@ find_package(sol2 CONFIG REQUIRED)
 find_package(Lua REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(date CONFIG REQUIRED)
+find_package(CLI11 CONFIG REQUIRED)
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/src
@@ -34,6 +35,7 @@ target_link_libraries(MalaSimCore PUBLIC
   sol2
   spdlog::spdlog
   date::date date::date-tz
+  CLI11::CLI11
 )
 
 set_property(TARGET MalaSimCore PROPERTY CXX_STANDARD 20)

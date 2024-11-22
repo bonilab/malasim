@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 
 #include "Utils/YamlFile.h"
+#include "Utils/Time.h"
 
 // Class to hold the simulation timeframe data
 class SimulationTimeframe {
@@ -53,11 +54,20 @@ public:
     start_collect_data_day_ = value;
   }
 
+  void set_total_time(int total_time) {
+    total_time_ = total_time;
+  }
+
+  [[nodiscard]] int get_total_time() const {
+    return total_time_;
+  }
+
 private:
   date::year_month_day starting_date_;
   date::year_month_day start_of_comparison_period_;
   date::year_month_day ending_date_;
   int start_collect_data_day_;
+  int total_time_;
 };
 
 // Specialization of convert for the SimulationTimeframe class
@@ -93,6 +103,7 @@ struct convert<SimulationTimeframe> {
     rhs.set_ending_date(node["ending_date"].as<date::year_month_day>());
     rhs.set_start_collect_data_day(node["start_collect_data_day"].as<int>());
 
+    rhs.set_total_time(utils::Time::instance().get_day_count(rhs.get_starting_date(), rhs.get_ending_date()));
     return true;
   }
 };

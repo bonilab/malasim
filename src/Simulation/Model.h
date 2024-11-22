@@ -3,9 +3,13 @@
 
 #include <memory>
 #include <string>
+#include <Utils/Random.h>
 
 // Forward declaration
 class Config;
+class Random;
+class Cli;
+class Scheduler;
 
 class Model {
 public:
@@ -16,7 +20,7 @@ public:
   }
 
   // Initialize the model
-  void initialize();
+  bool initialize();
 
   // Run the simulation
   void run() const;
@@ -45,7 +49,9 @@ private:
   ~Model() = default;
 
   // Configuration managed by a smart pointer
-  std::unique_ptr<Config> config_;
+  std::shared_ptr<Config> config_;
+
+  Scheduler *scheduler_;
 
   // Configuration file path with default value
   std::string config_file_path_;
