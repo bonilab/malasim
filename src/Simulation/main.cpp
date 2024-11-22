@@ -1,3 +1,5 @@
+#include <Core/Scheduler/Scheduler.h>
+
 #include "Utils/Cli.h"
 #include "Model.h"
 #include "Utils/Logger.h"
