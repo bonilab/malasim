@@ -13,58 +13,73 @@ int inline get_pipe_count(const std::string &str) {
   return pipe_count;
 }
 
-void Config::load(const std::string &filename) {
+bool Config::load(const std::string &filename) {
   config_file_path_ = filename;
-  YAML::Node config = YAML::LoadFile(filename);
+  try {
+    YAML::Node config = YAML::LoadFile(filename);
 
-  config_data_.model_settings = config["model_settings"].as<ModelSettings>();
-  config_data_.simulation_timeframe  =
-    config["simulation_timeframe"].as<SimulationTimeframe>();
+    std::cout << "Configuration file loaded successfully" << std::endl;
 
-  config_data_.transmission_settings =
-      config["transmission_settings"].as<TransmissionSettings>();
+    config_data_.model_settings = config["model_settings"].as<ModelSettings>();
+    config_data_.simulation_timeframe  =
+      config["simulation_timeframe"].as<SimulationTimeframe>();
 
-  config_data_.population_demographic =
-    config["population_demographic"].as<PopulationDemographic>();
+    config_data_.transmission_settings =
+        config["transmission_settings"].as<TransmissionSettings>();
 
-  config_data_.spatial_settings =
-     config["spatial_settings"].as<SpatialSettings>();
+    config_data_.population_demographic =
+      config["population_demographic"].as<PopulationDemographic>();
 
-  config_data_.seasonality_settings =
-    config["seasonality_settings"].as<SeasonalitySettings>();
+    config_data_.spatial_settings =
+       config["spatial_settings"].as<SpatialSettings>();
 
-  config_data_.movement_settings =
-    config["movement_settings"].as<MovementSettings>();
+    config_data_.seasonality_settings =
+      config["seasonality_settings"].as<SeasonalitySettings>();
 
-  config_data_.parasite_parameters =
-    config["parasite_parameters"].as<ParasiteParameters>();
+    config_data_.movement_settings =
+      config["movement_settings"].as<MovementSettings>();
 
-  config_data_.immune_system_parameters =
-    config["immune_system_parameters"].as<ImmuneSystemParameters>();
+    config_data_.parasite_parameters =
+      config["parasite_parameters"].as<ParasiteParameters>();
 
-  config_data_.genotype_parameters =
-    config["genotype_parameters"].as<GenotypeParameters>();
+    config_data_.immune_system_parameters =
+      config["immune_system_parameters"].as<ImmuneSystemParameters>();
 
-  config_data_.drug_parameters =
-    config["drug_parameters"].as<DrugParameters>();
+    config_data_.genotype_parameters =
+      config["genotype_parameters"].as<GenotypeParameters>();
 
-  config_data_.therapy_parameters =
-    config["therapy_parameters"].as<TherapyParameters>();
+    config_data_.drug_parameters =
+      config["drug_parameters"].as<DrugParameters>();
 
-  config_data_.strategy_parameters =
-    config["strategy_parameters"].as<StrategyParameters>();
+    config_data_.therapy_parameters =
+      config["therapy_parameters"].as<TherapyParameters>();
 
-  config_data_.epidemiological_parameters =
-    config["epidemiological_parameters"].as<EpidemiologicalParameters>();
+    config_data_.strategy_parameters =
+      config["strategy_parameters"].as<StrategyParameters>();
 
-  config_data_.mosquito_parameters =
-    config["mosquito_parameters"].as<MosquitoParameters>();
+    config_data_.epidemiological_parameters =
+      config["epidemiological_parameters"].as<EpidemiologicalParameters>();
 
-  config_data_.population_events =
-    config["population_events"].as<PopulationEvents>();
+    config_data_.mosquito_parameters =
+      config["mosquito_parameters"].as<MosquitoParameters>();
 
-  // Validate all cross field validations
-  validate_all_cross_field_validations();
+    config_data_.population_events =
+      config["population_events"].as<PopulationEvents>();
+
+    std::cout << "Configuration file parsed successfully" << std::endl;
+
+    // Validate all cross field validations
+    validate_all_cross_field_validations();
+
+    std::cout << "Configuration file validated successfully" << std::endl;
+
+    return true;
+  }
+  catch (YAML::BadFile) {
+    std::cerr << "Error: File not found" << std::endl;
+    return false;
+  }
+  return false;
 }
 
 void Config::validate_all_cross_field_validations() {

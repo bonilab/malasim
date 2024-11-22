@@ -19,7 +19,7 @@ public:
   Config &operator=(Config &&) = delete;
 
   // Load configuration from a YAML file
-  void load(const std::string &filename);
+  bool load(const std::string &filename);
 
   // Reload configuration (useful for dynamic updates)
   void reload();

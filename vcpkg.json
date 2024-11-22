@@ -7,6 +7,7 @@
     "sol2",
     "spdlog",
     "yaml-cpp",
-    "date"
+    "date",
+    "cli11"
   ]
 }

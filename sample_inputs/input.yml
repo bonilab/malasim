@@ -828,6 +828,7 @@ epidemiological_parameters:
 # ---------------------------------------------------------------
 # 15. Mosquito Parameters (default is location based)
 # ---------------------------------------------------------------
+#TODO: Check this implementation in Mosquito class
 mosquito_parameters:
   mosquito_config:
     mode: "location_based" # or "grid_based"
