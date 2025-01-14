@@ -1,7 +1,6 @@
 #include <filesystem>
 #include <yaml-cpp/yaml.h>
 #include "Config.h"
-#include "Utils/AscFile.h"
 
 int inline get_pipe_count(const std::string &str) {
   int pipe_count = 0;
@@ -72,6 +71,29 @@ bool Config::load(const std::string &filename) {
     validate_all_cross_field_validations();
 
     std::cout << "Configuration file validated successfully" << std::endl;
+
+    /* Any settings processed using settings from other settings should be called
+     * with setting names rather than process_config()
+     * This is to avoid circular linking of settings
+     * SeasonalitySettings and MovementSettings are examples of such settings
+     */
+    config_data_.model_settings.process_config();
+    config_data_.simulation_timeframe.process_config();
+    config_data_.transmission_settings.process_config();
+    config_data_.population_demographic.process_config();
+    config_data_.spatial_settings.process_config();
+    config_data_.seasonality_settings.process_config_using_number_of_locations(get_spatial_settings().get_number_of_locations());
+    config_data_.movement_settings.process_config_using_spatial_settings(
+      get_spatial_settings().get_spatial_distance_matrix(),
+      get_spatial_settings().get_number_of_locations());
+    config_data_.parasite_parameters.process_config();
+    config_data_.immune_system_parameters.process_config();
+    config_data_.genotype_parameters.process_config();
+    config_data_.drug_parameters.process_config();
+    config_data_.therapy_parameters.process_config();
+    config_data_.strategy_parameters.process_config();
+    config_data_.epidemiological_parameters.process_config();
+    config_data_.mosquito_parameters.process_config();
 
     return true;
   }
@@ -184,28 +206,6 @@ void Config::validate_all_cross_field_validations() {
        grid_based.get_p_treatment_under_5_raster().empty()) {
       throw std::invalid_argument("All raster file paths should be provided for grid based spatial mode");
     }
-    // Validate all raster file paths
-    utils::AscFile *asc_file = new utils::AscFile();
-    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_population_raster(),
-                          utils::AscFile::Type::Population)) {
-      std::cout << "Population raster file validated successfully" << std::endl;
-    }
-    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_district_raster(),
-                           utils::AscFile::Type::District)) {
-      std::cout << "District raster file validated successfully" << std::endl;
-    }
-    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_beta_raster(),
-                           utils::AscFile::Type::Beta)) {
-      std::cout << "Beta raster file validated successfully" << std::endl;
-    }
-    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_p_treatment_over_5_raster(),
-                            utils::AscFile::Type::Treatment)) {
-      std::cout << "P treatment over 5 raster file validated successfully" << std::endl;
-    }
-    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_p_treatment_under_5_raster(),
-                            utils::AscFile::Type::Treatment)) {
-      std::cout << "P treatment under 5 raster file validated successfully" << std::endl;
-    }
     //Check if age_distribution_by_location size is different from 1
     if(grid_based.get_age_distribution_by_location().size() != 1) {
       throw std::invalid_argument("Age distribution using raster must be 1 location (to distribute equally)");
@@ -232,7 +232,7 @@ void Config::validate_all_cross_field_validations() {
       throw std::invalid_argument("All location sizes should be equal");
     }
     //Check if age_distribution_by_location size matched initial_age_structure size
-    if(location_based.get_age_distribution_by_location()[0].size() != population_demographic.get_initial_age_structure().size()) {
+    if(location_based.get_age_distribution_by_location().size() != population_demographic.get_initial_age_structure().size()) {
       throw std::invalid_argument("Age distribution by location size should match initial age structure size");
     }
   }
@@ -242,12 +242,23 @@ void Config::validate_all_cross_field_validations() {
   ----------------------------*/
   SeasonalitySettings seasonality_settings = config_data_.seasonality_settings;
   //Check if rainfall file name is provided
-  if(seasonality_settings.get_rainfall().get_filename().empty()) {
-    throw std::invalid_argument("Rainfall file name should be provided");
+  if(seasonality_settings.get_enable() && seasonality_settings.get_mode().empty()) {
+    throw std::invalid_argument("Rainfall is enabled but mode is not provided");
   }
   //Check if rainfall file exists
-  if(!std::filesystem::exists(seasonality_settings.get_rainfall().get_filename())) {
+  if(seasonality_settings.get_mode() == "rainfall"
+    && !std::filesystem::exists(seasonality_settings.get_seasonal_rainfall().get_filename())) {
     throw std::invalid_argument("Rainfall file does not exist");
+  }
+  if(seasonality_settings.get_mode() == "rainfall"
+    && seasonality_settings.get_seasonal_rainfall().get_period() > 365) {
+    throw std::invalid_argument("Rainfall period should be less than or equal to 365");
+  }
+  if(seasonality_settings.get_mode() == "equation") {
+    if(seasonality_settings.get_seasonal_equation().get_raster()
+      && spatial_settings.get_grid_based().get_ecoclimatic_raster().empty()) {
+      throw std::invalid_argument("Ecoclimatic raster should be provided for equation based seasonality");
+      }
   }
 
   /*----------------------------
@@ -255,19 +266,43 @@ void Config::validate_all_cross_field_validations() {
   ----------------------------*/
   MovementSettings movement_settings = config_data_.movement_settings;
   //Check if Barabasi parameters are valid
-  if(movement_settings.get_spatial_model().get_name() == "Barabasi") {
-      MovementSettings::BarabasiSettings barabasi = movement_settings.get_spatial_model().get_barabasi();
+  if(movement_settings.get_spatial_model_settings().get_name() == "Barabasi") {
+      MovementSettings::BarabasiSM barabasi = movement_settings.get_spatial_model_settings().get_barabasi_sm();
       if(barabasi.get_r_g_0() <= 0 || barabasi.get_beta_r() <= 0 || barabasi.get_kappa() <= 0) {
       throw std::invalid_argument("Barabasi parameters should be positive numbers");
       }
   }
   //Check if Wesolowski parameters are valid
-  if(movement_settings.get_spatial_model().get_name() == "Wesolowski") {
-      MovementSettings::WesolowskiSettings wesolowski = movement_settings.get_spatial_model().get_wesolowski();
-      if(wesolowski.get_alpha() <= 0 || wesolowski.get_beta() <= 0 || wesolowski.get_gamma() <= 0 || wesolowski.get_kappa() <= 0) {
+  if(movement_settings.get_spatial_model_settings().get_name() == "Wesolowski") {
+      MovementSettings::WesolowskiSM wesolowski = movement_settings.get_spatial_model_settings().get_wesolowski_sm();
+      if(wesolowski.get_alpha() <= 0 || wesolowski.get_beta() <= 0
+        || wesolowski.get_gamma() <= 0 || wesolowski.get_kappa() <= 0) {
       throw std::invalid_argument("Wesolowski parameters should be positive numbers");
       }
   }
+  //Check if WesolowskiSurface parameters are valid
+  if(movement_settings.get_spatial_model_settings().get_name() == "WesolowskiSurface") {
+      MovementSettings::WesolowskiSurfaceSM wesolowski_surface = movement_settings.get_spatial_model_settings().get_wesolowski_surface_sm();
+      if(wesolowski_surface.get_alpha() <= 0 || wesolowski_surface.get_beta() <= 0
+        || wesolowski_surface.get_gamma() <= 0 || wesolowski_surface.get_kappa() <= 0) {
+      throw std::invalid_argument("WesolowskiSurface parameters should be positive numbers");
+      }
+  }
+  //Check if Marshall parameters are valid
+  if(movement_settings.get_spatial_model_settings().get_name() == "Marshall") {
+      MovementSettings::MarshallSM marshall = movement_settings.get_spatial_model_settings().get_marshall_sm();
+      if(marshall.get_alpha() <= 0 || marshall.get_log_rho() <= 0 || marshall.get_tau() <= 0) {
+      throw std::invalid_argument("Marshall parameters should be positive numbers");
+      }
+  }
+  //Check if BurkinaFaso parameters are valid
+    if(movement_settings.get_spatial_model_settings().get_name() == "BurkinaFaso") {
+        MovementSettings::BurkinaFasoSM burkina_faso = movement_settings.get_spatial_model_settings().get_burkina_faso_sm();
+        if(burkina_faso.get_alpha() <= 0 || burkina_faso.get_tau() <= 0 || burkina_faso.get_log_rho() <= 0 ||
+             burkina_faso.get_capital() <= 0 || burkina_faso.get_penalty() <= 0) {
+        throw std::invalid_argument("BurkinaFaso parameters should be positive numbers");
+        }
+    }
   //Check if circular parameters are valid
   MovementSettings::CirculationInfo circulation_info = movement_settings.get_circulation_info();
   if(circulation_info.get_max_relative_moving_value() < 0 || circulation_info.get_number_of_moving_levels() <= 0) {
@@ -500,37 +535,37 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate mosquito parameters
   ----------------------------*/
-  MosquitoParameters mosquito_parameters = config_data_.mosquito_parameters;
-  //Check if mosquito_mode is either grid_based or location_based
-  if(mosquito_parameters.get_mosquito_config().get_mode() != "grid_based" && mosquito_parameters.get_mosquito_config().get_mode() != "location_based") {
-      throw std::invalid_argument("Mosquito mode should be either grid_based or location_based");
-  }
+  // MosquitoParameters mosquito_parameters = config_data_.mosquito_parameters;
+  // //Check if mosquito_mode is either grid_based or location_based
+  // if(mosquito_parameters.get_mosquito_config().get_mode() != "grid_based" && mosquito_parameters.get_mosquito_config().get_mode() != "location_based") {
+  //     throw std::invalid_argument("Mosquito mode should be either grid_based or location_based");
+  // }
   //If mode is grid_based, check if all raster file paths are provided
-  if(mosquito_parameters.get_mosquito_config().get_mode() == "grid_based") {
-    MosquitoParameters::GridBased grid_based = mosquito_parameters.get_mosquito_config().get_grid_based();
-    utils::AscFile *asc_file = new utils::AscFile();
-    if(asc_file->load_and_validate(grid_based.get_interrupted_feeding_rate_raster(),
-                                    utils::AscFile::Type::Mosquito_IFR)) {
-      std::cout << "Interrupted feeding rate raster file validated successfully" << std::endl;
-                                    }
-    if(asc_file->load_and_validate(grid_based.get_prmc_size_raster(),
-                           utils::AscFile::Type::Mosquito_Size)) {
-      std::cout << "PRMC size raster file validated successfully" << std::endl;
-    }
-  }
+  // if(mosquito_parameters.get_mosquito_config().get_mode() == "grid_based") {
+  //   MosquitoParameters::GridBased grid_based = mosquito_parameters.get_mosquito_config().get_grid_based();
+  //   utils::AscFile *asc_file = new utils::AscFile();
+  //   if(asc_file->load_and_validate(grid_based.get_interrupted_feeding_rate_raster(),
+  //                                   utils::AscFile::Type::MOSQUITO_IFR)) {
+  //     std::cout << "Interrupted feeding rate raster file validated successfully" << std::endl;
+  //                                   }
+  //   if(asc_file->load_and_validate(grid_based.get_prmc_size_raster(),
+  //                          utils::AscFile::Type::MOSQUITO_SIZE)) {
+  //     std::cout << "PRMC size raster file validated successfully" << std::endl;
+  //   }
+  // }
   //If location_based, check if all location sizes are equal
-  if(mosquito_parameters.get_mosquito_config().get_mode() == "location_based") {
-    MosquitoParameters::LocationBased location_based = mosquito_parameters.get_mosquito_config().get_location_based();
-    if(location_based.get_interrupted_feeding_rate().empty() || location_based.get_prmc_size().empty()) {
-      throw std::invalid_argument("All locations should be provided for location based mosquito mode");
-    }
-    //Check if all location sizes are equal
-    SpatialSettings::LocationBased spatial_location_based = spatial_settings.get_location_based();
-    if(location_based.get_interrupted_feeding_rate().size() != location_based.get_prmc_size().size()
-      && location_based.get_interrupted_feeding_rate().size() != spatial_location_based.get_population_size_by_location().size()) {
-      throw std::invalid_argument("All location sizes should be equal");
-    }
-  }
+  // if(mosquito_parameters.get_mosquito_config().get_mode() == "location_based") {
+  //   MosquitoParameters::LocationBased location_based = mosquito_parameters.get_mosquito_config().get_location_based();
+  //   if(location_based.get_interrupted_feeding_rate().empty() || location_based.get_prmc_size().empty()) {
+  //     throw std::invalid_argument("All locations should be provided for location based mosquito mode");
+  //   }
+  //   //Check if all location sizes are equal
+  //   SpatialSettings::LocationBased spatial_location_based = spatial_settings.get_location_based();
+  //   if(location_based.get_interrupted_feeding_rate().size() != location_based.get_prmc_size().size()
+  //     && location_based.get_interrupted_feeding_rate().size() != spatial_location_based.get_population_size_by_location().size()) {
+  //     throw std::invalid_argument("All location sizes should be equal");
+  //   }
+  // }
 
   /*----------------------------
   Validate population events

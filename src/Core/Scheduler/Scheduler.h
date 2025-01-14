@@ -56,7 +56,8 @@ public:
 //
 //  void execute_events_list(EventPtrVector &events_list) const;
 
-  void initialize(const date::year_month_day &starting_date, const int &total_time);
+  void initialize(const date::year_month_day &starting_date,
+    const date::year_month_day &ending_date);
 
   void run();
 
@@ -68,7 +69,7 @@ public:
 
   [[nodiscard]] int current_day_in_year() const;
 
-  [[nodiscard]] int current_month_in_year() const;
+  [[nodiscard]] date::month current_month_in_year() const;
 
   [[nodiscard]] bool is_today_last_day_of_month() const;
 

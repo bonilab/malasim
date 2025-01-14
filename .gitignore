@@ -39,3 +39,4 @@ reporter\.txt
 
 # Ignore log files
 *.log
+/vcpkg/

@@ -1,13 +1,14 @@
+#include <Helpers/TimeHelpers.h>
 #include <yaml-cpp/yaml.h>
 #include <date/date.h>
 #include <stdexcept>
 #include <spdlog/spdlog.h>
 
-#include "Utils/YamlFile.h"
-#include "Utils/Time.h"
+#include "IConfigClass.h"
+#include "Utils/YamlFile.hxx"
 
 // Class to hold the simulation timeframe data
-class SimulationTimeframe {
+class SimulationTimeframe : public IConfigClass{
 public:
   // Getters and Setters for starting_date
   [[nodiscard]] const date::year_month_day &get_starting_date() const {
@@ -62,6 +63,11 @@ public:
     return total_time_;
   }
 
+  void process_config() override {
+    spdlog::info("Processing SimulationTimeframe");
+    total_time_ = TimeHelpers::get_day_count(starting_date_, ending_date_);
+  }
+
 private:
   date::year_month_day starting_date_;
   date::year_month_day start_of_comparison_period_;
@@ -103,7 +109,7 @@ struct convert<SimulationTimeframe> {
     rhs.set_ending_date(node["ending_date"].as<date::year_month_day>());
     rhs.set_start_collect_data_day(node["start_collect_data_day"].as<int>());
 
-    rhs.set_total_time(utils::Time::instance().get_day_count(rhs.get_starting_date(), rhs.get_ending_date()));
+    rhs.set_total_time(TimeHelpers::get_day_count(rhs.get_starting_date(), rhs.get_ending_date()));
     return true;
   }
 };

@@ -2,11 +2,26 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <date/date.h>
 #include <string>
-#include "ConfigData.h"
 
-class Config {
+#include "DrugParameters.h"
+#include "EpidemiologicalParameters.h"
+#include "GenotypeParameters.h"
+#include "ImmuneSystemParameters.h"
+#include "ModelSettings.h"
+#include "MosquitoParameters.h"
+#include "MovementSettings.h"
+#include "ParasiteParameters.h"
+#include "PopulationDemographic.h"
+#include "PopulationEvents.h"
+#include "TransmissionSettings.h"
+#include "SimulationTimeframe.h"
+#include "SpatialSettings.h"
+#include "SeasonalitySettings.h"
+#include "StrategyParameters.h"
+#include "TherapyParameters.h"
+
+class Config{
 public:
   // Constructor and Destructor
   Config() = default;
@@ -17,6 +32,25 @@ public:
   Config &operator=(const Config &) = delete;
   Config(Config &&) = delete;
   Config &operator=(Config &&) = delete;
+
+  struct ConfigData {
+    ModelSettings model_settings{};
+    TransmissionSettings transmission_settings{};
+    PopulationDemographic population_demographic{};
+    SimulationTimeframe simulation_timeframe{};
+    SpatialSettings spatial_settings{};
+    SeasonalitySettings seasonality_settings{};
+    MovementSettings movement_settings{};
+    ParasiteParameters parasite_parameters{};
+    ImmuneSystemParameters immune_system_parameters{};
+    GenotypeParameters genotype_parameters{};
+    DrugParameters drug_parameters{};
+    TherapyParameters therapy_parameters{};
+    StrategyParameters strategy_parameters{};
+    EpidemiologicalParameters epidemiological_parameters{};
+    MosquitoParameters mosquito_parameters{};
+    PopulationEvents population_events{};
+  };
 
   // Load configuration from a YAML file
   bool load(const std::string &filename);
@@ -41,7 +75,8 @@ public:
       const {
     return config_data_.population_demographic;
   }
-  [[nodiscard]] const SpatialSettings &get_spatial_settings() const {
+  [[nodiscard]] SpatialSettings &get_spatial_settings() {
+    /* no const here because Spatial Data class will need to access and modify later */
     return config_data_.spatial_settings;
   }
   [[nodiscard]] const SeasonalitySettings &get_seasonality_settings() const {
@@ -86,20 +121,23 @@ public:
     return config_data_.population_events;
   }
 
+  [[nodiscard]] ConfigData get_config_data() const {
+    return config_data_;
+  }
+
 private:
   // Template method for getting a field
   template <typename T>
   [[nodiscard]] const T &get_field(const T &field) const {
     return field;
   }
+  ConfigData config_data_;
 
   // Template method for setting a field
   template <typename T>
   void set_field(T &field, const T &value) {
     field = value;
   }
-  // Configuration Data
-  ConfigData config_data_;
 
   // Configuration File Path
   std::string config_file_path_;

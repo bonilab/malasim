@@ -6,7 +6,9 @@
 #include <vector>
 #include <map>
 
-class DrugParameters {
+#include "IConfigClass.h"
+
+class DrugParameters: IConfigClass {
 public:
     // Inner class: DrugInfo
     class DrugInfo {
@@ -50,6 +52,9 @@ public:
     // Getters and Setters for DrugParameters
     [[nodiscard]] const std::map<int, DrugInfo>& get_drug_db() const { return drug_db_; }
     void set_drug_db(const std::map<int, DrugInfo>& value) { drug_db_ = value; }
+
+    //process config data
+    void process_config() override {};
 
 private:
     std::map<int, DrugInfo> drug_db_;

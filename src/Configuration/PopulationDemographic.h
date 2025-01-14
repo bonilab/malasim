@@ -2,11 +2,13 @@
 #define POPULATION_DEMOGRAPHIC_H
 
 #include <yaml-cpp/yaml.h>
-
+#include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <vector>
 
-class PopulationDemographic {
+#include "IConfigClass.h"
+
+class PopulationDemographic : IConfigClass {
 public:
   // Getters
   [[nodiscard]] int get_number_of_age_classes() const {
@@ -81,6 +83,11 @@ public:
       throw std::invalid_argument(
           "artificial_rescaling_of_population_size must be greater than 0");
     artificial_rescaling_of_population_size_ = value;
+  }
+
+  void process_config() override{
+    spdlog::info("Processing PopulationDemographic");
+    number_of_age_classes_ = static_cast<int>(age_structure_.size());
   }
 
 private:

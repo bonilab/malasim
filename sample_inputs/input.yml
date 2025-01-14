@@ -13,7 +13,7 @@ model_settings:
   # are sent to stdout, measured in days.
   days_between_stdout_output: 30
 
-  # Initial seed number for random number generator; set to -1 or comment out to use a random seed
+  # Initial seed number for random number generator; set to -1 to use a random seed
   initial_seed_number: -1
 
   # Record the genomic data (set to true for a real run)
@@ -27,7 +27,7 @@ simulation_timeframe:
   starting_date: 2000/1/1
 
   # Start of comparison period (mutations start in 2010)
-  start_of_comparison_period: 2010/1/1
+  start_of_comparison_period: 2000/1/1
 
   # Simulation ending date
   ending_date: 2030/1/1
@@ -77,41 +77,45 @@ population_demographic:
 # ---------------------------------------------------------------
 spatial_settings:
   mode: "grid_based" # or "location_based"
+#  mode: "location_based" # or "location_based"
   grid_based:
+    # Approximate national age distribution (to be updated with specific country data)
+    age_distribution_by_location:
+     - [0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0]
+
     # Adjusted population raster to account for burn-in up to 2009 start
-    population_raster: "../../sample_inputs/kag_init_pop.asc"
+#    population_raster: "../../sample_inputs/kag_init_pop.asc"
+    population_raster: "../../sample_inputs/dev_init_pop.asc"
 
     # Raster files defining the country districts
-    district_raster: "../../sample_inputs/kag_district.asc"
+#    district_raster: "../../sample_inputs/kag_district.asc"
+    district_raster: "../../sample_inputs/dev_district.asc"
 
     # Raster files defining treatment probabilities (comment these out for beta calibration)
-    p_treatment_under_5_raster: "../../sample_inputs/kag_treatment.asc"
-    p_treatment_over_5_raster: "../../sample_inputs/kag_treatment.asc"
-
-    # Probability that an infected and symptomatic person receives treatment; single value for the entire country
-    # If set to '-1', these values are read from 'pr_treatment_under5' and 'pr_treatment_over5' above
-    p_treatment_under_5_by_location: [-1]
-    p_treatment_over_5_by_location: [-1]
+#    p_treatment_under_5_raster: "../../sample_inputs/kag_treatment.asc"
+#    p_treatment_over_5_raster: "../../sample_inputs/kag_treatment.asc"
+    p_treatment_under_5_raster: "../../sample_inputs/dev_treatment.asc"
+    p_treatment_over_5_raster: "../../sample_inputs/dev_treatment.asc"
 
     # Raster file containing the calibrated beta value
-    beta_raster: "../../sample_inputs/kag_beta_r1.asc"
-    # Will be overridden by beta_raster
-    beta_by_location: [-1]
+#    beta_raster: "../../sample_inputs/kag_beta_r1.asc"
+    beta_raster: "../../sample_inputs/dev_beta.asc"
+
+    # Raster file containing the seasonal values,
+    # use this only when using raster in seasonal equation
+    ecoclimatic_raster: "../../sample_inputs/dev_ecozone.asc"
 
     # Cell size used by raster, in square kilometers
     cell_size: 5
 
+  location_based:
     # Approximate national age distribution (to be updated with specific country data)
     age_distribution_by_location:
-      - [0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0]
-  location_based:
+     - [0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0]
+
     #id, latitude, longitude
     location_info:
       - [0, 0, 0]
-
-    #if the number of values less than number of locations, the first value will be applied for all locations
-    age_distribution_by_location:
-      - [0.0334, 0.0300, 0.0329, 0.0324, 0.0332, 0.0314, 0.0316, 0.0310, 0.0285, 0.0256, 0.0298, 0.0212, 0.0321, 0.0228, 0.0230, 0.1906, 0.1403, 0.0966, 0.0605, 0.0344, 0.0387]
 
     # probability that a symptomatic and infected individual seeks and receives antimalarial treatment
     #if the number of values less than number of locations, the first value will be applied for all locations
@@ -131,16 +135,19 @@ spatial_settings:
 # ---------------------------------------------------------------
 seasonality_settings:
   # Seasonality of malaria (to be updated with specific country data)
-  enable: false
-  mode: rainfall
+  enable: true
+  mode: "rainfall"
   rainfall:
-    filename: "../../sample_inputs/kag_seasonality.csv"
+    filename: "../../sample_inputs/dev_seasonality.csv"
     period: 365
-  simple:
-    a: [1]
-    phi: [250]
-    min_value: [0.1]
-    period: 365
+  equation:
+    # If raster is enabled, make sure to include
+    # ecoclimatic_raster in spatial_settings
+    raster: true
+    base: [ 0.4]
+    a:    [ 0.6]
+    b:    [ 2.5]
+    phi:  [ 146]
 
 # ---------------------------------------------------------------
 # 7. Movement and Spatial Model
@@ -148,7 +155,7 @@ seasonality_settings:
 movement_settings:
   # Country-specific movement model and calibration
   spatial_model:
-    name: "Wesolowski"
+    name: "BurkinaFaso"
     Barabasi:
       r_g_0: 5.8
       beta_r: 1.65
@@ -158,6 +165,21 @@ movement_settings:
       alpha: 0.22268982
       beta: 0.14319618
       gamma: 0.83741484
+    WesolowskiSurface:
+      kappa: 0.01093251
+      alpha: 0.22268982
+      beta: 0.14319618
+      gamma: 0.83741484
+    Marshall:
+      alpha: 1.27
+      log_rho: 0.54
+      tau: 1.342
+    BurkinaFaso:
+      alpha: 1.27
+      log_rho: 0.25
+      tau: 1.342
+      capital: 14
+      penalty: 12
 
   # Settings that determine how long an individual stays in a given location
   circulation_info:
@@ -165,6 +187,8 @@ movement_settings:
     number_of_moving_levels: 100
     moving_level_distribution:
       distribution: Gamma
+      Exponential:
+        scale: 0.17
       Gamma:
         mean: 5
         sd: 10
@@ -188,7 +212,7 @@ parasite_parameters:
     log_parasite_density_clinical_from: 3.301 # Corresponds to 2,000 parasites per μl of blood
     log_parasite_density_clinical_to: 5.301 # Corresponds to 200,000 parasites per μl of blood
     log_parasite_density_detectable: 1.000 # Corresponds to 10 parasites per μl of blood
-    log_parasite_density_detectable_pfpr: 1.699 # Corresponds to 100 parasites per μl of blood
+    log_parasite_density_detectable_pfpr: 1.699 # Corresponds to 100 parasites per μl of blood›
     log_parasite_density_pyrogenic: 3.398 # Corresponds to 2,500 parasites per μl of blood
 
   recombination_parameters:
@@ -282,7 +306,7 @@ genotype_parameters:
                   factors: [1, 1.2]
             - position: 93
               amino_acids: ["T", "S"]
-              daily_crs: [0, 0.0002433748] #0.0000313953492  = (0.0081/0.1290)*0.0005
+              daily_crs: [0, 0.0002433748] #0.0000313953492 (this number is is supplement)  = (0.0081/0.1290)*0.0005
               multiplicative_effect_on_EC50:
                 - drug_id: 3
                   factors: [1, 1.6648]
@@ -294,13 +318,13 @@ genotype_parameters:
                   factors: [1, 1.6648]
             - position: 145
               amino_acids: ["F", "I"]
-              daily_crs: [0, 0.0078751277] #0.0010158914733  = (0.2621/0.1290)*0.0005
+              daily_crs: [0, 0.0078751277] #0.0010158914733 (this number is in supplement)  = (0.2621/0.1290)*0.0005
               multiplicative_effect_on_EC50:
                 - drug_id: 3
                   factors: [1, 2.2226]
             - position: 218
               amino_acids: ["I", "F"]
-              daily_crs: [0, 0.0035124091] #0.0004531007739 = (0.1169/0.1290)*0.0005
+              daily_crs: [0, 0.0035124091] #0.0004531007739 (this number is in supplement) = (0.1169/0.1290)*0.0005
               multiplicative_effect_on_EC50:
                 - drug_id: 3
                   factors: [1, 1.6648]
@@ -785,6 +809,8 @@ epidemiological_parameters:
     number_of_biting_levels: 100
     biting_level_distribution:
       distribution: Gamma
+      Exponential:
+        scale: 0.17
       Gamma:
         mean: 5
         sd: 10

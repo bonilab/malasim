@@ -1,7 +1,8 @@
 #ifndef IMMUNESYSTEMPARAMETERS_H
 #define IMMUNESYSTEMPARAMETERS_H
+#include "IConfigClass.h"
 
-class ImmuneSystemParameters {
+class ImmuneSystemParameters : IConfigClass {
 public:
     // Getters and Setters
     [[nodiscard]] double get_b1() const { return b1_; }
@@ -57,6 +58,8 @@ public:
 
     [[nodiscard]] double get_midpoint() const { return midpoint_; }
     void set_midpoint(double value) { midpoint_ = value; }
+
+    void process_config() override {};
 
 private:
     double b1_;
