@@ -24,7 +24,8 @@ void Scheduler::clear_all_events() {
   // clear_all_events(population_events_list_);
 }
 
-void Scheduler::initialize(const date::year_month_day& starting_date, const int& total_time) {
+void Scheduler::initialize(const date::year_month_day& starting_date, const date::year_month_day& ending_date) {
+  int total_time = TimeHelpers::days_between(starting_date, ending_date);
   set_total_available_time(total_time + 720); // Prevent scheduling at the end of simulation
   set_current_time(0);
   calendar_date = date::sys_days(starting_date);
@@ -82,11 +83,11 @@ bool Scheduler::can_stop() const {
 }
 
 int Scheduler::current_day_in_year() const {
-  return utils::Time::instance().day_of_year(calendar_date);
+  return TimeHelpers::day_of_year(calendar_date);
 }
 
-int Scheduler::current_month_in_year() const {
-  return utils::Time::instance().month_of_year(calendar_date);
+date::month Scheduler::current_month_in_year() const {
+  return TimeHelpers::month_of_year(calendar_date);
 }
 
 bool Scheduler::is_today_last_day_of_year() const {

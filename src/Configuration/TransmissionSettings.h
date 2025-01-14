@@ -5,7 +5,7 @@
 
 #include <stdexcept>
 
-class TransmissionSettings {
+class TransmissionSettings : IConfigClass {
 public:
   // Getter for transmission_parameter
   [[nodiscard]] double get_transmission_parameter() const {
@@ -31,6 +31,10 @@ public:
       throw std::invalid_argument(
           "p_infection_from_an_infectious_bite must be between 0 and 1");
     p_infection_from_an_infectious_bite_ = value;
+  }
+
+  void process_config() override{
+    spdlog::info("Processing TransmissionSettings");
   }
 
 private:

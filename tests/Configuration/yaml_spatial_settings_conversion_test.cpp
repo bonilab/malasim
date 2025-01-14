@@ -102,8 +102,8 @@ TEST_F(SpatialSettingsTest, DecodeSpatialSettings) {
     EXPECT_EQ(location.get_p_treatment_over_5_by_location(), std::vector<double>{0.5});
     for (size_t i = 0; i < location.get_location_info().size(); ++i) {
       EXPECT_EQ(location.get_location_info()[i].get_id(),0);
-      EXPECT_EQ(location.get_location_info()[i].get_latitude(),0);
-      EXPECT_EQ(location.get_location_info()[i].get_longitude(),0);
+      EXPECT_EQ(location.get_location_info()[i].get_coordinate().get_latitude(),0);
+      EXPECT_EQ(location.get_location_info()[i].get_coordinate().get_longitude(),0);
     }
     for (size_t i = 0; i < location.get_age_distribution_by_location().size(); ++i) {
       CompareVectors(location.get_age_distribution_by_location()[i],

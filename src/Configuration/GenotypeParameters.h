@@ -5,7 +5,9 @@
 #include <yaml-cpp/yaml.h>
 #include <stdexcept>
 
-class GenotypeParameters {
+#include "IConfigClass.h"
+
+class GenotypeParameters: IConfigClass {
 public:
     // Inner class: MultiplicativeEffectOnEC50For2OrMoreMutations
     class MultiplicativeEffectOnEC50For2OrMoreMutations {
@@ -175,6 +177,8 @@ public:
 
     [[nodiscard]] const std::vector<InitialGenotypeInfo>& get_initial_genotype_info() const { return initial_genotype_info_; }
     void set_initial_genotype_info(const std::vector<InitialGenotypeInfo>& value) { initial_genotype_info_ = value; }
+
+    void process_config() override {};
 
 private:
     std::string mutation_mask_;

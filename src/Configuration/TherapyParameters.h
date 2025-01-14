@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 
-class TherapyParameters {
+class TherapyParameters: IConfigClass {
 public:
   // Inner class: TherapyInfo
   class TherapyInfo {
@@ -32,6 +32,8 @@ public:
 
   [[nodiscard]] const std::map<int, TherapyInfo>& get_therapy_db() const { return therapy_db_; }
   void set_therapy_db(const std::map<int, TherapyInfo>& value) { therapy_db_ = value; }
+
+  void process_config() override {};
 
 private:
   int tf_testing_day_;

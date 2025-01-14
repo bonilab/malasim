@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <yaml-cpp/yaml.h>
 
-class MosquitoParameters {
+class MosquitoParameters : IConfigClass {
 public:
     // Inner class: GridBased
     class GridBased {
@@ -64,6 +64,8 @@ public:
     // Getters and Setters for MosquitoParameters
     [[nodiscard]] const MosquitoConfig& get_mosquito_config() const { return mosquito_config_; }
     void set_mosquito_config(const MosquitoConfig& value) { mosquito_config_ = value; }
+
+    void process_config() override {};
 
 private:
     MosquitoConfig mosquito_config_;

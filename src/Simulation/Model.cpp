@@ -2,13 +2,18 @@
 #include <stdexcept>
 #include "Model.h"
 #include <Core/Scheduler/Scheduler.h>
+#include <Population/Population.h>
+#include <Utils/Random.h>
+
 #include "Configuration/Config.h"  // Assuming Config is defined here
-#include "Utils/Cli.h"
+#include "Utils/Cli.hxx"
 
 // Private constructor: creates the Config instance
 Model::Model()
-    : config_(std::make_unique<Config>()),
-      scheduler_(std::make_unique<Scheduler>(this)), config_file_path_("input.yml"),
+    : config_(new Config()),
+      scheduler_(new Scheduler(this)), config_file_path_("input.yml"),
+      population_(new Population(this)),
+      random_(new utils::Random()),
       is_initialized_(false) {
 }
 
@@ -17,8 +22,17 @@ bool Model::initialize() {
     config_file_path_ = utils::Cli::get_instance().get_input_file();
     // Load the configuration file
     if(config_->load(config_file_path_)) {
-      std::cout << "Model initialized with configuration file: "
-                << config_file_path_ << "\n";
+      spdlog::info("Configuration file loaded successfully: " + config_file_path_);
+
+      if(config_->get_model_settings().get_initial_seed_number() <= 0) {
+        random_->set_seed(std::chrono::system_clock::now().time_since_epoch().count());
+      } else {
+        random_->set_seed(config_->get_model_settings().get_initial_seed_number());
+      }
+      scheduler_->initialize(config_->get_simulation_timeframe().get_starting_date(),
+                             config_->get_simulation_timeframe().get_ending_date());
+      population_->initialize();
+
       is_initialized_ = true;
     }
     else {
@@ -41,13 +55,15 @@ void Model::finalize() {
     throw std::runtime_error("Model is not initialized or already finalized.");
   }
   // Cleanup code
-  config_.reset();  // Automatically handled by unique_ptr, but explicitly
-                    // showing intent
+  delete population_;
+  delete scheduler_;
+  delete config_;
+  delete random_;
 }
 
 void Model::begin_time_step() {
   // spdlog::info("\t\t\tBegin time step");
-}/**/
+}
 
 void Model::end_time_step() {
   // spdlog::info("\t\t\tEnd time step");
@@ -55,6 +71,7 @@ void Model::end_time_step() {
 
 void Model::daily_update() {
   // spdlog::info("\tDaily update");
+  population_->update(scheduler_->current_time());
 }
 
 void Model::monthly_update() {
@@ -63,5 +80,9 @@ void Model::monthly_update() {
 
 void Model::yearly_update() {
   // spdlog::info("\tYearly update");
+}
+
+utils::Random* Model::get_random() {
+  return random_;
 }
 
