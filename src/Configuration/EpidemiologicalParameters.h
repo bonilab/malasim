@@ -1,6 +1,10 @@
 #ifndef EPIDEMIOLOGICALPARAMETERS_H
 #define EPIDEMIOLOGICALPARAMETERS_H
 
+#include <yaml-cpp/yaml.h>
+#include <stdexcept>
+#include <string>
+
 #include "IConfigClass.h"
 
 class EpidemiologicalParameters: IConfigClass {
@@ -203,9 +207,6 @@ private:
 };
 
 namespace YAML {
-#include <yaml-cpp/yaml.h>
-#include <stdexcept>
-#include <string>
 
 // ExponentialDistribution YAML conversion
 template<>

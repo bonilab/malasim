@@ -8,12 +8,10 @@
 #ifndef MARSHALLSM_HXX
 #define MARSHALLSM_HXX
 
-#include "Configuration/Config.h"
 #include "Helpers/NumberHelpers.hxx"
 #include "Simulation/Model.h"
 #include "Spatial/SpatialModel.hxx"
 #include "Utils/TypeDef.hxx"
-#include "yaml-cpp/yaml.h"
 
 namespace Spatial {
 class MarshallSM : public SpatialModel {

@@ -260,7 +260,7 @@ public:
     mode_ = value;
   }
 
-  [[nodiscard]] SeasonalRainfall &get_seasonal_rainfall() {
+  [[nodiscard]]  SeasonalRainfall get_seasonal_rainfall() const {
     return seasonal_rainfall_;
   }
 
@@ -268,7 +268,7 @@ public:
     seasonal_rainfall_ = value;
   }
 
-  [[nodiscard]] SeasonalEquation &get_seasonal_equation() {
+  [[nodiscard]]  SeasonalEquation get_seasonal_equation() const {
     return seasonal_equation_;
   }
 
@@ -284,18 +284,16 @@ public:
         // process equation based
         return get_seasonal_equation().get_seasonal_factor(today, location);
       }
-      else if(mode_=="rainfall") {
+      if(mode_=="rainfall") {
         spdlog::info("Rainfall based");
         // process rainfall based
         return get_seasonal_rainfall().get_seasonal_factor(today, location);
-      }
-      else {
-        throw std::runtime_error("Unknown mode in 'seasonality_settings'.");
       }
     }
     else {
       return 1.0;
     }
+    return 1.0;
   }
 
   void process_config() override {};
@@ -354,6 +352,14 @@ struct convert<SeasonalitySettings::SeasonalEquation> {
     rhs.raster_A_ = node["a"].as<std::vector<double>>();
     rhs.raster_B_ = node["b"].as<std::vector<double>>();
     rhs.raster_phi_ = node["phi"].as<std::vector<int>>();
+    rhs.A_ = rhs.raster_A_;
+    rhs.B_ = rhs.raster_B_;
+    rhs.base_ = rhs.raster_base_;
+    rhs.phi_ = rhs.raster_phi_;
+    rhs.reference_A_ = rhs.raster_A_;
+    rhs.reference_B_ = rhs.raster_B_;
+    rhs.reference_base_ = rhs.raster_base_;
+    rhs.reference_phi_ = rhs.raster_phi_;
     return true;
   }
 };
@@ -387,6 +393,12 @@ struct convert<SeasonalitySettings> {
     Node node;
     node["enable"] = rhs.get_enable();
     node["mode"] = rhs.get_mode();
+    node["equation"]["base"] = rhs.get_seasonal_equation().base_;
+    node["equation"]["a"] = rhs.get_seasonal_equation().A_;
+    node["equation"]["b"] = rhs.get_seasonal_equation().B_;
+    node["equation"]["phi"] = rhs.get_seasonal_equation().phi_;
+    node["rainfall"]["filename"] = rhs.get_seasonal_rainfall().filename_;
+    node["rainfall"]["period"] = rhs.get_seasonal_rainfall().period_;
     return node;
   }
 
@@ -397,13 +409,11 @@ struct convert<SeasonalitySettings> {
 
     rhs.set_enable(node["enable"].as<bool>());
     rhs.set_mode(node["mode"].as<std::string>());
-    if(rhs.get_mode()=="equation") {
+    if(node["equation"]) {
       rhs.set_seasonal_equation(node["equation"].as<SeasonalitySettings::SeasonalEquation>());
-    } else if(rhs.get_mode()=="rainfall") {
-      rhs.set_seasonal_rainfall(node["rainfall"].as<SeasonalitySettings::SeasonalRainfall>());
     }
-    else {
-      throw std::runtime_error("Unknown mode in 'seasonality_settings'.");
+    if(node["rainfall"]) {
+      rhs.set_seasonal_rainfall(node["rainfall"].as<SeasonalitySettings::SeasonalRainfall>());
     }
     return true;
   }
