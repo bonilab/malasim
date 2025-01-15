@@ -4,10 +4,12 @@
 #include <yaml-cpp/yaml.h>
 #include <stdexcept>
 #include <spdlog/spdlog.h>
-#include "Utils/YamlFile.h"
+
+#include "IConfigClass.h"
+#include "Utils/YamlFile.hxx"
 #include "Utils/Random.h"
 
-class ModelSettings {
+class ModelSettings : IConfigClass {
 public:
   // Getters
   [[nodiscard]] int get_days_between_stdout_output() const {
@@ -34,6 +36,10 @@ public:
   }
   [[nodiscard]] bool get_record_genome_db() const { return record_genome_db_; }
   void set_record_genome_db(bool value) { record_genome_db_ = value; }
+
+  void process_config() override {
+    spdlog::info("Processing ModelSettings");
+  }
 
 private:
   int days_between_stdout_output_;

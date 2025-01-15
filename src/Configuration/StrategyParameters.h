@@ -7,7 +7,9 @@
 #include <vector>
 #include <string>
 
-class StrategyParameters {
+#include "IConfigClass.h"
+
+class StrategyParameters: IConfigClass {
 public:
     // Inner class: StrategyInfo
     class StrategyInfo {
@@ -115,6 +117,9 @@ public:
 
     [[nodiscard]] const MassDrugAdministration& get_mass_drug_administration() const { return mass_drug_administration_; }
     void set_mass_drug_administration(const MassDrugAdministration& value) { mass_drug_administration_ = value; }
+
+    //process config data
+    void process_config() override {};
 
 private:
     std::map<int, StrategyInfo> strategy_db_;  // Changed from vector to map

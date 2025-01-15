@@ -4,24 +4,25 @@
 
 class SeasonalitySettingsTest : public ::testing::Test {
 protected:
-    SeasonalitySettings default_settings;
+    SeasonalitySettings default_settings = SeasonalitySettings();
 
     void SetUp() override {
         // Initialize default SeasonalitySettings object using setters
-        SeasonalitySettings::RainfallSettings rainfall;
-        rainfall.set_filename("test.csv");
-        rainfall.set_period(date::days{365});
+        SeasonalitySettings::SeasonalEquation equation;
+        equation.base_ = std::vector<double>{2.5};
+        equation.A_ = std::vector<double>{0.4};
+        equation.B_ = std::vector<double>{0.6};
+        equation.phi_ = std::vector<int>{146};
+        equation.raster_ = true;
 
-        SeasonalitySettings::SimpleSettings simple;
-        simple.set_a({1.0});
-        simple.set_phi({250});
-        simple.set_min_value({0.1});
-        simple.set_period(date::days{365});
+        SeasonalitySettings::SeasonalRainfall rainfall;
+        rainfall.set_filename("../../sample_inputs/dev_seasonality.csv");
+        rainfall.set_period(365);
 
         default_settings.set_enable(true);
         default_settings.set_mode("rainfall");
-        default_settings.set_rainfall(rainfall);
-        default_settings.set_simple(simple);
+        default_settings.set_seasonal_rainfall(rainfall);
+        default_settings.set_seasonal_equation(equation);
     }
 };
 
@@ -32,15 +33,16 @@ TEST_F(SeasonalitySettingsTest, EncodeSeasonalitySettings) {
     EXPECT_EQ(node["enable"].as<bool>(), default_settings.get_enable());
     EXPECT_EQ(node["mode"].as<std::string>(), default_settings.get_mode());
 
-    auto rainfall = default_settings.get_rainfall();
+    auto rainfall = default_settings.get_seasonal_rainfall();
     EXPECT_EQ(node["rainfall"]["filename"].as<std::string>(), rainfall.get_filename());
-    EXPECT_EQ(node["rainfall"]["period"].as<int>(), rainfall.get_period().count());
+    EXPECT_EQ(node["rainfall"]["period"].as<int>(), rainfall.get_period());
 
-    auto simple = default_settings.get_simple();
-    EXPECT_EQ(node["simple"]["a"].as<std::vector<double>>(), simple.get_a());
-    EXPECT_EQ(node["simple"]["phi"].as<std::vector<int>>(), simple.get_phi());
-    EXPECT_EQ(node["simple"]["min_value"].as<std::vector<double>>(), simple.get_min_value());
-    EXPECT_EQ(node["simple"]["period"].as<int>(), simple.get_period().count());
+    auto equation = default_settings.get_seasonal_equation();
+
+    EXPECT_EQ(node["equation"]["base"].as<std::vector<double>>(), equation.base_);
+    EXPECT_EQ(node["equation"]["a"].as<std::vector<double>>(), equation.A_);
+    EXPECT_EQ(node["equation"]["b"].as<std::vector<double>>(), equation.B_);
+    EXPECT_EQ(node["equation"]["phi"].as<std::vector<int>>(), equation.phi_);
 }
 
 // Test decoding functionality
@@ -49,18 +51,14 @@ TEST_F(SeasonalitySettingsTest, DecodeSeasonalitySettings) {
     node["enable"] = true;
     node["mode"] = "rainfall";
 
-    YAML::Node rainfall_node;
-    rainfall_node["filename"] = "test.csv";
-    rainfall_node["period"] = 365;
+    node["rainfall"]["filename"] = "../../sample_inputs/dev_seasonality.csv";
+    node["rainfall"]["period"] = 365;
 
-    YAML::Node simple_node;
-    simple_node["a"] = std::vector<double>{1.0};
-    simple_node["phi"] = std::vector<int>{250};
-    simple_node["min_value"] = std::vector<double>{0.1};
-    simple_node["period"] = 365;
-
-    node["rainfall"] = rainfall_node;
-    node["simple"] = simple_node;
+    node["equation"]["base"] = std::vector<double>{2.5};
+    node["equation"]["a"] = std::vector<double>{0.4};
+    node["equation"]["b"] = std::vector<double>{0.6};
+    node["equation"]["phi"] = std::vector<int>{146};
+    node["equation"]["raster"] = true;
 
     SeasonalitySettings decoded_settings;
     EXPECT_NO_THROW(YAML::convert<SeasonalitySettings>::decode(node, decoded_settings));
@@ -68,15 +66,16 @@ TEST_F(SeasonalitySettingsTest, DecodeSeasonalitySettings) {
     EXPECT_EQ(decoded_settings.get_enable(), true);
     EXPECT_EQ(decoded_settings.get_mode(), "rainfall");
 
-    auto decoded_rainfall = decoded_settings.get_rainfall();
-    EXPECT_EQ(decoded_rainfall.get_filename(), "test.csv");
-    EXPECT_EQ(decoded_rainfall.get_period().count(), 365);
+    auto decoded_rainfall = decoded_settings.get_seasonal_rainfall();
+    EXPECT_EQ(decoded_rainfall.get_filename(), "../../sample_inputs/dev_seasonality.csv");
+    EXPECT_EQ(decoded_rainfall.get_period(), 365);
 
-    auto decoded_simple = decoded_settings.get_simple();
-    EXPECT_EQ(decoded_simple.get_a(), std::vector<double>{1.0});
-    EXPECT_EQ(decoded_simple.get_phi(), std::vector<int>{250});
-    EXPECT_EQ(decoded_simple.get_min_value(), std::vector<double>{0.1});
-    EXPECT_EQ(decoded_simple.get_period().count(), 365);
+    auto decoded_equation = decoded_settings.get_seasonal_equation();
+
+    EXPECT_EQ(decoded_equation.base_, std::vector<double>{2.5});
+    EXPECT_EQ(decoded_equation.A_, std::vector<double>{0.4});
+    EXPECT_EQ(decoded_equation.B_, std::vector<double>{0.6});
+    EXPECT_EQ(decoded_equation.phi_, std::vector<int>{146});
 }
 
 // Test missing fields during decoding

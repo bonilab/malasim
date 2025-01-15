@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <uuid.h>
 #include <vector>
 
 namespace utils {
@@ -361,8 +362,23 @@ public:
     gsl_ran_shuffle(rng_.get(), vec.data(), vec.size(), sizeof(T));
   }
 
+    /**
+     * @brief Generates a new UUID.
+     *
+     * This function uses the `uuid_random_generator` to produce a new universally
+     * unique identifier (UUID). It can be used to generate unique IDs for various
+     * purposes, such as object identifiers or session tokens.
+     *
+     * @return uuids::uuid A newly generated UUID.
+     */
+    uuids::uuid uuid() {
+      std::random_device rd;
+      std::mt19937 generator{rd()};
+      return uuids::uuid_random_generator{generator}();
+  }
+
 private:
-  uint64_t seed_;
+    uint64_t seed_;
 
   // Custom deleter for gsl_rng
   struct GslRngDeleter {
@@ -385,6 +401,7 @@ private:
    * @throws std::runtime_error If RNG allocation fails.
    */
   void initialize(uint64_t initial_seed = 0);
+
 };
 }  // namespace utils
 #endif  // RANDOM_H

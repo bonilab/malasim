@@ -1,13 +1,5 @@
 {
-  "dependencies": [
-    "fmt",
-    "gsl",
-    "gtest",
-    "lua",
-    "sol2",
-    "spdlog",
-    "yaml-cpp",
-    "date",
-    "cli11"
-  ]
+  "dependencies" : [ "fmt", "gsl", "date", "gtest", "lua", "sol2", "spdlog", "yaml-cpp", "cli11", "stduuid" ],
+  "version" : "1.0",
+  "name" : "malasim"
 }

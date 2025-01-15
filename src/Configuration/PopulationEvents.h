@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "date/date.h"
-#include "Utils/YamlFile.h"
+#include "Utils/YamlFile.hxx"
 #include <stdexcept>
 
 class PopulationEvents {

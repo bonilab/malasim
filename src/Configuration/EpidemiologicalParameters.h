@@ -1,7 +1,13 @@
 #ifndef EPIDEMIOLOGICALPARAMETERS_H
 #define EPIDEMIOLOGICALPARAMETERS_H
 
-class EpidemiologicalParameters {
+#include <yaml-cpp/yaml.h>
+#include <stdexcept>
+#include <string>
+
+#include "IConfigClass.h"
+
+class EpidemiologicalParameters: IConfigClass {
 public:
     class BitingLevelDistributionGamma {
     public:
@@ -17,6 +23,18 @@ public:
         double sd_;
     };
 
+    class BitingLevelDistributionExponential {
+    public:
+        // Getters and Setters
+        [[nodiscard]] double get_scale() const { return scale_; }
+        void set_scale(double value) { scale_ = value; }
+
+    private:
+        double scale_;
+        double mean_;
+        double sd_;
+    };
+
     class BitingLevelDistribution {
     public:
         // Getters and Setters
@@ -26,9 +44,13 @@ public:
         [[nodiscard]] const BitingLevelDistributionGamma& get_gamma() const { return gamma_; }
         void set_gamma(const BitingLevelDistributionGamma& value) { gamma_ = value; }
 
+        [[nodiscard]] const BitingLevelDistributionExponential& get_exponential() const { return exponential_; }
+        void set_exponential(const BitingLevelDistributionExponential& value) { exponential_ = value; }
+
     private:
         std::string distribution_;
         BitingLevelDistributionGamma gamma_;
+        BitingLevelDistributionExponential exponential_;
     };
 
     class RelativeBitingInfo {
@@ -46,10 +68,31 @@ public:
         [[nodiscard]] const BitingLevelDistribution& get_biting_level_distribution() const { return biting_level_distribution_; }
         void set_biting_level_distribution(const BitingLevelDistribution& value) { biting_level_distribution_ = value; }
 
+        [[nodiscard]] double get_scale() const { return scale_; }
+        void set_scale(double value) { scale_ = value; }
+
+        [[nodiscard]] double get_mean() const { return mean_; }
+        void set_mean(double value) { mean_ = value; }
+
+        [[nodiscard]] double get_sd() const { return sd_; }
+        void set_sd(double value) { sd_ = value; }
+
+        [[nodiscard]] double get_gamma_a() const { return gamma_a_; }
+        void set_gamma_a(double value) { gamma_a_ = value; }
+
+        [[nodiscard]] double get_gamma_b() const { return gamma_b_; }
+        void set_gamma_b(double value) { gamma_b_ = value; }
+
     private:
         int max_relative_biting_value_;
         double min_relative_biting_value_;
         int number_of_biting_levels_;
+        double scale_;
+        double mean_;
+        double sd_;
+        double gamma_a_;
+        double gamma_b_;
+
         BitingLevelDistribution biting_level_distribution_;
     };
 
@@ -94,7 +137,14 @@ public:
     void set_min_dosing_days(int value) { min_dosing_days_ = value; }
 
     [[nodiscard]] const RelativeBitingInfo& get_relative_biting_info() const { return relative_biting_info_; }
-    void set_relative_biting_info(const RelativeBitingInfo& value) { relative_biting_info_ = value; }
+    void set_relative_biting_info(const RelativeBitingInfo& value) {
+        relative_biting_info_ = value;
+        // const auto temp = relative_biting_info_.get_biting_level_distribution().get_gamma().get_sd()
+        // * relative_biting_info_.get_biting_level_distribution().get_gamma().get_sd();
+        // relative_biting_info_.set_gamma_b(temp / relative_biting_info_.get_biting_level_distribution().get_gamma().get_mean());
+        // relative_biting_info_.set_gamma_a(relative_biting_info_.get_biting_level_distribution().get_gamma().get_mean()
+        //     / relative_biting_info_.get_gamma_b());
+    }
 
     [[nodiscard]] double get_gametocyte_level_under_artemisinin_action() const { return gametocyte_level_under_artemisinin_action_; }
     void set_gametocyte_level_under_artemisinin_action(double value) { gametocyte_level_under_artemisinin_action_ = value; }
@@ -129,6 +179,11 @@ public:
     [[nodiscard]] double get_inflation_factor() const { return inflation_factor_; }
     void set_inflation_factor(double value) { inflation_factor_ = value; }
 
+    //process config data
+    void process_config() override {
+
+    };
+
 private:
     int number_of_tracking_days_;
     int days_to_clinical_under_five_;
@@ -152,9 +207,24 @@ private:
 };
 
 namespace YAML {
-#include <yaml-cpp/yaml.h>
-#include <stdexcept>
-#include <string>
+
+// ExponentialDistribution YAML conversion
+template<>
+struct convert<EpidemiologicalParameters::BitingLevelDistributionExponential> {
+    static Node encode(const EpidemiologicalParameters::BitingLevelDistributionExponential& rhs) {
+        Node node;
+        node["scale"] = rhs.get_scale();
+        return node;
+    }
+
+    static bool decode(const Node& node, EpidemiologicalParameters::BitingLevelDistributionExponential& rhs) {
+        if (!node["scale"]) {
+            throw std::runtime_error("Missing fields in ExponentialDistribution");
+        }
+        rhs.set_scale(node["scale"].as<double>());
+        return true;
+    }
+};
 
 // GammaDistribution YAML conversion
 template<>
@@ -183,15 +253,17 @@ struct convert<EpidemiologicalParameters::BitingLevelDistribution> {
         Node node;
         node["distribution"] = rhs.get_distribution();
         node["Gamma"] = rhs.get_gamma();
+        node["exponential"] = rhs.get_exponential();
         return node;
     }
 
     static bool decode(const Node& node, EpidemiologicalParameters::BitingLevelDistribution& rhs) {
-        if (!node["distribution"] || !node["Gamma"]) {
+        if (!node["distribution"] || !node["Gamma"] || !node["Exponential"]) {
             throw std::runtime_error("Missing fields in BitingLevelDistribution");
         }
         rhs.set_distribution(node["distribution"].as<std::string>());
         rhs.set_gamma(node["Gamma"].as<EpidemiologicalParameters::BitingLevelDistributionGamma>());
+        rhs.set_exponential(node["Exponential"].as<EpidemiologicalParameters::BitingLevelDistributionExponential>());
         return true;
     }
 };
