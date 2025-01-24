@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <spdlog/spdlog.h>
 
 #include "IConfigClass.h"
 
@@ -119,7 +120,9 @@ public:
     void set_mass_drug_administration(const MassDrugAdministration& value) { mass_drug_administration_ = value; }
 
     //process config data
-    void process_config() override {};
+    void process_config() override {
+      spdlog::info("Processing StrategyParameters");
+    };
 
 private:
     std::map<int, StrategyInfo> strategy_db_;  // Changed from vector to map

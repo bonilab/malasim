@@ -10,8 +10,8 @@
 #include <fstream>
 
 #include "IConfigClass.h"
-#include "GIS/AscFile.h"
-#include "GIS/SpatialData.h"
+#include "Spatial/GIS/AscFile.h"
+#include "Spatial/GIS/SpatialData.h"
 #include "Simulation/Model.h"
 #include "Utils/Constants.h"
 #include "date/date.h"
@@ -92,25 +92,28 @@ public:
 
       // Load the values based upon the raster data
       auto size = A_.size();
+      int index = 0;
       for (int row = 0; row < raster->NROWS; row++) {
         for (int col = 0; col < raster->NCOLS; col++) {
           // Pass if we have no data here
           if (raster->data[row][col] == raster->NODATA_VALUE) { continue; }
-
-          // Verify the index
-          int index = static_cast<int>(raster->data[row][col]);
-          if (index < 0) {
-            throw std::out_of_range(fmt::format(
-                "Raster value at row: {}, col: {} is less than zero.", row, col));
-          }
-          if (index > (size - 1)) {
-            throw std::out_of_range(fmt::format(
-                "Raster value at row: {}, col: {} exceeds bounds of {}.", row, col,
-                size));
-          }
+          //
+          // // Verify the index
+          // int index = static_cast<int>(raster->data[row][col]);
+          // spdlog::info("Setting seasonal equation for location: {}", index);
+          // if (index < 0) {
+          //   throw std::out_of_range(fmt::format(
+          //       "Raster value at row: {}, col: {} is less than zero.", row, col));
+          // }
+          // if (index > (size - 1)) {
+          //   throw std::out_of_range(fmt::format(
+          //       "Raster value at row: {}, col: {} exceeds bounds of {}.", row, col,
+          //       size));
+          // }
 
           // Set the seasonal period
           set_seasonal_period(index);
+          index++;
         }
       }
     }
@@ -280,18 +283,11 @@ public:
                                              const int &location) {
     if(enable_) {
       if(mode_=="equation") {
-        spdlog::info("Equation based");
-        // process equation based
         return get_seasonal_equation().get_seasonal_factor(today, location);
       }
       if(mode_=="rainfall") {
-        spdlog::info("Rainfall based");
-        // process rainfall based
         return get_seasonal_rainfall().get_seasonal_factor(today, location);
       }
-    }
-    else {
-      return 1.0;
     }
     return 1.0;
   }

@@ -31,8 +31,6 @@ protected:
         biting_info.set_scale(1.0);
         biting_info.set_mean(5.0);
         biting_info.set_sd(1.5);
-        biting_info.set_gamma_a(3.0);
-        biting_info.set_gamma_b(2.0);
 
         // Initialize RelativeInfectivity
         EpidemiologicalParameters::RelativeInfectivity infectivity;

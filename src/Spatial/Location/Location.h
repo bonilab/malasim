@@ -24,6 +24,8 @@ public:
   float beta;
   float p_treatment_under_5;
   float p_treatment_over_5;
+  double mosquito_size;
+  double mosquito_ifr;
   std::unique_ptr<Coordinate> coordinate;
   std::vector<double> age_distribution;
 

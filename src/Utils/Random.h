@@ -25,6 +25,7 @@ namespace utils {
  */
 class Random {
 public:
+  gsl_rng *G_RNG;
   // Delete copy constructor and copy assignment operator
   Random(const Random &) = delete;
   Random &operator=(const Random &) = delete;
@@ -251,6 +252,9 @@ public:
    * @throws std::runtime_error If RNG is not initialized.
    */
   double random_gamma(double shape, double scale);
+
+
+  double random_flat(const double &from, const double &to);
 
   /**
    * @brief Computes the CDF of the Gamma distribution.

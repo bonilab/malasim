@@ -72,6 +72,64 @@ bool Config::load(const std::string &filename) {
 
     std::cout << "Configuration file validated successfully" << std::endl;
 
+
+    //test config
+    spdlog::info("Genotype info:");
+    for(const auto& parasites : get_genotype_parameters().get_initial_parasite_info_raw()) {
+
+      for(const auto& parasite : parasites.get_parasite_info()) {
+        spdlog::info("{} {}",
+          parasite.get_aa_sequence(),
+          parasite.get_prevalence());
+      }
+    }
+
+    spdlog::info("Pf genotype info: {}",
+      get_genotype_parameters().get_pf_genotype_info().chromosome_infos.back()
+      .get_genes().back()
+      .get_cnv_multiplicative_effect_on_EC50().back()
+      .get_drug_id());
+    for(const auto& chromosome : get_genotype_parameters().get_pf_genotype_info().chromosome_infos) {
+      spdlog::info("chromosome:{}",chromosome.get_chromosome_id());
+      for(const auto& genes : chromosome.get_genes()) {
+        spdlog::info("\tgene:{}",genes.get_name());
+        if(genes.get_max_copies() != -1) {
+          spdlog::info("\tmax copies:{}",genes.get_max_copies());
+        }
+        if(genes.get_average_daily_crs() != -1) {
+          spdlog::info("\taverage crs:{}",genes.get_average_daily_crs());
+        }
+        for(const auto &cnv_crs : genes.get_cnv_daily_crs()){
+          spdlog::info("\tcnv crs:{}",cnv_crs);
+        }
+        for(const auto &cnv_ec50 : genes.get_cnv_multiplicative_effect_on_EC50()){
+          spdlog::info("\tcnv ec50:{}",cnv_ec50.get_drug_id());
+          for(const auto &factor : cnv_ec50.get_factors()) {
+            spdlog::info("\t\tfactor:{}",factor);
+          }
+        }
+        for(const auto &cnv_ec50 : genes.get_multiplicative_effect_on_ec50_for_2_or_more_mutations()){
+          spdlog::info("\tcnv_ec50_2_or_more id:{}",cnv_ec50.get_drug_id());
+          spdlog::info("\tcnv_ec50_2_or_more factor:{}",cnv_ec50.get_factor());
+        }
+        for(const auto &aa_pos : genes.get_aa_positions()) {
+          spdlog::info("\tpos {}",aa_pos.get_position());
+          for(const auto & aa : aa_pos.get_amino_acids()) {
+            spdlog::info("\t\taa:{}",aa);
+          }
+          for(const auto &crs : aa_pos.get_daily_crs()) {
+            spdlog::info("\t\tcrs:{}",crs);
+          }
+          for(const auto &crs : aa_pos.get_multiplicative_effect_on_EC50()) {
+            spdlog::info("\t\tmultiplicative_effect_on_EC50: {}",crs.get_drug_id());
+            for(const auto &factor : crs.get_factors()) {
+              spdlog::info("\t\t\tfactor:{}",factor);
+            }
+          }
+        }
+      }
+    }
+
     /* Any settings processed using settings from other settings should be called
      * with setting names rather than process_config()
      * This is to avoid circular linking of settings
@@ -82,18 +140,24 @@ bool Config::load(const std::string &filename) {
     config_data_.transmission_settings.process_config();
     config_data_.population_demographic.process_config();
     config_data_.spatial_settings.process_config();
-    config_data_.seasonality_settings.process_config_using_number_of_locations(get_spatial_settings().get_number_of_locations());
+    config_data_.seasonality_settings.process_config_using_number_of_locations(
+      get_spatial_settings().get_number_of_locations());
     config_data_.movement_settings.process_config_using_spatial_settings(
       get_spatial_settings().get_spatial_distance_matrix(),
       get_spatial_settings().get_number_of_locations());
     config_data_.parasite_parameters.process_config();
-    config_data_.immune_system_parameters.process_config();
-    config_data_.genotype_parameters.process_config();
+    config_data_.immune_system_parameters.process_config_with_parasite_density(
+      get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_asymptomatic(),
+      get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured());
+    /* Drug mut be parsed before genotype */
     config_data_.drug_parameters.process_config();
     config_data_.therapy_parameters.process_config();
     config_data_.strategy_parameters.process_config();
+    config_data_.genotype_parameters.process_config_with_number_of_locations(
+      get_spatial_settings().get_number_of_locations());
     config_data_.epidemiological_parameters.process_config();
-    config_data_.mosquito_parameters.process_config();
+    config_data_.mosquito_parameters.process_config_using_locations(
+      get_spatial_settings().get_locations());
 
     return true;
   }
@@ -257,7 +321,7 @@ void Config::validate_all_cross_field_validations() {
   if(seasonality_settings.get_mode() == "equation") {
     if(seasonality_settings.get_seasonal_equation().get_raster()
       && spatial_settings.get_grid_based().get_ecoclimatic_raster().empty()) {
-      throw std::invalid_argument("Ecoclimatic raster should be provided for equation based seasonality");
+      throw std::invalid_argument("Ecoclimatic raster should be provided for equation based seasonality.");
       }
   }
 
@@ -372,13 +436,13 @@ void Config::validate_all_cross_field_validations() {
       throw std::invalid_argument("Override EC50 pattern should contain 13 '|' characters");
     }
   }
-  //Check if aa_sequence in genotype_info of initial_genotype_info has correct string size and format
-  for(auto initial_genotype_info : genotype_parameters.get_initial_genotype_info()) {
-    for(auto genotype_info : initial_genotype_info.get_genotype_info()) {
-      if(get_pipe_count(genotype_info.get_aa_sequence()) != 13) {
+  //Check if aa_sequence in parasite_info of initial_parasite_info has correct string size and format
+  for(auto initial_parasite_info : genotype_parameters.get_initial_parasite_info_raw()) {
+    for(auto parasite_info : initial_parasite_info.get_parasite_info()) {
+      if(get_pipe_count(parasite_info.get_aa_sequence()) != 13) {
         throw std::invalid_argument("Initial genotype aa sequence should contain 13 '|' characters");
       }
-      if(genotype_info.get_aa_sequence().size() != genotype_parameters.get_mutation_mask().size()) {
+      if(parasite_info.get_aa_sequence().size() != genotype_parameters.get_mutation_mask().size()) {
         throw std::invalid_argument("Initial genotype aa sequence size should match mutation mask size");
       }
     }
@@ -389,7 +453,7 @@ void Config::validate_all_cross_field_validations() {
   ----------------------------*/
   //Loop through all drug parameters
   DrugParameters drug_parameters = config_data_.drug_parameters;
-  for(auto drug: drug_parameters.get_drug_db()) {
+  for(auto drug: drug_parameters.get_drug_db_raw()) {
     if(drug.second.get_half_life() < 0 || drug.second.get_maximum_parasite_killing_rate() < 0
       || drug.second.get_n() < 0 || drug.second.get_k() < 0 || drug.second.get_base_EC50() < 0) {
         throw std::invalid_argument("All drug parameters should be positive numbers");
@@ -424,7 +488,7 @@ void Config::validate_all_cross_field_validations() {
   for(auto therapy : therapy_parameters.get_therapy_db()) {
     for(auto drug_id : therapy.second.get_drug_ids()) {
       //Check if drug id is in drug_db keys
-      if(drug_parameters.get_drug_db().find(drug_id) == drug_parameters.get_drug_db().end()) {
+      if(drug_parameters.get_drug_db_raw().find(drug_id) == drug_parameters.get_drug_db_raw().end()) {
         throw std::invalid_argument("Drug id should be in drug db keys");
       }
       // Check if dosing days are positive numbers

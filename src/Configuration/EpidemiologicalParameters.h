@@ -4,6 +4,7 @@
 #include <yaml-cpp/yaml.h>
 #include <stdexcept>
 #include <string>
+#include <spdlog/spdlog.h>
 
 #include "IConfigClass.h"
 
@@ -77,12 +78,6 @@ public:
         [[nodiscard]] double get_sd() const { return sd_; }
         void set_sd(double value) { sd_ = value; }
 
-        [[nodiscard]] double get_gamma_a() const { return gamma_a_; }
-        void set_gamma_a(double value) { gamma_a_ = value; }
-
-        [[nodiscard]] double get_gamma_b() const { return gamma_b_; }
-        void set_gamma_b(double value) { gamma_b_ = value; }
-
     private:
         int max_relative_biting_value_;
         double min_relative_biting_value_;
@@ -90,8 +85,6 @@ public:
         double scale_;
         double mean_;
         double sd_;
-        double gamma_a_;
-        double gamma_b_;
 
         BitingLevelDistribution biting_level_distribution_;
     };
@@ -139,11 +132,6 @@ public:
     [[nodiscard]] const RelativeBitingInfo& get_relative_biting_info() const { return relative_biting_info_; }
     void set_relative_biting_info(const RelativeBitingInfo& value) {
         relative_biting_info_ = value;
-        // const auto temp = relative_biting_info_.get_biting_level_distribution().get_gamma().get_sd()
-        // * relative_biting_info_.get_biting_level_distribution().get_gamma().get_sd();
-        // relative_biting_info_.set_gamma_b(temp / relative_biting_info_.get_biting_level_distribution().get_gamma().get_mean());
-        // relative_biting_info_.set_gamma_a(relative_biting_info_.get_biting_level_distribution().get_gamma().get_mean()
-        //     / relative_biting_info_.get_gamma_b());
     }
 
     [[nodiscard]] double get_gametocyte_level_under_artemisinin_action() const { return gametocyte_level_under_artemisinin_action_; }
@@ -181,7 +169,11 @@ public:
 
     //process config data
     void process_config() override {
-
+      spdlog::info("Processing EpidemiologicalParameters");
+      const auto var = get_relative_biting_info().get_biting_level_distribution().get_gamma().get_sd()
+      * get_relative_biting_info().get_biting_level_distribution().get_gamma().get_sd();
+      gamma_b = var / get_relative_biting_info().get_biting_level_distribution().get_gamma().get_mean();
+      gamma_a = get_relative_biting_info().get_biting_level_distribution().get_gamma().get_mean() / gamma_b;
     };
 
 private:
@@ -204,6 +196,9 @@ private:
     int tf_window_size_;
     double fraction_mosquitoes_interrupted_feeding_;
     double inflation_factor_;
+public:
+    double gamma_a;
+    double gamma_b;
 };
 
 namespace YAML {

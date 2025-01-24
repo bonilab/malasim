@@ -9,7 +9,7 @@
 
 #include "IConfigClass.h"
 #include "Spatial/Location/Location.h"
-#include "GIS/SpatialData.h"
+#include "Spatial/GIS/SpatialData.h"
 
 // Class for SpatialSettings
 class SpatialSettings : IConfigClass{
@@ -296,7 +296,7 @@ struct convert<SpatialSettings::GridBased> {
         node["p_treatment_under_5_raster"] = rhs.get_p_treatment_under_5_raster();
         node["p_treatment_over_5_raster"] = rhs.get_p_treatment_over_5_raster();
         node["beta_raster"] = rhs.get_beta_raster();
-        node["eco_climatic_raster"] = rhs.get_ecoclimatic_raster();
+        node["ecoclimatic_raster"] = rhs.get_ecoclimatic_raster();
         node["cell_size"] = rhs.get_cell_size();
         node["age_distribution_by_location"] = rhs.get_age_distribution_by_location();
         return node;
@@ -315,9 +315,8 @@ struct convert<SpatialSettings::GridBased> {
         rhs.set_p_treatment_over_5_raster(node["p_treatment_over_5_raster"].as<std::string>());
         rhs.set_beta_raster(node["beta_raster"].as<std::string>());
         rhs.set_cell_size(node["cell_size"].as<double>());
-
-        if(node["eco_climatic_raster"]) {
-            rhs.set_ecoclimatic_raster(node["eco_climatic_raster"].as<std::string>());
+        if(node["ecoclimatic_raster"]) {
+            rhs.set_ecoclimatic_raster(node["ecoclimatic_raster"].as<std::string>());
         }
 
         /* use one age distribution for all locations */

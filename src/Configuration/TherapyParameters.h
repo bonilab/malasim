@@ -5,10 +5,12 @@
 #include <stdexcept>
 #include <vector>
 #include <map>
+#include <spdlog/spdlog.h>
 #include "IConfigClass.h"
 
 class TherapyParameters: IConfigClass {
 public:
+  std::vector<Therapy*> therapy_db;
   // Inner class: TherapyInfo
   class TherapyInfo {
   public:
@@ -31,15 +33,17 @@ public:
   [[nodiscard]] double get_tf_rate() const { return tf_rate_; }
   void set_tf_rate(double value) { tf_rate_ = value; }
 
-  [[nodiscard]] const std::map<int, TherapyInfo>& get_therapy_db() const { return therapy_db_; }
-  void set_therapy_db(const std::map<int, TherapyInfo>& value) { therapy_db_ = value; }
+  [[nodiscard]] const std::map<int, TherapyInfo>& get_therapy_db_raw() const { return therapy_db_raw_; }
+  void set_therapy_db_raw(const std::map<int, TherapyInfo>& value) { therapy_db_raw_ = value; }
 
-  void process_config() override {};
+  void process_config() override {
+      spdlog::info("Processing TherapyParameters");
+  };
 
 private:
   int tf_testing_day_;
   double tf_rate_;
-  std::map<int, TherapyInfo> therapy_db_;  // Changed from vector to map
+  std::map<int, TherapyInfo> therapy_db_raw_;  // Changed from vector to map
 };
 
 namespace YAML {

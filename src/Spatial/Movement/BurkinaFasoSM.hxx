@@ -12,7 +12,7 @@
 
 #include "Helpers/NumberHelpers.hxx"
 #include "Spatial/SpatialModel.hxx"
-#include "GIS/SpatialData.h"
+#include "Spatial/GIS/SpatialData.h"
 #include "Utils/TypeDef.hxx"
 
 namespace Spatial {

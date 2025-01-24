@@ -29,6 +29,11 @@ protected:
         gamma.set_sd(2.0);
 
 
+        MovementSettings::LengthOfStay length_of_stay;
+        length_of_stay.set_mean(5.0);
+        length_of_stay.set_sd(2.0);
+
+
         MovementSettings::MovingLevelDistributionExponential exponential;
         exponential.set_scale( 0.17);
 
@@ -42,7 +47,7 @@ protected:
         circulation_info.set_number_of_moving_levels(3);
         circulation_info.set_moving_level_distribution(moving_level_dist);
         circulation_info.set_circulation_percent(50.0);
-        circulation_info.set_length_of_stay(gamma);
+        circulation_info.set_length_of_stay(length_of_stay);
 
         // Set the updated objects in MovementSettings
         movement_settings.set_spatial_model_settings(spatial_model_settings);

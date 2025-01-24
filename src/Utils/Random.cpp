@@ -174,3 +174,6 @@ double Random::cdf_standard_normal_distribution(double value) {
   return gsl_cdf_ugaussian_P(value);
 }
 
+double Random::random_flat(const double &from, const double &to) {
+  return gsl_ran_flat(G_RNG, from, to);
+}

@@ -735,14 +735,14 @@ void Person::set_current_relative_biting_rate(double current_relative_biting_rat
 
 double Person::draw_random_relative_biting_rate(utils::Random* pRandom, Config* pConfig) {
   auto result =
-      pRandom->random_gamma(pConfig->get_epidemiological_parameters().get_relative_biting_info().get_gamma_a(),
-        pConfig->get_epidemiological_parameters().get_relative_biting_info().get_gamma_b());
+      pRandom->random_gamma(pConfig->get_epidemiological_parameters().gamma_a,
+        pConfig->get_epidemiological_parameters().gamma_b);
 
   while (result > (pConfig->get_epidemiological_parameters().get_relative_biting_info().get_max_relative_biting_value()
                    - pConfig->get_epidemiological_parameters().get_relative_biting_info().get_min_relative_biting_value())) {
     // re-draw
-    result = pRandom->random_gamma(pConfig->get_epidemiological_parameters().get_relative_biting_info().get_gamma_a(),
-      pConfig->get_epidemiological_parameters().get_relative_biting_info().get_gamma_b());
+    result = pRandom->random_gamma(pConfig->get_epidemiological_parameters().gamma_a,
+      pConfig->get_epidemiological_parameters().gamma_b);
   }
 
   return result + pConfig->get_epidemiological_parameters().get_relative_biting_info().get_min_relative_biting_value();
