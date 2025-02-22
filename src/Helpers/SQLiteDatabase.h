@@ -2,18 +2,19 @@
 #define HELPERS_SQLITEDATABASE_H
 
 #include <sqlite3.h>
+#include <spdlog/spdlog.h>
 
 #include <ctime>
-
-#include "Core/PropertyMacro.h"
-#include "easylogging++.h"
+#include <string>
 
 // NOTE: Consider using other SQLite wrapper library for better binding and
 // error handling
 // SQLiteDatabase class manages the lifecycle and operations of an SQLite
 // database connection.
 class SQLiteDatabase {
-  DELETE_COPY_AND_MOVE(SQLiteDatabase)
+  //disallow copy and move
+  SQLiteDatabase(const SQLiteDatabase&) = delete;
+  void operator=(const SQLiteDatabase&) = delete;
 private:
   sqlite3* db_ = nullptr;  // Pointer to the SQLite database
 
@@ -62,8 +63,7 @@ private:
   template <typename T>
   static void bind_single_value(sqlite3_stmt* /*stmt*/, int /*index*/,
                                 const T & /*value*/) {
-    std::cerr << "Unsupported type for binding: " << typeid(T).name()
-              << std::endl;
+    spdlog::error("Unsupported type for binding: {}", typeid(T).name());
     // exit program
     throw std::runtime_error("Unsupported type for binding");
   }
@@ -92,7 +92,7 @@ public:
     if (sqlite3_open_v2(path.c_str(), &db_,
                         SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, nullptr)
         != SQLITE_OK) {
-      LOG(ERROR) << "Error opening SQLite database: " << sqlite3_errmsg(db_);
+      spdlog::error("Error opening SQLite database: {}", sqlite3_errmsg(db_));
     }
   }
 
@@ -113,7 +113,7 @@ public:
       std::string error = "SQL error: " + std::string(err_msg);
       sqlite3_free(err_msg);
       /* throw std::runtime_error(error); */
-      LOG(ERROR) << "SQL error: " << err_msg;
+      spdlog::error("SQL error: {}", error);
     }
   }
 
@@ -125,7 +125,7 @@ public:
     if (sqlite3_prepare_v2(db_, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
       /* throw std::runtime_error("Error preparing statement: " + */
       /*                          std::string(sqlite3_errmsg(db))); */
-      LOG(ERROR) << "Error preparing statement: " << sqlite3_errmsg(db_);
+      spdlog::error("Error preparing statement: {}", sqlite3_errmsg(db_));
     }
     return stmt;
   }
@@ -145,7 +145,7 @@ public:
       std::string error = "Error executing insert statement: "
                           + std::string(sqlite3_errmsg(db_));
       sqlite3_finalize(stmt);
-      LOG(ERROR) << error;
+      spdlog::error(error);
       throw std::runtime_error(error);
     }
 
@@ -156,7 +156,7 @@ public:
       std::string error =
           "Execution didn't finish: " + std::string(sqlite3_errmsg(db_));
       sqlite3_finalize(stmt);
-      LOG(ERROR) << error;
+      spdlog::error(error);
       throw std::runtime_error(error);
     }
 
@@ -184,7 +184,7 @@ public:
   }
   // Prevent copy and assignment
   TransactionGuard(const TransactionGuard &) = delete;
-  TransactionGuard &operator=(const TransactionGuard &) = delete;
+  void operator=(const TransactionGuard &) = delete;
 
   ~TransactionGuard() {
     if (!committed_) { db_->commit_transaction(); }

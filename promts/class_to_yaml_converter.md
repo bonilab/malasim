@@ -30,11 +30,11 @@ public:
   void set_starting_date(const date::year_month_day &value) {
     starting_date_ = value;
   }
-  [[nodiscard]] const date::year_month_day &get_start_of_comparison_period()
+  [[nodiscard]] const date::year_month_day &get_start_of_comparison_period_date()
       const {
     return start_of_comparison_period_;
   }
-  void set_start_of_comparison_period(const date::year_month_day &value) {
+  void set_start_of_comparison_period_date(const date::year_month_day &value) {
     if (value < starting_date_)
       throw std::invalid_argument(
           "start_of_comparison_period cannot be before starting_date");
@@ -78,7 +78,7 @@ struct convert<ModelSettings> {
     node["initial_seed_number"] = rhs.get_initial_seed_number();
     node["record_genome_db"] = rhs.get_record_genome_db();
     node["starting_date"] = rhs.get_starting_date();
-    node["start_of_comparison_period"] = rhs.get_start_of_comparison_period();
+    node["start_of_comparison_period"] = rhs.get_start_of_comparison_period_date();
     node["ending_date"] = rhs.get_ending_date();
     node["start_collect_data_day"] = rhs.get_start_collect_data_day();
     return node;
@@ -111,7 +111,7 @@ struct convert<ModelSettings> {
     rhs.set_initial_seed_number(node["initial_seed_number"].as<int>());
     rhs.set_record_genome_db(node["record_genome_db"].as<bool>());
     rhs.set_starting_date(node["starting_date"].as<date::year_month_day>());
-    rhs.set_start_of_comparison_period(
+    rhs.set_start_of_comparison_period_date(
         node["start_of_comparison_period"].as<date::year_month_day>());
     rhs.set_ending_date(node["ending_date"].as<date::year_month_day>());
     rhs.set_start_collect_data_day(node["start_collect_data_day"].as<int>());

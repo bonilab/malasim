@@ -1,3 +1,5 @@
+#include <gsl/gsl_cdf.h>
+
 #include <string>
 #include <stdexcept>
 #include "IConfigClass.h"
@@ -7,6 +9,10 @@
 #include "Spatial/Movement/MarshallSM.hxx"
 #include "Spatial/Movement/WesolowskiSM.hxx"
 #include "Spatial/Movement/WesolowskiSurfaceSM.hxx"
+#include "Utils/MultinomialDistributionGenerator.h"
+#include "spdlog/spdlog.h"
+
+class MultinomialDistributionGenerator;
 
 class MovementSettings : IConfigClass {
 public:
@@ -165,6 +171,20 @@ public:
         double sd_;
     };
 
+    class LengthOfStay {
+    public:
+      // Getters and Setters
+      [[nodiscard]] double get_mean() const { return mean_; }
+      void set_mean(double value) { mean_ = value; }
+
+      [[nodiscard]] double get_sd() const { return sd_; }
+      void set_sd(double value) { sd_ = value; }
+
+    private:
+      double mean_;
+      double sd_;
+    };
+
     class MovingLevelDistributionGamma {
     public:
         // Getters and Setters
@@ -221,15 +241,36 @@ public:
             circulation_percent_ = value;
         }
 
-        [[nodiscard]] const MovingLevelDistributionGamma& get_length_of_stay() const { return length_of_stay_; }
-        void set_length_of_stay(const MovingLevelDistributionGamma& value) { length_of_stay_ = value; }
+        [[nodiscard]] const LengthOfStay& get_length_of_stay() const { return length_of_stay_; }
+        void set_length_of_stay(const LengthOfStay& value) { length_of_stay_ = value; }
+
+        [[nodiscard]] double get_relative_probability_that_child_travels_compared_to_adult() const {
+          return relative_probability_that_child_travels_compared_to_adult_;
+        }
+
+        void set_relative_probability_that_child_travels_compared_to_adult(double value) {
+          relative_probability_that_child_travels_compared_to_adult_ = value;
+        }
+
+        [[nodiscard]] double get_relative_probability_for_clinical_to_travel() const {
+          return relative_probability_for_clinical_to_travel_;
+        }
+
+        void set_relative_probability_for_clinical_to_travel(double value) {
+          relative_probability_for_clinical_to_travel_ = value;
+        }
 
     private:
-        int max_relative_moving_value_;
-        int number_of_moving_levels_;
         MovingLevelDistribution moving_level_distribution_;
+        MovingLevelDistributionGamma moving_level_distribution_gamma_;
+        LengthOfStay length_of_stay_;
+
+        double max_relative_moving_value_;
+        int number_of_moving_levels_;
         double circulation_percent_;
-        MovingLevelDistributionGamma length_of_stay_;
+
+        double relative_probability_that_child_travels_compared_to_adult_ = 1.0;
+        double relative_probability_for_clinical_to_travel_ = 1.0;
     };
 
     // Getters and Setters
@@ -241,6 +282,22 @@ public:
 
     [[nodiscard]] const CirculationInfo& get_circulation_info() const { return circulation_info_; }
     void set_circulation_info(const CirculationInfo& value) { circulation_info_ = value; }
+
+    [[nodiscard]] const std::vector<double>& get_v_moving_level_density() const { return v_moving_level_density; }
+    void set_v_moving_level_density(const std::vector<double>& value) { v_moving_level_density = value; }
+
+    [[nodiscard]] const std::vector<double>& get_v_moving_level_value() const { return v_moving_level_value; }
+    void set_v_moving_level_value(const std::vector<double>& value) { v_moving_level_value = value; }
+
+    [[nodiscard]] double get_length_of_stay_theta() const { return length_of_stay_theta; }
+    void set_length_of_stay_theta(double value) { length_of_stay_theta = value; }
+
+    [[nodiscard]] double get_length_of_stay_k() const { return length_of_stay_k; }
+    void set_length_of_stay_k(double value) { length_of_stay_k = value; }
+
+    [[nodiscard]] MultinomialDistributionGenerator get_moving_level_generator() const {
+      return moving_level_generator_;
+    }
 
   void process_config() override {}
 
@@ -282,12 +339,72 @@ public:
                                                   number_of_locations,
                                                   spatial_distance_matrix);
     }
+      // Circulation Info
+      // calculate density and level value here
+      const auto var = get_circulation_info().get_moving_level_distribution().get_gamma().get_sd()
+      * get_circulation_info().get_moving_level_distribution().get_gamma().get_sd();
+      const auto b = var / (get_circulation_info().get_moving_level_distribution().get_gamma().get_mean() - 1);  // theta
+      const auto a = (get_circulation_info().get_moving_level_distribution().get_gamma().get_mean() - 1) / b;    // k
+
+      v_moving_level_density.clear();
+      v_moving_level_value.clear();
+
+      const auto max =
+          get_circulation_info().get_max_relative_moving_value() - 1;  // maxRelativeBiting -1
+      const auto number_of_level = get_circulation_info().get_number_of_moving_levels();
+
+      const auto step = max / static_cast<double>(number_of_level - 1);
+
+      auto j = 0;
+      double old_p = 0;
+      double sum = 0;
+      for (double i = 0; i <= max + 0.0001; i += step) {
+        const auto p = gsl_cdf_gamma_P(i + step, a, b);
+        double value = 0;
+        value = (j == 0) ? p : p - old_p;
+        v_moving_level_density.push_back(value);
+        old_p = p;
+        v_moving_level_value.push_back(i + 1);
+        sum += value;
+        j++;
+      }
+
+      // normalized
+      double t = 0;
+      for (auto &i : v_moving_level_density) {
+        i = i + (1 - sum) / v_moving_level_density.size();
+        t += i;
+      }
+
+      assert((unsigned)get_circulation_info().get_number_of_moving_levels()
+             == v_moving_level_density.size());
+      assert((unsigned)get_circulation_info().get_number_of_moving_levels()
+             == v_moving_level_value.size());
+      assert(fabs(t - 1) < 0.0001);
+
+      const auto stay_variance = get_circulation_info().get_length_of_stay().get_sd()
+      * get_circulation_info().get_length_of_stay().get_sd();
+      const auto k = stay_variance / get_circulation_info().get_length_of_stay().get_mean();  // k
+      const auto theta = get_circulation_info().get_length_of_stay().get_mean() / k;          // theta
+
+      length_of_stay_theta = theta;
+      length_of_stay_k = k;
+
+      moving_level_generator_.level_density = v_moving_level_density;
   }
 
 private:
     SpatialModelSettings spatial_model_settings_;
     Spatial::SpatialModel* spatial_model_;
     CirculationInfo circulation_info_;
+    DoubleVector v_moving_level_value;
+    DoubleVector v_moving_level_density;
+    MultinomialDistributionGenerator moving_level_generator_{};
+    double length_of_stay;
+    double length_of_stay_mean;
+    double length_of_stay_sd;
+    double length_of_stay_theta;
+    double length_of_stay_k;
 };
 
 namespace YAML {
@@ -487,6 +604,26 @@ struct convert<MovementSettings::MovingLevelDistributionGamma> {
     }
 };
 
+// LengthOfStay YAML conversion
+template<>
+struct convert<MovementSettings::LengthOfStay> {
+  static Node encode(const MovementSettings::LengthOfStay& rhs) {
+    Node node;
+    node["mean"] = rhs.get_mean();
+    node["sd"] = rhs.get_sd();
+    return node;
+  }
+
+  static bool decode(const Node& node, MovementSettings::LengthOfStay& rhs) {
+    if(!node["mean"] || !node["sd"])
+      throw std::runtime_error("Missing fields in LengthOfStay");
+
+    rhs.set_mean(node["mean"].as<double>());
+    rhs.set_sd(node["sd"].as<double>());
+    return true;
+  }
+};
+
 // MovingLevelDistribution YAML conversion
 template<>
 struct convert<MovementSettings::MovingLevelDistribution> {
@@ -519,6 +656,8 @@ struct convert<MovementSettings::CirculationInfo> {
         node["moving_level_distribution"] = rhs.get_moving_level_distribution();
         node["circulation_percent"] = rhs.get_circulation_percent();
         node["length_of_stay"] = rhs.get_length_of_stay();
+        node["relative_probability_that_child_travels_compared_to_adult"] = rhs.get_relative_probability_that_child_travels_compared_to_adult();
+        node["relative_probability_for_clinical_to_travel"] = rhs.get_relative_probability_for_clinical_to_travel();
         return node;
     }
 
@@ -532,7 +671,26 @@ struct convert<MovementSettings::CirculationInfo> {
         rhs.set_number_of_moving_levels(node["number_of_moving_levels"].as<int>());
         rhs.set_moving_level_distribution(node["moving_level_distribution"].as<MovementSettings::MovingLevelDistribution>());
         rhs.set_circulation_percent(node["circulation_percent"].as<double>());
-        rhs.set_length_of_stay(node["length_of_stay"].as<MovementSettings::MovingLevelDistributionGamma>());
+        rhs.set_length_of_stay(node["length_of_stay"].as<MovementSettings::LengthOfStay>());
+        if (node["relative_probability_that_child_travels_compared_to_adult"]) {
+          rhs.set_relative_probability_that_child_travels_compared_to_adult(
+            node["relative_probability_that_child_travels_compared_to_adult"]
+                  .as<double>());
+        } else {
+          spdlog::info("Relative probability that child travels compared to adult is "
+                       "not set in input file, defaulting to 1.0");
+          rhs.set_relative_probability_that_child_travels_compared_to_adult(1.0);
+        }
+        if (node["relative_probability_for_clinical_to_travel"]) {
+          rhs.set_relative_probability_for_clinical_to_travel(
+            node["relative_probability_that_child_travels_compared_to_adult"]
+                  .as<double>());
+        } else {
+          // log warning
+          spdlog::info("Relative probability for a clinical case to travel is "
+                       "not set in input file, defaulting to 1.0");
+          rhs.set_relative_probability_for_clinical_to_travel(1.0);
+        }
         return true;
     }
 };

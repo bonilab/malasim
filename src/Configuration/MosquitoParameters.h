@@ -5,6 +5,10 @@
 #include <stdexcept>
 #include <yaml-cpp/yaml.h>
 #include "IConfigClass.h"
+#include "Spatial/GIS/AscFile.h"
+#include "Spatial/GIS/SpatialData.h"
+#include "Spatial/Location/Location.h"
+#include "spdlog/spdlog.h"
 
 class MosquitoParameters : IConfigClass {
 public:
@@ -66,10 +70,58 @@ public:
     [[nodiscard]] const MosquitoConfig& get_mosquito_config() const { return mosquito_config_; }
     void set_mosquito_config(const MosquitoConfig& value) { mosquito_config_ = value; }
 
+    [[nodiscard]] bool get_within_host_induced_free_recombination() const { return within_host_induced_free_recombination_; }
+    void set_within_host_induced_free_recombination(bool value) { within_host_induced_free_recombination_ = value; }
+
     void process_config() override {};
+    void process_config_using_locations(std::vector<Spatial::Location> locations) {
+      spdlog::info("Processing MosquitoParameters");
+      if(get_mosquito_config().get_mode()=="grid_based") {
+        AscFile* raster = SpatialData::get_instance().get_raster(
+                  SpatialData::SpatialFileType::Ecoclimatic);
+        if (raster == nullptr) {
+          throw std::invalid_argument(
+              "Mosquito  raster flag set without eco-climatic raster loaded.");
+        }
+        // Prepare to run
+        spdlog::info("Setting seasonal equation using raster data.");
+        // Load the values based upon the raster data
+        auto size = locations.size();
+        int index = 0;
+        for (int row = 0; row < raster->NROWS; row++) {
+          for (int col = 0; col < raster->NCOLS; col++) {
+            // Pass if we have no data here
+            if (raster->data[row][col] == raster->NODATA_VALUE) { continue; }
+            // Set the seasonal period
+            locations[index].mosquito_ifr = locations[index].mosquito_ifr;
+            locations[index].mosquito_size = locations[index].mosquito_size;
+            index++;
+          }
+        }
+      }
+      if(get_mosquito_config().get_mode()=="location_based") {
+        LocationBased location_based = get_mosquito_config().get_location_based();
+        if(location_based.get_interrupted_feeding_rate().size() == 1) {
+          spdlog::info("1 IFR value provided, distributing equally to all locations");
+          for(auto &location : locations) {
+            location.mosquito_ifr = location_based.get_interrupted_feeding_rate()[0];
+            location.mosquito_size = location_based.get_prmc_size()[0];
+          }
+        }
+        if(location_based.get_interrupted_feeding_rate().size() == locations.size()) {
+          spdlog::info("IFR values provided for all locations");
+          for(auto i=0; i<locations.size(); i++) {
+            locations[i].mosquito_ifr = location_based.get_interrupted_feeding_rate()[i];
+            locations[i].mosquito_size = location_based.get_prmc_size()[i];
+          }
+        }
+      }
+    }
 
 private:
     MosquitoConfig mosquito_config_;
+    bool within_host_induced_free_recombination_ = true;
+
 };
 
 namespace YAML {
@@ -151,14 +203,16 @@ struct convert<MosquitoParameters> {
     static Node encode(const MosquitoParameters& rhs) {
         Node node;
         node["mosquito_config"] = rhs.get_mosquito_config();
+        node["within_host_induced_free_recombination"] = rhs.get_within_host_induced_free_recombination();
         return node;
     }
 
     static bool decode(const Node& node, MosquitoParameters& rhs) {
-        if (!node["mosquito_config"]) {
+        if (!node["mosquito_config"] || !node["within_host_induced_free_recombination"]) {
             throw std::runtime_error("Missing 'mosquito_config' field in MosquitoParameters");
         }
         rhs.set_mosquito_config(node["mosquito_config"].as<MosquitoParameters::MosquitoConfig>());
+        rhs.set_within_host_induced_free_recombination(node["within_host_induced_free_recombination"].as<bool>());
         return true;
     }
 };

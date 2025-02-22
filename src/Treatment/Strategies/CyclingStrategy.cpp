@@ -1,0 +1,67 @@
+/* 
+ * File:   CyclingStrategy.cpp
+ * Author: nguyentran
+ * 
+ * Created on June 4, 2013, 11:10 AM
+ */
+
+#include "CyclingStrategy.h"
+#include "Simulation/Model.h"
+#include "Core/Scheduler/Scheduler.h"
+#include "Configuration/Config.h"
+#include "MDC/ModelDataCollector.h"
+#include <sstream>
+#include "IStrategy.h"
+#include "Treatment/Therapies/Therapy.h"
+
+CyclingStrategy::CyclingStrategy() : IStrategy("CyclingStrategy", Cycling) {}
+
+CyclingStrategy::~CyclingStrategy() = default;
+
+void CyclingStrategy::add_therapy(Therapy *therapy) {
+  therapy_list.push_back(therapy);
+}
+
+void CyclingStrategy::switch_therapy() {
+  //    std::cout << "Switch from: " << index_ << "\t - to: " << index_ + 1;
+  index++;
+  index %= therapy_list.size();
+  Model::get_instance().get_mdc()->update_UTL_vector();
+
+  // TODO: cycling_time should be match with calendar day
+  next_switching_day = Model::get_instance().get_scheduler()->current_time() + cycling_time;
+  std::cout << date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}
+            << ": Cycling Strategy switch therapy to: " << therapy_list[index]->get_id();
+}
+
+Therapy *CyclingStrategy::get_therapy(Person *person) {
+
+  //int index = ((Global::scheduler->currentTime - Global::startTreatmentDay) / circleTime) % therapyList.size();
+  //    std::cout << therapy_list()[index_]->id() << std::endl;
+  return therapy_list[index];
+}
+
+std::string CyclingStrategy::to_string() const {
+  std::stringstream sstm;
+  sstm << id << "-" << name << "-";
+  std::string sep;
+  for (auto *therapy : therapy_list) {
+    sstm << sep << therapy->get_id();
+    sep = ",";
+  }
+  return sstm.str();
+}
+
+void CyclingStrategy::update_end_of_time_step() {
+  if (Model::get_instance().get_scheduler()->current_time()==next_switching_day) {
+    switch_therapy();
+    //            std::cout << to_string() << std::endl;
+  }
+}
+
+void CyclingStrategy::adjust_started_time_point(const int &current_time) {
+  next_switching_day = Model::get_instance().get_scheduler()->current_time() + cycling_time;
+  index = 0;
+}
+
+void CyclingStrategy::monthly_update() {}

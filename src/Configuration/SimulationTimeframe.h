@@ -20,14 +20,22 @@ public:
   }
 
   // Getters and Setters for start_of_comparison_period
-  [[nodiscard]] const date::year_month_day &get_start_of_comparison_period() const {
-    return start_of_comparison_period_;
+  [[nodiscard]] const date::year_month_day &get_start_of_comparison_period_date() const {
+    return start_of_comparison_period_date_;
   }
 
-  void set_start_of_comparison_period(const date::year_month_day &value) {
+  void set_start_of_comparison_period_date(const date::year_month_day &value) {
     if (value < starting_date_) {
       throw std::invalid_argument("start_of_comparison_period cannot be before starting_date");
     }
+    start_of_comparison_period_date_ = value;
+  }
+
+  [[nodiscard]] int get_start_of_comparison_period() const {
+    return start_of_comparison_period_;
+  }
+
+  void set_start_of_comparison_period(int value) {
     start_of_comparison_period_ = value;
   }
 
@@ -37,7 +45,7 @@ public:
   }
 
   void set_ending_date(const date::year_month_day &value) {
-    if (value < start_of_comparison_period_) {
+    if (value < start_of_comparison_period_date_) {
       throw std::invalid_argument("ending_date cannot be before start_of_comparison_period");
     }
     ending_date_ = value;
@@ -66,11 +74,13 @@ public:
   void process_config() override {
     spdlog::info("Processing SimulationTimeframe");
     total_time_ = TimeHelpers::get_day_count(starting_date_, ending_date_);
+    start_of_comparison_period_ = (date::sys_days { start_of_comparison_period_date_ } - date::sys_days(starting_date_)).count();
   }
 
 private:
   date::year_month_day starting_date_;
-  date::year_month_day start_of_comparison_period_;
+  date::year_month_day start_of_comparison_period_date_;
+  int start_of_comparison_period_;
   date::year_month_day ending_date_;
   int start_collect_data_day_;
   int total_time_;
@@ -83,7 +93,7 @@ struct convert<SimulationTimeframe> {
   static Node encode(const SimulationTimeframe &rhs) {
     Node node;
     node["starting_date"] = date::format("%Y/%m/%d", rhs.get_starting_date());
-    node["start_of_comparison_period"] = date::format("%Y/%m/%d", rhs.get_start_of_comparison_period());
+    node["start_of_comparison_period"] = date::format("%Y/%m/%d", rhs.get_start_of_comparison_period_date());
     node["ending_date"] = date::format("%Y/%m/%d", rhs.get_ending_date());
     node["start_collect_data_day"] = rhs.get_start_collect_data_day();
     return node;
@@ -105,7 +115,7 @@ struct convert<SimulationTimeframe> {
 
     // Parsing and assigning the values
     rhs.set_starting_date(node["starting_date"].as<date::year_month_day>());
-    rhs.set_start_of_comparison_period(node["start_of_comparison_period"].as<date::year_month_day>());
+    rhs.set_start_of_comparison_period_date(node["start_of_comparison_period"].as<date::year_month_day>());
     rhs.set_ending_date(node["ending_date"].as<date::year_month_day>());
     rhs.set_start_collect_data_day(node["start_collect_data_day"].as<int>());
 

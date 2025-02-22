@@ -1,11 +1,10 @@
 #include "BirthdayEvent.h"
-
 #include <Core/Scheduler/Scheduler.h>
 #include <spdlog/spdlog.h>
-
 #include "Population/Person/Person.h"
 #include "Helpers/TimeHelpers.h"
 
+// OBJECTPOOL_IMPL(BirthdayEvent)
 
 BirthdayEvent::BirthdayEvent() = default;
 
@@ -33,5 +32,5 @@ void BirthdayEvent::schedule_event(Scheduler* scheduler, Person *person, const i
 }
 
 std::string BirthdayEvent::name() {
-  return "Birthday Event " + get_id_str();
+  return "Birthday Event " + get_id();
 }

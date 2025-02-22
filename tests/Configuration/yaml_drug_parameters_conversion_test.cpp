@@ -24,7 +24,7 @@ protected:
         // Insert the drug_info into the drug_parameters map
         std::map<int, DrugParameters::DrugInfo> drug_db;
         drug_db[0] = drug_info_art;
-        drug_parameters.set_drug_db(drug_db);
+        drug_parameters.set_drug_db_raw(drug_db);
     }
 };
 
@@ -64,13 +64,13 @@ TEST_F(DrugParametersTest, DecodeDrugParameters) {
     DrugParameters decoded_parameters;
     EXPECT_NO_THROW(YAML::convert<DrugParameters>::decode(node, decoded_parameters));
 
-    EXPECT_EQ(decoded_parameters.get_drug_db().at(0).get_name(), "artemisinin");
-    EXPECT_EQ(decoded_parameters.get_drug_db().at(0).get_half_life(), 0.0);
-    EXPECT_EQ(decoded_parameters.get_drug_db().at(0).get_maximum_parasite_killing_rate(), 0.999);
-    EXPECT_EQ(decoded_parameters.get_drug_db().at(0).get_n(), 25);
-    EXPECT_EQ(decoded_parameters.get_drug_db().at(0).get_age_specific_drug_concentration_sd(), std::vector<double>(15, 0.4));
-    EXPECT_EQ(decoded_parameters.get_drug_db().at(0).get_k(), 4);
-    EXPECT_EQ(decoded_parameters.get_drug_db().at(0).get_base_EC50(), 0.75);
+    EXPECT_EQ(decoded_parameters.get_drug_db_raw().at(0).get_name(), "artemisinin");
+    EXPECT_EQ(decoded_parameters.get_drug_db_raw().at(0).get_half_life(), 0.0);
+    EXPECT_EQ(decoded_parameters.get_drug_db_raw().at(0).get_maximum_parasite_killing_rate(), 0.999);
+    EXPECT_EQ(decoded_parameters.get_drug_db_raw().at(0).get_n(), 25);
+    EXPECT_EQ(decoded_parameters.get_drug_db_raw().at(0).get_age_specific_drug_concentration_sd(), std::vector<double>(15, 0.4));
+    EXPECT_EQ(decoded_parameters.get_drug_db_raw().at(0).get_k(), 4);
+    EXPECT_EQ(decoded_parameters.get_drug_db_raw().at(0).get_base_EC50(), 0.75);
 }
 
 // Test for decoding with missing fields
