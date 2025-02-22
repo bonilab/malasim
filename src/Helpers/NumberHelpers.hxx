@@ -1,15 +1,4 @@
-/*
- * NumberHelpers.hxx
- *
- * This file defines a utility class that defines various templated functions
- * for use with numeric data.
- *
- * NOTE that for the most part the differences between the various floating
- * point comparisons is in their ability to be self documenting; however, when
- * checking if a floating point value is zero, then the is_zero function will be
- * nominally faster since it is able to save a couple instructions once
- * complied.
- */
+
 #ifndef NUMBER_HELPERS_HXX
 #define NUMBER_HELPERS_HXX
 #include <fstream>

@@ -30,7 +30,7 @@ typedef std::pair<std::vector<std::pair<int,std::string>>,std::pair<int,int>> Mo
 class Genotype {
   //disallow copy and assign
   Genotype(const Genotype&) = delete;
-  Genotype& operator=(const Genotype&) = delete;
+  void operator=(const Genotype&) = delete;
 
 public:
   int genotype_id { -1 };

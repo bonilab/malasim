@@ -249,7 +249,7 @@ public:
           for (auto loc = location_from; loc < location_to; ++loc) {
             for (const auto &parasite_node : initial_genotype_info_raw.get_parasite_info()) {
               auto aa_sequence = parasite_node.get_aa_sequence();
-              auto parasite_type_id = genotype_db->get_id(aa_sequence);
+              auto parasite_type_id = genotype_db.get_id(aa_sequence);
               auto prevalence = parasite_node.get_prevalence();
               initial_parasite_info_.emplace_back(loc, parasite_type_id, prevalence);
             }
@@ -270,7 +270,7 @@ private:
     std::vector<InitialParasiteInfo> initial_parasite_info_;
     std::vector<InitialParasiteInfoRaw> initial_parasite_info_raw_;
 public:
-    GenotypeDatabase* genotype_db = new GenotypeDatabase();
+    GenotypeDatabase genotype_db {};
 };
 
 namespace YAML {

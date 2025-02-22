@@ -250,7 +250,7 @@ immune_system_parameters:
 # ---------------------------------------------------------------
 genotype_parameters:
   # Mutation mask indicating positions of genetic mutations
-  mutation_mask: "||||111||1111111,0||||||000000000010|1"
+  mutation_mask: "||||111||1111111,0||||||0000000000100|1"
 
   # Daily probability that a parasite will mutate at a given locus when drug concentration is not zero
   mutation_probability_per_locus: 0.001
@@ -425,6 +425,12 @@ genotype_parameters:
               multiplicative_effect_on_EC50:
                 - drug_id: 0
                   factors: [1, 1.6]
+            - position: 622
+              amino_acids: ["R", "I"]
+              daily_crs: [0, 0.0005]
+              multiplicative_effect_on_EC50:
+                - drug_id: 0
+                  factors: [1, 1.6]
             - position: 675
               amino_acids: ["A", "V"]
               daily_crs: [0, 0.0005]
@@ -443,85 +449,85 @@ genotype_parameters:
           aa_positions: []
 
   override_ec50_patterns:
-    - pattern: "||||NY1||K......,.||||||............|."
+    - pattern: "||||NY1||K......,.||||||.............|."
       drug_id: 1
       ec50: 0.8
-    - pattern: "||||YY1||K......,.||||||............|."
+    - pattern: "||||YY1||K......,.||||||.............|."
       drug_id: 1
       ec50: 0.67
-    - pattern: "||||NF1||K......,.||||||............|."
+    - pattern: "||||NF1||K......,.||||||.............|."
       drug_id: 1
       ec50: 0.9
-    - pattern: "||||YF1||K......,.||||||............|."
+    - pattern: "||||YF1||K......,.||||||.............|."
       drug_id: 1
       ec50: 0.8
-    - pattern: "||||NY2||K......,.||||||............|."
+    - pattern: "||||NY2||K......,.||||||.............|."
       drug_id: 1
       ec50: 1.0
-    - pattern: "||||YY2||K......,.||||||............|."
+    - pattern: "||||YY2||K......,.||||||.............|."
       drug_id: 1
       ec50: 0.87
-    - pattern: "||||NF2||K......,.||||||............|."
+    - pattern: "||||NF2||K......,.||||||.............|."
       drug_id: 1
       ec50: 1.1
-    - pattern: "||||YF2||K......,.||||||............|."
+    - pattern: "||||YF2||K......,.||||||.............|."
       drug_id: 1
       ec50: 1.0
-    - pattern: "||||NY1||T......,.||||||............|."
+    - pattern: "||||NY1||T......,.||||||.............|."
       drug_id: 1
       ec50: 0.75
-    - pattern: "||||YY1||T......,.||||||............|."
+    - pattern: "||||YY1||T......,.||||||.............|."
       drug_id: 1
       ec50: 0.6
-    - pattern: "||||NF1||T......,.||||||............|."
+    - pattern: "||||NF1||T......,.||||||.............|."
       drug_id: 1
       ec50: 0.85
-    - pattern: "||||YF1||T......,.||||||............|."
+    - pattern: "||||YF1||T......,.||||||.............|."
       drug_id: 1
       ec50: 0.75
-    - pattern: "||||NY2||T......,.||||||............|."
+    - pattern: "||||NY2||T......,.||||||.............|."
       drug_id: 1
       ec50: 0.95
-    - pattern: "||||YY2||T......,.||||||............|."
+    - pattern: "||||YY2||T......,.||||||.............|."
       drug_id: 1
       ec50: 0.8
-    - pattern: "||||NF2||T......,.||||||............|."
+    - pattern: "||||NF2||T......,.||||||.............|."
       drug_id: 1
       ec50: 1.05
-    - pattern: "||||YF2||T......,.||||||............|."
+    - pattern: "||||YF2||T......,.||||||.............|."
       drug_id: 1
       ec50: 0.95
-    - pattern: "||||NY.||K......,.||||||............|."
+    - pattern: "||||NY.||K......,.||||||.............|."
       drug_id: 2
       ec50: 0.62
-    - pattern: "||||YY.||K......,.||||||............|."
+    - pattern: "||||YY.||K......,.||||||.............|."
       drug_id: 2
       ec50: 0.85
-    - pattern: "||||NF.||K......,.||||||............|."
+    - pattern: "||||NF.||K......,.||||||.............|."
       drug_id: 2
       ec50: 0.5
-    - pattern: "||||YF.||K......,.||||||............|."
+    - pattern: "||||YF.||K......,.||||||.............|."
       drug_id: 2
       ec50: 0.775
-    - pattern: "||||NY.||T......,.||||||............|."
+    - pattern: "||||NY.||T......,.||||||.............|."
       drug_id: 2
       ec50: 0.7
-    - pattern: "||||YY.||T......,.||||||............|."
+    - pattern: "||||YY.||T......,.||||||.............|."
       drug_id: 2
       ec50: 0.9
-    - pattern: "||||NF.||T......,.||||||............|."
+    - pattern: "||||NF.||T......,.||||||.............|."
       drug_id: 2
       ec50: 0.65
-    - pattern: "||||YF.||T......,.||||||............|."
+    - pattern: "||||YF.||T......,.||||||.............|."
       drug_id: 2
       ec50: 0.82
 
   initial_parasite_info:
     - location_id: -1 # -1 indicates all locations
       parasite_info:
-        - aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
+        - aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
           prevalence: 0.05
-        - aa_sequence: "||||NY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
+        - aa_sequence: "||||NY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
           prevalence: 0.05
 
 # ---------------------------------------------------------------
@@ -619,60 +625,79 @@ therapy_parameters:
   therapy_db:
     #mono as
     0:
+      name: "Artemisinin"
       drug_ids: [0]
       dosing_days: [3]
     #mono Lumefaltrine
     1:
+      name: "Lumefantrine"
       drug_ids: [1]
       dosing_days: [3]
     #mono AQ
     2:
+      name: "Amodiaquine"
       drug_ids: [2]
       dosing_days: [3]
     #mono PPQ
     3:
+      name: "Piperaquine"
       drug_ids: [3]
       dosing_days: [3]
     #mono MQ
     4:
+      name: "Mefloquine"
       drug_ids: [4]
       dosing_days: [3]
     #mono SP
     5:
+      name: "SP"
       drug_ids: [5]
       dosing_days: [3]
     #AL
     6:
+      name: "AL"
       drug_ids: [0, 1]
       dosing_days: [3]
     #AS-AQ
     7:
+      name: "AS-AQ"
       drug_ids: [0, 2]
       dosing_days: [3]
     # DHA-PPQ
     8:
+      name: "DHA-PPQ"
       drug_ids: [0, 3]
       dosing_days: [3]
     #AS-MQ
     9:
+      name: "AS-MQ"
       drug_ids: [0, 4]
       dosing_days: [3]
     #TACT DHA-PPQ-MQ
     10:
+      name: "TACT DHA-PPQ-MQ"
       drug_ids: [0, 3, 4]
       dosing_days: [3]
     #TACT AL-AQ
     11:
+      name: "TACT AL-AQ"
       drug_ids: [0, 1, 2]
       dosing_days: [3]
     #CQ
     12:
+      name: "CQ"
       drug_ids: [6]
       dosing_days: [3]
     #Generic for Burn-in
     13:
+      name: "Generic 80% Effective"
       drug_ids: [8]
       dosing_days: [3]
+    #this is a MAC Therapy
+    14:
+      name: "MAC DHAPPQ"
+      therapy_ids: [0,0]
+      regimen: [1,7]
 
 # ---------------------------------------------------------------
 # 13. Treatment Strategy Parameters
@@ -747,10 +772,10 @@ strategy_parameters:
       peak_after: 3650
     12:
       name: ASAQ-BaseLineStrategy
-      type: NestedMFT
-      strategy_ids: [2, 0]
-      start_distribution: [0.05, 0.95]
-      peak_distribution: [0.8, 0.2]
+      type: MFTMultiLocation
+      therapy_ids: [2, 0]
+      start_distribution_by_location: [[0.05, 0.95]]
+      peak_distribution_by_location: [[0.8, 0.2]]
       peak_after: 3650
     13:
       name: BaseLineStrategy
@@ -856,6 +881,13 @@ epidemiological_parameters:
   # Inflation factor for certain calculations
   inflation_factor: 0.01
 
+  # special function to make the mean biting rate (across hosts) depend on age
+  using_age_dependent_biting_level: false
+
+  # special function which makes the probability of an infection (resulting
+  # from an infectious mosquito bite) age-dependent
+  using_variable_probability_infectious_bites_cause_infection: false
+
 # ---------------------------------------------------------------
 # 15. Mosquito Parameters (default is location based)
 # ---------------------------------------------------------------
@@ -881,154 +913,151 @@ population_events:
     info:
       date: 2000/1/1
       value: false
+
+  - name: change_within_host_induced_recombination
+    info:
+      date: 2010/1/1
+      value: true
+
+  - name: turn_off_mutation
+    info:
+      - date: 2000/1/1
+  - name: turn_on_mutation
+    info:
+      - date: 2010/1/1
+
+  - name: change_treatment_coverage
+    info:
+      - type: SteadyTCM
+        date: 1990/2/1
+        p_treatment_under_5_by_location: [ 0.600000 ]
+        p_treatment_over_5_by_location: [ 0.550000 ]
+      - type: InflatedTCM
+        date: 1990/3/1
+        annual_inflation_rate: 0.01
+      - type: LinearTCM
+        from_date: 1990/6/1
+        to_date: 1990/12/1
+        p_treatment_under_5_by_location_to: [ 0.900000 ]
+        p_treatment_over_5_by_location_to: [ 0.90000 ]
+
+  - name: change_treatment_strategy
+    info:
+      - date: 1990/3/2
+        strategy_id: 2
+      - date: 1990/6/2
+        strategy_id: 3
+      - date: 1990/9/2
+        strategy_id: 4
+
+  - name: single_round_MDA
+    info:
+      - date: 2020/1/1
+        fraction_population_targeted: [ 1.0 ]
+        days_to_complete_all_treatments: 14
+      - date: 2020/2/8
+        fraction_population_targeted: [ 0.03333333 ]
+        days_to_complete_all_treatments: 14
+      - date: 2020/3/14
+        fraction_population_targeted: [ 0.7 ]
+        days_to_complete_all_treatments: 14
+
+  - name: modify_nested_mft_strategy
+    info:
+      - date: 2015/5/1
+        strategy_id: 5
+
+  - name: introduce_plas2_parasites
+    info:
+      - location: 0
+        date: 1990/3/20
+        fraction: 0.01
+
+  - name: introduce_parasites
+    info:
+      - location: 0
+        parasite_info:
+          - date: 1990/3/20
+            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+            number_of_cases: 5
+          - date: 1990/4/15
+            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+            number_of_cases: 5
+      - location: 1
+        parasite_info:
+          - date: 1990/8/25
+            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+            number_of_cases: 5
+          - date: 1990/10/20
+            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+            number_of_cases: 5
+
+  - name: introduce_parasites_periodically
+    info:
+      - location: 0
+        parasite_info:
+          - duration: 10
+            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+            number_of_cases: 1
+            start_date: 1990/6/2
+
+  - name: introduce_580Y_parasites
+    info:
+      - location: 2
+        date: 2005/7/15
+        fraction: 0.02
+
+  - name: introduce_aq_mutant_parasites
+    info:
+      - location: 3
+        date: 2007/4/30
+        fraction: 0.05
+
+  - name: introduce_lumefantrine_mutant_parasites
+    info:
+      - location: 4
+        date: 2012/10/12
+        fraction: 0.03
+
+  - name: introduce_triple_mutant_to_dpm_parasites
+    info:
+      - location: 1
+        date: 2013/12/20
+        fraction: 0.04
+
+  - name: change_interrupted_feeding_rate
+    info:
+      - location: 5
+        date: 2001/6/1
+        interrupted_feeding_rate: 0.5
+      - location: 6
+        date: 2002/8/15
+        interrupted_feeding_rate: 0.7
+
   - name: change_mutation_probability_per_locus
     info:
-      date: 2000/1/1
-      value: false
-#  - name: change_within_host_induced_recombination
-#    info:
-#      day: 2010/1/1
-#      value: true
-#
-#  - name: turn_off_mutation
-#    info:
-#      - day: 2000/1/1
-#  - name: turn_on_mutation
-#    info:
-#      - day: 2010/1/1
-#
-#  - name: change_treatment_coverage
-#    info:
-#      - type: SteadyTCM
-#        date: 1990/2/1
-#        p_treatment_under_5_by_location: [ 0.600000 ]
-#        p_treatment_over_5_by_location: [ 0.550000 ]
-#      - type: InflatedTCM
-#        date: 1990/3/1
-#        annual_inflation_rate: 0.01
-#      - type: LinearTCM
-#        from_date: 1990/6/1
-#        to_date: 1990/12/1
-#        p_treatment_under_5_by_location_to: [ 0.900000 ]
-#        p_treatment_over_5_by_location_to: [ 0.90000 ]
-#
-#  - name: change_treatment_strategy
-#    info:
-#      - date: 1990/3/2
-#        strategy_id: 2
-#      - date: 1990/6/2
-#        strategy_id: 3
-#      - date: 1990/9/2
-#        strategy_id: 4
-#
-#  - name: single_round_MDA
-#    info:
-#      - date: 2020/1/1
-#        fraction_population_targeted: [ 1.0 ]
-#        days_to_complete_all_treatments: 14
-#      - date: 2020/2/8
-#        fraction_population_targeted: [ 0.03333333 ]
-#        days_to_complete_all_treatments: 14
-#      - date: 2020/3/14
-#        fraction_population_targeted: [ 0.7 ]
-#        days_to_complete_all_treatments: 14
-#
-#  - name: modify_nested_mft_strategy
-#    info:
-#      - date: 2015/5/1
-#        strategy_id: 5
-#
-#  - name: introduce_plas2_parasites
-#    info:
-#      - location: 0
-#        date: 1990/3/20
-#        fraction: 0.01
-#
-#  - name: introduce_parasites
-#    info:
-#      - location: 0
-#        parasite_info:
-#          - date: 1990/3/20
-#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
-#            number_of_cases: 5
-#          - date: 1990/4/15
-#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
-#            number_of_cases: 5
-#      - location: 1
-#        parasite_info:
-#          - date: 1990/8/25
-#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
-#            number_of_cases: 5
-#          - date: 1990/10/20
-#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1"
-#            number_of_cases: 5
-#
-#  - name: introduce_parasites_periodically
+      - date: 2008/9/10
+        mutation_probability_per_locus: 0.001
+
+  # TODO: change this event to match new genotype format
+#  - name: introduce_parasites_periodically_v2
 #    info:
 #      - location: 0
 #        parasite_info:
 #          - duration: 10
-#            genotype_aa_sequence: -1
 #            number_of_cases: 1
-#            start_date: 1990/6/2
-#
-#  - name: introduce_580Y_parasites
-#    info:
-#      - location: 2
-#        date: 2005/7/15
-#        fraction: 0.02
-#
-#  - name: introduce_aq_mutant_parasites
-#    info:
-#      - location: 3
-#        date: 2007/4/30
-#        fraction: 0.05
-#
-#  - name: introduce_lumefantrine_mutant_parasites
-#    info:
-#      - location: 4
-#        date: 2012/10/12
-#        fraction: 0.03
-#
-#  - name: introduce_triple_mutant_to_dpm_parasites
-#    info:
-#      - location: 1
-#        date: 2013/12/20
-#        fraction: 0.04
-#
-#  - name: change_interrupted_feeding_rate
-#    info:
-#      - location: 5
-#        date: 2001/6/1
-#        interrupted_feeding_rate: 0.5
-#      - location: 6
-#        date: 2002/8/15
-#        interrupted_feeding_rate: 0.7
-#
-#  - name: change_mutation_probability_per_locus
-#    info:
-#      - date: 2008/9/10
-#        mutation_probability_per_locus: 0.001
-#
-#  # TODO: change this event to match new genotype format
-##  - name: introduce_parasites_periodically_v2
-##    info:
-##      - location: 0
-##        parasite_info:
-##          - duration: 10
-##            number_of_cases: 1
-##            start_date: 2008/2/1
-##            end_date: 2008/2/1
-##            allele_distributions:
-##              - position: 0
-##                distribution: [ 0.5, 0.5 ]
-##              - position: 1
-##                distribution: [ 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 ]
-##              - position: 2
-##                distribution: [ 0.5, 0.5 ]
-##              - position: 3
-##                distribution: [ 0.5, 0.5 ]
-##              - position: 4
-##                distribution: [ 0.5, 0.5 ]
+#            start_date: 2008/2/1
+#            end_date: 2008/2/1
+#            allele_distributions:
+#              - position: 0
+#                distribution: [ 0.5, 0.5 ]
+#              - position: 1
+#                distribution: [ 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 ]
+#              - position: 2
+#                distribution: [ 0.5, 0.5 ]
+#              - position: 3
+#                distribution: [ 0.5, 0.5 ]
+#              - position: 4
+#                distribution: [ 0.5, 0.5 ]
 
 

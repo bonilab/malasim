@@ -61,9 +61,9 @@ public:
     return get_day_count(start_date, end_date);
   }
 
-  static date::month month_of_year(const date::sys_days &day) {
+  static int month_of_year(const date::sys_days &day) {
     const date::year_month_day ymd{day};
-    return ymd.month();
+    return static_cast<unsigned>(ymd.month());
   }
 
 };

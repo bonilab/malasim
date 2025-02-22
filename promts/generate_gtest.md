@@ -17,7 +17,7 @@ class ModelSettingsTest : public ::testing::Test {
                   default_settings.set_record_genome_db(true);
                   default_settings.set_starting_date(
                       date::year_month_day{date::year{2024}, date::month{10}, date::day{1}});
-default_settings.set_start_of_comparison_period(
+default_settings.set_start_of_comparison_period_date(
 date::year_month_day{date::year{2024}, date::month{10}, date::day{1}});
 default_settings.set_ending_date(
 date::year_month_day{date::year{2024}, date::month{10}, date::day{2}});
@@ -38,7 +38,7 @@ default_settings.get_record_genome_db());
 EXPECT_EQ(node["starting_date"].as<date::year_month_day>(),
 default_settings.get_starting_date());
 EXPECT_EQ(node["start_of_comparison_period"].as<date::year_month_day>(),
-default_settings.get_start_of_comparison_period());
+default_settings.get_start_of_comparison_period_date());
 EXPECT_EQ(node["ending_date"].as<date::year_month_day>(),
 default_settings.get_ending_date());
 EXPECT_EQ(node["start_collect_data_day"].as<int>(),
@@ -72,7 +72,7 @@ EXPECT_EQ(decoded_settings.get_starting_date(), expected_starting_date);
 
 auto expected_start_of_comparison_period =
 date::year_month_day{date::year{2024}, date::month{10}, date::day{1}};
-EXPECT_EQ(decoded_settings.get_start_of_comparison_period(),
+EXPECT_EQ(decoded_settings.get_start_of_comparison_period_date(),
 expected_start_of_comparison_period);
 
 auto expected_ending_date =

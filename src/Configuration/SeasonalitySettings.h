@@ -19,7 +19,6 @@
 // Class to hold seasonality settings, combining RainfallSettings and SimpleSettings
 class SeasonalitySettings : public IConfigClass{
 public:
-
   class ISeasonalInfo {
   public:
     virtual ~ISeasonalInfo() = default;
@@ -322,6 +321,12 @@ private:
   std::string mode_;
   SeasonalEquation seasonal_equation_;
   SeasonalRainfall seasonal_rainfall_;
+public:
+  DoubleVector A;
+  DoubleVector B;
+  DoubleVector C;
+  DoubleVector phi;
+  DoubleVector min_value;
 };
 
 namespace YAML {

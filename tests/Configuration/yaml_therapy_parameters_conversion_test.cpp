@@ -23,7 +23,7 @@ protected:
 
         therapy_parameters.set_tf_testing_day(28);
         therapy_parameters.set_tf_rate(0.1);
-        therapy_parameters.set_therapy_db(therapy_db);
+        therapy_parameters.set_therapy_db_raw(therapy_db);
     }
 };
 
@@ -56,10 +56,10 @@ TEST_F(TherapyParametersTest, DecodeTherapyParameters) {
 
     EXPECT_EQ(decoded_parameters.get_tf_testing_day(), 28);
     EXPECT_EQ(decoded_parameters.get_tf_rate(), 0.1);
-    EXPECT_EQ(decoded_parameters.get_therapy_db().at(0).get_drug_ids(), std::vector<int>{0});
-    EXPECT_EQ(decoded_parameters.get_therapy_db().at(0).get_dosing_days(), std::vector<int>{3});
-    EXPECT_EQ(decoded_parameters.get_therapy_db().at(1).get_drug_ids(), std::vector<int>{1});
-    EXPECT_EQ(decoded_parameters.get_therapy_db().at(1).get_dosing_days(), std::vector<int>{3});
+    EXPECT_EQ(decoded_parameters.get_therapy_db_raw().at(0).get_drug_ids(), std::vector<int>{0});
+    EXPECT_EQ(decoded_parameters.get_therapy_db_raw().at(0).get_dosing_days(), std::vector<int>{3});
+    EXPECT_EQ(decoded_parameters.get_therapy_db_raw().at(1).get_drug_ids(), std::vector<int>{1});
+    EXPECT_EQ(decoded_parameters.get_therapy_db_raw().at(1).get_dosing_days(), std::vector<int>{3});
 }
 
 // Test for missing fields in the input YAML

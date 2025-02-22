@@ -18,7 +18,7 @@ class DrugType {
 public:
   //disallow copy and assign
   DrugType(const DrugType&) = delete;
-  DrugType& operator=(const DrugType&) = delete;
+  void operator=(const DrugType&) = delete;
 
   int id() const { return id_; }
   void set_id(int id) { id_ = id; }

@@ -85,6 +85,43 @@ double Random::random_uniform() {
   return gsl_rng_uniform(rng_.get());
 }
 
+
+// return an integer in  [from, to) , not include to
+unsigned long Random::random_uniform_int(const unsigned long &from, const unsigned long &to) {
+  return from + gsl_rng_uniform_int(rng_.get(), to - from);
+}
+
+double Random::random_uniform_double(const double &from, const double &to) {
+  //    return from + gsl_rng_uniform_pos(rng_.get())*(to-from);
+  return gsl_ran_flat(rng_.get(), from, to);
+}
+
+double Random::random_normal(const double &mean, const double &sd) {
+  return mean + gsl_ran_gaussian(rng_.get(), sd);
+}
+
+double Random::random_normal_truncated(const double &mean, const double &sd) {
+  double value = gsl_ran_gaussian(rng_.get(), sd);
+  while (value > 3 * sd || value < -3 * sd) {
+    value = gsl_ran_gaussian(rng_.get(), sd);
+  }
+
+  return mean + value;
+}
+
+int Random::random_normal(const int &mean, const int &sd) {
+  return static_cast<int>(mean + round(gsl_ran_gaussian(rng_.get(), sd)));
+}
+
+int Random::random_normal_truncated(const int &mean, const int &sd) {
+  double value = gsl_ran_gaussian(rng_.get(), sd);
+  while (value > 3 * sd || value < -3 * sd) {
+    value = gsl_ran_gaussian(rng_.get(), sd);
+  }
+
+  return static_cast<int>(mean + round(value));
+}
+
 // Generates a Beta-distributed random double
 double Random::random_beta(double alpha, double beta) {
   if (!rng_) {
@@ -175,5 +212,9 @@ double Random::cdf_standard_normal_distribution(double value) {
 }
 
 double Random::random_flat(const double &from, const double &to) {
-  return gsl_ran_flat(G_RNG, from, to);
+  return gsl_ran_flat(rng_.get(), from, to);
+}
+
+void Random::random_shuffle(void *base, size_t base_length, size_t size_of_type) {
+  gsl_ran_shuffle(rng_.get(), base, base_length, size_of_type);
 }

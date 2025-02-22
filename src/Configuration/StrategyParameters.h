@@ -9,6 +9,9 @@
 #include <spdlog/spdlog.h>
 
 #include "IConfigClass.h"
+#include "Helpers/NumberHelpers.hxx"
+#include "Treatment/Strategies/IStrategy.h"
+#include "Treatment/Strategies/StrategyBuilder.h"
 
 class StrategyParameters: IConfigClass {
 public:
@@ -82,6 +85,10 @@ public:
     // Inner class: MassDrugAdministration
     class MassDrugAdministration {
     public:
+        struct beta_distribution_params {
+          double alpha;
+          double beta;
+        };
         // Getters and Setters
         [[nodiscard]] bool get_enable() const { return enable_; }
         void set_enable(bool value) { enable_ = value; }
@@ -98,17 +105,21 @@ public:
         [[nodiscard]] const std::vector<double>& get_sd_prob_individual_present_at_mda() const { return sd_prob_individual_present_at_mda_; }
         void set_sd_prob_individual_present_at_mda(const std::vector<double>& value) { sd_prob_individual_present_at_mda_ = value; }
 
+        std::vector<beta_distribution_params> get_prob_individual_present_at_mda_distribution() { return prob_individual_present_at_mda_distribution_; }
+        void set_prob_individual_present_at_mda_distribution(const std::vector<beta_distribution_params>& value) { prob_individual_present_at_mda_distribution_ = value; }
+
     private:
         bool enable_;
         int mda_therapy_id_;
         std::vector<int> age_bracket_prob_individual_present_at_mda_;
         std::vector<double> mean_prob_individual_present_at_mda_;
         std::vector<double> sd_prob_individual_present_at_mda_;
+        std::vector<beta_distribution_params> prob_individual_present_at_mda_distribution_;
     };
 
     // Getters and Setters for StrategyParameters
-    [[nodiscard]] const std::map<int, StrategyInfo>& get_strategy_db() const { return strategy_db_; }
-    void set_strategy_db(const std::map<int, StrategyInfo>& value) { strategy_db_ = value; }
+    [[nodiscard]] const std::map<int, StrategyInfo>& get_strategy_db_raw() const { return strategy_db_raw_; }
+    void set_strategy_db_raw(const std::map<int, StrategyInfo>& value) { strategy_db_raw_ = value; }
 
     [[nodiscard]] int get_initial_strategy_id() const { return initial_strategy_id_; }
     void set_initial_strategy_id(int value) { initial_strategy_id_ = value; }
@@ -116,19 +127,63 @@ public:
     [[nodiscard]] int get_recurrent_therapy_id() const { return recurrent_therapy_id_; }
     void set_recurrent_therapy_id(int value) { recurrent_therapy_id_ = value; }
 
-    [[nodiscard]] const MassDrugAdministration& get_mass_drug_administration() const { return mass_drug_administration_; }
+    [[nodiscard]] MassDrugAdministration get_mda() const { return mass_drug_administration_; }
     void set_mass_drug_administration(const MassDrugAdministration& value) { mass_drug_administration_ = value; }
+
+    [[nodiscard]] const YAML::Node& get_node() const { return node_; }
+    void set_node(const YAML::Node& value) { node_ = value; }
+
+    IStrategy *read_strategy(const YAML::Node &n, const int &strategy_id) {
+      const auto s_id = NumberHelpers::number_to_string<int>(strategy_id);
+      auto *result = StrategyBuilder::build(n[s_id], strategy_id);
+      std::cout << result->to_string()<<std::endl;
+      return result;
+    }
 
     //process config data
     void process_config() override {
       spdlog::info("Processing StrategyParameters");
+      /*
+       * Here we have to parse directly from YAML config file
+       * because strategies are implemented in different classes
+       * and this will make implementation more flexible.
+       */
+      for (std::size_t i = 0; i < node_.size(); i++) {
+        auto *s = read_strategy(node_, (int)i);
+        strategy_db.push_back(s);
+      }
+      std::vector<MassDrugAdministration::beta_distribution_params> prob_individual_present_at_mda_distribution_;
+      for (std::size_t i = 0;
+       i < mass_drug_administration_.get_mean_prob_individual_present_at_mda().size(); i++) {
+        const auto mean = mass_drug_administration_.get_mean_prob_individual_present_at_mda()[i];
+        const auto sd = mass_drug_administration_.get_sd_prob_individual_present_at_mda()[i];
+
+        MassDrugAdministration::beta_distribution_params params{};
+
+        if (NumberHelpers::is_zero(sd)) {
+          params.alpha = mean;
+          params.beta = 0.0;
+        } else {
+          params.alpha = mean * mean * (1 - mean) / (sd * sd) - mean;
+          params.beta = params.alpha / mean - params.alpha;
+        }
+
+        prob_individual_present_at_mda_distribution_.push_back(params);
+       }
+      for (auto mda_prob : prob_individual_present_at_mda_distribution_) {
+        std::cout << "alpha: " << mda_prob.alpha << " beta: " << mda_prob.beta << std::endl;
+      }
+      mass_drug_administration_.set_prob_individual_present_at_mda_distribution(prob_individual_present_at_mda_distribution_);
     };
 
+public:
+    std::vector<IStrategy *> strategy_db = std::vector<IStrategy *>();
 private:
-    std::map<int, StrategyInfo> strategy_db_;  // Changed from vector to map
+    std::map<int, StrategyInfo> strategy_db_raw_;  // Changed from vector to map
     int initial_strategy_id_;
     int recurrent_therapy_id_;
     MassDrugAdministration mass_drug_administration_;
+    YAML::Node node_;
 };
 
 namespace YAML {
@@ -240,14 +295,14 @@ struct convert<StrategyParameters> {
 
         // Encode strategy_db as a map
         Node strategy_db_node;
-        for (const auto& [key, value] : rhs.get_strategy_db()) {
+        for (const auto& [key, value] : rhs.get_strategy_db_raw()) {
             strategy_db_node[key] = value;
         }
         node["strategy_db"] = strategy_db_node;
 
         node["initial_strategy_id"] = rhs.get_initial_strategy_id();
         node["recurrent_therapy_id"] = rhs.get_recurrent_therapy_id();
-        node["mass_drug_administration"] = rhs.get_mass_drug_administration();
+        node["mass_drug_administration"] = rhs.get_mda();
         return node;
     }
 
@@ -262,7 +317,8 @@ struct convert<StrategyParameters> {
             int key = element.first.as<int>();
             strategy_db[key] = element.second.as<StrategyParameters::StrategyInfo>();
         }
-        rhs.set_strategy_db(strategy_db);
+        rhs.set_strategy_db_raw(strategy_db);
+        rhs.set_node(node["strategy_db"]);
 
         rhs.set_initial_strategy_id(node["initial_strategy_id"].as<int>());
         rhs.set_recurrent_therapy_id(node["recurrent_therapy_id"].as<int>());

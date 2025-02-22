@@ -11,11 +11,12 @@ class Config;
 typedef std::map<ul, Genotype*> GenotypePtrMap;
 
 class GenotypeDatabase : public GenotypePtrMap {
+public:
   //disallow copy, assign and move
-  GenotypeDatabase(const GenotypeDatabase&) = delete;
-  GenotypeDatabase& operator=(const GenotypeDatabase&) = delete;
-  GenotypeDatabase(GenotypeDatabase&&) = delete;
-  GenotypeDatabase& operator=(GenotypeDatabase&&) = delete;
+  // GenotypeDatabase(const GenotypeDatabase&) = delete;
+  // void operator=(const GenotypeDatabase&) = delete;
+  // GenotypeDatabase(GenotypeDatabase&&) = delete;
+  // GenotypeDatabase& operator=(GenotypeDatabase&&) = delete;
 
 public:
   std::map<std::string, Genotype*> aa_sequence_id_map;

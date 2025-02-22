@@ -7,7 +7,7 @@ namespace Spatial {
 class Coordinate {
   //disable copy and move
   Coordinate(const Coordinate &) = delete;
-  Coordinate &operator=(const Coordinate &) = delete;
+  void operator=(const Coordinate &) = delete;
 
 public:
   float latitude;

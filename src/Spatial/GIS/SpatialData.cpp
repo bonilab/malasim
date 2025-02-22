@@ -69,7 +69,7 @@ bool SpatialData::check_catalog(std::string &errors) {
 }
 
 void SpatialData::generate_distances() const {
-  auto &db = Model::get_instance().get_config()->get_spatial_settings().get_locations();
+  auto &db = Model::get_instance().get_config()->get_spatial_settings().location_db;
   auto &distances = Model::get_instance().get_config()->get_spatial_settings().get_spatial_distance_matrix();
 
   auto locations = db.size();
@@ -108,7 +108,7 @@ void SpatialData::generate_locations() {
   }
 
   // Start by over allocating the location_db
-  auto &db = Model::get_instance().get_config()->get_spatial_settings().get_locations();
+  auto &db = Model::get_instance().get_config()->get_spatial_settings().location_db;
   db.clear();
   db.reserve(reference->NROWS * reference->NCOLS);
 
@@ -129,7 +129,7 @@ void SpatialData::generate_locations() {
 
   // Update the configured count
   Model::get_instance().get_config()->get_spatial_settings().set_number_of_locations(
-    static_cast<int>(Model::get_instance().get_config()->get_spatial_settings().get_locations().size()));
+    static_cast<int>(Model::get_instance().get_config()->get_spatial_settings().location_db.size()));
   if (Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations() == 0) {
     // This error should be redundant since the ASC loader should catch it
     spdlog::error("Zero locations loaded while parsing ASC file.");
@@ -147,7 +147,7 @@ int SpatialData::get_raster_district(int location) {
   }
 
   // Get the coordinate of the location
-  auto &coordinate = Model::get_instance().get_config()->get_spatial_settings().get_locations()[location].coordinate;
+  auto &coordinate = Model::get_instance().get_config()->get_spatial_settings().location_db[location].coordinate;
 
   // Use the x, y to get the district id
   auto district =
@@ -164,7 +164,7 @@ int SpatialData::get_district(int location) {
   }
 
   // Get the coordinate of the location
-  auto &coordinate = Model::get_instance().get_config()->get_spatial_settings().get_locations()[location].coordinate;
+  auto &coordinate = Model::get_instance().get_config()->get_spatial_settings().location_db[location].coordinate;
 
   // Use the x, y to get the district id
   auto district =
@@ -251,7 +251,7 @@ void SpatialData::load_raster(SpatialFileType type) {
   auto* values = data[type];
 
   // Grab a reference to the location_db to work with
-  auto &location_db = Model::get_instance().get_config()->get_spatial_settings().get_locations();
+  auto &location_db = Model::get_instance().get_config()->get_spatial_settings().location_db;
   auto count = Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
 
   // Iterate through the raster and locations to set the value
@@ -354,7 +354,7 @@ bool SpatialData::parse(const YAML::Node &node) {
   refresh();
 
   // Grab a reference to the location_db to work with
-  auto &location_db = Model::get_instance().get_config()->get_spatial_settings().get_locations();
+  auto &location_db = Model::get_instance().get_config()->get_spatial_settings().location_db;
   auto number_of_locations = Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
 
   // Load the age distribution from the YAML

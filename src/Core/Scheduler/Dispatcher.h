@@ -11,13 +11,17 @@ class Dispatcher {
 public:
  // Disallow copy and assign
  Dispatcher(const Dispatcher&) = delete;
- Dispatcher& operator=(const Dispatcher&) = delete;
+ void operator=(const Dispatcher&) = delete;
  Dispatcher(Dispatcher&&) = delete;
  Dispatcher& operator=(Dispatcher&&) = delete;
 
 private:
  // std::vector<Event*> *events_;
  std::map<uuids::uuid, Event*> *events_;
+public:
+  std::map<uuids::uuid, Event*> *events() const { return events_; }
+  void set_events(std::map<uuids::uuid, Event*> *value) { events_ = value; }
+
  public:
   Dispatcher();
 

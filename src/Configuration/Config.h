@@ -20,18 +20,19 @@
 #include "SeasonalitySettings.h"
 #include "StrategyParameters.h"
 #include "TherapyParameters.h"
+#include "PreconfigPopulationEvents.h"
 
 class Config{
 public:
+  //disallow copy, assign and move
+  Config(const Config&) = delete;
+  void operator=(const Config&) = delete;
+  Config(Config&&) = delete;
+  Config& operator=(Config&&) = delete;
+
   // Constructor and Destructor
   Config() = default;
   ~Config() = default;
-
-  // delete copy and move constructors and assign operators
-  Config(const Config &) = delete;
-  Config &operator=(const Config &) = delete;
-  Config(Config &&) = delete;
-  Config &operator=(Config &&) = delete;
 
   struct ConfigData {
     ModelSettings model_settings{};
@@ -50,6 +51,7 @@ public:
     EpidemiologicalParameters epidemiological_parameters{};
     MosquitoParameters mosquito_parameters{};
     PopulationEvents population_events{};
+    PreconfigPopulationEvents preconfig_population_events{};
   };
 
   // Load configuration from a YAML file
@@ -65,7 +67,7 @@ public:
   [[nodiscard]] const ModelSettings &get_model_settings() const {
     return config_data_.model_settings;
   }
-  [[nodiscard]] const SimulationTimeframe &get_simulation_timeframe() const {
+  [[nodiscard]] SimulationTimeframe &get_simulation_timeframe() {
     return config_data_.simulation_timeframe;
   }
   [[nodiscard]] const TransmissionSettings &get_transmission_settings() const {
@@ -79,7 +81,7 @@ public:
     /* no const here because Spatial Data class will need to access and modify later */
     return config_data_.spatial_settings;
   }
-  [[nodiscard]] const SeasonalitySettings &get_seasonality_settings() const {
+  [[nodiscard]] SeasonalitySettings &get_seasonality_settings() {
     return config_data_.seasonality_settings;
   }
   [[nodiscard]] const MovementSettings &get_movement_settings() const {
@@ -92,8 +94,8 @@ public:
       const {
     return config_data_.immune_system_parameters;
   }
-  [[nodiscard]] const GenotypeParameters &get_genotype_parameters()
-      const {
+  [[nodiscard]] GenotypeParameters &get_genotype_parameters()
+      {
     return config_data_.genotype_parameters;
   }
   [[nodiscard]] const DrugParameters &get_drug_parameters()
@@ -104,8 +106,8 @@ public:
       const {
     return config_data_.therapy_parameters;
   }
-  [[nodiscard]] const StrategyParameters &get_strategy_parameters()
-      const {
+  [[nodiscard]] StrategyParameters &get_strategy_parameters()
+      {
     return config_data_.strategy_parameters;
   }
   [[nodiscard]] const EpidemiologicalParameters &get_epidemiological_parameters()
@@ -121,8 +123,9 @@ public:
     return config_data_.population_events;
   }
 
-  [[nodiscard]] ConfigData get_config_data() const {
-    return config_data_;
+  [[nodiscard]] const PreconfigPopulationEvents &get_preconfig_population_events()
+      const {
+    return config_data_.preconfig_population_events;
   }
 
 private:
@@ -141,6 +144,7 @@ private:
 
   // Configuration File Path
   std::string config_file_path_;
+  Model *model_;
 };
 
 #endif  // CONFIG_H
