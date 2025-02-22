@@ -40,7 +40,7 @@ protected:
         std::map<int, StrategyParameters::StrategyInfo> strategy_db;
         strategy_db[0] = strategy_info;  // Using integer key 0 for the map
 
-        strategy_parameters.set_strategy_db(strategy_db);
+        strategy_parameters.set_strategy_db_raw(strategy_db);
         strategy_parameters.set_initial_strategy_id(15);
         strategy_parameters.set_recurrent_therapy_id(-1);
         strategy_parameters.set_mass_drug_administration(mda_info);
@@ -93,18 +93,18 @@ TEST_F(StrategyParametersTest, DecodeStrategyParameters) {
 
     EXPECT_EQ(decoded_parameters.get_initial_strategy_id(), 15);
     EXPECT_EQ(decoded_parameters.get_recurrent_therapy_id(), -1);
-    EXPECT_EQ(decoded_parameters.get_strategy_db().at(0).get_name(), "SP-AQ-CQ-AL-MFTStrategy");
-    EXPECT_EQ(decoded_parameters.get_strategy_db().at(0).get_therapy_ids(), std::vector<int>({5, 2, 12, 6}));
+    EXPECT_EQ(decoded_parameters.get_strategy_db_raw().at(0).get_name(), "SP-AQ-CQ-AL-MFTStrategy");
+    EXPECT_EQ(decoded_parameters.get_strategy_db_raw().at(0).get_therapy_ids(), std::vector<int>({5, 2, 12, 6}));
 
     // Check the decoded values for the new fields
-    EXPECT_TRUE(compareNestedVectors(decoded_parameters.get_strategy_db().at(0).get_start_distribution_by_location(),
+    EXPECT_TRUE(compareNestedVectors(decoded_parameters.get_strategy_db_raw().at(0).get_start_distribution_by_location(),
                                      {{0.1, 0.2}, {0.3, 0.4}}));
-    EXPECT_TRUE(compareNestedVectors(decoded_parameters.get_strategy_db().at(0).get_peak_distribution_by_location(),
+    EXPECT_TRUE(compareNestedVectors(decoded_parameters.get_strategy_db_raw().at(0).get_peak_distribution_by_location(),
                                      {{0.5, 0.6}, {0.7, 0.8}}));
 
-    EXPECT_EQ(decoded_parameters.get_mass_drug_administration().get_enable(), false);
-    EXPECT_EQ(decoded_parameters.get_mass_drug_administration().get_age_bracket_prob_individual_present_at_mda(), std::vector<int>({10, 40}));
-    EXPECT_EQ(decoded_parameters.get_mass_drug_administration().get_mean_prob_individual_present_at_mda(), std::vector<double>({0.85, 0.75, 0.85}));
+    EXPECT_EQ(decoded_parameters.get_mda().get_enable(), false);
+    EXPECT_EQ(decoded_parameters.get_mda().get_age_bracket_prob_individual_present_at_mda(), std::vector<int>({10, 40}));
+    EXPECT_EQ(decoded_parameters.get_mda().get_mean_prob_individual_present_at_mda(), std::vector<double>({0.85, 0.75, 0.85}));
 }
 
 // Test for decoding with missing fields

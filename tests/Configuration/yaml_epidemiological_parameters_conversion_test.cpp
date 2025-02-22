@@ -35,7 +35,7 @@ protected:
         // Initialize RelativeInfectivity
         EpidemiologicalParameters::RelativeInfectivity infectivity;
         infectivity.set_sigma(1.2);
-        infectivity.set_ro(0.8);
+        infectivity.set_ro_star(0.8);
         infectivity.set_blood_meal_volume(2.0);
 
         // Set values in EpidemiologicalParameters
@@ -106,6 +106,8 @@ TEST_F(EpidemiologicalParametersYAMLTest, DecodeEpidemiologicalParameters) {
     node["tf_window_size"] = 10;
     node["fraction_mosquitoes_interrupted_feeding"] = 0.1;
     node["inflation_factor"] = 1.5;
+    node["using_age_dependent_biting_level"] = false;
+    node["using_variable_probability_infectious_bites_cause_infection"] = false;
 
     EpidemiologicalParameters decoded_parameters;
     EXPECT_NO_THROW(YAML::convert<EpidemiologicalParameters>::decode(node, decoded_parameters));

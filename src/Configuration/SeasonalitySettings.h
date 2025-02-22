@@ -15,6 +15,7 @@
 #include "Simulation/Model.h"
 #include "Utils/Constants.h"
 #include "date/date.h"
+#include "Utils/TypeDef.hxx"
 
 // Class to hold seasonality settings, combining RainfallSettings and SimpleSettings
 class SeasonalitySettings : public IConfigClass{

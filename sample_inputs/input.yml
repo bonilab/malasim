@@ -896,8 +896,8 @@ mosquito_parameters:
   mosquito_config:
     mode: "grid_based" # or "grid_based"
     grid_based:
-      interrupted_feeding_rate_raster: "../sample_inputs/kag_mosquito_ifr.asc"
-      prmc_size_raster: "../sample_inputs/kag_mosquito_size.asc"
+      interrupted_feeding_rate_raster: "../sample_inputs/dev_mosquito_ifr.asc"
+      prmc_size_raster: "../sample_inputs/dev_mosquito_size.asc"
     location_based:
       interrupted_feeding_rate: [0.19]
       prmc_size: [100]
