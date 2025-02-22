@@ -16,15 +16,13 @@ namespace Spatial {
  */
 
 class Location {
-  //    DISALLOW_COPY_AND_ASSIGN_(Location)
-
 public:
   int id;
   int population_size;
   float beta;
   float p_treatment_under_5;
   float p_treatment_over_5;
-  double mosquito_size;
+  int mosquito_size;
   double mosquito_ifr;
   std::unique_ptr<Coordinate> coordinate;
   std::vector<double> age_distribution;
@@ -37,7 +35,6 @@ public:
   virtual ~Location();
 
   Location(const Location &org);
-
   Location &operator=(const Location &other);
 
   friend std::ostream &operator<<(std::ostream &os, const Location &location);

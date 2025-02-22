@@ -22,19 +22,19 @@ Dispatcher::~Dispatcher() {
 }
 
 void Dispatcher::add_dispatcher(Event* event) {
-  events_->insert({event->get_id(), event});
+  events_->insert({event->get_id_raw(), event});
 }
 
 void Dispatcher::remove_dispatcher(Event* event) {
-  events_->erase(event->get_id());
+  events_->erase(event->get_id_raw());
 }
 
 void Dispatcher::clear_dispatcher_events() {
   if (events_== nullptr) return;
   if (events_->empty()) return;
-  for(auto & event : *events_) {
-    delete event.second;
-  }
+  // for(auto & event : *events_) {
+  //   delete event.second;
+  // }
   events_->clear();
 }
 

@@ -3,7 +3,7 @@
 #include "Utils/Cli.hxx"
 #include "Model.h"
 #include "Utils/Logger.h"
-#include "Configuration/Config.h"
+
 
 int main(int argc, char** argv) {
   Logger::Instance().Initialize(spdlog::level::info);

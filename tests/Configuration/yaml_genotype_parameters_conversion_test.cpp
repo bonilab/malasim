@@ -40,7 +40,7 @@ protected:
 
         // Set up initial parasite info
         GenotypeParameters::ParasiteInfo parasite_info;
-        parasite_info.set_aa_sequence("||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1");
+        parasite_info.set_aa_sequence("||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1");
         parasite_info.set_prevalence(0.05);
 
         GenotypeParameters::InitialParasiteInfoRaw initial_parasite_info;
@@ -139,7 +139,7 @@ TEST_F(GenotypeParametersTest, DecodeGenotypeParameters) {
 
     // Initial parasite info
     node["initial_parasite_info"][0]["location_id"] = -1;
-    node["initial_parasite_info"][0]["parasite_info"][0]["aa_sequence"] = "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCA|1";
+    node["initial_parasite_info"][0]["parasite_info"][0]["aa_sequence"] = "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1";
     node["initial_parasite_info"][0]["parasite_info"][0]["prevalence"] = 0.05;
 
     GenotypeParameters decoded_parameters;

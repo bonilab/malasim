@@ -6,7 +6,7 @@ namespace utils{
   class Indexer {
     // Disable copy and assignment
     Indexer(const Indexer&) = delete;
-    Indexer& operator=(const Indexer&) = delete;
+    void operator=(const Indexer&) = delete;
     Indexer(Indexer&&) = delete;
     Indexer& operator=(Indexer&&) = delete;
 
@@ -16,6 +16,13 @@ namespace utils{
     Indexer() : index(-1) {}
 
     ~Indexer() = default;
+
+    void set_index(const int64_t &value) {
+      index = value;
+    }
+    [[nodiscard]] int64_t get_index() const {
+      return index;
+    }
 
   };
 }

@@ -62,6 +62,7 @@ public:
     void set_midpoint(double value) { midpoint_ = value; }
 
   void process_config() override {};
+
   void process_config_with_parasite_density(double log_parasite_density_asymptomatic, double log_parasite_density_cured) {
     spdlog::info("Processing ImmuneSystemParameters");
     acquire_rate = b1_;

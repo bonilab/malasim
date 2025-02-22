@@ -213,14 +213,6 @@ public:
         location_based_ = value;
     }
 
-    void set_locations(const std::vector<Spatial::Location> &value) {
-      locations_ = value;
-    }
-
-    [[nodiscard]] std::vector<Spatial::Location> &get_locations() {
-      return locations_;
-    }
-
     void set_spatial_distance_matrix(const std::vector<std::vector<double>> &value) {
       spatial_distance_matrix_ = value;
     }
@@ -267,19 +259,21 @@ public:
                       *this->get_location_based().get_location_info()[to_location].coordinate);
               }
           }
-          locations_ = location_based_.get_location_info();
+          location_db = location_based_.get_location_info();
         }
         else {
           throw std::runtime_error("Unknown mode in 'spatial_settings'.");
         }
     }
 
+public:
+  std::vector<Spatial::Location> location_db = {};
+
 private:
     std::string mode_;  // "grid_based" or "location_based"
     GridBased grid_based_;
     LocationBased location_based_;
     std::vector<std::vector<double>> spatial_distance_matrix_;
-    std::vector<Spatial::Location> locations_;
     std::vector<std::vector<double>> age_distribution_by_location_;
     int number_of_location_ = 0;
     YAML::Node node_;

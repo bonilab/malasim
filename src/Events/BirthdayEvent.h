@@ -7,10 +7,11 @@
 class Person;
 
 class BirthdayEvent : public Event {
+ // OBJECTPOOL(BirthdayEvent);
  public:
   // Disable copy and assignment
   BirthdayEvent(const BirthdayEvent&) = delete;
- BirthdayEvent& operator=(const BirthdayEvent&) = delete;
+  void operator=(const BirthdayEvent&) = delete;
 
   BirthdayEvent();
 
@@ -19,7 +20,7 @@ class BirthdayEvent : public Event {
 
   std::string name() override;
 
- void schedule_event(Scheduler* scheduler, Person* person, const int &time);
+ static void schedule_event(Scheduler* scheduler, Person* person, const int &time);
  private:
   void execute() override;
 };

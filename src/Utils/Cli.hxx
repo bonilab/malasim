@@ -3,6 +3,23 @@
 
 namespace utils{
 class Cli {
+
+  struct MaSimAppInput {
+    std::string input_path { "input.yml" };
+    std::string output_path { "" };
+    std::string reporter { "" };
+    int verbosity { 0 };
+    int job_number { 0 };
+    int replicate { 1 };
+    std::string list_reporters { "lr" };
+    std::string help { "h" };
+    bool dump_movement_matrix { false };
+    bool record_individual_movement { false };
+    bool record_cell_movement { false };
+    bool record_district_movement { false };
+    bool record_movement { false };
+  };
+
 public:
     // Static method to get the single instance of the class
     static Cli& get_instance() {
@@ -12,49 +29,83 @@ public:
 
     // Delete copy constructor and assignment operator
     Cli(const Cli&) = delete;
-    Cli& operator=(const Cli&) = delete;
+    void operator=(const Cli&) = delete;
 
     // Parse function
-    void parse(int argc, char** argv) {
+  void parse(int argc, char** argv) {
+      create_cli_options(app, cli_input);
+      spdlog::info("Parsing command line arguments");
         try {
             app.parse(argc, argv);
+            validate_config(cli_input);
         } catch (const CLI::ParseError &e) {
             std::exit(app.exit(e));
         }
     }
 
     // Accessors for parameters
-    std::string get_input_file() const { return input_file; }
-    int get_cluster_job_number() const { return cluster_job_number; }
-    std::string get_reporter() const { return reporter; }
-    std::string get_output_path() const { return output_path; }
-    int get_verbosity() const { return verbosity; }
-    bool is_help_requested() const { return help; }
+    [[nodiscard]] std::string get_input_path() const { return cli_input.input_path; }
+    void set_input_path(const std::string& input_path) { cli_input.input_path = input_path; }
+    [[nodiscard]] int get_job_number() const { return cli_input.job_number; }
+    [[nodiscard]] int get_replicate() const { return cli_input.replicate; }
+    [[nodiscard]] std::string get_reporter() const { return cli_input.reporter; }
+    [[nodiscard]] std::string get_output_path() const { return cli_input.output_path; }
+    void set_output_path(const std::string& output_path) { cli_input.output_path = output_path; }
+    [[nodiscard]] int get_verbosity() const { return cli_input.verbosity; }
+    [[nodiscard]] bool get_dump_movement_matrix() const { return cli_input.dump_movement_matrix; }
+    [[nodiscard]] bool get_record_individual_movement() const { return cli_input.record_individual_movement; }
+    [[nodiscard]] bool get_record_cell_movement() const { return cli_input.record_cell_movement; }
+    [[nodiscard]] bool get_record_district_movement() const { return cli_input.record_district_movement; }
+    [[nodiscard]] bool get_record_movement() const { return cli_input.record_movement; }
+
+  void create_cli_options(CLI::App& app, MaSimAppInput& input) {
+    app.add_option("-i,--input", input.input_path, "Input filename. Default: `input.yml`.");
+
+    app.add_option("-o,--output", input.output_path, "Output path. Default: `./`.");
+
+    app.add_option("-r,--reporter", input.reporter, "Reporter type. Default: `MonthlyReporter`.");
+
+    app.add_option("-v,--verbosity", input.verbosity, "Sets the verbosity of the logging. Default: 0");
+
+    app.add_option("-j,--job", input.job_number, "Sets the study to associate with the configuration (or database id). Default: 0");
+
+    app.add_option("-d,--dump", input.dump_movement_matrix, "Dump the movement matrix as calculated.");
+
+    app.add_option("-l,--list", input.list_reporters, "List the possible reporters.");
+
+    app.add_option("--im", input.record_individual_movement, "Record individual movement data.");
+
+    app.add_option("--mc", input.record_cell_movement, "Record the movement between cells.");
+
+    app.add_option("--md", input.record_district_movement, "Record the movement between districts.");
+
+    app.add_option("--replicate", input.replicate, "Replicate number. Default: 1");
+  }
+
+  bool validate_config(MaSimAppInput& input) {
+
+    std::ifstream f(input.input_path.c_str());
+    if (!f.good()) {
+      std::cerr << "Err: Input file error or not found!" << std::endl;
+      return false;
+    }
+
+    if (input.record_cell_movement && input.record_district_movement) {
+      std::cerr << "--mc and --md are mutual exclusive and may not be run together." << std::endl;
+      return false;
+    }
+
+    input.record_movement = input.record_individual_movement || input.record_cell_movement || input.record_district_movement;
+
+    return true;
+  }
 
 private:
     // Private constructor for Singleton
-    Cli() {
-        app.description("Individual-based simulation for malaria.");
-
-        // Command options with required() to make them compulsory
-        app.add_option("-i,--input,--config", input_file, "The config file (YAML format) (Required). \nEx: MaSim -i input.yml")->required();
-        app.add_option("-j,--job", cluster_job_number, "Cluster job number (Optional). \nEx: MaSim -j 1");
-        app.add_option("-r,--reporter", reporter, "Reporter Type (Optional). \nEx: MaSim -r MonthlyReporter");
-        app.add_option("-o,--output", output_path, "Path for output files, default is current directory (Optional). \nEx: MaSim -o out");
-
-        // Global options
-        app.add_option("--v", verbosity, "Sets the current verbosity of the logging, default zero");
-    }
+    Cli() {};
 
     CLI::App app{"Individual-based simulation for malaria"};
-
-    // Parameters
-    std::string input_file;
-    int cluster_job_number;
-    std::string reporter;
-    std::string output_path;
-    int verbosity = 0;
-    bool help = false;
+    MaSimAppInput cli_input;
 };
 }  // namespace utils
 

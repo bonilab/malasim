@@ -1,0 +1,63 @@
+
+#include "Configuration/Config.h"
+#include "Utils/Random.h"
+#include "Core/Scheduler/Scheduler.h"
+#include "Simulation/Model.h"
+#include "Population/ClonalParasitePopulation.h"
+#include "Population/DrugsInBlood.h"
+#include "Population/ImmuneSystem/ImmuneSystem.h"
+#include "Population/Person/Person.h"
+#include "Population/SingleHostClonalParasitePopulations.h"
+
+#include "Utils/TypeDef.hxx"
+
+Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations()
+
+Model::get_instance().get_config()->get_epidemiological_parameters().get_number_of_tracking_days()
+
+Model::get_instance().get_config()->get_spatial_settings().location_db
+
+Model::get_instance().get_config()->get_drug_parameters().drug_db
+
+Model::get_instance().get_config()->get_therapy_parameters().therapy_db
+
+Model::get_instance().get_config()->get_strategy_parameters().therapy_db
+
+Model::get_instance().get_config()->get_immune_system_parameters()
+
+Model::get_instance().get_config()->get_movement_settings().get_v_moving_level_value()
+
+Model::get_instance().get_config()->get_population_demographic()
+
+Model::get_instance().get_config()->get_population_demographic().get_number_of_age_classes()
+
+Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels().get_
+
+Model::get_instance().get_scheduler()
+
+Model::get_instance().get_config()->get_seasonality_settings().get_seasonal_factor()
+
+Model::get_instance().get_config()->get_spatial_settings().get_spatial_distance_matrix()
+
+Model::get_instance().get_random()
+
+Model::get_instance().get_mdc()
+
+Model::get_instance().get_mosquito()
+
+
+
+
+
+
+Merge from Temple Malaria Simulation to malasim
+MainDataCollector to ModelDataCollector
+SCTherapy (compliance), in Person.cpp complied_dosing_days
+UpdateEventEveryKdays in Events
+
+
+change:
+therapy_id to therapy_ids in all strategies
+day to date in all event dates
+DAYS_IN_YEAR -> DAYS_IN_YEAR
+

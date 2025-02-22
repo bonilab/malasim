@@ -2,6 +2,8 @@
 #include <yaml-cpp/yaml.h>
 #include "Config.h"
 
+#include "Utils/Cli.hxx"
+
 int inline get_pipe_count(const std::string &str) {
   int pipe_count = 0;
   for(const char c : str) {
@@ -17,7 +19,7 @@ bool Config::load(const std::string &filename) {
   try {
     YAML::Node config = YAML::LoadFile(filename);
 
-    std::cout << "Configuration file loaded successfully" << std::endl;
+    spdlog::info("Configuration file loaded successfully: " + utils::Cli::get_instance().get_input_path());
 
     config_data_.model_settings = config["model_settings"].as<ModelSettings>();
     config_data_.simulation_timeframe  =
@@ -65,13 +67,12 @@ bool Config::load(const std::string &filename) {
     config_data_.population_events =
       config["population_events"].as<PopulationEvents>();
 
-    std::cout << "Configuration file parsed successfully" << std::endl;
+    spdlog::info("Configuration file parsed successfully");
 
     // Validate all cross field validations
     validate_all_cross_field_validations();
 
-    std::cout << "Configuration file validated successfully" << std::endl;
-
+    spdlog::info("Configuration file validated successfully");
 
     //test config
     spdlog::info("Genotype info:");
@@ -157,7 +158,7 @@ bool Config::load(const std::string &filename) {
       get_spatial_settings().get_number_of_locations());
     config_data_.epidemiological_parameters.process_config();
     config_data_.mosquito_parameters.process_config_using_locations(
-      get_spatial_settings().get_locations());
+      get_spatial_settings().location_db);
 
     return true;
   }
@@ -187,8 +188,8 @@ void Config::validate_all_cross_field_validations() {
       throw std::invalid_argument("Simulation ending date should be greater than starting date");
   }
   //Comparison period should be in between starting and ending date
-  if(simulation_timeframe.get_start_of_comparison_period() < simulation_timeframe.get_starting_date() ||
-       simulation_timeframe.get_start_of_comparison_period() > simulation_timeframe.get_ending_date()) {
+  if(simulation_timeframe.get_start_of_comparison_period_date() < simulation_timeframe.get_starting_date() ||
+       simulation_timeframe.get_start_of_comparison_period_date() > simulation_timeframe.get_ending_date()) {
       throw std::invalid_argument("Comparison period should be in between starting and ending date");
   }
   //start_collect_data_day should be >= 0
@@ -485,7 +486,7 @@ void Config::validate_all_cross_field_validations() {
   }
   int therapy_max_dosing_days = 0;
   //Loop through therapy_db
-  for(auto therapy : therapy_parameters.get_therapy_db()) {
+  for(auto therapy : therapy_parameters.get_therapy_db_raw()) {
     for(auto drug_id : therapy.second.get_drug_ids()) {
       //Check if drug id is in drug_db keys
       if(drug_parameters.get_drug_db_raw().find(drug_id) == drug_parameters.get_drug_db_raw().end()) {
@@ -508,7 +509,7 @@ void Config::validate_all_cross_field_validations() {
   ----------------------------*/
   StrategyParameters strategy_parameters = config_data_.strategy_parameters;
   //Check if initial_strategy_id is in strategy_db keys
-  if(strategy_parameters.get_strategy_db().find(strategy_parameters.get_initial_strategy_id()) == strategy_parameters.get_strategy_db().end()) {
+  if(strategy_parameters.get_strategy_db_raw().find(strategy_parameters.get_initial_strategy_id()) == strategy_parameters.get_strategy_db_raw().end()) {
       throw std::invalid_argument("Initial strategy id should be in strategy db keys");
   }
 
@@ -591,7 +592,7 @@ void Config::validate_all_cross_field_validations() {
   }
   EpidemiologicalParameters::RelativeInfectivity relative_infectivity = epidemiological_parameters.get_relative_infectivity();
   //Check if relative_infectivity is positive number
-  if(relative_infectivity.get_sigma() < 0 || relative_infectivity.get_ro() <= 0
+  if(relative_infectivity.get_sigma() < 0 || relative_infectivity.get_ro_star() <= 0
       || relative_infectivity.get_blood_meal_volume() <= 0) {
       throw std::invalid_argument("Relative infectivity should be positive numbers");
   }

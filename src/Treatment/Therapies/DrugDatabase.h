@@ -9,7 +9,7 @@ typedef std::map<int, DrugType *> DrugTypePtrMap;
 class DrugDatabase : public DrugTypePtrMap {
   //Dsiallow copy and assign
   DrugDatabase(const DrugDatabase&) = delete;
-  DrugDatabase& operator=(const DrugDatabase&) = delete;
+  void operator=(const DrugDatabase&) = delete;
 
  public:
   DrugDatabase();

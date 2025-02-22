@@ -267,6 +267,13 @@ public:
   // Write the current spatial data to the filename and path indicated, output
   // will be an ASC file
   void write(const std::string &filename, SpatialFileType type);
+
+  std::vector<int> get_district_lookup() {
+    return district_lookup_;
+  }
+  void set_district_lookup(const std::vector<int> &district_lookup) {
+    district_lookup_ = district_lookup;
+  }
 };
 
 #endif

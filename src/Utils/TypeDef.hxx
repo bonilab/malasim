@@ -127,7 +127,7 @@ typedef std::vector<IStrategy *> StrategyPtrVector;
 //   }
 // };
 
-// struct RelativeBittingInformation {
+// struct RelativeBitingInformation {
 //   double max_relative_biting_value;
 //   double min_relative_biting_value;
 //   int number_of_biting_levels;

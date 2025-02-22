@@ -9,7 +9,10 @@
 #include "Spatial/Movement/MarshallSM.hxx"
 #include "Spatial/Movement/WesolowskiSM.hxx"
 #include "Spatial/Movement/WesolowskiSurfaceSM.hxx"
+#include "Utils/MultinomialDistributionGenerator.h"
 #include "spdlog/spdlog.h"
+
+class MultinomialDistributionGenerator;
 
 class MovementSettings : IConfigClass {
 public:
@@ -280,6 +283,22 @@ public:
     [[nodiscard]] const CirculationInfo& get_circulation_info() const { return circulation_info_; }
     void set_circulation_info(const CirculationInfo& value) { circulation_info_ = value; }
 
+    [[nodiscard]] const std::vector<double>& get_v_moving_level_density() const { return v_moving_level_density; }
+    void set_v_moving_level_density(const std::vector<double>& value) { v_moving_level_density = value; }
+
+    [[nodiscard]] const std::vector<double>& get_v_moving_level_value() const { return v_moving_level_value; }
+    void set_v_moving_level_value(const std::vector<double>& value) { v_moving_level_value = value; }
+
+    [[nodiscard]] double get_length_of_stay_theta() const { return length_of_stay_theta; }
+    void set_length_of_stay_theta(double value) { length_of_stay_theta = value; }
+
+    [[nodiscard]] double get_length_of_stay_k() const { return length_of_stay_k; }
+    void set_length_of_stay_k(double value) { length_of_stay_k = value; }
+
+    [[nodiscard]] MultinomialDistributionGenerator get_moving_level_generator() const {
+      return moving_level_generator_;
+    }
+
   void process_config() override {}
 
   void process_config_using_spatial_settings(
@@ -370,6 +389,8 @@ public:
 
       length_of_stay_theta = theta;
       length_of_stay_k = k;
+
+      moving_level_generator_.level_density = v_moving_level_density;
   }
 
 private:
@@ -378,6 +399,7 @@ private:
     CirculationInfo circulation_info_;
     DoubleVector v_moving_level_value;
     DoubleVector v_moving_level_density;
+    MultinomialDistributionGenerator moving_level_generator_{};
     double length_of_stay;
     double length_of_stay_mean;
     double length_of_stay_sd;

@@ -70,6 +70,9 @@ public:
     [[nodiscard]] const MosquitoConfig& get_mosquito_config() const { return mosquito_config_; }
     void set_mosquito_config(const MosquitoConfig& value) { mosquito_config_ = value; }
 
+    [[nodiscard]] bool get_within_host_induced_free_recombination() const { return within_host_induced_free_recombination_; }
+    void set_within_host_induced_free_recombination(bool value) { within_host_induced_free_recombination_ = value; }
+
     void process_config() override {};
     void process_config_using_locations(std::vector<Spatial::Location> locations) {
       spdlog::info("Processing MosquitoParameters");
@@ -117,6 +120,7 @@ public:
 
 private:
     MosquitoConfig mosquito_config_;
+    bool within_host_induced_free_recombination_ = true;
 
 };
 
@@ -199,14 +203,16 @@ struct convert<MosquitoParameters> {
     static Node encode(const MosquitoParameters& rhs) {
         Node node;
         node["mosquito_config"] = rhs.get_mosquito_config();
+        node["within_host_induced_free_recombination"] = rhs.get_within_host_induced_free_recombination();
         return node;
     }
 
     static bool decode(const Node& node, MosquitoParameters& rhs) {
-        if (!node["mosquito_config"]) {
+        if (!node["mosquito_config"] || !node["within_host_induced_free_recombination"]) {
             throw std::runtime_error("Missing 'mosquito_config' field in MosquitoParameters");
         }
         rhs.set_mosquito_config(node["mosquito_config"].as<MosquitoParameters::MosquitoConfig>());
+        rhs.set_within_host_induced_free_recombination(node["within_host_induced_free_recombination"].as<bool>());
         return true;
     }
 };
