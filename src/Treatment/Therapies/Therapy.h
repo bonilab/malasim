@@ -2,6 +2,8 @@
 #define    THERAPY_H
 
 #include <vector>
+#include <string>
+#include <ostream>
 
 class DrugType;
 
