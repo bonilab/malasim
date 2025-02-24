@@ -1,10 +1,3 @@
-/*
- * File:   MatureGametocyteEvent.h
- * Author: Merlin
- *
- * Created on July 31, 2013, 11:38 PM
- */
-
 #ifndef MATUREGAMETOCYTEEVENT_H
 #define MATUREGAMETOCYTEEVENT_H
 

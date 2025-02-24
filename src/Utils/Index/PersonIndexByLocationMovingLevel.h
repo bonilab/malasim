@@ -12,7 +12,7 @@ public:
     void operator=(const PersonIndexByLocationMovingLevel &) = delete;
 
 public:
-  PersonPtrVector3 vPerson() {
+  PersonPtrVector3 &vPerson() {
     return vPerson_;
   }
   void vPerson(const PersonPtrVector3 &v) {

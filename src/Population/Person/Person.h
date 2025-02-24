@@ -57,7 +57,7 @@ public:
   };
 
   // Priority queue of Event
-  std::priority_queue<Event*, std::vector<Event*>, EventComparator> event_queue;
+  // std::priority_queue<Event*, std::vector<Event*>, EventComparator> event_queue;
 
   Person();
 
@@ -94,14 +94,14 @@ private:
 public:
     void initialize();
 
-    // Method to run events before a certain time
-    void execute_events(int time);
+    // // Method to run events before a certain time
+    // void execute_events(int time);
 
-    // Method to add an event
-    void add_event(Event* event);
-
-    // Method to remove an event
-    void remove_event(Event* event);
+    // // Method to add an event
+    // void add_event(Event* event);
+    //
+    // // Method to remove an event
+    // void remove_event(Event* event);
 
     void increase_age_by_1_year();
 

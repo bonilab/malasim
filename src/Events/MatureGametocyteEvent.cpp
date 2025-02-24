@@ -1,10 +1,3 @@
-/*
- * File:   MatureGametocyteEvent.cpp
- * Author: Merlin
- *
- * Created on July 31, 2013, 11:38 PM
- */
-
 #include "MatureGametocyteEvent.h"
 
 #include "Configuration/Config.h"
@@ -29,12 +22,14 @@ void MatureGametocyteEvent::schedule_event(
     e->set_blood_parasite(blood_parasite);
     e->time = time;
 
-    p->add_event(e);
+    p->add_dispatcher(e);
     scheduler->schedule_individual_event(e);
+    // spdlog::info("Mature gametocyte event scheduled {}", e->get_id());
   }
 }
 
 void MatureGametocyteEvent::execute() {
+  // spdlog::info("Mature gametocyte event executed {}", get_id());
   auto* person = dynamic_cast<Person*>(dispatcher);
   if (person->get_all_clonal_parasite_populations()->contain(blood_parasite_)) {
     blood_parasite_->set_gametocyte_level(

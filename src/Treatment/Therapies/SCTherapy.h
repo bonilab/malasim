@@ -19,7 +19,9 @@ public:
   bool full_compliance() const {
     return full_compliance_;
   }
-  void set_full_compliance(bool full_compliance);
+  void set_full_compliance(bool full_compliance) {
+    full_compliance_ = full_compliance;
+  }
 
 public:
   int artemisinin_id;

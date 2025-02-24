@@ -14,6 +14,9 @@ class TherapyBuilder {
   virtual ~TherapyBuilder();
 
   static Therapy *build(const YAML::Node &ns, const int &t_id);
+private:
+  static Therapy* create_simple(const YAML::Node &ns, const int &t_id);
+  static Therapy* create_complex(const YAML::Node &ns, const int &t_id);
 
  private:
 

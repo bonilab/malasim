@@ -13,16 +13,16 @@
 
 // Initialize the reporter
 // Sets up the database and prepares it for data entry
-void SQLiteDistrictReporter::initialize() {
+void SQLiteDistrictReporter::initialize(int job_number, const std::string &path) {
   // Inform the user of the reporter type and make sure there are districts
-  spdlog::info("Using SQLiteDbReporterwith aggregation at the district level.");
+  spdlog::info("Using SQLiteDbReporter with aggregation at the district level.");
   if (!SpatialData::get_instance().has_raster(SpatialData::Districts)) {
     spdlog::error("District raster must be present when aggregating data at "
                   "the district level.");
     throw std::invalid_argument("No district raster present");
   }
 
-  SQLiteDbReporter::initialize();
+  SQLiteDbReporter::initialize(job_number, path);
 }
 
 void SQLiteDistrictReporter::count_infections_for_location(int location) {
@@ -89,7 +89,6 @@ void SQLiteDistrictReporter::collect_site_data_for_location(int location) {
               ->monthly_number_of_treatment_by_location_age_class()[location]
                                                                    [ndx];
     }
-
     // collect the clinical episodes by age class
     monthly_site_data.clinical_episodes_by_age_class[district][ndx] +=
         Model::get_instance().get_mdc()
@@ -180,12 +179,19 @@ void SQLiteDistrictReporter::calculate_and_build_up_site_data_insert_values(
 // database
 void SQLiteDistrictReporter::monthly_report_site_data(int monthId) {
   TransactionGuard transaction{db.get()};
-  auto numDistricts = SpatialData::get_instance().get_district_count();
+  auto numDistricts = SpatialData::get_instance().get_district_count() + 1;
   auto &ageClasses = Model::get_instance().get_config()->get_population_demographic().get_age_structure();
 
   // Prepare the data structures
   reset_site_data_structures(numDistricts, ageClasses.size());
 
+  for (auto location = 0; location < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
+       location++) {
+    // If the population is zero, press on
+    auto locationPopulation =
+        static_cast<int>(Model::get_instance().get_population()->size(location));
+    if (locationPopulation == 0) { continue; }
+       }
   // Collect the data
   for (auto location = 0; location < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
        location++) {

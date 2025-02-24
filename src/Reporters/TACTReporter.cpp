@@ -14,7 +14,7 @@
 #include "Treatment/ITreatmentCoverageModel.h"
 #include "Utility/ReporterUtils.h"
 
-void TACTReporter::initialize() {}
+void TACTReporter::initialize(int job_number, const std::string &path) {}
 
 void TACTReporter::before_run() {
   // output header for csv file

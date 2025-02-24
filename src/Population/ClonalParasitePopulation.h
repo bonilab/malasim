@@ -44,13 +44,13 @@ private:
   Genotype *genotype() const;
   void set_genotype(Genotype *value);
 
-  ParasiteDensityUpdateFunction *update_function() const {
+  ParasiteDensityUpdateFunction *update_function() {
     return update_function_;
   }
   void set_update_function(ParasiteDensityUpdateFunction *value) {
     update_function_ = value;
   }
-  [[nodiscard]] SingleHostClonalParasitePopulations *parasite_population() const {
+  [[nodiscard]] SingleHostClonalParasitePopulations *parasite_population() {
     return parasite_population_;
   }
   void set_parasite_population(SingleHostClonalParasitePopulations *value) {

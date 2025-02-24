@@ -24,11 +24,11 @@ MonthlyReporter::MonthlyReporter() = default;
 
 MonthlyReporter::~MonthlyReporter() = default;
 
-void MonthlyReporter::initialize() {
-  gene_freq_file.open(fmt::format("{}/gene_freq_{}.txt", utils::Cli::get_instance().get_output_path(), utils::Cli::get_instance().get_job_number()));
-  monthly_data_file.open(fmt::format("{}/monthly_data_{}.txt", utils::Cli::get_instance().get_output_path(), utils::Cli::get_instance().get_job_number()));
-  summary_data_file.open(fmt::format("{}/summary_{}.txt", utils::Cli::get_instance().get_output_path(), utils::Cli::get_instance().get_job_number()));
-  gene_db_file.open(fmt::format("{}/gene_db_{}.txt", utils::Cli::get_instance().get_output_path(), utils::Cli::get_instance().get_job_number()));
+void MonthlyReporter::initialize(int job_number, const std::string &path) {
+  gene_freq_file.open(fmt::format("{}/gene_freq_{}.txt", path, job_number));
+  monthly_data_file.open(fmt::format("{}/monthly_data_{}.txt", path, job_number));
+  summary_data_file.open(fmt::format("{}/summary_{}.txt", path, job_number));
+  gene_db_file.open(fmt::format("{}/gene_db_{}.txt", path, job_number));
 }
 
 void MonthlyReporter::before_run() {}

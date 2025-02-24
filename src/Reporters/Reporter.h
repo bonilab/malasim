@@ -6,6 +6,20 @@
 
 class Model;
 
+// Wrapper for TSV file constants
+namespace Tsv {
+const std::string sep = "\t";
+const std::string end_line = "\n";
+const std::string extension = "tsv";
+}  // namespace Tsv
+
+// Wrapper for CSV file constants
+namespace Csv {
+const std::string sep = ",";
+const std::string end_line = "\n";
+const std::string extension = "csv";
+}  // namespace Csv
+
 class Reporter {
 public:
   //disallow copy and assign and move
@@ -29,7 +43,21 @@ public:
     MMC_REPORTER,
     TACT_REPORTER,
     NOVEL_DRUG_REPOTER,
-    VALIDATION_REPORTER
+    VALIDATION_REPORTER,
+
+    // SQLite reporter
+    SQLITE_DISTRICT_REPORTER,
+    SQLITE_PIXEL_REPORTER,
+    TRAVEL_TRACKING_REPORTER,
+
+    // Specialist reporters for specific experiments
+    MOVEMENT_REPORTER,
+    POPULATION_REPORTER,
+    CELLULAR_REPORTER,
+    GENOTYPE_CARRIERS,
+    SEASONAL_IMMUNITY,
+    AGE_BAND_REPORTER,
+    THERAPY_RECORD_REPORTER,
   };
 
 
@@ -43,7 +71,7 @@ public:
   //    Reporter(const Reporter& orig);
   virtual ~Reporter();
 
-  virtual void initialize() = 0;
+  virtual void initialize(int job_number, const std::string &path) = 0;
 
   virtual void before_run() = 0;
 

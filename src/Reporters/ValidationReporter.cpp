@@ -22,15 +22,15 @@ ValidationReporter::ValidationReporter() = default;
 
 ValidationReporter::~ValidationReporter() = default;
 
-void ValidationReporter::initialize() {
-    monthly_data_file.open(fmt::format("{}/validation_monthly_data_{}.txt", utils::Cli::get_instance().get_output_path(), utils::Cli::get_instance().get_job_number()));
-    summary_data_file.open(fmt::format("{}/validation_summary_{}.txt", utils::Cli::get_instance().get_output_path(), utils::Cli::get_instance().get_job_number()));
-    gene_freq_file.open(fmt::format("{}/validation_gene_freq_{}.txt", utils::Cli::get_instance().get_output_path(), utils::Cli::get_instance().get_job_number()));
-    gene_db_file.open(fmt::format("{}/validation_gene_db_{}.txt", utils::Cli::get_instance().get_output_path(), utils::Cli::get_instance().get_job_number()));
-    prmc_freq_file.open(fmt::format("{}/validation_prmc_freq_{}.txt", utils::Cli::get_instance().get_output_path(), utils::Cli::get_instance().get_job_number()));
-    prmc_db_file.open(fmt::format("{}/validation_prmc_db_{}.txt", utils::Cli::get_instance().get_output_path(), utils::Cli::get_instance().get_job_number()));
-    monthly_mutation_file.open(fmt::format("{}/validation_monthly_mutation_{}.txt", utils::Cli::get_instance().get_output_path(), utils::Cli::get_instance().get_job_number()));
-    mosquito_res_count_file.open(fmt::format("{}/validation_mosquito_res_count_{}.txt", utils::Cli::get_instance().get_output_path(), utils::Cli::get_instance().get_job_number()));
+void ValidationReporter::initialize(int job_number, const std::string &path) {
+    monthly_data_file.open(fmt::format("{}/validation_monthly_data_{}.txt", path, job_number));
+    summary_data_file.open(fmt::format("{}/validation_summary_{}.txt", path, job_number));
+    gene_freq_file.open(fmt::format("{}/validation_gene_freq_{}.txt", path, job_number));
+    gene_db_file.open(fmt::format("{}/validation_gene_db_{}.txt", path, job_number));
+    prmc_freq_file.open(fmt::format("{}/validation_prmc_freq_{}.txt", path, job_number));
+    prmc_db_file.open(fmt::format("{}/validation_prmc_db_{}.txt", path, job_number));
+    monthly_mutation_file.open(fmt::format("{}/validation_monthly_mutation_{}.txt", path, job_number));
+    mosquito_res_count_file.open(fmt::format("{}/validation_mosquito_res_count_{}.txt", path, job_number));
 }
 
 void ValidationReporter::before_run() {}

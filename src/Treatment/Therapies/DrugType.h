@@ -32,10 +32,10 @@ public:
   double maximum_parasite_killing_rate() const { return maximum_parasite_killing_rate_; }
   void set_maximum_parasite_killing_rate(double maximum_parasite_killing_rate) { maximum_parasite_killing_rate_ = maximum_parasite_killing_rate; }
 
-  DoubleVector age_group_specific_drug_concentration_sd() const { return age_group_specific_drug_concentration_sd_; }
+  DoubleVector& age_group_specific_drug_concentration_sd()  { return age_group_specific_drug_concentration_sd_; }
   void set_age_group_specific_drug_concentration_sd(DoubleVector age_group_specific_drug_concentration_sd) { age_group_specific_drug_concentration_sd_ = age_group_specific_drug_concentration_sd; }
 
-  DoubleVector age_specific_drug_absorption() const { return age_specific_drug_absorption_; }
+  DoubleVector& age_specific_drug_absorption() { return age_specific_drug_absorption_; }
   void set_age_specific_drug_absorption(DoubleVector age_specific_drug_absorption) { age_specific_drug_absorption_ = age_specific_drug_absorption; }
 
   double k() const { return k_; }

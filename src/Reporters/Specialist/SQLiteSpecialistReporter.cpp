@@ -50,13 +50,11 @@ void SQLiteSpecialistReporter::populate_db_schema() {
 
 // Initialize the reporter
 // Sets up the database and prepares it for data entry
-void SQLiteSpecialistReporter::initialize() {
+void SQLiteSpecialistReporter::initialize(int job_number, const std::string &path) {
   spdlog::info("Base SQLiteSpecialistReporter initialized.\n");
 
   // Define the database file path
-  auto dbPath = fmt::format("{}specialist_data_{}.db",
-    utils::Cli::get_instance().get_output_path(),
-    utils::Cli::get_instance().get_job_number());
+  auto dbPath = fmt::format("{}specialist_data_{}.db",path,job_number);
 
   // Check if the file exists
   if (std::filesystem::exists(dbPath)) {

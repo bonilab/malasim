@@ -14,7 +14,7 @@ model_settings:
   days_between_stdout_output: 30
 
   # Initial seed number for random number generator; set to -1 to use a random seed
-  initial_seed_number: -1
+  initial_seed_number: 218103809 #-1
 
   # Record the genomic data (set to true for a real run)
   record_genome_db: true
@@ -104,6 +104,9 @@ spatial_settings:
     # Raster file containing the seasonal values,
     # use this only when using raster in seasonal equation
     ecoclimatic_raster: "../../sample_inputs/dev_ecozone.asc"
+
+    #Travel (for Burkina Faso)
+    travel_raster: "../../sample_inputs/dev_travel.asc"
 
     # Cell size used by raster, in square kilometers
     cell_size: 5
@@ -525,7 +528,7 @@ genotype_parameters:
   initial_parasite_info:
     - location_id: -1 # -1 indicates all locations
       parasite_info:
-        - aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+        - aa_sequence: "||||NY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
           prevalence: 0.05
         - aa_sequence: "||||NY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
           prevalence: 0.05
@@ -658,6 +661,7 @@ therapy_parameters:
       name: "AL"
       drug_ids: [0, 1]
       dosing_days: [3]
+      #pr_completed_days: [0.0, 0.375, 0.375] #From TMS RWA
     #AS-AQ
     7:
       name: "AS-AQ"
@@ -909,135 +913,135 @@ mosquito_parameters:
 # 16. Population Events (all events are optional)
 # ---------------------------------------------------------------
 population_events:
-  - name: change_within_host_induced_recombination
-    info:
-      date: 2000/1/1
-      value: false
-
-  - name: change_within_host_induced_recombination
-    info:
-      date: 2010/1/1
-      value: true
-
-  - name: turn_off_mutation
-    info:
-      - date: 2000/1/1
-  - name: turn_on_mutation
-    info:
-      - date: 2010/1/1
-
-  - name: change_treatment_coverage
-    info:
-      - type: SteadyTCM
-        date: 1990/2/1
-        p_treatment_under_5_by_location: [ 0.600000 ]
-        p_treatment_over_5_by_location: [ 0.550000 ]
-      - type: InflatedTCM
-        date: 1990/3/1
-        annual_inflation_rate: 0.01
-      - type: LinearTCM
-        from_date: 1990/6/1
-        to_date: 1990/12/1
-        p_treatment_under_5_by_location_to: [ 0.900000 ]
-        p_treatment_over_5_by_location_to: [ 0.90000 ]
-
-  - name: change_treatment_strategy
-    info:
-      - date: 1990/3/2
-        strategy_id: 2
-      - date: 1990/6/2
-        strategy_id: 3
-      - date: 1990/9/2
-        strategy_id: 4
-
-  - name: single_round_MDA
-    info:
-      - date: 2020/1/1
-        fraction_population_targeted: [ 1.0 ]
-        days_to_complete_all_treatments: 14
-      - date: 2020/2/8
-        fraction_population_targeted: [ 0.03333333 ]
-        days_to_complete_all_treatments: 14
-      - date: 2020/3/14
-        fraction_population_targeted: [ 0.7 ]
-        days_to_complete_all_treatments: 14
-
-  - name: modify_nested_mft_strategy
-    info:
-      - date: 2015/5/1
-        strategy_id: 5
-
-  - name: introduce_plas2_parasites
-    info:
-      - location: 0
-        date: 1990/3/20
-        fraction: 0.01
-
-  - name: introduce_parasites
-    info:
-      - location: 0
-        parasite_info:
-          - date: 1990/3/20
-            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
-            number_of_cases: 5
-          - date: 1990/4/15
-            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
-            number_of_cases: 5
-      - location: 1
-        parasite_info:
-          - date: 1990/8/25
-            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
-            number_of_cases: 5
-          - date: 1990/10/20
-            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
-            number_of_cases: 5
-
-  - name: introduce_parasites_periodically
-    info:
-      - location: 0
-        parasite_info:
-          - duration: 10
-            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
-            number_of_cases: 1
-            start_date: 1990/6/2
-
-  - name: introduce_580Y_parasites
-    info:
-      - location: 2
-        date: 2005/7/15
-        fraction: 0.02
-
-  - name: introduce_aq_mutant_parasites
-    info:
-      - location: 3
-        date: 2007/4/30
-        fraction: 0.05
-
-  - name: introduce_lumefantrine_mutant_parasites
-    info:
-      - location: 4
-        date: 2012/10/12
-        fraction: 0.03
-
-  - name: introduce_triple_mutant_to_dpm_parasites
-    info:
-      - location: 1
-        date: 2013/12/20
-        fraction: 0.04
-
-  - name: change_interrupted_feeding_rate
-    info:
-      - location: 5
-        date: 2001/6/1
-        interrupted_feeding_rate: 0.5
-      - location: 6
-        date: 2002/8/15
-        interrupted_feeding_rate: 0.7
-
-  - name: change_mutation_probability_per_locus
-    info:
-      - date: 2008/9/10
-        mutation_probability_per_locus: 0.001
+#  - name: change_within_host_induced_recombination
+#    info:
+#      date: 2000/1/1
+#      value: false
+#
+#  - name: change_within_host_induced_recombination
+#    info:
+#      date: 2010/1/1
+#      value: true
+#
+#  - name: turn_off_mutation
+#    info:
+#      - date: 2000/1/1
+#  - name: turn_on_mutation
+#    info:
+#      - date: 2010/1/1
+#
+#  - name: change_treatment_coverage
+#    info:
+#      - type: SteadyTCM
+#        date: 1990/2/1
+#        p_treatment_under_5_by_location: [ 0.600000 ]
+#        p_treatment_over_5_by_location: [ 0.550000 ]
+#      - type: InflatedTCM
+#        date: 1990/3/1
+#        annual_inflation_rate: 0.01
+#      - type: LinearTCM
+#        from_date: 1990/6/1
+#        to_date: 1990/12/1
+#        p_treatment_under_5_by_location_to: [ 0.900000 ]
+#        p_treatment_over_5_by_location_to: [ 0.90000 ]
+#
+#  - name: change_treatment_strategy
+#    info:
+#      - date: 1990/3/2
+#        strategy_id: 2
+#      - date: 1990/6/2
+#        strategy_id: 3
+#      - date: 1990/9/2
+#        strategy_id: 4
+#
+#  - name: single_round_MDA
+#    info:
+#      - date: 2020/1/1
+#        fraction_population_targeted: [ 1.0 ]
+#        days_to_complete_all_treatments: 14
+#      - date: 2020/2/8
+#        fraction_population_targeted: [ 0.03333333 ]
+#        days_to_complete_all_treatments: 14
+#      - date: 2020/3/14
+#        fraction_population_targeted: [ 0.7 ]
+#        days_to_complete_all_treatments: 14
+#
+#  - name: modify_nested_mft_strategy
+#    info:
+#      - date: 2015/5/1
+#        strategy_id: 5
+#
+#  - name: introduce_plas2_parasites
+#    info:
+#      - location: 0
+#        date: 1990/3/20
+#        fraction: 0.01
+#
+#  - name: introduce_parasites
+#    info:
+#      - location: 0
+#        parasite_info:
+#          - date: 1990/3/20
+#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+#            number_of_cases: 5
+#          - date: 1990/4/15
+#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+#            number_of_cases: 5
+#      - location: 1
+#        parasite_info:
+#          - date: 1990/8/25
+#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+#            number_of_cases: 5
+#          - date: 1990/10/20
+#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+#            number_of_cases: 5
+#
+#  - name: introduce_parasites_periodically
+#    info:
+#      - location: 0
+#        parasite_info:
+#          - duration: 10
+#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+#            number_of_cases: 1
+#            start_date: 1990/6/2
+#
+#  - name: introduce_580Y_parasites
+#    info:
+#      - location: 2
+#        date: 2005/7/15
+#        fraction: 0.02
+#
+#  - name: introduce_aq_mutant_parasites
+#    info:
+#      - location: 3
+#        date: 2007/4/30
+#        fraction: 0.05
+#
+#  - name: introduce_lumefantrine_mutant_parasites
+#    info:
+#      - location: 4
+#        date: 2012/10/12
+#        fraction: 0.03
+#
+#  - name: introduce_triple_mutant_to_dpm_parasites
+#    info:
+#      - location: 1
+#        date: 2013/12/20
+#        fraction: 0.04
+#
+#  - name: change_interrupted_feeding_rate
+#    info:
+#      - location: 5
+#        date: 2001/6/1
+#        interrupted_feeding_rate: 0.5
+#      - location: 6
+#        date: 2002/8/15
+#        interrupted_feeding_rate: 0.7
+#
+#  - name: change_mutation_probability_per_locus
+#    info:
+#      - date: 2008/9/10
+#        mutation_probability_per_locus: 0.001
 
   # TODO: change this event to match new genotype format
 #  - name: introduce_parasites_periodically_v2

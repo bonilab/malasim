@@ -441,7 +441,7 @@ void SpatialData::populate_dependent_data() {
       }
     }
   }
-  spdlog::info("Districts loaded with {} pixels", district_count);
+  spdlog::info("Districts loaded with {} cells", district_count);
 
   // Sort the districts and only keep the unique ones, we should have a list
   // from [0, 1] to n with a step of one

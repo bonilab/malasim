@@ -38,9 +38,6 @@ public:
   // Run the simulation
   void run() const;
 
-  // Finalize and clean up resources
-  void finalize();
-
   // Access configuration in a controlled manner
   [[nodiscard]] Config* get_config() {
     if (config_ == nullptr) {
@@ -89,11 +86,14 @@ private:
   ImmunityClearanceUpdateFunction* clinical_update_function_;
   std::vector<Reporter *> reporters_;
 public:
+  void before_run();
+  void after_run();
   void begin_time_step();
   void end_time_step();
   void daily_update();
   void monthly_update();
   void yearly_update();
+  void release();
   Model* get_model();
   utils::Random* get_random();
   ModelDataCollector* get_mdc();
