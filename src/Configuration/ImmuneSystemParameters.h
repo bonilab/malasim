@@ -1,7 +1,7 @@
 #ifndef IMMUNESYSTEMPARAMETERS_H
 #define IMMUNESYSTEMPARAMETERS_H
 #include "IConfigClass.h"
-#include "Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.hxx"
 #include <spdlog/spdlog.h>
 
 class ImmuneSystemParameters : IConfigClass {

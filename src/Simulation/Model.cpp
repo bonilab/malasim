@@ -6,7 +6,7 @@
 #include <Utils/Random.h>
 
 #include "Configuration/Config.h"  // Assuming Config is defined here
-#include "Helpers/ObjectHelpers.h"
+#include "Utils/Helpers/ObjectHelpers.h"
 #include "MDC/ModelDataCollector.h"
 #include "Mosquito/Mosquito.h"
 #include "Population/ClinicalUpdateFunction.h"
@@ -155,12 +155,14 @@ bool Model::initialize() {
   return is_initialized_;
 }
 
-void Model::run() const {
+void Model::run() {
   if (!is_initialized_) {
     throw std::runtime_error(
         "Model is not initialized. Call Initialize() first.");
   }
+  before_run();
   scheduler_->run();
+  after_run();
 }
 
 void Model::before_run() {

@@ -2,7 +2,7 @@
 #include <Configuration/Config.h>
 
 #include "Events/Event.h"
-#include "Helpers/ObjectHelpers.h"
+#include "Utils/Helpers/ObjectHelpers.h"
 
 Scheduler::Scheduler(Model* model)
     : current_time_(-1), total_available_time_(-1), model_(model), is_force_stop_(false) {}

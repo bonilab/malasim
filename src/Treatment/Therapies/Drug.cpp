@@ -5,7 +5,7 @@
 #include "Configuration/Config.h"
 #include "Utils/Random.h"
 #include "Core/Scheduler/Scheduler.h"
-#include "Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.hxx"
 #include "Parasites/Genotype.h"
 #include "Simulation/Model.h"
 #include "Population/Person/Person.h"
@@ -97,5 +97,5 @@ void Drug::set_number_of_dosing_days(int dosingDays) {
 
 double Drug::get_parasite_killing_rate(const int &genotype_id) const {
   return drug_type_->get_parasite_killing_rate_by_concentration(
-      last_update_value_, Model::get_instance().get_config()->get_genotype_parameters().genotype_db[genotype_id]->get_EC50_power_n(drug_type_));
+      last_update_value_, Model::get_instance().get_config()->get_genotype_parameters().genotype_db.get_genotype_by_id(genotype_id)->get_EC50_power_n(drug_type_));
 }

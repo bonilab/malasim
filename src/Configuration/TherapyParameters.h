@@ -10,7 +10,7 @@
 #include "Treatment/Therapies/MACTherapy.h"
 #include "Treatment/Therapies/SCTherapy.h"
 #include "Treatment/Therapies/TherapyBuilder.h"
-#include "Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.hxx"
 
 class TherapyParameters: IConfigClass {
 public:

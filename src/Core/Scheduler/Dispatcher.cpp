@@ -9,7 +9,7 @@
 
 #include <Population/Person/Person.h>
 #include "Events/Event.h"
-#include "Helpers/ObjectHelpers.h"
+#include "Utils/Helpers/ObjectHelpers.h"
 
 Dispatcher::Dispatcher() : events_(nullptr) {}
 

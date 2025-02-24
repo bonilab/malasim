@@ -371,7 +371,6 @@ void ValidationReporter::after_run() {
         }
         spdlog::debug("###############");
     }
-
     gene_db_file.close();
     gene_freq_file.close();
     prmc_db_file.close();

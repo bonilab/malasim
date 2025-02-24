@@ -4,7 +4,7 @@
 #include "Treatment/Therapies/Therapy.h"
 #include "MDC/ModelDataCollector.h"
 #include "Configuration/Config.h"
-#include "Helpers/TimeHelpers.h"
+#include "Utils/Helpers/TimeHelpers.h"
 #include "Core/Scheduler/Scheduler.h"
 #include "SFTStrategy.h"
 #include "MFTStrategy.h"

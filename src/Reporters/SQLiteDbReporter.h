@@ -1,7 +1,7 @@
 #ifndef SQLITEDBREPORTER_H
 #define SQLITEDBREPORTER_H
 
-#include "Helpers/SQLiteDatabase.h"
+#include "Utils/Helpers/SQLiteDatabase.h"
 #include "Reporter.h"
 
 class PersonIndexByLocationStateAgeClass;

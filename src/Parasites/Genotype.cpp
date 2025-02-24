@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "Configuration/Config.h"
 #include "Core/Scheduler/Scheduler.h"
-#include "Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.hxx"
 #include "Simulation/Model.h"
 #include "Treatment/Therapies/DrugDatabase.h"
 // #include "Therapies/SCTherapy.h"

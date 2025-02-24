@@ -4,7 +4,7 @@
 
 #include "Configuration/Config.h"
 #include "Core/Scheduler/Scheduler.h"
-#include "Helpers/StringHelpers.h"
+#include "Utils/Helpers/StringHelpers.h"
 #include "MDC/ModelDataCollector.h"
 #include "Parasites/Genotype.h"
 #include "Simulation/Model.h"

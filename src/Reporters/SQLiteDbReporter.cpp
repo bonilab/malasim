@@ -4,7 +4,7 @@
 
 #include "Configuration/Config.h"
 #include "Core/Scheduler/Scheduler.h"
-#include "Helpers/StringHelpers.h"
+#include "Utils/Helpers/StringHelpers.h"
 #include "MDC/ModelDataCollector.h"
 #include "Parasites/Genotype.h"
 #include "Simulation/Model.h"
@@ -23,11 +23,10 @@ void SQLiteDbReporter::populate_genotype_table() {
     auto* config = Model::get_instance().get_config();
 
     for (auto id = 0; id < config->get_genotype_parameters().genotype_db.size(); id++) {
-      Genotype* genotype = config->get_genotype_parameters().genotype_db[id];
+      Genotype* genotype = config->get_genotype_parameters().genotype_db.get_genotype_by_id(id);
       // Bind values to the prepared statement
       sqlite3_bind_int(stmt, 1, id);
-      sqlite3_bind_text(stmt, 2, genotype->get_aa_sequence().c_str(), -1,
-                        SQLITE_STATIC);
+      sqlite3_bind_text(stmt, 2, genotype->get_aa_sequence().c_str(), strlen(genotype->get_aa_sequence().c_str()), SQLITE_TRANSIENT);
 
       if (sqlite3_step(stmt) != SQLITE_DONE) {
         throw std::runtime_error("Error executing INSERT statement");

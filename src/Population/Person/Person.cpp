@@ -1,6 +1,6 @@
 #include "Person.h"
 
-#include <Helpers/TimeHelpers.h>
+#include <Utils/Helpers/TimeHelpers.h>
 #include <spdlog/spdlog.h>
 #include <uuid.h>
 #include <Configuration/Config.h>
@@ -20,7 +20,7 @@
 #include "Events/UpdateEveryKDaysEvent.h"
 #include "Events/UpdateWhenDrugIsPresentEvent.h"
 #include "Events/ReturnToResidenceEvent.h"
-#include "Helpers/ObjectHelpers.h"
+#include "Utils/Helpers/ObjectHelpers.h"
 #include "MDC/ModelDataCollector.h"
 #include "Population/ClinicalUpdateFunction.h"
 #include "Population/DrugsInBlood.h"

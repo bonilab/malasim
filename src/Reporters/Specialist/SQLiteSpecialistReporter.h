@@ -2,7 +2,7 @@
 #define SQLITESPECIALISTREPORTER_H
 
 
-#include "Helpers/SQLiteDatabase.h"
+#include "Utils/Helpers/SQLiteDatabase.h"
 #include "Reporters/Reporter.h"
 
 class SQLiteSpecialistReporter : public Reporter {
