@@ -62,6 +62,35 @@ public:
     }
     return result;
   }
+
+  static std::string santinize_pipe(const std::string &str) {
+    std::string sanitized = str;
+    size_t pos = 0;
+    while ((pos = sanitized.find('|', pos)) != std::string::npos) {
+      sanitized.replace(pos, 1, "\\|");
+      pos += 2;  // Move past the newly inserted escape character
+    }
+    return sanitized;
+  }
+
+  static std::string escaped_string(const std::string &str) {
+    std::string escapedValue;
+    for (char c : str) {
+      if (c == '\'') escapedValue += "''"; // Escape single quote
+      else escapedValue += c;
+    }
+    return escapedValue;
+  }
+
+  static std::string utf8_string(const std::string &str) {
+    std::string utf8Value;
+    for (char c : str) {
+      if (c == '\\') utf8Value += "\\\\";
+      else if (c == '\"') utf8Value += "\\\"";
+      else utf8Value += c;
+    }
+    return utf8Value;
+  }
 };
 
 #endif  // POMS_STRINGSPLITHELPER_H

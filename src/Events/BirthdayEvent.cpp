@@ -2,7 +2,7 @@
 #include <Core/Scheduler/Scheduler.h>
 #include <spdlog/spdlog.h>
 #include "Population/Person/Person.h"
-#include "Helpers/TimeHelpers.h"
+#include "Utils/Helpers/TimeHelpers.h"
 
 // OBJECTPOOL_IMPL(BirthdayEvent)
 

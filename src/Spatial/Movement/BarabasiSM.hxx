@@ -11,7 +11,7 @@
 
 #include <cmath>
 
-#include "Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.hxx"
 #include "Spatial/SpatialModel.hxx"
 
 namespace Spatial {

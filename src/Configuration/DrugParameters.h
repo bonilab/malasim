@@ -8,7 +8,7 @@
 #include <map>
 
 #include "IConfigClass.h"
-#include "Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.hxx"
 #include "Treatment/Therapies/DrugDatabase.h"
 
 class DrugParameters: IConfigClass {

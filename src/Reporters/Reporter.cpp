@@ -8,10 +8,6 @@
 #include "SQLitePixelReporter.h"
 #include "TACTReporter.h"
 #include "ValidationReporter.h"
-// #include "MMCReporter.h"
-// #include "TACTReporter.h"
-// #include "NovelDrugReporter.h"
-// #include "ValidationReporter.h"
 
 std::map<std::string, Reporter::ReportType> Reporter::ReportTypeMap{
     {"Console",         CONSOLE},

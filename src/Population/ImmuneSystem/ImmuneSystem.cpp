@@ -4,7 +4,7 @@
 #include "Simulation/Model.h"
 #include "Configuration//Config.h"
 #include <cmath>
-#include "Helpers/ObjectHelpers.h"
+#include "Utils/Helpers/ObjectHelpers.h"
 
 ImmuneSystem::ImmuneSystem(Person *p) : person_(p), increase_(false), immune_component_(nullptr) {
   //    immune_components_ = new ImmuneComponentPtrVector();

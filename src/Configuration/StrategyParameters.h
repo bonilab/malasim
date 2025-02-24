@@ -9,7 +9,7 @@
 #include <spdlog/spdlog.h>
 
 #include "IConfigClass.h"
-#include "Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.hxx"
 #include "Treatment/Strategies/IStrategy.h"
 #include "Treatment/Strategies/StrategyBuilder.h"
 

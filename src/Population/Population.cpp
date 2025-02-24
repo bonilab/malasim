@@ -11,7 +11,7 @@
 #include "Events/BirthdayEvent.h"
 #include "Events/SwitchImmuneComponentEvent.h"
 #include "Person/Person.h"
-#include "Helpers/ObjectHelpers.h"
+#include "Utils/Helpers/ObjectHelpers.h"
 #include "ImmuneSystem/ImmuneSystem.h"
 #include "ImmuneSystem/InfantImmuneComponent.h"
 #include "ImmuneSystem/NonInfantImmuneComponent.h"
@@ -281,8 +281,8 @@ void Population::initialize() {
     // Initialize population
     auto &location_db = model_->get_config()->get_spatial_settings().location_db;
     for (auto loc = 0; loc < number_of_locations; loc++) {
-     spdlog::info("Cell {}, population {}", loc,
-                             location_db[loc].population_size);
+     // spdlog::info("Cell {}, population {}", loc,
+     //                         location_db[loc].population_size);
 
       const auto popsize_by_location = static_cast<int>(
           location_db[loc].population_size

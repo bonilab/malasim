@@ -3,7 +3,7 @@
 #include "Events/Event.h"
 #include "Treatment/Therapies/DrugType.h"
 #include "Population/Person/Person.h"
-#include "Helpers/ObjectHelpers.h"
+#include "Utils/Helpers/ObjectHelpers.h"
 #include "Utils/TypeDef.hxx"
 
 #ifndef DRUG_CUT_OFF_VALUE

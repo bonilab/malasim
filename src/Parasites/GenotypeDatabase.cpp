@@ -1,7 +1,7 @@
 #include "GenotypeDatabase.h"
 #include "Configuration/Config.h"
 #include "Genotype.h"
-#include "Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.hxx"
 #include "Simulation/Model.h"
 #include "Utils/TypeDef.hxx"
 
@@ -19,6 +19,7 @@ void GenotypeDatabase::add(Genotype *genotype) {
     delete (*this)[genotype->genotype_id];
   }
   (*this)[genotype->genotype_id] = genotype;
+  // spdlog::info("GenotypeDatabase Added genotype id: {} aa_sequence: {}", genotype->genotype_id, genotype->get_aa_sequence());
 }
 
 Genotype *GenotypeDatabase::get_genotype_from_alleles_structure(const IntVector &alleles) {
@@ -91,4 +92,12 @@ double GenotypeDatabase::get_min_ec50(int drug_id){
 
   return it->second;
 }
+
+Genotype* GenotypeDatabase::get_genotype_by_id(const int& id) {
+  return (*this)[id];
+}
+
+// GenotypeDatabase* GenotypeDatabase::all() {
+//   return this;
+// }
 

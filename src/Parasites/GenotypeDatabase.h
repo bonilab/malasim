@@ -27,11 +27,17 @@ public:
 
   virtual ~GenotypeDatabase();
 
+  GenotypeDatabase* operator()() {
+    return this;
+  }
+
   void add(Genotype* genotype);
 
   Genotype* get_genotype(const std::string& aa_sequence);
 
   unsigned int get_id(const std::string& aa_sequence);
+
+  Genotype* get_genotype_by_id(const int& id);
 
   Genotype* get_genotype_from_alleles_structure(const IntVector& alleles);
 

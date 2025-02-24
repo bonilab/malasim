@@ -1,7 +1,7 @@
 #ifndef SEASONALITYSETTINGS_H
 #define SEASONALITYSETTINGS_H
 
-#include <Helpers/TimeHelpers.h>
+#include <Utils/Helpers/TimeHelpers.h>
 
 #include <string>
 #include <vector>

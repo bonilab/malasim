@@ -8,7 +8,7 @@
 #ifndef MARSHALLSM_HXX
 #define MARSHALLSM_HXX
 
-#include "Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.hxx"
 #include "Simulation/Model.h"
 #include "Spatial/SpatialModel.hxx"
 #include "Utils/TypeDef.hxx"

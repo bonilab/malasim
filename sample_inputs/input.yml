@@ -30,7 +30,7 @@ simulation_timeframe:
   start_of_comparison_period: 2000/1/1
 
   # Simulation ending date
-  ending_date: 2030/1/1
+  ending_date: 2010/1/1
 
   # Day to start collecting data
   start_collect_data_day: 0
@@ -528,7 +528,7 @@ genotype_parameters:
   initial_parasite_info:
     - location_id: -1 # -1 indicates all locations
       parasite_info:
-        - aa_sequence: "||||NY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+        - aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
           prevalence: 0.05
         - aa_sequence: "||||NY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
           prevalence: 0.05

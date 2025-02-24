@@ -35,9 +35,6 @@ public:
   // Initialize the model
   bool initialize();
 
-  // Run the simulation
-  void run() const;
-
   // Access configuration in a controlled manner
   [[nodiscard]] Config* get_config() {
     if (config_ == nullptr) {
@@ -87,6 +84,7 @@ private:
   std::vector<Reporter *> reporters_;
 public:
   void before_run();
+  void run();
   void after_run();
   void begin_time_step();
   void end_time_step();
