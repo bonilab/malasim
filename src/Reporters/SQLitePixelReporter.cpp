@@ -17,10 +17,10 @@
 #include "Utils/Cli.hxx"
 #include "Utils/Index/PersonIndexByLocationStateAgeClass.h"
 
-void SQLitePixelReporter::initialize() {
+void SQLitePixelReporter::initialize(int job_number, const std::string &path) {
   // Inform the user of the reporter type is pixel / cell level
   spdlog::info("Using SQLiteDbReporterwith aggregation at the pixel / cell level.");
-  SQLiteDbReporter::initialize();
+  SQLiteDbReporter::initialize(job_number, path);
 }
 
 // Iterate over all the sites and prepare the query for the site specific data

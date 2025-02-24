@@ -825,8 +825,6 @@ public:
 
   void perform_population_statistic();
 
-  void perform_yearly_update();
-
   void monthly_update();
 
   virtual void collect_number_of_bites(const int& location, const int& number_of_bites);
@@ -849,18 +847,13 @@ public:
 
   void record_1_TF(const int& location, const bool& by_drug);
 
-  void record_1_treatment_by_age(const int& location, const int& age, const int& therapy_id);
-  void record_1_treatment_by_age_class(const int& location, const int& age_class, const int& therapy_id);
+  void record_1_treatment(const int& location, const int& age, const int& age_class, const int& therapy_id);
 
-  void record_1_non_treated_case(const int &location, const int &age_class);
-  void record_1_non_treated_case_by_age(const int& location, const int& age);
-  void record_1_non_treated_case_by_age_class(const int& location, const int& age_class);
+  void record_1_non_treated_case(const int& location,  const int& age, const int& age_class);
 
   void record_1_mutation(const int& location, Genotype* from, Genotype* to);
 
   void record_1_mutation_by_drug(const int& location, Genotype* from, Genotype* to, int drug_id);
-
-  void record_1_migration(Person* pPerson, const int& from, const int& to);
 
   void begin_time_step();
 
@@ -869,12 +862,8 @@ public:
   void update_UTL_vector();
 
   //    void collect_1_non_resistant_treatment(const int& therapy_id);
-  void record_1_treatment(const int& location, const int& age, const int& therapy_id);
   void record_1_treatment_failure_by_therapy(const int& location, const int& age, const int& therapy_id);
-  void record_1_treatment_failure_by_therapy(const int& therapy_id);
-
   void record_1_treatment_success_by_therapy(const int& location, const int& age, const int& therapy_id);
-  void record_1_treatment_success_by_therapy(const int& therapy_id);
 
   void update_after_run();
 
@@ -902,103 +891,103 @@ public:
 private:
   IntVector monthly_treatment_failure_by_location_;
 public:
-  [[nodiscard]] IntVector monthly_treatment_failure_by_location() const { return monthly_treatment_failure_by_location_; }
-  void monthly_treatment_failure_by_location(const IntVector& value) { monthly_treatment_failure_by_location_ = value; }
+  [[nodiscard]] IntVector& monthly_treatment_failure_by_location() { return monthly_treatment_failure_by_location_; }
+  void set_monthly_treatment_failure_by_location(const IntVector& value) { monthly_treatment_failure_by_location_ = value; }
 
 private:
   IntVector monthly_nontreatment_by_location_;
 public:
-  [[nodiscard]] IntVector monthly_nontreatment_by_location() const { return monthly_nontreatment_by_location_; }
-  void monthly_nontreatment_by_location(const IntVector& value) { monthly_nontreatment_by_location_ = value; }
+  [[nodiscard]] IntVector& monthly_nontreatment_by_location() { return monthly_nontreatment_by_location_; }
+  void set_monthly_nontreatment_by_location(const IntVector& value) { monthly_nontreatment_by_location_ = value; }
 
 private:
   IntVector2 monthly_number_of_treatment_by_location_age_class_;
 public:
-  [[nodiscard]] IntVector2 monthly_number_of_treatment_by_location_age_class() const { return monthly_number_of_treatment_by_location_age_class_; }
-    void monthly_number_of_treatment_by_location_age_class(const IntVector2& value) { monthly_number_of_treatment_by_location_age_class_ = value; }
+  [[nodiscard]] IntVector2& monthly_number_of_treatment_by_location_age_class() { return monthly_number_of_treatment_by_location_age_class_; }
+    void set_monthly_number_of_treatment_by_location_age_class(const IntVector2& value) { monthly_number_of_treatment_by_location_age_class_ = value; }
 
 private:
   IntVector2 monthly_number_of_clinical_episode_by_location_age_class_;
 public:
-  [[nodiscard]] IntVector2 monthly_number_of_clinical_episode_by_location_age_class() const { return monthly_number_of_clinical_episode_by_location_age_class_; }
-    void monthly_number_of_clinical_episode_by_location_age_class(const IntVector2& value) { monthly_number_of_clinical_episode_by_location_age_class_ = value; }
+  [[nodiscard]] IntVector2& monthly_number_of_clinical_episode_by_location_age_class() { return monthly_number_of_clinical_episode_by_location_age_class_; }
+    void set_monthly_number_of_clinical_episode_by_location_age_class(const IntVector2& value) { monthly_number_of_clinical_episode_by_location_age_class_ = value; }
 private:
   IntVector births_by_location_;
 public:
-  [[nodiscard]] IntVector births_by_location() const { return births_by_location_; }
-    void births_by_location(const IntVector& value) { births_by_location_ = value; }
+  [[nodiscard]] IntVector& births_by_location() { return births_by_location_; }
+    void set_births_by_location(const IntVector& value) { births_by_location_ = value; }
 
 private:
   IntVector deaths_by_location_;
 public:
-  [[nodiscard]] IntVector deaths_by_location() const { return deaths_by_location_; }
-    void deaths_by_location(const IntVector& value) { deaths_by_location_ = value; }
+  [[nodiscard]] IntVector& deaths_by_location() { return deaths_by_location_; }
+    void set_deaths_by_location(const IntVector& value) { deaths_by_location_ = value; }
 
 private:
   IntVector malaria_deaths_by_location_;
 public:
-  [[nodiscard]] IntVector malaria_deaths_by_location() const { return malaria_deaths_by_location_; }
-    void malaria_deaths_by_location(const IntVector& value) { malaria_deaths_by_location_ = value; }
+  [[nodiscard]] IntVector& malaria_deaths_by_location() { return malaria_deaths_by_location_; }
+    void set_malaria_deaths_by_location(const IntVector& value) { malaria_deaths_by_location_ = value; }
 
 private:
   IntVector monthly_treatment_success_by_location_;
 public:
-  [[nodiscard]] IntVector monthly_treatment_success_by_location() const { return monthly_treatment_success_by_location_; }
-    void monthly_treatment_success_by_location(const IntVector& value) { monthly_treatment_success_by_location_ = value; }
+  [[nodiscard]] IntVector& monthly_treatment_success_by_location() { return monthly_treatment_success_by_location_; }
+    void set_monthly_treatment_success_by_location(const IntVector& value) { monthly_treatment_success_by_location_ = value; }
 
 private:
   IntVector2 monthly_nontreatment_by_location_age_class_;
 public:
-  [[nodiscard]] IntVector2 monthly_nontreatment_by_location_age_class() const { return monthly_nontreatment_by_location_age_class_; }
-    void monthly_nontreatment_by_location_age_class(const IntVector2& value) { monthly_nontreatment_by_location_age_class_ = value; }
+  [[nodiscard]] IntVector2& monthly_nontreatment_by_location_age_class() { return monthly_nontreatment_by_location_age_class_; }
+    void set_monthly_nontreatment_by_location_age_class(const IntVector2& value) { monthly_nontreatment_by_location_age_class_ = value; }
 
 private:
   IntVector2 malaria_deaths_by_location_age_class_;
 public:
-  [[nodiscard]] IntVector2 malaria_deaths_by_location_age_class() const { return malaria_deaths_by_location_age_class_; }
-    void malaria_deaths_by_location_age_class(const IntVector2& value) { malaria_deaths_by_location_age_class_ = value; }
+  [[nodiscard]] IntVector2& malaria_deaths_by_location_age_class() { return malaria_deaths_by_location_age_class_; }
+    void set_malaria_deaths_by_location_age_class(const IntVector2& value) { malaria_deaths_by_location_age_class_ = value; }
 
 private:
   IntVector2 monthly_number_of_treatment_by_location_therapy_;
 public:
-  [[nodiscard]] IntVector2 monthly_number_of_treatment_by_location_therapy() const { return monthly_number_of_treatment_by_location_therapy_; }
-    void monthly_number_of_treatment_by_location_therapy(const IntVector2& value) { monthly_number_of_treatment_by_location_therapy_ = value; }
+  [[nodiscard]] IntVector2& monthly_number_of_treatment_by_location_therapy() { return monthly_number_of_treatment_by_location_therapy_; }
+    void set_monthly_number_of_treatment_by_location_therapy(const IntVector2& value) { monthly_number_of_treatment_by_location_therapy_ = value; }
 
 private:
   IntVector2 monthly_treatment_complete_by_location_therapy_;
 public:
-  [[nodiscard]] IntVector2 monthly_treatment_complete_by_location_therapy() const { return monthly_treatment_complete_by_location_therapy_; }
-    void monthly_treatment_complete_by_location_therapy(const IntVector2& value) { monthly_treatment_complete_by_location_therapy_ = value; }
+  [[nodiscard]] IntVector2& monthly_treatment_complete_by_location_therapy() { return monthly_treatment_complete_by_location_therapy_; }
+    void set_monthly_treatment_complete_by_location_therapy(const IntVector2& value) { monthly_treatment_complete_by_location_therapy_ = value; }
 
 private:
   IntVector2 monthly_treatment_failure_by_location_age_class_;
 public:
-  [[nodiscard]] IntVector2 monthly_treatment_failure_by_location_age_class() const { return monthly_treatment_failure_by_location_age_class_; }
-    void monthly_treatment_failure_by_location_age_class(const IntVector2& value) { monthly_treatment_failure_by_location_age_class_ = value; }
+  [[nodiscard]] IntVector2& monthly_treatment_failure_by_location_age_class() { return monthly_treatment_failure_by_location_age_class_; }
+    void set_monthly_treatment_failure_by_location_age_class(const IntVector2& value) { monthly_treatment_failure_by_location_age_class_ = value; }
 
 private:
   IntVector2 monthly_treatment_failure_by_location_therapy_;
 public:
-  [[nodiscard]] IntVector2 monthly_treatment_failure_by_location_therapy() const { return monthly_treatment_failure_by_location_therapy_; }
-    void monthly_treatment_failure_by_location_therapy(const IntVector2& value) { monthly_treatment_failure_by_location_therapy_ = value; }
+  [[nodiscard]] IntVector2& monthly_treatment_failure_by_location_therapy() { return monthly_treatment_failure_by_location_therapy_; }
+    void set_monthly_treatment_failure_by_location_therapy(const IntVector2& value) { monthly_treatment_failure_by_location_therapy_ = value; }
 
 private:
   IntVector2 monthly_treatment_success_by_location_age_class_;
 public:
-  [[nodiscard]] IntVector2 monthly_treatment_success_by_location_age_class() const { return monthly_treatment_success_by_location_age_class_; }
-    void monthly_treatment_success_by_location_age_class(const IntVector2& value) { monthly_treatment_success_by_location_age_class_ = value; }
+  [[nodiscard]] IntVector2& monthly_treatment_success_by_location_age_class() { return monthly_treatment_success_by_location_age_class_; }
+    void set_monthly_treatment_success_by_location_age_class(const IntVector2& value) { monthly_treatment_success_by_location_age_class_ = value; }
 
 private:
   IntVector2 monthly_treatment_success_by_location_therapy_;
 public:
-  [[nodiscard]] IntVector2 monthly_treatment_success_by_location_therapy() const { return monthly_treatment_success_by_location_therapy_; }
-    void monthly_treatment_success_by_location_therapy(const IntVector2& value) { monthly_treatment_success_by_location_therapy_ = value; }
+  [[nodiscard]] IntVector2& monthly_treatment_success_by_location_therapy() { return monthly_treatment_success_by_location_therapy_; }
+    void set_monthly_treatment_success_by_location_therapy(const IntVector2& value) { monthly_treatment_success_by_location_therapy_ = value; }
 
 private:
   long current_number_of_mutation_events_;
 public:
   [[nodiscard]] long current_number_of_mutation_events() const { return current_number_of_mutation_events_; }
-  void current_number_of_mutation_events(const long& value) { current_number_of_mutation_events_ = value; }
+  void set_current_number_of_mutation_events(const long& value) { current_number_of_mutation_events_ = value; }
 
 private:
   bool recording = false;

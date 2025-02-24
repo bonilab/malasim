@@ -60,6 +60,9 @@ private:
     for (auto source = 0; source < number_of_locations_; source++) {
       kernel[source] = new double[number_of_locations_];
       for (auto destination = 0; destination < number_of_locations_; destination++) {
+        spdlog::info(
+            "Calculating kernel for source {} and destination {} spatial_distance {}",
+            source, destination, spatial_distance_matrix_[source][destination]);
         kernel[source][destination] =
             std::pow(1 + (spatial_distance_matrix_[source][destination] / rho_), (-alpha_));
       }

@@ -48,7 +48,7 @@ void Scheduler::initialize(const date::year_month_day& starting_date, const date
 void Scheduler::run() {
   current_time_ = 0;
   for (current_time_ = 0; !can_stop(); current_time_++) {
-    spdlog::info("Scheduler Day: {}", current_time_);
+    // spdlog::info("Scheduler Day: {}", current_time_);
     if (current_time_ % model_->get_config()->get_model_settings().get_days_between_stdout_output() == 0) {
       spdlog::info("Day: {}", current_time_);
     }
@@ -171,7 +171,7 @@ void Scheduler::cancel(Event* event) {
 
 void Scheduler::execute_events_list(EventPtrVector& events_list) {
   for (auto& event : events_list) {
-    // std::cout << event->name() << std::endl;
+    // std::cout << "execute_events_list " << event->name() << " id: " << event->get_id() << std::endl;
     event->perform_execute();
     ObjectHelpers::delete_pointer<Event>(event);
   }

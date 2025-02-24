@@ -126,13 +126,11 @@ void SQLiteDbReporter::populate_db_schema() {
 
 // Initialize the reporter
 // Sets up the database and prepares it for data entry
-void SQLiteDbReporter::initialize() {
-  spdlog::info("Base SQLiteDbReporter initialized.\n");
+void SQLiteDbReporter::initialize(int job_number, const std::string &path) {
+  spdlog::info("Base SQLiteDbReporter initialized.");
 
   // Define the database file path
-  auto dbPath = fmt::format("{}monthly_data_{}.db",
-    utils::Cli::get_instance().get_output_path(),
-    utils::Cli::get_instance().get_job_number());
+  auto dbPath = fmt::format("{}monthly_data_{}.db",path,job_number);
 
   // Check if the file exists
   if (std::filesystem::exists(dbPath)) {
@@ -143,7 +141,7 @@ void SQLiteDbReporter::initialize() {
     }
   } else {
     // The file doesn't exist, so no need to delete it
-    spdlog::info("Database file does not exist. No deletion needed.\n");
+    spdlog::info("Database file does not exist. No deletion needed.");
   }
 
   // Open or create the SQLite database file

@@ -11,7 +11,7 @@ public:
   PersonIndexByLocationStateAgeClass(const PersonIndexByLocationStateAgeClass &) = delete;
   void operator=(const PersonIndexByLocationStateAgeClass &) = delete;
 
-  PersonPtrVector4 vPerson() {
+  PersonPtrVector4 &vPerson() {
     return vPerson_;
   }
   void vPerson(const PersonPtrVector4 &v) {

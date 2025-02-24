@@ -10,7 +10,7 @@ public:
   void operator=(const PersonIndexAll &) = delete;
 
 public:
-  PersonPtrVector vPerson() {
+  PersonPtrVector &vPerson() {
    return vPerson_;
   }
   void set_vPerson(const PersonPtrVector &value) {

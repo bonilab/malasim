@@ -27,7 +27,7 @@ public:
 
   ~MonthlyReporter() override;
 
-  void initialize() override;
+  void initialize(int job_number, const std::string &path) override;
 
   void before_run() override;
 

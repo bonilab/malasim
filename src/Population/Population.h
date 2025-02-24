@@ -66,7 +66,7 @@ public:
 
   virtual void perform_infection_event();
 
-  // void introduce_initial_cases();
+  void introduce_initial_cases();
   //
   void introduce_parasite(const int &location, Genotype *parasite_type, const int &num_of_infections);
 
@@ -77,6 +77,8 @@ public:
   void perform_birth_event();
 
   void perform_death_event();
+
+  void generate_individual(int location, int age_class);
 
   void give_1_birth(const int &location);
 

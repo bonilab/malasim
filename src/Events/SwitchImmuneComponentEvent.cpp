@@ -26,7 +26,7 @@ void SwitchImmuneComponentEvent::schedule_for_switch_immune_component_event(Sche
     e->dispatcher = p;
     e->time = time;
 
-    p->add_event(e);
+    p->add_dispatcher(e);
     scheduler->schedule_individual_event(e);
   }
 }

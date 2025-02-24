@@ -9,6 +9,7 @@
 
 #include <Population/Person/Person.h>
 #include "Events/Event.h"
+#include "Helpers/ObjectHelpers.h"
 
 Dispatcher::Dispatcher() : events_(nullptr) {}
 
@@ -18,7 +19,7 @@ void Dispatcher::initialize() {
 
 Dispatcher::~Dispatcher() {
   Dispatcher::clear_dispatcher_events();
-  delete events_;
+  ObjectHelpers::delete_pointer<std::map<uuids::uuid, Event*>>(events_);
 }
 
 void Dispatcher::add_dispatcher(Event* event) {
@@ -32,9 +33,10 @@ void Dispatcher::remove_dispatcher(Event* event) {
 void Dispatcher::clear_dispatcher_events() {
   if (events_== nullptr) return;
   if (events_->empty()) return;
-  // for(auto & event : *events_) {
-  //   delete event.second;
-  // }
+  for (auto &event_pair : *events_) {
+    event_pair.second->dispatcher = nullptr;
+    event_pair.second->executable = false;
+  }
   events_->clear();
 }
 

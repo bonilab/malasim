@@ -15,7 +15,7 @@
 #include "Treatment/ITreatmentCoverageModel.h"
 #include "Utility/ReporterUtils.h"
 
-void NovelDrugReporter::initialize() {}
+void NovelDrugReporter::initialize(int job_number, const std::string &path) {}
 
 void NovelDrugReporter::before_run() {
   // output header for csv file

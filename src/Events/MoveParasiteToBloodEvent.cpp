@@ -27,7 +27,7 @@ void MoveParasiteToBloodEvent::schedule_event(Scheduler* scheduler, Person* p,
     e->set_infection_genotype(infection_type);
     e->time = time;
 
-    p->add_event(e);
+    p->add_dispatcher(e);
     scheduler->schedule_individual_event(e);
   }
 }

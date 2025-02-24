@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
   utils::Cli::get_instance().parse(argc, argv);
   if(Model::get_instance().initialize()) {
     Model::get_instance().run();
-    Model::get_instance().finalize();
+    Model::get_instance().release();
   }
   else {
     spdlog::get("default_logger")->error("Model initialization failed.");

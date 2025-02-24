@@ -25,7 +25,7 @@ void BirthdayEvent::schedule_event(Scheduler* scheduler, Person *person, const i
     birthday_event->set_id(Model::get_instance().get_random()->uuid());
     birthday_event->time = time;
     birthday_event->executable = true;
-    person->add_event(birthday_event);
+    person->add_dispatcher(birthday_event);
     birthday_event->dispatcher = person;
     person->add_dispatcher(birthday_event);
   }

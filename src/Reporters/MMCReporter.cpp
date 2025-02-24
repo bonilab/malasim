@@ -14,7 +14,7 @@
 
 MMCReporter::MMCReporter() = default;
 
-void MMCReporter::initialize() {
+void MMCReporter::initialize(int job_number, const std::string &path) {
   ReporterUtils::initialize_moi_file_logger();
 
 }

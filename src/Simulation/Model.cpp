@@ -14,6 +14,7 @@
 #include "Reporters/Reporter.h"
 #include "Treatment/SteadyTCM.h"
 #include "Utils/Cli.hxx"
+#include "Validation/MovementValidation.h"
 
 // Private constructor: creates the Config instance
 Model::Model(const int &object_pool_size){
@@ -71,6 +72,7 @@ bool Model::initialize() {
         utils::Cli::get_instance().set_output_path("./");
       }
 
+      spdlog::info("Model initialized with seed: " + std::to_string(random_->get_seed()));
       // add reporter here
       if (utils::Cli::get_instance().get_reporter().empty()) {
         add_reporter(Reporter::MakeReport(Reporter::MONTHLY_REPORTER));
@@ -80,30 +82,70 @@ bool Model::initialize() {
         }
       }
 
+#ifdef ENABLE_TRAVEL_TRACKING
+      add_reporter(Reporter::MakeReport(Reporter::TRAVEL_TRACKING_REPORTER));
+#endif
+
       // initialize reporters
       for (auto* reporter : reporters_) {
-        reporter->initialize();
+        reporter->initialize(utils::Cli::get_instance().get_job_number(), utils::Cli::get_instance().get_output_path());
       }
+      spdlog::info("Model initialized reporters.");
 
       scheduler_->initialize(config_->get_simulation_timeframe().get_starting_date(),
                              config_->get_simulation_timeframe().get_ending_date());
+      spdlog::info("Model initialized scheduler.");
 
       set_treatment_strategy(config_->get_strategy_parameters().get_initial_strategy_id());
+      spdlog::info("Model initialized treatment strategy.");
 
       build_initial_treatment_coverage();
+      spdlog::info("Model initialized treatment coverage model.");
 
       mdc_->initialize();
+      spdlog::info("Model initialized data collector.");
 
       population_->initialize();
+      spdlog::info("Model initialized population.");
+
+      config_->get_movement_settings().get_spatial_model()->prepare();
+      spdlog::info("Model initialized movement model.");
 
       mosquito_->initialize(config_);
+      spdlog::info("Model initialized mosquito.");
 
-      // population_->introduce_initial_cases();
+      population_->introduce_initial_cases();
+      spdlog::info("Model initialized initial cases.");
 
       // for (auto* event : config_->get_preconfig_population_events().get_events()) {
       //   scheduler_->schedule_population_event(event);
       // }
 
+      if (utils::Cli::get_instance().get_record_movement()) {
+        // Generate a movement reporter
+        Reporter* reporter =
+            Reporter::MakeReport(Reporter::ReportType::MOVEMENT_REPORTER);
+        add_reporter(reporter);
+        reporter->initialize(utils::Cli::get_instance().get_job_number(), utils::Cli::get_instance().get_output_path());
+
+        // Get the validator and prepare it for the run
+        auto &validator = MovementValidation::get_instance();
+        validator.set_reporter((MovementReporter*)reporter);
+
+        // Set the flags on the validator
+        if (utils::Cli::get_instance().get_record_individual_movement()) {
+          spdlog::info("Tracking of individual movement enabled.");
+          validator.set_individual_movement(utils::Cli::get_instance().get_record_individual_movement());
+        }
+        if (utils::Cli::get_instance().get_record_cell_movement()) {
+          spdlog::info("Tracking of cell movement enabled.");
+          validator.set_cell_movement(utils::Cli::get_instance().get_record_cell_movement());
+        }
+        if (utils::Cli::get_instance().get_record_district_movement()) {
+          spdlog::info("Tracking of district movement enabled.");
+          validator.set_district_movement(utils::Cli::get_instance().get_record_district_movement());
+        }
+      }
       is_initialized_ = true;
     }
     else {
@@ -121,36 +163,118 @@ void Model::run() const {
   scheduler_->run();
 }
 
-void Model::finalize() {
-  if (!is_initialized_) {
-    throw std::runtime_error("Model is not initialized or already finalized.");
+void Model::before_run() {
+  spdlog::info("Perform before run events");
+  for (auto* reporter : reporters_) {
+    reporter->before_run();
   }
-  // Cleanup code
-  delete population_;
-  delete scheduler_;
-  delete config_;
-  delete random_;
+}
+
+void Model::after_run() {
+  spdlog::info("Perform after run events");
+
+  mdc_->update_after_run();
+
+  for (auto* reporter : reporters_) {
+    reporter->after_run();
+  }
 }
 
 void Model::begin_time_step() {
-  // spdlog::info("\t\t\tBegin time step");
+  // reset daily variables
+  mdc_->begin_time_step();
+  report_begin_of_time_step();
 }
 
 void Model::end_time_step() {
-  // spdlog::info("\t\t\tEnd time step");
+  // update / calculate daily UTL
+  mdc_->end_of_time_step();
+
+  // check to switch strategy
+  treatment_strategy_->update_end_of_time_step();
 }
 
 void Model::daily_update() {
-  spdlog::info("\tDaily update {}", scheduler_->current_time());
-  // population_->update(scheduler_->current_time());
+  population_->update_all_individuals();
+  // for safety remove all dead by calling perform_death_event
+  population_->perform_death_event();
+  population_->perform_birth_event();
+
+  // update current foi should be call after perform death, birth event
+  // in order to obtain the right all alive individuals,
+  // infection event will use pre-calculated individual relative biting rate to infect new infections
+  // circulation event will use pre-calculated individual relative moving rate to migrate individual to new location
+  population_->update_current_foi();
+
+  population_->perform_infection_event();
+  population_->perform_circulation_event();
+
+  // infect new mosquito cohort in prmc must be run after population perform infection event and update current foi
+  // because the prmc at the tracking index will be overridden with new cohort to use N days later and
+  // infection event used the prmc at the tracking index for the today infection
+  auto tracking_index = scheduler_->current_time() % config_->get_epidemiological_parameters().get_number_of_tracking_days();
+  mosquito_->infect_new_cohort_in_PRMC(config_, random_, population_, tracking_index);
+
+  // this function must be called after mosquito infect new cohort in prmc
+  population_->persist_current_force_of_infection_to_use_N_days_later();
 }
 
 void Model::monthly_update() {
-  // spdlog::info("\t\tMonthly update");
+  monthly_report();
+
+  // reset monthly variables
+  mdc_->monthly_update();
+
+  //
+  treatment_strategy_->monthly_update();
+
+  // update treatment coverage
+  treatment_coverage_->monthly_update();
 }
 
 void Model::yearly_update() {
-  // spdlog::info("\tYearly update");
+  mdc_->yearly_update();
+}
+
+void Model::monthly_report() {
+  mdc_->perform_population_statistic();
+
+  for (auto* reporter : reporters_) { reporter->monthly_report(); }
+}
+
+void Model::report_begin_of_time_step() {
+  for (auto* reporter : reporters_) { reporter->begin_time_step(); }
+}
+
+void Model::add_reporter(Reporter* reporter) {
+  reporters_.push_back(reporter);
+  reporter->set_model(this);
+}
+
+void Model::release() {
+  // Clean up the memory used by the model
+  ObjectHelpers::delete_pointer<ClinicalUpdateFunction>(
+      progress_to_clinical_update_function_);
+  ObjectHelpers::delete_pointer<ImmunityClearanceUpdateFunction>(
+      immunity_clearance_update_function_);
+  ObjectHelpers::delete_pointer<ImmunityClearanceUpdateFunction>(
+      having_drug_update_function_);
+  ObjectHelpers::delete_pointer<ImmunityClearanceUpdateFunction>(
+      clinical_update_function_);
+  ObjectHelpers::delete_pointer<Population>(population_);
+  ObjectHelpers::delete_pointer<Scheduler>(scheduler_);
+  ObjectHelpers::delete_pointer<ModelDataCollector>(mdc_);
+
+  treatment_strategy_ = nullptr;
+  ObjectHelpers::delete_pointer<ITreatmentCoverageModel>(treatment_coverage_);
+
+  ObjectHelpers::delete_pointer<Config>(config_);
+  ObjectHelpers::delete_pointer<utils::Random>(random_);
+
+  for (Reporter* reporter : reporters_) {
+    ObjectHelpers::delete_pointer<Reporter>(reporter);
+  }
+  reporters_.clear();
 }
 
 Model* Model::get_model() {
@@ -179,25 +303,6 @@ IStrategy* Model::get_treatment_strategy() {
 
 ITreatmentCoverageModel* Model::get_treatment_coverage() {
   return treatment_coverage_;
-}
-
-void Model::monthly_report() {
-  mdc_->perform_population_statistic();
-
-  for (auto* reporter : reporters_) {
-    reporter->monthly_report();
-  }
-}
-
-void Model::report_begin_of_time_step() {
-  for (auto* reporter : reporters_) {
-    reporter->begin_time_step();
-  }
-}
-
-void Model::add_reporter(Reporter* reporter) {
-  reporters_.push_back(reporter);
-  reporter->set_model(this);
 }
 
 

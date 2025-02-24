@@ -81,7 +81,7 @@ void ProgressToClinicalEvent::execute() {
 
     person->receive_therapy(therapy, clinical_caused_parasite_);
     //Statistic increase today treatments
-    Model::get_instance().get_mdc()->record_1_treatment(person->get_location(), person->get_age(), therapy->get_id());
+    Model::get_instance().get_mdc()->record_1_treatment(person->get_location(), person->get_age(), person->get_age_class(), therapy->get_id());
 
     clinical_caused_parasite_->set_update_function(Model::get_instance().having_drug_update_function());
 
@@ -119,7 +119,7 @@ void ProgressToClinicalEvent::execute() {
     //not recieve treatment
     //Statistic store NTF
     Model::get_instance().get_mdc()->record_1_TF(person->get_location(), false);
-    Model::get_instance().get_mdc()->record_1_non_treated_case(person->get_location(), person->get_age());
+    Model::get_instance().get_mdc()->record_1_non_treated_case(person->get_location(), person->get_age(), person->get_age_class());
 
     receive_no_treatment_routine(person);
     if (person->get_host_state()==Person::DEAD) {
@@ -142,7 +142,7 @@ void ProgressToClinicalEvent::schedule_event(Scheduler *scheduler, Person *p,
     e->set_clinical_caused_parasite(clinical_caused_parasite);
     e->time = time;
 
-    p->add_event(e);
+    p->add_dispatcher(e);
     scheduler->schedule_individual_event(e);
   }
 }

@@ -57,7 +57,7 @@ Person::Person() : age_(0),
 }
 
 Person::~Person() {
-  event_queue = std::priority_queue<Event*, std::vector<Event*>, EventComparator>();
+  // event_queue = std::priority_queue<Event*, std::vector<Event*>, EventComparator>();
   Dispatcher::clear_dispatcher_events();
   ObjectHelpers::delete_pointer<ImmuneSystem>(immune_system_);
   ObjectHelpers::delete_pointer<SingleHostClonalParasitePopulations>(all_clonal_parasite_populations_);
@@ -68,7 +68,7 @@ Person::~Person() {
 
 void Person::initialize() {
   Dispatcher::initialize();
-  event_queue = std::priority_queue<Event*, std::vector<Event*>, EventComparator>();
+  // event_queue = std::priority_queue<Event*, std::vector<Event*>, EventComparator>();
 
   immune_system_ = new ImmuneSystem(this);
 
@@ -101,8 +101,6 @@ void Person::set_location(const int& value) {
       }
       Model::get_instance().get_mdc()->update_person_days_by_years(value, day_diff);
     }
-
-    Model::get_instance().get_mdc()->record_1_migration(this, location_, value);
 
     NotifyChange(LOCATION, &location_, &value);
 
@@ -467,7 +465,7 @@ void Person::schedule_relapse_event(ClonalParasitePopulation* clinical_caused_pa
 }
 
 void Person::update() {
-  //    std::cout << "Person Update"<< std::endl;
+  // std::cout << "Person Update " << get_id() << std::endl;
   // already update
   assert(host_state_ != DEAD);
 
@@ -763,35 +761,36 @@ void Person::increase_age_by_1_year() {
 
 void Person::update(int time) {
   //Update all person attributes before execute events
-  execute_events(time);
+  // execute_events(time);
 }
 
-void Person::execute_events(int time) {
-  if(event_queue.empty()) return;
-  while (!event_queue.empty() && event_queue.top()->time <= time) {
-    auto event = event_queue.top();
-    event_queue.pop();
-    if (Model::get_instance().get_random()->random_uniform<double>(0,1) < 0.0001) {
-      spdlog::info("Running event {} time {} of person {} {}", event->name(), time, get_id(), event->get_id());
-    }
-    event->perform_execute();
-  }
-}
+// void Person::execute_events(int time) {
+//   if(event_queue.empty()) return;
+//   while (!event_queue.empty() && event_queue.top()->time <= time) {
+//     auto event = event_queue.top();
+//     event_queue.pop();
+//     if (Model::get_instance().get_random()->random_uniform<double>(0,1) < 0.0001) {
+//       spdlog::info("Running event {} time {} of person {} {}", event->name(), time, get_id(), event->get_id());
+//     }
+//     event->perform_execute();
+//   }
+// }
 
-void Person::add_event(Event* event) {
-  event_queue.push(event);
-}
-
-void Person::remove_event(Event* event) {
-  std::vector<Event*> temp_events;
-  while (!event_queue.empty()) {
-    auto top_event = event_queue.top();
-    event_queue.pop();
-    if (top_event != event) {
-      temp_events.push_back(top_event);
-    }
-  }
-  for (const auto& e : temp_events) {
-    event_queue.push(e);
-  }
-}
+// void Person::add_event(Event* event) {
+//   event_queue.push(event);
+//   add_dispatcher(event);
+// }
+//
+// void Person::remove_event(Event* event) {
+//   std::vector<Event*> temp_events;
+//   while (!event_queue.empty()) {
+//     auto top_event = event_queue.top();
+//     event_queue.pop();
+//     if (top_event != event) {
+//       temp_events.push_back(top_event);
+//     }
+//   }
+//   for (const auto& e : temp_events) {
+//     event_queue.push(e);
+//   }
+// }

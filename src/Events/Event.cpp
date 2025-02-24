@@ -5,7 +5,12 @@
 
 #include <iostream>
 
-Event::Event() = default;
+#include "Simulation/Model.h"
+#include "Utils/Random.h"
+
+Event::Event() {
+  id_ = Model::get_instance().get_random()->uuid();
+}
 
 Event::~Event(){
   if (dispatcher!=nullptr) {

@@ -316,7 +316,7 @@ bool Genotype::match_pattern(const std::string &pattern) {
 
 Genotype *Genotype::free_recombine_with(Config *pConfig, utils::Random *pRandom, Genotype *other) {
   // TODO: this function is not optimized 100%, use with care
-  PfGenotypeStr new_pf_genotype_str;
+  PfGenotypeStr new_pf_genotype_str = std::vector<ChromosomalGenotypeStr>(14);
   // for each chromosome
   for (int chromosome_id = 0; chromosome_id < pf_genotype_str.size(); ++chromosome_id) {
     if (pf_genotype_str[chromosome_id].empty()) continue;
@@ -384,7 +384,7 @@ std::string Genotype::Convert_PfGenotypeStr_To_String(const PfGenotypeStr &pfGen
   return ss.str();
 }
 Genotype *Genotype::free_recombine(Config *config, utils::Random *pRandom, Genotype *f, Genotype *m) {
-  PfGenotypeStr new_pf_genotype_str;
+  PfGenotypeStr new_pf_genotype_str = std::vector<ChromosomalGenotypeStr>(14);
   // for each chromosome
   for (int chromosome_id = 0; chromosome_id < f->pf_genotype_str.size(); ++chromosome_id) {
     if (f->pf_genotype_str[chromosome_id].empty()) continue;
