@@ -253,7 +253,7 @@ immune_system_parameters:
 # ---------------------------------------------------------------
 genotype_parameters:
   # Mutation mask indicating positions of genetic mutations
-  mutation_mask: "||||111||1111111,0||||||0000000000100|1"
+  mutation_mask: "||||111||1000000,0||||||0000000000110|1"
 
   # Daily probability that a parasite will mutate at a given locus when drug concentration is not zero
   mutation_probability_per_locus: 0.001
@@ -447,7 +447,7 @@ genotype_parameters:
           cnv_daily_crs: [0, 0.0005]
           cnv_multiplicative_effect_on_EC50:
             - drug_id: 3
-              #            factors: [ 1, 2.4137931 ]
+              #factors: [ 1, 2.4137931 ] #old without pfcrt
               factors: [1, 1.37]
           aa_positions: []
 
@@ -528,9 +528,9 @@ genotype_parameters:
   initial_parasite_info:
     - location_id: -1 # -1 indicates all locations
       parasite_info:
-        - aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+        - aa_sequence: "||||YF1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
           prevalence: 0.05
-        - aa_sequence: "||||NY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+        - aa_sequence: "||||YF1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
           prevalence: 0.05
 
 # ---------------------------------------------------------------
@@ -539,7 +539,7 @@ genotype_parameters:
 drug_parameters:
   drug_db:
     0:
-      name: "artemisinin"
+      name: "Artemisinin"
       half_life: 0.0
       maximum_parasite_killing_rate: 0.999
       n: 25
@@ -547,7 +547,7 @@ drug_parameters:
       k: 4
       base_EC50: 0.75
     1:
-      name: "lumefantrine"
+      name: "Lumefantrine"
       half_life: 4.5
       maximum_parasite_killing_rate: 0.99
       n: 20
@@ -556,7 +556,7 @@ drug_parameters:
       k: 4
       base_EC50: 0.6
     2:
-      name: "amodiaquine"
+      name: "Amodiaquine"
       half_life: 9.0
       maximum_parasite_killing_rate: 0.95
       n: 19
@@ -564,7 +564,7 @@ drug_parameters:
       k: 4
       base_EC50: 0.5
     3:
-      name: "piperaquine"
+      name: "Piperaquine"
       half_life: 28.0
       maximum_parasite_killing_rate: 0.9
       n: 15
@@ -607,7 +607,7 @@ drug_parameters:
       k: 4
       base_EC50: 0.55
     8:
-      name: "generic"
+      name: "Generic"
       half_life: 7
       maximum_parasite_killing_rate: 0.8
       n: 15
@@ -628,32 +628,32 @@ therapy_parameters:
   therapy_db:
     #mono as
     0:
-      name: "Artemisinin"
+      name: "Mono Artemisinin"
       drug_ids: [0]
       dosing_days: [3]
     #mono Lumefaltrine
     1:
-      name: "Lumefantrine"
+      name: "Mono Lumefantrine"
       drug_ids: [1]
       dosing_days: [3]
     #mono AQ
     2:
-      name: "Amodiaquine"
+      name: "Mono Amodiaquine"
       drug_ids: [2]
       dosing_days: [3]
     #mono PPQ
     3:
-      name: "Piperaquine"
+      name: "Mono Piperaquine"
       drug_ids: [3]
       dosing_days: [3]
     #mono MQ
     4:
-      name: "Mefloquine"
+      name: "Mono Mefloquine"
       drug_ids: [4]
       dosing_days: [3]
     #mono SP
     5:
-      name: "SP"
+      name: "Mono SP"
       drug_ids: [5]
       dosing_days: [3]
     #AL
@@ -913,89 +913,58 @@ mosquito_parameters:
 # 16. Population Events (all events are optional)
 # ---------------------------------------------------------------
 population_events:
-#  - name: change_within_host_induced_recombination
-#    info:
-#      date: 2000/1/1
-#      value: false
-#
-#  - name: change_within_host_induced_recombination
-#    info:
-#      date: 2010/1/1
-#      value: true
-#
-#  - name: turn_off_mutation
+#  - name: change_within_host_induced_free_recombination
 #    info:
 #      - date: 2000/1/1
-#  - name: turn_on_mutation
+#        value: false
+
+#  - name: turn_off_mutation
 #    info:
-#      - date: 2010/1/1
-#
-#  - name: change_treatment_coverage
-#    info:
-#      - type: SteadyTCM
-#        date: 1990/2/1
-#        p_treatment_under_5_by_location: [ 0.600000 ]
-#        p_treatment_over_5_by_location: [ 0.550000 ]
-#      - type: InflatedTCM
-#        date: 1990/3/1
-#        annual_inflation_rate: 0.01
-#      - type: LinearTCM
-#        from_date: 1990/6/1
-#        to_date: 1990/12/1
-#        p_treatment_under_5_by_location_to: [ 0.900000 ]
-#        p_treatment_over_5_by_location_to: [ 0.90000 ]
-#
-#  - name: change_treatment_strategy
-#    info:
-#      - date: 1990/3/2
-#        strategy_id: 2
-#      - date: 1990/6/2
-#        strategy_id: 3
-#      - date: 1990/9/2
-#        strategy_id: 4
-#
-#  - name: single_round_MDA
-#    info:
-#      - date: 2020/1/1
-#        fraction_population_targeted: [ 1.0 ]
-#        days_to_complete_all_treatments: 14
-#      - date: 2020/2/8
-#        fraction_population_targeted: [ 0.03333333 ]
-#        days_to_complete_all_treatments: 14
-#      - date: 2020/3/14
-#        fraction_population_targeted: [ 0.7 ]
-#        days_to_complete_all_treatments: 14
-#
-#  - name: modify_nested_mft_strategy
-#    info:
-#      - date: 2015/5/1
-#        strategy_id: 5
-#
-#  - name: introduce_plas2_parasites
+#      - date: 2001/1/1
+
+  - name: turn_on_mutation
+    info:
+      - date: 2000/1/1
+
+  - name: change_mutation_probability_per_locus
+    info:
+      - date: 2000/1/1
+        mutation_probability_per_locus: 0.001
+
+#  - name: change_interrupted_feeding_rate
 #    info:
 #      - location: 0
-#        date: 1990/3/20
-#        fraction: 0.01
-#
+#        date: 2001/6/1
+#        interrupted_feeding_rate: 0.1
+#      - location: 0
+#        date: 2002/6/1
+#        interrupted_feeding_rate: 0.2
+#      - location: 1
+#        date: 2002/6/1
+#        interrupted_feeding_rate: 0.3
+#      - location: 1
+#        date: 2003/6/1
+#        interrupted_feeding_rate: 0.4
+
 #  - name: introduce_parasites
 #    info:
 #      - location: 0
 #        parasite_info:
-#          - date: 1990/3/20
-#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+#          - date: 2002/3/20
+#            genotype_aa_sequence: "||||YY1||KTHFIMG,x||||||FNCMYRIPRPYRA|1"
 #            number_of_cases: 5
-#          - date: 1990/4/15
-#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+#          - date: 2003/4/15
+#            genotype_aa_sequence: "||||YF1||TTHFIMG,x||||||FNCMYRIPRPCIA|1"
 #            number_of_cases: 5
 #      - location: 1
 #        parasite_info:
-#          - date: 1990/8/25
-#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+#          - date: 2003/8/25
+#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRV|1"
 #            number_of_cases: 5
-#          - date: 1990/10/20
-#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
+#          - date: 2004/10/20
+#            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPHPCRA|1"
 #            number_of_cases: 5
-#
+
 #  - name: introduce_parasites_periodically
 #    info:
 #      - location: 0
@@ -1003,45 +972,128 @@ population_events:
 #          - duration: 10
 #            genotype_aa_sequence: "||||YY1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"
 #            number_of_cases: 1
-#            start_date: 1990/6/2
-#
-#  - name: introduce_580Y_parasites
+#            start_date: 2005/6/2
+
+#  - name: change_treatment_coverage
 #    info:
-#      - location: 2
-#        date: 2005/7/15
-#        fraction: 0.02
-#
-#  - name: introduce_aq_mutant_parasites
+#      - type: SteadyTCM
+#        date: 2005/2/1
+#        p_treatment_under_5_by_location: [ 0.600000 ]
+#        p_treatment_over_5_by_location: [ 0.550000 ]
+#      - type: InflatedTCM
+#        date: 2006/3/1
+#        annual_inflation_rate: 0.01
+#      - type: LinearTCM
+#        from_date: 2007/6/1
+#        to_date: 2007/12/1
+#        p_treatment_under_5_by_location_from: [ 0.700000 ]
+#        p_treatment_under_5_by_location_to: [ 0.900000 ]
+#        p_treatment_over_5_by_location_from: [ 0.70000 ]
+#        p_treatment_over_5_by_location_to: [ 0.90000 ]
+
+#  - name: change_treatment_strategy
 #    info:
-#      - location: 3
-#        date: 2007/4/30
+#      - date: 2000/3/2
+#        strategy_id: 11
+#      - date: 2005/6/2
+#        strategy_id: 3
+#      - date: 2005/9/2
+#        strategy_id: 4
+#
+#  - name: single_round_MDA
+#    info:
+#      - date: 2001/1/1
+#        fraction_population_targeted: [ 1.0 ]
+#        days_to_complete_all_treatments: 14
+#      - date: 2002/2/8
+#        fraction_population_targeted: [ 0.03333333 ]
+#        days_to_complete_all_treatments: 14
+#      - date: 2003/3/14
+#        fraction_population_targeted: [ 0.7 ]
+#        days_to_complete_all_treatments: 14
+#
+#  - name: modify_nested_mft_strategy
+#    info:
+#      - date: 2003/5/1
+#        strategy_id: 5
+
+#  - name: introduce_plas2_parasites
+#    info:
+#      - location: 0
+#        date: 2002/3/20
+#        fraction: 0.01
+#      - location: 1
+#        date: 2002/3/21
+#        fraction: 0.01
+
+  - name: introduce_580Y_parasites
+    info:
+      - location: 1
+        date: 2002/7/15
+        fraction: 0.2
+        #index start from 1, check if locus mask is "1"
+        # allele must be 1 char
+        alleles:
+          - chromosome: 13
+            locus: 11
+            allele: "Y"
+          - chromosome: 13
+            locus: 12
+            allele: "I"
+#
+#  - name: introduce_plas2_parasites
+#    info:
+#      - location: 0
+#        date: 2002/4/30
 #        fraction: 0.05
-#
-#  - name: introduce_lumefantrine_mutant_parasites
-#    info:
-#      - location: 4
-#        date: 2012/10/12
-#        fraction: 0.03
+
+  - name: introduce_amodiaquine_mutant_parasites
+    info:
+      - location: 0
+        date: 2002/4/30
+        fraction: 0.05
+        #index start from 1, check if locus mask is "1"
+        # allele must be 1 char
+        alleles:
+          - chromosome: 7
+            locus: 1
+            allele: "T"
+          - chromosome: 5
+            locus: 1
+            allele: "Y"
+          - chromosome: 5
+            locus: 2
+            allele: "Y"
+          - chromosome: 5
+            locus: 3
+            allele: "2"
+
+  - name: introduce_lumefantrine_mutant_parasites
+    info:
+      - location: 1
+        date: 2002/10/12
+        fraction: 0.03
+        #index start from 1, check if locus mask is "1"
+        # allele must be 1 char
+        alleles:
+          - chromosome: 7
+            locus: 1
+            allele: "K"
+          - chromosome: 5
+            locus: 1
+            allele: "N"
+          - chromosome: 5
+            locus: 2
+            allele: "F"
+          - chromosome: 5
+            locus: 3
+            allele: "1"
 #
 #  - name: introduce_triple_mutant_to_dpm_parasites
 #    info:
 #      - location: 1
-#        date: 2013/12/20
+#        date: 2004/12/20
 #        fraction: 0.04
-#
-#  - name: change_interrupted_feeding_rate
-#    info:
-#      - location: 5
-#        date: 2001/6/1
-#        interrupted_feeding_rate: 0.5
-#      - location: 6
-#        date: 2002/8/15
-#        interrupted_feeding_rate: 0.7
-#
-#  - name: change_mutation_probability_per_locus
-#    info:
-#      - date: 2008/9/10
-#        mutation_probability_per_locus: 0.001
 
   # TODO: change this event to match new genotype format
 #  - name: introduce_parasites_periodically_v2
@@ -1064,4 +1116,12 @@ population_events:
 #              - position: 4
 #                distribution: [ 0.5, 0.5 ]
 
-
+# ---------------------------------------------------------------
+# 17. Optional settings
+# ---------------------------------------------------------------
+rapt_settings:
+  period: 12
+  therapy_id: 1
+  compliance: 0.7
+  age_start: 18
+  start_date: 2002/08/18

@@ -268,7 +268,7 @@ public:
   // will be an ASC file
   void write(const std::string &filename, SpatialFileType type);
 
-  std::vector<int> get_district_lookup() {
+  std::vector<int>& get_district_lookup() {
     return district_lookup_;
   }
   void set_district_lookup(const std::vector<int> &district_lookup) {

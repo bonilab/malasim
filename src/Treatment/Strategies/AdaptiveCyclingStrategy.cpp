@@ -13,6 +13,7 @@
 #include "IStrategy.h"
 #include "Core/Scheduler/Scheduler.h"
 #include "Treatment/Therapies/Therapy.h"
+#include "Utils/Helpers/StringHelpers.h"
 
 AdaptiveCyclingStrategy::AdaptiveCyclingStrategy() : IStrategy("AdaptiveCyclingStrategy", AdaptiveCycling) {}
 
@@ -28,8 +29,9 @@ void AdaptiveCyclingStrategy::switch_therapy() {
   index %= therapy_list.size();
 
   Model::get_instance().get_mdc()->update_UTL_vector();
-  std::cout << date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}
-            << ": Adaptive Cycling Strategy switch Therapy to: " << therapy_list[index]->get_id();
+  spdlog::info("{}: Adaptive Cycling Strategy switch Therapy to: {}",
+    StringHelpers::date_as_string(date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}),
+    therapy_list[index]->get_id());
 }
 
 Therapy *AdaptiveCyclingStrategy::get_therapy(Person *person) {
@@ -57,9 +59,8 @@ void AdaptiveCyclingStrategy::update_end_of_time_step() {
       // TODO:: turn_off_days and delay_until_actual_trigger should be match with calendar day
       if (Model::get_instance().get_scheduler()->current_time() > latest_switch_time + turn_off_days) {
         latest_switch_time = Model::get_instance().get_scheduler()->current_time() + delay_until_actual_trigger;
-        std::cout << date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}
-                  << ": Adaptive Cycling will switch therapy next year";
-        //                    std::cout << "TF: " << Model::get_instance().get_mdc()->current_TF_by_therapy()[get_therapy()->id()] << std::endl;
+          spdlog::info("{}: Adaptive Cycling will switch therapy next year",
+          StringHelpers::date_as_string(date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}));
       }
     }
   }

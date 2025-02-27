@@ -39,6 +39,14 @@ public:
     [[nodiscard]] const std::vector<double>& get_factors() const { return factors_; }
     void set_factors(const std::vector<double>& value) { factors_ = value; }
 
+    std::string to_string() {
+      std::string result = std::to_string(drug_id_) + ": ";
+      for (const auto& factor : factors_) {
+        result += std::to_string(factor) + " ";
+      }
+      return result;
+    }
+
   private:
     int drug_id_;
     std::vector<double> factors_;
@@ -51,7 +59,9 @@ public:
     [[nodiscard]] int get_position() const { return position_; }
     void set_position(int value) { position_ = value; }
 
-    [[nodiscard]] const std::vector<std::string>& get_amino_acids() const { return amino_acids_; }
+    [[nodiscard]] const std::vector<std::string>& get_amino_acids() const {
+      return amino_acids_;
+    }
     void set_amino_acids(const std::vector<std::string>& value) { amino_acids_ = value; }
 
     [[nodiscard]] const std::vector<double>& get_daily_crs() const { return daily_crs_; }
@@ -60,6 +70,18 @@ public:
     [[nodiscard]] const std::vector<MultiplicativeEffectOnEC50>& get_multiplicative_effect_on_EC50() const { return multiplicative_effect_on_EC50_; }
     void set_multiplicative_effect_on_EC50(const std::vector<MultiplicativeEffectOnEC50>& value) { multiplicative_effect_on_EC50_ = value; }
 
+    std::string to_string() const {
+      std::string result = std::to_string(position_) + ": ";
+      if (!amino_acids_.empty()) {
+        for (const auto& aa : amino_acids_) {
+          result += aa + " ";
+        }
+      }
+      else {
+        result = std::to_string(position_) + ": empty";
+      }
+      return result;
+    }
   private:
     int position_;
     std::vector<std::string> amino_acids_;
@@ -95,6 +117,14 @@ public:
     [[nodiscard]] int get_chromosome_id() const { return chromosome_id_; }
     void set_chromosome_id(int value) { chromosome_id_ = value; }
 
+    std::string to_string() const {
+      std::string result = std::to_string(chromosome_id_) + ": " + name_ + " ";
+      for (const auto& aa_pos : aa_positions_) {
+        result += aa_pos.to_string() + " ";
+      }
+      return result;
+    }
+
   private:
     int chromosome_id_ = -1;
     std::string name_;
@@ -124,6 +154,14 @@ public:
       }
     }
 
+    std::string to_string() const {
+      std::string result = std::to_string(chromosome_id_) + ": ";
+      for (const auto& gene : genes_) {
+        result += gene.to_string() + " ";
+      }
+      return result;
+    }
+
   private:
     int chromosome_id_ = -1;
     std::vector<GeneInfo> genes_;
@@ -132,7 +170,7 @@ public:
   class PfGenotypeInfo {
   public:
     std::vector<ChromosomeInfo> chromosome_infos = std::vector<ChromosomeInfo>(14);
-    int calculate_aa_pos(int chromosome_id, int gene_id, int aa_pos_id, int aa_id) const {
+    int calculate_aa_pos(int chromosome_id, int gene_id, int aa_pos_id, int aa_id) {
       auto result = 0;
       for (int ii = 0; ii < chromosome_id; ++ii) {
         result += chromosome_infos[ii].get_genes().size() > 1 ? chromosome_infos[ii].get_genes().size() - 1 : 0;  // for ','
@@ -152,6 +190,14 @@ public:
 
       // final gene
       result += aa_id;
+      return result;
+    }
+
+    std::string to_string() const {
+      std::string result;
+      for (const auto& chromosome : chromosome_infos) {
+        result += chromosome.to_string() + "\n";
+      }
       return result;
     }
   };
@@ -249,7 +295,7 @@ public:
       for (auto loc = location_from; loc < location_to; ++loc) {
         for (const auto &parasite_node : initial_genotype_info_raw.get_parasite_info()) {
           auto aa_sequence = parasite_node.get_aa_sequence();
-          auto parasite_type_id = genotype_db.get_id(aa_sequence);
+          auto parasite_type_id = genotype_db->get_id(aa_sequence);
           auto prevalence = parasite_node.get_prevalence();
           initial_parasite_info_.emplace_back(loc, parasite_type_id, prevalence);
         }
@@ -270,7 +316,7 @@ private:
   std::vector<InitialParasiteInfo> initial_parasite_info_;
   std::vector<InitialParasiteInfoRaw> initial_parasite_info_raw_;
 public:
-  GenotypeDatabase genotype_db{};
+  GenotypeDatabase* genotype_db = new GenotypeDatabase();
 };
 
 namespace YAML {

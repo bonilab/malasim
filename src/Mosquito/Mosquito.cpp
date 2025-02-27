@@ -28,32 +28,6 @@ void Mosquito::initialize(Config *config) {
           config->get_spatial_settings().location_db[loc_index].mosquito_size, nullptr);
     }
   }
-  spdlog::info("First location mosquito size: {}",
-               config->get_spatial_settings().location_db[0].mosquito_size);
-  spdlog::info("Last location mosquito size: {}",
-               config->get_spatial_settings().location_db.back().mosquito_size);
-
-  // if (!config->mosquito_config().interrupted_feeding_rate_raster.empty()) {
-  //   // read from raster
-  //   //    MosquitoData::get_instance().load_raster_from_path(Model::CONFIG->mosquito_config().interrupted_feeding_rate_raster,
-  //   //    MosquitoData::InteruptedFeedingRate);
-  //   LOG(FATAL) << "Raster is not supported in version 3.x!!!";
-  // } else {
-  //   if (config->mosquito_config().interrupted_feeding_rate.size() == 1) {
-  //     double if_rate = config->mosquito_config().interrupted_feeding_rate[0];
-  //     config->mosquito_config().interrupted_feeding_rate = std::vector<double>(config->get_spatial_settings().get_number_of_locations(), if_rate);
-  //   } else if (config->mosquito_config().interrupted_feeding_rate.size() != config->get_spatial_settings().get_number_of_locations()) {
-  //     LOG(FATAL) << "Number of element of interrupted feeding rate should be 1 or equal to number of locations!!!!";
-  //   }
-  // }
-
-  // // add min ec50 of each drug to db
-  // for (int drug_id = 0; drug_id < config->drug_db()->size(); drug_id++) {
-  //     drug_id_min_ec50[drug_id] = pow(config->drug_db()->at(drug_id)->base_EC50, config->drug_db()->at(drug_id)->n());
-  //     LOG(INFO) << fmt::format("Drug id: {} base_EC50: {} n: {} min_EC50: {}",drug_id,
-  //            config->drug_db()->at(drug_id)->base_EC50, config->drug_db()->at(drug_id)->n(),
-  //            drug_id_min_ec50[drug_id]);
-  // }
 }
 
 void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, Population *population,
@@ -256,14 +230,14 @@ std::vector<std::string> Mosquito::split_string(std::string str, char delimiter)
   return internal;
 }
 
+/*
+ * For DxG
+ */
+
 std::string Mosquito::get_old_genotype_string(std::string new_genotype){
     std::vector<std::string> pattern_chr = split_string(new_genotype,'|');
     std::string old_chr_7 = pattern_chr[6].substr(0, 7);
     std::string old_chr_5 = pattern_chr[4];
-//    if(pattern_chr[4].substr(2, 1) == "2")
-//        old_chr_5 = pattern_chr[4].substr(0, 2)+pattern_chr[4].substr(0, 2);
-//    else
-//        old_chr_5 = pattern_chr[4].substr(0, 2)+"--";
     std::string old_chr_13 = pattern_chr[12].substr(0, 13);
     std::string old_chr_14 = pattern_chr[13].substr(0, 1);
     std::string old_chr_x = pattern_chr[6].substr(6, 1);
@@ -275,10 +249,6 @@ std::string Mosquito::get_old_genotype_string2(std::string new_genotype){
   std::vector<std::string> pattern_chr = split_string(new_genotype,'|');
   std::string old_chr_7 = pattern_chr[6].substr(0, 7);
   std::string old_chr_5 = pattern_chr[4];
-//    if(pattern_chr[4].substr(2, 1) == "2")
-//        old_chr_5 = pattern_chr[4].substr(0, 2)+pattern_chr[4].substr(0, 2);
-//    else
-//        old_chr_5 = pattern_chr[4].substr(0, 2)+"--";
   std::string old_chr_13 = pattern_chr[12].substr(0, 13);
   std::string old_chr_14 = pattern_chr[13].substr(0, 1);
   std::string old_chr_x = pattern_chr[6].substr(6, 1);

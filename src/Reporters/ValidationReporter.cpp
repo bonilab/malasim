@@ -217,10 +217,10 @@ void ValidationReporter::monthly_report() {
     monthly_data_file << ss.str() << std::endl;
 
     std::stringstream gene_freq_ss;
-//    ReporterUtils::output_genotype_frequency3(gene_freq_ss, Model::get_instance().get_config()->get_genotype_parameters().genotype_db.size(),
+//    ReporterUtils::output_genotype_frequency3(gene_freq_ss, Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size(),
 //                                              Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
     std::stringstream prmc_freq_ss;
-    ReporterUtils::output_genotype_frequency4(gene_freq_ss, prmc_freq_ss, Model::get_instance().get_config()->get_genotype_parameters().genotype_db.size(),
+    ReporterUtils::output_genotype_frequency4(gene_freq_ss, prmc_freq_ss, Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size(),
                                               Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
 
     gene_freq_file << gene_freq_ss.str() << std::endl;
@@ -332,17 +332,17 @@ void ValidationReporter::after_run() {
     }
     summary_data_file << ss.str() << std::endl;
 
-    for (auto [g_id, genotype] : Model::get_instance().get_config()->get_genotype_parameters().genotype_db) {
+    for (auto [g_id, genotype] : *(Model::get_instance().get_config()->get_genotype_parameters().genotype_db)) {
         gene_db_file << g_id << sep << genotype->aa_sequence << std::endl;
         prmc_db_file << g_id << sep << genotype->aa_sequence << std::endl;
     }
 
-    for (auto [g_id, genotype] : Model::get_instance().get_config()->get_genotype_parameters().genotype_db) {
+    for (auto [g_id, genotype] : *(Model::get_instance().get_config()->get_genotype_parameters().genotype_db)) {
         spdlog::debug("{}:{}",genotype->aa_sequence,genotype->daily_fitness_multiple_infection);
     }
     for(int resistant_drug_pair_id = 0; resistant_drug_pair_id < Model::get_instance().get_mosquito()->resistant_drug_list.size(); resistant_drug_pair_id++){
         auto drugs = Model::get_instance().get_mosquito()->resistant_drug_list[resistant_drug_pair_id].second;
-        for (auto [g_id, genotype] : Model::get_instance().get_config()->get_genotype_parameters().genotype_db) {
+        for (auto [g_id, genotype] : *(Model::get_instance().get_config()->get_genotype_parameters().genotype_db)) {
             if(resistant_drug_pair_id < 3){
                 spdlog::debug(fmt::format("resistant_drug_pair_id: {} {}\tR-0: {}\tR-1: {}\tEC50-0: {}\tEC50-1: {}\tminEC50-0: {}\tminEC50-1: {}",
                                        resistant_drug_pair_id,

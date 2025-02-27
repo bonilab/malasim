@@ -45,13 +45,15 @@ public:
 
   virtual ~Genotype();
 
-  double get_EC50_power_n(DrugType* dt) const;
+  double get_EC50_power_n(DrugType* dt);
 
   bool resist_to(DrugType* dt);
 
   Genotype* combine_mutation_to(const int& locus, const int& value);
 
-  std::string get_aa_sequence() const;
+  Genotype* modify_genotype_allele(const std::vector<std::tuple<int,int,char>> &alleles, Config *pConfig);
+
+  std::string get_aa_sequence();
 
   bool is_valid(const GenotypeParameters::PfGenotypeInfo& gene_info);
 

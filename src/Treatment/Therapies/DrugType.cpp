@@ -65,7 +65,7 @@ void DrugType::populate_resistant_aa_locations() {
         for(auto const& cnv_multiple_ec50 : gene_info.get_cnv_multiplicative_effect_on_EC50()) {
           if (cnv_multiple_ec50.get_drug_id() == id_) {
             resistant_aa_locations.push_back({ chromosome_info.get_chromosome_id() - 1,
-              gene_id, static_cast<int>(gene_info.get_aa_positions().size()), aa_pos_in_sequence, false });
+              gene_id, static_cast<int>(gene_info.get_aa_positions().size()), aa_pos_in_sequence, true });
           }
         }
       }

@@ -14,9 +14,10 @@ class ITreatmentCoverageModel {
   ITreatmentCoverageModel &operator=(ITreatmentCoverageModel &&) = delete;
 
  public:
+  std::string type;
   int starting_time{0};
-  std::vector<double> p_treatment_less_than_5;
-  std::vector<double> p_treatment_more_than_5;
+  std::vector<double> p_treatment_under_5;
+  std::vector<double> p_treatment_over_5;
 
   ITreatmentCoverageModel() = default;
 

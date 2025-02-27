@@ -89,6 +89,9 @@ private:
 #ifdef ENABLE_TRAVEL_TRACKING
   int day_that_last_trip_was_initiated_{-1};
   int day_that_last_trip_outside_district_was_initiated_{-1};
+public:
+  int get_day_that_last_trip_was_initiated() const { return day_that_last_trip_was_initiated_; }
+  int get_day_that_last_trip_outside_district_was_initiated() const { return day_that_last_trip_outside_district_was_initiated_; }
 #endif
 
 public:
@@ -297,6 +300,17 @@ public:
   int complied_dosing_days(const SCTherapy* therapy);
 
   void schedule_update_every_K_days_event(const int &time);
+  // Check to see if the indicated event has been defined for the individual.
+  template <typename T>
+  bool has_event() const {
+    for (auto event_pair : *events()) {
+      if (dynamic_cast<T*>(event_pair.second) != nullptr && event_pair.second->executable
+          && event_pair.second->dispatcher != nullptr) {
+        return true;
+          }
+    }
+    return false;
+  }
 
 };
 

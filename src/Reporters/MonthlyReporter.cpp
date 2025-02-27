@@ -67,11 +67,11 @@ void MonthlyReporter::monthly_report() {
     ss << group_sep;
 
   // including total number of positive individuals
-  //  ReporterUtils::output_genotype_frequency3(ss, Model::get_instance().get_config()->get_genotype_parameters().genotype_db.size(),
+  //  ReporterUtils::output_genotype_frequency3(ss, Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size(),
   //                                            Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
 
   std::stringstream gene_freq_ss;
-  ReporterUtils::output_genotype_frequency3(gene_freq_ss, Model::get_instance().get_config()->get_genotype_parameters().genotype_db.size(),
+  ReporterUtils::output_genotype_frequency3(gene_freq_ss, Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size(),
                                             Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
 
   gene_freq_file << gene_freq_ss.str() << std::endl;
@@ -113,7 +113,7 @@ void MonthlyReporter::after_run() {
   }
   summary_data_file << ss.str() << std::endl;
 
-  for (auto [g_id, genotype] : Model::get_instance().get_config()->get_genotype_parameters().genotype_db) {
+  for (auto [g_id, genotype] : *(Model::get_instance().get_config()->get_genotype_parameters().genotype_db)) {
     gene_db_file << g_id << sep << genotype->aa_sequence << std::endl;
   }
 

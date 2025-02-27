@@ -5,6 +5,7 @@
 #include "Utils/Helpers/NumberHelpers.hxx"
 #include "Simulation/Model.h"
 #include "Treatment/Therapies/DrugDatabase.h"
+#include "Utils/Helpers/StringHelpers.h"
 // #include "Therapies/SCTherapy.h"
 
 Genotype::Genotype(const std::string &in_aa_sequence) : aa_sequence { in_aa_sequence } {
@@ -36,17 +37,54 @@ Genotype *Genotype::combine_mutation_to(const int &locus, const int &value) {
   return this;
 }
 
-double Genotype::get_EC50_power_n(DrugType *dt) const {
+Genotype* Genotype::modify_genotype_allele(const std::vector<std::tuple<int,int,char>> &alleles,Config *pConfig) {
+  std::string new_aa_sequence { aa_sequence };
+  /*
+   * allele_map_info is (chromosome_id,locus_pos,allele)
+  */
+  // for (auto & allele : alleles) {
+  //   spdlog::info("Mutation at {}:{} {}",std::get<0>(allele),std::get<1>(allele),std::get<2>(allele));
+  // }
+  for (auto const allele_info : alleles) {
+    int chromosome_counter = 0;
+    int locus_counter = 0;
+    for(int char_counter = 0; char_counter < new_aa_sequence.size(); char_counter++) {
+      if (chromosome_counter == (std::get<0>(allele_info) - 1)) {
+        if (locus_counter == (std::get<1>(allele_info) - 1)) {
+          if(pConfig->get_genotype_parameters().get_mutation_mask()[char_counter] == '1'){
+            if (new_aa_sequence[char_counter] != std::get<2>(allele_info)) {
+              // spdlog::trace("{}:{} Changing allele at {} ({} -> {}) new aa_sequence {} mask: {}",
+              //   std::get<0>(allele_info),std::get<1>(allele_info),
+              //   char_counter, new_aa_sequence[char_counter],std::get<2>(allele_info),new_aa_sequence,
+              //   pConfig->get_genotype_parameters().get_mutation_mask()[char_counter]);
+                new_aa_sequence[char_counter] = std::get<2>(allele_info);
+            }
+          }
+          else {
+            spdlog::error("{}:{} Changing allele at {} ({} -> {}) of genotype aa_sequence {} but the mask is 0",
+              std::get<0>(allele_info),std::get<1>(allele_info),
+            char_counter, new_aa_sequence[char_counter],std::get<2>(allele_info),new_aa_sequence);
+          }
+        }
+        locus_counter++;
+      }
+      if (new_aa_sequence[char_counter] == '|') chromosome_counter++;
+    }
+  }
+  return pConfig->get_genotype_parameters().genotype_db->get_genotype(new_aa_sequence);
+}
+
+double Genotype::get_EC50_power_n(DrugType *dt) {
   return EC50_power_n[dt->id()];
 }
 
-std::ostream &operator<<(std::ostream &os, const Genotype &e) {
+std::ostream &operator<<(std::ostream &os, Genotype &e) {
   os << e.genotype_id << "\t";
   os << e.get_aa_sequence();
   return os;
 }
 
-std::string Genotype::get_aa_sequence() const {
+std::string Genotype::get_aa_sequence() {
   return aa_sequence;
 }
 bool Genotype::is_valid(const GenotypeParameters::PfGenotypeInfo &genotype_info) {
@@ -138,7 +176,7 @@ void Genotype::calculate_daily_fitness(const GenotypeParameters::PfGenotypeInfo 
       }
     }
   }
-//  LOG(INFO) << "\n";
+//  std::cout << "\n";
 }
 
 void Genotype::calculate_EC50_power_n(const GenotypeParameters::PfGenotypeInfo &genotype_info, DrugDatabase *drug_db) {
@@ -221,49 +259,50 @@ void Genotype::calculate_EC50_power_n(const GenotypeParameters::PfGenotypeInfo &
 
 Genotype *Genotype::perform_mutation_by_drug(Config *pConfig, utils::Random *pRandom, DrugType *pDrugType, double mutation_probability_by_locus) const {
   std::string new_aa_sequence { aa_sequence };
-//  LOG(INFO) << "mask: " << pConfig->mutation_mask();
-//  LOG(INFO) << "old aa_sequence: " << aa_sequence;
+  // std::cout << "\nmask: " << pConfig->get_genotype_parameters().get_mutation_mask() << std::endl;
+  // std::cout << "old aa_sequence: " << aa_sequence << std::endl;
   for(int aa_pos_id = 0; aa_pos_id < pDrugType->resistant_aa_locations.size(); aa_pos_id++) {
     // get aa position info (aa index in aa string, is copy number)
     auto aa_pos = pDrugType->resistant_aa_locations[aa_pos_id];
     if(pConfig->get_genotype_parameters().get_mutation_mask()[aa_pos.aa_index_in_aa_string] == '1'){
         const auto p = pRandom->random_flat(0.0, 1.0);
-//        LOG(INFO) << "p: " << p << " Mutation probability: " << mutation_probability_by_locus;
-//        LOG(INFO) << "aa_pos_id: " << aa_pos_id << " aa_pos.aa_index_in_aa_string: " << aa_pos.aa_index_in_aa_string;
+        // std::cout << "p: " << p << " Mutation probability: " << mutation_probability_by_locus << std::endl;
+        // std::cout << "aa_pos_id: " << aa_pos_id << " aa_pos.aa_index_in_aa_string: "
+        // << aa_pos.aa_index_in_aa_string << " aa_pos.is_copy_number: " << aa_pos.is_copy_number << std::endl;
         if (p < mutation_probability_by_locus){
           if (aa_pos.is_copy_number) {
                 // increase or decrease by 1 step
                 auto old_copy_number = NumberHelpers::char_to_single_digit_number(aa_sequence[aa_pos.aa_index_in_aa_string]);
-//                LOG(INFO) << "old_copy_number: " << old_copy_number;
+                // std::cout << "old_copy_number: " << old_copy_number << std::endl;
                 if (old_copy_number == 1) {
-//                  LOG(INFO) << "old_copy_number == 1";
+//                  std::cout << "old_copy_number == 1";
                     new_aa_sequence[aa_pos.aa_index_in_aa_string] = NumberHelpers::single_digit_number_to_char(old_copy_number + 1);
                 } else if (old_copy_number == pConfig->get_genotype_parameters().get_pf_genotype_info()
                                    .chromosome_infos[aa_pos.chromosome_id]
                                    .get_genes()[aa_pos.gene_id]
                                    .get_max_copies()) {
-//                    LOG(INFO) << "old_copy_number == max_copies";
+                    // std::cout << "old_copy_number == max_copies" << std::endl;
                     new_aa_sequence[aa_pos.aa_index_in_aa_string] = NumberHelpers::single_digit_number_to_char(old_copy_number - 1);
                 } else {
                     auto new_copy_number = pRandom->random_uniform() < 0.5 ? old_copy_number - 1 : old_copy_number + 1;
-//                    LOG(INFO) << "else " << "pRandom->random_uniform(): " << pRandom->random_uniform() << " new_copy_number: " << new_copy_number;
+                    // std::cout << "else " << "pRandom->random_uniform(): " << pRandom->random_uniform() << " new_copy_number: " << new_copy_number << std::endl;
                     new_aa_sequence[aa_pos.aa_index_in_aa_string] = NumberHelpers::single_digit_number_to_char(new_copy_number);
                 }
-            } else {
-                auto &aa_list = pConfig->get_genotype_parameters().get_pf_genotype_info()
+          } else {
+                const std::vector<std::string> aa_list = pConfig->get_genotype_parameters().get_pf_genotype_info()
                         .chromosome_infos[aa_pos.chromosome_id]
                         .get_genes()[aa_pos.gene_id]
                         .get_aa_positions()[aa_pos.aa_id]
                         .get_amino_acids();
-//                LOG(INFO) << "aa_list: [" << aa_list[0] << "," << aa_list[1] << "]";
+                // std::cout << "aa_list: [" << aa_list[0] << "," << aa_list[1] << "]" << std::endl;
                 // draw random aa id
                 auto new_aa_id = pRandom->random_uniform(aa_list.size() - 1);
-//                LOG(INFO) << "pRandom->random_uniform(aa_list.size() - 1) " << pRandom->random_uniform(aa_list.size() - 1);
+                // std::cout << "pRandom->random_uniform(aa_list.size() - 1) " << pRandom->random_uniform(aa_list.size() - 1) << std::endl;
                 auto old_aa = aa_sequence[aa_pos.aa_index_in_aa_string];
                 auto new_aa = aa_list[new_aa_id][0];
-//                LOG(INFO) << "Mutation old_aa: " << old_aa << " -> new_aa: " << new_aa;
+                // std::cout << "Mutation old_aa: " << old_aa << " -> new_aa: " << new_aa << std::endl;
 //                if (new_aa == old_aa) {
-//                    LOG(INFO) << "old_aa: " << old_aa << " == new_aa: " << new_aa;
+//                    std::cout << "old_aa: " << old_aa << " == new_aa: " << new_aa;
 //                    new_aa = aa_list[new_aa_id + 1];
 //                }
                 if (new_aa == old_aa) {
@@ -274,11 +313,11 @@ Genotype *Genotype::perform_mutation_by_drug(Config *pConfig, utils::Random *pRa
                   }
                 }
                 new_aa_sequence[aa_pos.aa_index_in_aa_string] = new_aa;
-                if (aa_pos.aa_index_in_aa_string == 9 && old_aa == 'K' && new_aa == 'T'){
+                if (old_aa == 'C' && new_aa == 'Y'){
                   spdlog::info("{} p: {} < {} select new_aa_id: {} from [0,{}] aa_list[new_aa_id] = aa_list[{}] = {}",
                             Model::get_instance().get_scheduler()->current_time(), p, mutation_probability_by_locus,
                             new_aa_id, aa_list.size() - 1, new_aa_id, aa_list[new_aa_id]);
-                  spdlog::info("{} Mutation {} -> {} old:{} new: {} aa_pos_id: {} aa_pos: {}",
+                  spdlog::info("{} Mutation {} -> {} old: {} new: {} aa_pos_id: {} aa_pos: {}",
                             Model::get_instance().get_scheduler()->current_time(), p, mutation_probability_by_locus,
                             old_aa, new_aa, aa_pos_id, aa_pos.aa_index_in_aa_string);
                 }
@@ -287,7 +326,7 @@ Genotype *Genotype::perform_mutation_by_drug(Config *pConfig, utils::Random *pRa
     }
   }
   // get genotype pointer from gene database based on aa sequence
-  return pConfig->get_genotype_parameters().genotype_db.get_genotype(new_aa_sequence);
+  return pConfig->get_genotype_parameters().genotype_db->get_genotype(new_aa_sequence);
 }
 
 void Genotype::override_EC50_power_n(const std::vector<GenotypeParameters::OverrideEC50Pattern> &override_patterns, DrugDatabase *drug_db) {
@@ -362,7 +401,7 @@ Genotype *Genotype::free_recombine_with(Config *pConfig, utils::Random *pRandom,
   }
 
   auto new_aa_sequence = Convert_PfGenotypeStr_To_String(new_pf_genotype_str);
-  return pConfig->get_genotype_parameters().genotype_db.get_genotype(new_aa_sequence);
+  return pConfig->get_genotype_parameters().genotype_db->get_genotype(new_aa_sequence);
 }
 
 std::string Genotype::Convert_PfGenotypeStr_To_String(const PfGenotypeStr &pfGenotypeStr) {
@@ -431,5 +470,5 @@ Genotype *Genotype::free_recombine(Config *config, utils::Random *pRandom, Genot
   }
 
   auto new_aa_sequence = Convert_PfGenotypeStr_To_String(new_pf_genotype_str);
-  return config->get_genotype_parameters().genotype_db.get_genotype(new_aa_sequence);
+  return config->get_genotype_parameters().genotype_db->get_genotype(new_aa_sequence);
 }

@@ -22,8 +22,8 @@ void SQLiteDbReporter::populate_genotype_table() {
 
     auto* config = Model::get_instance().get_config();
 
-    for (auto id = 0; id < config->get_genotype_parameters().genotype_db.size(); id++) {
-      Genotype* genotype = config->get_genotype_parameters().genotype_db.get_genotype_by_id(id);
+    for (auto id = 0; id < config->get_genotype_parameters().genotype_db->size(); id++) {
+      Genotype* genotype = config->get_genotype_parameters().genotype_db->get_genotype_by_id(id);
       // Bind values to the prepared statement
       sqlite3_bind_int(stmt, 1, id);
       sqlite3_bind_text(stmt, 2, genotype->get_aa_sequence().c_str(), strlen(genotype->get_aa_sequence().c_str()), SQLITE_TRANSIENT);

@@ -8,6 +8,7 @@
 #include "SQLitePixelReporter.h"
 #include "TACTReporter.h"
 #include "ValidationReporter.h"
+#include "Specialist/MovementReporter.h"
 
 std::map<std::string, Reporter::ReportType> Reporter::ReportTypeMap{
     {"Console",         CONSOLE},
@@ -16,6 +17,7 @@ std::map<std::string, Reporter::ReportType> Reporter::ReportTypeMap{
     {"TACT",            TACT_REPORTER},
     {"NovelDrug",       NOVEL_DRUG_REPOTER},
     {"ValidationReporter",       VALIDATION_REPORTER},
+    {"TherapyRecordReporter", THERAPY_RECORD_REPORTER},
     {"SQLiteDistrictReporter", SQLITE_DISTRICT_REPORTER},
     {"SQLitePixelReporter", SQLITE_PIXEL_REPORTER},
 #ifdef ENABLE_TRAVEL_TACKING

@@ -71,7 +71,7 @@ void MMCReporter::monthly_report() {
 
   ReporterUtils::output_genotype_frequency3(
       ss,
-      Model::get_instance().get_config()->get_genotype_parameters().genotype_db.size(),
+      Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size(),
       Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
 
   ss << group_sep;
