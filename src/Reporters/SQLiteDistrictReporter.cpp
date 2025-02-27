@@ -262,7 +262,7 @@ void SQLiteDistrictReporter::reset_genome_data_structures(int numDistricts,
 }
 void SQLiteDistrictReporter::collect_genome_data_for_a_person(Person* person,
                                                               int site) {
-  const auto numGenotypes = Model::get_instance().get_config()->get_genotype_parameters().genotype_db.size();
+  const auto numGenotypes = Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size();
   auto individual = std::vector<int>(numGenotypes, 0);
   // Get the person, press on if they are not infected
   auto* parasites = person->get_all_clonal_parasite_populations()->parasites();
@@ -298,7 +298,7 @@ void SQLiteDistrictReporter::collect_genome_data_for_a_person(Person* person,
 }
 
 void SQLiteDistrictReporter::build_up_genome_data_insert_values(int monthId) {
-  auto numGenotypes = Model::get_instance().get_config()->get_genotype_parameters().genotype_db.size();
+  auto numGenotypes = Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size();
   auto numDistricts = SpatialData::get_instance().get_district_count();
 
   insert_values.clear();
@@ -331,7 +331,7 @@ void SQLiteDistrictReporter::monthly_report_genome_data(int monthId) {
   TransactionGuard transaction{db.get()};
 
   // Cache some values
-  auto numGenotypes = Model::get_instance().get_config()->get_genotype_parameters().genotype_db.size();
+  auto numGenotypes = Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size();
   auto numDistricts = SpatialData::get_instance().get_district_count();
   auto* index =
       Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();

@@ -411,7 +411,7 @@ void Population::introduce_initial_cases() {
       auto num_of_infections = Model::get_instance().get_random()->random_poisson(std::round(size_at(p_info.location) * p_info.prevalence));
       num_of_infections = num_of_infections <= 0 ? 1 : num_of_infections;
 
-      auto* genotype = Model::get_instance().get_config()->get_genotype_parameters().genotype_db.at(p_info.parasite_type_id);
+      auto* genotype = Model::get_instance().get_config()->get_genotype_parameters().genotype_db->at(p_info.parasite_type_id);
       spdlog::info("Introducing genotype {} with prevalence: {} : {} infections at location {}",
                 p_info.parasite_type_id, p_info.prevalence, num_of_infections, p_info.location);
       introduce_parasite(p_info.location, genotype, num_of_infections);

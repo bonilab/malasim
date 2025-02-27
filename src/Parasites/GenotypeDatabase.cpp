@@ -76,10 +76,9 @@ Genotype *GenotypeDatabase::get_genotype(const std::string &aa_sequence) {
 
     aa_sequence_id_map[aa_sequence] = new_genotype;
     add(new_genotype);
-//    LOG(INFO)<< "New genotype id: " << auto_id << " aa_sequence: " << aa_sequence;
     new_genotype->resistant_recombinations_in_mosquito = std::vector<MosquitoRecombinedGenotypeInfo>();
-
     auto_id++;
+    // spdlog::info("GenotypeDB new genotype id {} aa_sequence {}",auto_id,aa_sequence);
     return new_genotype;
   } else {
     return aa_sequence_id_map[aa_sequence];

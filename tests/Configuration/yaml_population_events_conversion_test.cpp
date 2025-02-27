@@ -12,7 +12,6 @@ protected:
         // Setting up EventInfo
         PopulationEvents::EventInfo event_info;
         event_info.set_date(date::year_month_day{date::year(2024), date::month(10), date::day(1)});
-        event_info.set_location_id(1);
 
         // Setting up PopulationEvent
         PopulationEvents::PopulationEvent population_event;
@@ -20,7 +19,7 @@ protected:
         population_event.set_info({event_info});
 
         // Adding event to PopulationEvents
-        population_events.set_events({population_event});
+        population_events.set_events_raw({population_event});
     }
 };
 
@@ -45,12 +44,11 @@ TEST_F(PopulationEventsTest, DecodePopulationEvents) {
     PopulationEvents decoded_population_events;
     ASSERT_NO_THROW(YAML::convert<PopulationEvents>::decode(node, decoded_population_events));
 
-    const auto& events = decoded_population_events.get_events();
+    const auto& events = decoded_population_events.get_events_raw();
     ASSERT_EQ(events.size(), 1);
     const auto& event_info = events[0].get_info()[0];
 
     EXPECT_EQ(event_info.get_date().year(), date::year(2024));
-    EXPECT_EQ(event_info.get_location_id(), 1);
 }
 
 // Test missing fields during decoding

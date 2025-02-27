@@ -20,7 +20,7 @@ void TACTReporter::before_run() {
   // output header for csv file
   ss << "TIME" << sep << "PFPR" << sep << "MUTATIONS" << sep << "NUMBER_OF_TREATMENTS" << sep
      << "NUMBER_OF_TREATMENT_FAILURES" << sep << "NUMBER_OF_SYMPTOMATIC_CASES" << sep;
-  for (auto i = 0; i < Model::get_instance().get_config()->get_genotype_parameters().genotype_db.size(); i++) {
+  for (auto i = 0; i < Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size(); i++) {
     ss << "GENOTYPE_ID_" << i << sep;
   }
   ss << group_sep;
@@ -48,7 +48,7 @@ void TACTReporter::monthly_report() {
     ss << Model::get_instance().get_mdc()->monthly_number_of_clinical_episode_by_location()[loc] << sep;
   }
 
-  output_genotype_frequency_3(Model::get_instance().get_config()->get_genotype_parameters().genotype_db.size(),
+  output_genotype_frequency_3(Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size(),
                               Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
 
   ss << group_sep;
@@ -77,7 +77,7 @@ void TACTReporter::after_run() {
     } else {
       ss << Model::get_instance().get_mdc()->EIR_by_location_year()[loc].back() << sep;
     }
-    ss << Model::get_instance().get_treatment_coverage()->p_treatment_less_than_5[0] << sep;
+    ss << Model::get_instance().get_treatment_coverage()->p_treatment_under_5[0] << sep;
     ss << Model::get_instance().get_mdc()->cumulative_number_treatments_by_location()[loc] << sep;
     ss << Model::get_instance().get_mdc()->cumulative_TF_by_location()[loc] << sep;
     ss << Model::get_instance().get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;

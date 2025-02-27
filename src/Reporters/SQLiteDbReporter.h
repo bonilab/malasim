@@ -66,7 +66,13 @@ public:
   // closed when the Database object is destroyed. Therefore, no explicit action
   // is required here. If there are other cleanup actions to perform, they can
   // be added here.
-  void after_run() override {}
+  void after_run() override {
+    /*
+     * Re-populate genotype database,
+     * because the genotype database is dynamic now
+    */
+    populate_genotype_table();
+  }
 };
 
 #endif

@@ -64,8 +64,8 @@ bool Config::load(const std::string &filename) {
     config_data_.mosquito_parameters =
       config["mosquito_parameters"].as<MosquitoParameters>();
 
-    config_data_.population_events =
-      config["population_events"].as<PopulationEvents>();
+    config_data_.rapt_settings =
+      config["rapt_settings"].as<RaptSettings>();
 
     spdlog::info("Configuration file parsed successfully");
 
@@ -158,7 +158,17 @@ bool Config::load(const std::string &filename) {
       get_spatial_settings().get_number_of_locations());
     config_data_.epidemiological_parameters.process_config();
     config_data_.mosquito_parameters.process_config_using_locations(
-      get_spatial_settings().location_db);
+    get_spatial_settings().location_db);
+    config_data_.rapt_settings.process_config_with_starting_date(
+      get_simulation_timeframe().get_starting_date());
+
+    /*
+     * Parse population events last because it depends on all other settings
+     */
+    config_data_.population_events =
+      config["population_events"].as<PopulationEvents>();
+
+    spdlog::info("Population events parsed successfully");
 
     return true;
   }
@@ -637,15 +647,15 @@ void Config::validate_all_cross_field_validations() {
   ----------------------------*/
   PopulationEvents population_events = config_data_.population_events;
   //Loop through all events
-  for(auto population_event : population_events.get_events()) {
+  for(auto population_event : population_events.get_events_raw()) {
     //Check if name is provided
     if(population_event.get_name().empty()) {
       throw std::invalid_argument("Name should be provided for all population events");
     }
     for(auto event_info : population_event.get_info()) {
       //Check if event date is valid
-      if(event_info.get_date() <= simulation_timeframe.get_starting_date() ||
-           event_info.get_date() >= simulation_timeframe.get_ending_date()) {
+      if(event_info.get_date() < simulation_timeframe.get_starting_date() ||
+           event_info.get_date() > simulation_timeframe.get_ending_date()) {
           throw std::invalid_argument("Event date should be in between simulation starting and ending date");
       }
     }

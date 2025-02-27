@@ -21,12 +21,18 @@ class StringHelpers {
 public:
   template <typename Elem>
   static std::vector<tstring<Elem>> split(tstring<Elem> text,
-                                          Elem const delimiter) {
+                                          Elem const delimiter,
+                                          bool ignore_empty = true) {
     auto sstr = tstringstream<Elem>{text};
     auto tokens = std::vector<tstring<Elem>>{};
     auto token = tstring<Elem>{};
     while (std::getline(sstr, token, delimiter)) {
-      if (!token.empty()) tokens.push_back(token);
+      if (ignore_empty) {
+        if (!token.empty()) tokens.push_back(token);
+      }
+      else {
+        tokens.push_back(token);
+      }
     }
 
     return tokens;
@@ -63,33 +69,10 @@ public:
     return result;
   }
 
-  static std::string santinize_pipe(const std::string &str) {
-    std::string sanitized = str;
-    size_t pos = 0;
-    while ((pos = sanitized.find('|', pos)) != std::string::npos) {
-      sanitized.replace(pos, 1, "\\|");
-      pos += 2;  // Move past the newly inserted escape character
-    }
-    return sanitized;
-  }
-
-  static std::string escaped_string(const std::string &str) {
-    std::string escapedValue;
-    for (char c : str) {
-      if (c == '\'') escapedValue += "''"; // Escape single quote
-      else escapedValue += c;
-    }
-    return escapedValue;
-  }
-
-  static std::string utf8_string(const std::string &str) {
-    std::string utf8Value;
-    for (char c : str) {
-      if (c == '\\') utf8Value += "\\\\";
-      else if (c == '\"') utf8Value += "\\\"";
-      else utf8Value += c;
-    }
-    return utf8Value;
+  static std::string date_as_string(date::year_month_day date) {
+    std::stringstream ss;
+    ss << date.year() << "/" << static_cast<unsigned int>(date.month()) << "/" << date.day();
+    return ss.str();
   }
 };
 

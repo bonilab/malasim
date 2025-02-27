@@ -14,13 +14,13 @@
 #include "ParasiteParameters.h"
 #include "PopulationDemographic.h"
 #include "PopulationEvents.h"
+#include "RaptSettings.h"
 #include "TransmissionSettings.h"
 #include "SimulationTimeframe.h"
 #include "SpatialSettings.h"
 #include "SeasonalitySettings.h"
 #include "StrategyParameters.h"
 #include "TherapyParameters.h"
-#include "PreconfigPopulationEvents.h"
 
 class Config{
 public:
@@ -51,7 +51,7 @@ public:
     EpidemiologicalParameters epidemiological_parameters{};
     MosquitoParameters mosquito_parameters{};
     PopulationEvents population_events{};
-    PreconfigPopulationEvents preconfig_population_events{};
+    RaptSettings rapt_settings{};
   };
 
   // Load configuration from a YAML file
@@ -84,7 +84,7 @@ public:
   [[nodiscard]] SeasonalitySettings &get_seasonality_settings() {
     return config_data_.seasonality_settings;
   }
-  [[nodiscard]] const MovementSettings &get_movement_settings() const {
+  [[nodiscard]] MovementSettings &get_movement_settings() {
     return config_data_.movement_settings;
   }
   [[nodiscard]] const ParasiteParameters &get_parasite_parameters() const {
@@ -114,18 +114,16 @@ public:
       const {
     return config_data_.epidemiological_parameters;
   }
-  [[nodiscard]] const MosquitoParameters &get_mosquito_parameters()
-      const {
+  [[nodiscard]] MosquitoParameters &get_mosquito_parameters()
+      {
     return config_data_.mosquito_parameters;
   }
-  [[nodiscard]] const PopulationEvents &get_population_events()
-      const {
+  [[nodiscard]] PopulationEvents &get_population_events()
+      {
     return config_data_.population_events;
   }
-
-  [[nodiscard]] const PreconfigPopulationEvents &get_preconfig_population_events()
-      const {
-    return config_data_.preconfig_population_events;
+  [[nodiscard]] RaptSettings &get_rapt_settings() {
+    return config_data_.rapt_settings;
   }
 
 private:

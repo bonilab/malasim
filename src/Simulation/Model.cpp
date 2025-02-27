@@ -40,10 +40,10 @@ void Model::set_treatment_strategy(const int& strategy_id) {
 
 void Model::set_treatment_coverage(ITreatmentCoverageModel* tcm) {
   if (treatment_coverage_ != tcm) {
-    if (tcm->p_treatment_less_than_5.empty() || tcm->p_treatment_more_than_5.empty()) {
+    if (tcm->p_treatment_under_5.empty() || tcm->p_treatment_over_5.empty()) {
       // copy current value
-      tcm->p_treatment_less_than_5 = treatment_coverage_->p_treatment_less_than_5;
-      tcm->p_treatment_more_than_5 = treatment_coverage_->p_treatment_more_than_5;
+      tcm->p_treatment_under_5 = treatment_coverage_->p_treatment_under_5;
+      tcm->p_treatment_over_5 = treatment_coverage_->p_treatment_over_5;
     }
     ObjectHelpers::delete_pointer<ITreatmentCoverageModel>(treatment_coverage_);
   }
@@ -53,8 +53,8 @@ void Model::set_treatment_coverage(ITreatmentCoverageModel* tcm) {
 void Model::build_initial_treatment_coverage() {
   auto* tcm = new SteadyTCM();
   for (auto& location : config_->get_spatial_settings().location_db) {
-    tcm->p_treatment_less_than_5.push_back(location.p_treatment_under_5);
-    tcm->p_treatment_more_than_5.push_back(location.p_treatment_over_5);
+    tcm->p_treatment_under_5.push_back(location.p_treatment_under_5);
+    tcm->p_treatment_over_5.push_back(location.p_treatment_over_5);
   }
   set_treatment_coverage(tcm);
 }
@@ -105,6 +105,7 @@ bool Model::initialize() {
       mdc_->initialize();
       spdlog::info("Model initialized data collector.");
 
+      spdlog::info("Model initializing population...");
       population_->initialize();
       spdlog::info("Model initialized population.");
 
@@ -117,9 +118,10 @@ bool Model::initialize() {
       population_->introduce_initial_cases();
       spdlog::info("Model initialized initial cases.");
 
-      // for (auto* event : config_->get_preconfig_population_events().get_events()) {
-      //   scheduler_->schedule_population_event(event);
-      // }
+      for (auto* event : config_->get_population_events().get_events()) {
+        spdlog::info("Model initialized population event: " + event->name());
+        scheduler_->schedule_population_event(event);
+      }
 
       if (utils::Cli::get_instance().get_record_movement()) {
         // Generate a movement reporter

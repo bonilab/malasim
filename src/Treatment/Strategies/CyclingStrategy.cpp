@@ -13,6 +13,7 @@
 #include <sstream>
 #include "IStrategy.h"
 #include "Treatment/Therapies/Therapy.h"
+#include "Utils/Helpers/StringHelpers.h"
 
 CyclingStrategy::CyclingStrategy() : IStrategy("CyclingStrategy", Cycling) {}
 
@@ -30,8 +31,9 @@ void CyclingStrategy::switch_therapy() {
 
   // TODO: cycling_time should be match with calendar day
   next_switching_day = Model::get_instance().get_scheduler()->current_time() + cycling_time;
-  std::cout << date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}
-            << ": Cycling Strategy switch therapy to: " << therapy_list[index]->get_id();
+  spdlog::info("{}: Cycling Strategy switch Therapy to: {}",
+    StringHelpers::date_as_string(date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}),
+    therapy_list[index]->get_id());
 }
 
 Therapy *CyclingStrategy::get_therapy(Person *person) {

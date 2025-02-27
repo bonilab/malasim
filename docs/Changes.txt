@@ -23,7 +23,7 @@ Model::get_instance().get_config()->get_drug_parameters().drug_db
 
 Model::get_instance().get_config()->get_therapy_parameters().therapy_db
 
-Model::get_instance().get_config()->get_strategy_parameters().therapy_db
+Model::get_instance().get_config()->get_strategy_parameters().strategy_db
 
 Model::get_instance().get_config()->get_immune_system_parameters()
 
@@ -35,11 +35,15 @@ Model::get_instance().get_config()->get_population_demographic().get_number_of_a
 
 Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels().get_
 
+Model::get_instance().get_config()->get_epidemiological_parameters().get_
+
 Model::get_instance().get_scheduler()
 
 Model::get_instance().get_config()->get_seasonality_settings().get_seasonal_factor()
 
 Model::get_instance().get_config()->get_spatial_settings().get_spatial_distance_matrix()
+
+Model::get_instance().get_population()
 
 Model::get_instance().get_random()
 

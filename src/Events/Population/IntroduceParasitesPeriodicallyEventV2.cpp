@@ -1,0 +1,115 @@
+#include "IntroduceParasitesPeriodicallyEventV2.h"
+#include "Simulation/Model.h"
+#include "Population/Population.h"
+#include "Population/ImmuneSystem/ImmuneSystem.h"
+#include "Population/ClonalParasitePopulation.h"
+#include "Configuration/Config.h"
+#include "Core/Scheduler/Scheduler.h"
+#include "Utils/Random.h"
+#include "MDC/ModelDataCollector.h"
+#include "Utils/Index/PersonIndexByLocationStateAgeClass.h"
+
+// OBJECTPOOL_IMPL(IntroduceParasitesPeriodicallyEventV2)
+
+IntroduceParasitesPeriodicallyEventV2::IntroduceParasitesPeriodicallyEventV2(
+    const std::vector<std::vector<double>>& allele_distributions_in,
+    const int& location, const int& duration,
+    const int& number_of_cases, const int& start_day_in, const int & end_day_in
+)
+    : allele_distributions(allele_distributions_in),
+      location_(location), duration_(duration), number_of_cases_(number_of_cases),
+      start_day(start_day_in), end_day(end_day_in) {
+
+  time = start_day;
+
+  if (end_day_in == -1){
+    end_day = Model::get_instance().get_config()->get_simulation_timeframe().get_total_time();
+  }
+}
+
+IntroduceParasitesPeriodicallyEventV2::~IntroduceParasitesPeriodicallyEventV2() = default;
+
+void IntroduceParasitesPeriodicallyEventV2::schedule_event(
+    Scheduler* scheduler, IntroduceParasitesPeriodicallyEventV2* old_event
+) {
+  if (scheduler != nullptr) {
+    auto* e = new IntroduceParasitesPeriodicallyEventV2(
+        old_event->allele_distributions,
+        old_event->location(), old_event->duration(),
+        old_event->number_of_cases(), old_event->start_day, old_event->end_day
+    );
+    e->dispatcher = nullptr;
+    e->time = scheduler->current_time() + 1;
+    scheduler->schedule_population_event(e);
+  }
+}
+
+void IntroduceParasitesPeriodicallyEventV2::execute() {
+  // TODO: rework this
+
+  // std::cout << date::year_month_day{ Model::get_instance().get_scheduler()->calendar_date } << ":import periodically event" << std::endl;
+  //schedule importation for the next day
+  if (Model::get_instance().get_scheduler()->current_time() < end_day) {
+    schedule_event(Model::get_instance().get_scheduler(), this);
+  }
+//  else {
+//    LOG(INFO) << "Hello End importation" ;
+//  }
+
+  const auto number_of_importation_cases = Model::get_instance().get_random()->random_poisson(
+      static_cast<double>(number_of_cases_) / duration_
+  );
+  if (Model::get_instance().get_mdc()->popsize_by_location_hoststate()[location_][0] < number_of_importation_cases) {
+    return;
+  }
+
+  //    std::cout << number_of_cases_ << std::endl;
+  auto* pi = Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
+  if (number_of_importation_cases > 0) {
+    spdlog::debug("Day {}: Importing {} at location {}",
+                  Model::get_instance().get_scheduler()->current_time(), number_of_importation_cases,
+                  location_);
+  }
+
+  for (auto i = 0; i < number_of_importation_cases; i++) {
+
+    std::size_t ind_ac = Model::get_instance().get_random()->random_uniform(static_cast<unsigned long>(pi->vPerson()[location_][0].size()));
+    if (pi->vPerson()[location_][0][ind_ac].empty()) {
+      continue;
+    }
+
+    std::size_t index = Model::get_instance().get_random()->random_uniform(pi->vPerson()[location_][0][ind_ac].size());
+    auto* p = pi->vPerson()[location_][0][ind_ac][index];
+
+    p->get_immune_system()->set_increase(true);
+    p->set_host_state(Person::ASYMPTOMATIC);
+
+    //check and draw random Genotype
+    std::vector<int> gene_structure(allele_distributions.size());
+
+    for (int j = 0; j < allele_distributions.size(); ++j) {
+      int k = 0;
+      double sum = allele_distributions[j][k];
+      double r = Model::get_instance().get_random()->random_uniform();
+
+      while (r > sum) {
+        k += 1;
+        sum += allele_distributions[j][k];
+      }
+      gene_structure[j] = k;
+    }
+
+    Genotype* imported_genotype =Model::get_instance().get_config()->get_genotype_parameters().genotype_db->get_genotype_from_alleles_structure(gene_structure);
+
+    auto* blood_parasite = p->add_new_parasite_to_blood(imported_genotype);
+
+    auto size = Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_asymptomatic();
+
+    blood_parasite->set_gametocyte_level(Model::get_instance().get_config()->get_epidemiological_parameters().get_gametocyte_level_full());
+    blood_parasite->set_last_update_log10_parasite_density(size);
+    blood_parasite->set_update_function(Model::get_instance().immunity_clearance_update_function());
+  }
+  spdlog::info("Day {}: Importing v2 {} at location {}",
+                Model::get_instance().get_scheduler()->current_time(), number_of_importation_cases,
+                location_);
+}

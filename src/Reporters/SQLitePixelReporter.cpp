@@ -133,7 +133,7 @@ void SQLitePixelReporter::monthly_report_genome_data(int monthId) {
   TransactionGuard transaction{db.get()};
 
   // Prepare the data structures
-  auto genotypes = Model::get_instance().get_config()->get_genotype_parameters().genotype_db.size();
+  auto genotypes = Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size();
   std::vector<int> individual(genotypes, 0);
 
   // Cache some values
