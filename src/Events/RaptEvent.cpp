@@ -19,7 +19,7 @@
 
 void RaptEvent::schedule_event(Scheduler* scheduler, Person* p,
                                const int &time) {
-  if (scheduler != nullptr && Model::get_instance().get_config()->get_rapt_settings().get_is_defined()) {
+  if (scheduler != nullptr && Model::get_config()->get_rapt_settings().get_is_defined()) {
     auto* rapt_event = new RaptEvent();
     rapt_event->dispatcher = p;
     rapt_event->time = time;
@@ -31,38 +31,38 @@ void RaptEvent::schedule_event(Scheduler* scheduler, Person* p,
 
 void RaptEvent::execute() {
   auto* person = dynamic_cast<Person*>(dispatcher);
-  const auto raptConfig = Model::get_instance().get_config()->get_rapt_settings();
+  const auto raptConfig = Model::get_config()->get_rapt_settings();
 
   // Check to see if we should receive a therapy: RAPT is currently active, the
   // person is the correct age, and they have not recently taken a treatment in
   // the past 28 days (based on testing for treatment failure).
-  if (Model::get_instance().get_scheduler()->current_time() >= raptConfig.get_start_date_as_day()
+  if (Model::get_scheduler()->current_time() >= raptConfig.get_start_date_as_day()
       && person->get_age() >= raptConfig.get_age_start()
       && !person->has_event<TestTreatmentFailureEvent>()) {
     // Is their base compliance over-5 or under-5 treatment rate, presume that
     // we are following the Malaria Indicator Survey convention of under-5 being
     // 0 - 59 months.
     auto pr_treatment = person->get_age() < 5
-                            ? Model::get_instance().get_config()->get_spatial_settings().location_db[person->get_location()]
+                            ? Model::get_config()->get_spatial_settings().location_db[person->get_location()]
                                   .p_treatment_under_5
-                            : Model::get_instance().get_config()->get_spatial_settings().location_db[person->get_location()]
+                            : Model::get_config()->get_spatial_settings().location_db[person->get_location()]
                                   .p_treatment_over_5;
 
     // Adjust the probability based upon the configured compliance rate with
     // RAPT
     double pr_rapt = pr_treatment * raptConfig.get_compliance();
-    const auto pr = Model::get_instance().get_random()->random_flat(0.0, 1.0);
+    const auto pr = Model::get_random()->random_flat(0.0, 1.0);
 
     if (pr <= pr_rapt) {
       person->receive_therapy(
-          Model::get_instance().get_config()->get_therapy_parameters().therapy_db[raptConfig.get_therapy_id()], nullptr);
+          Model::get_config()->get_therapy_parameters().therapy_db[raptConfig.get_therapy_id()], nullptr);
     }
   }
 
   // Determine when the next RAPT dose should take place based upon scheduling
   // period
-  const auto ymd = date::year_month_day(Model::get_instance().get_scheduler()->calendar_date)
-                   + date::months(Model::get_instance().get_config()->get_rapt_settings().get_period());
+  const auto ymd = date::year_month_day(Model::get_scheduler()->calendar_date)
+                   + date::months(Model::get_config()->get_rapt_settings().get_period());
 
   // Find the first and last day of the month of the next dose
   const auto first_day =
@@ -74,11 +74,11 @@ void RaptEvent::execute() {
   // dosing month to determine the actual next date when the RAPT dose may be
   // taken
   const auto from =
-      (date::sys_days(first_day) - Model::get_instance().get_scheduler()->calendar_date).count();
+      (date::sys_days(first_day) - Model::get_scheduler()->calendar_date).count();
   const auto to =
-      (date::sys_days(last_day) - Model::get_instance().get_scheduler()->calendar_date).count();
+      (date::sys_days(last_day) - Model::get_scheduler()->calendar_date).count();
   const auto days_to_next_event =
-      Model::get_instance().get_random()->random_uniform_int(from, to + 1);
+      Model::get_random()->random_uniform_int(from, to + 1);
 
   // Schedule the event
   schedule_event(scheduler, person,

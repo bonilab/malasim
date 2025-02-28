@@ -85,46 +85,51 @@ bool Config::load(const std::string &filename) {
       }
     }
 
-    spdlog::info("Pf genotype info: {}",
+    spdlog::debug("Pf genotype info: {}",
       get_genotype_parameters().get_pf_genotype_info().chromosome_infos.back()
       .get_genes().back()
       .get_cnv_multiplicative_effect_on_EC50().back()
       .get_drug_id());
     for(const auto& chromosome : get_genotype_parameters().get_pf_genotype_info().chromosome_infos) {
-      spdlog::info("chromosome:{}",chromosome.get_chromosome_id());
-      for(const auto& genes : chromosome.get_genes()) {
-        spdlog::info("\tgene:{}",genes.get_name());
-        if(genes.get_max_copies() != -1) {
-          spdlog::info("\tmax copies:{}",genes.get_max_copies());
-        }
-        if(genes.get_average_daily_crs() != -1) {
-          spdlog::info("\taverage crs:{}",genes.get_average_daily_crs());
-        }
-        for(const auto &cnv_crs : genes.get_cnv_daily_crs()){
-          spdlog::info("\tcnv crs:{}",cnv_crs);
-        }
-        for(const auto &cnv_ec50 : genes.get_cnv_multiplicative_effect_on_EC50()){
-          spdlog::info("\tcnv ec50:{}",cnv_ec50.get_drug_id());
-          for(const auto &factor : cnv_ec50.get_factors()) {
-            spdlog::info("\t\tfactor:{}",factor);
+      if (chromosome.get_chromosome_id() != -1) {
+        spdlog::debug("chromosome:{}",chromosome.get_chromosome_id());
+        for(const auto& genes : chromosome.get_genes()) {
+          spdlog::debug("\tgene:{}",genes.get_name());
+          if(genes.get_max_copies() != -1) {
+            spdlog::debug("\tmax copies:{}",genes.get_max_copies());
           }
-        }
-        for(const auto &cnv_ec50 : genes.get_multiplicative_effect_on_ec50_for_2_or_more_mutations()){
-          spdlog::info("\tcnv_ec50_2_or_more id:{}",cnv_ec50.get_drug_id());
-          spdlog::info("\tcnv_ec50_2_or_more factor:{}",cnv_ec50.get_factor());
-        }
-        for(const auto &aa_pos : genes.get_aa_positions()) {
-          spdlog::info("\tpos {}",aa_pos.get_position());
-          for(const auto & aa : aa_pos.get_amino_acids()) {
-            spdlog::info("\t\taa:{}",aa);
+          if(genes.get_average_daily_crs() != -1) {
+            spdlog::debug("\taverage crs:{}",genes.get_average_daily_crs());
           }
-          for(const auto &crs : aa_pos.get_daily_crs()) {
-            spdlog::info("\t\tcrs:{}",crs);
+          for(const auto &cnv_crs : genes.get_cnv_daily_crs()){
+            spdlog::debug("\tcnv crs:{}",cnv_crs);
           }
-          for(const auto &crs : aa_pos.get_multiplicative_effect_on_EC50()) {
-            spdlog::info("\t\tmultiplicative_effect_on_EC50: {}",crs.get_drug_id());
-            for(const auto &factor : crs.get_factors()) {
-              spdlog::info("\t\t\tfactor:{}",factor);
+          for(const auto &cnv_ec50 : genes.get_cnv_multiplicative_effect_on_EC50()){
+            spdlog::debug("\tcnv ec50:{}",cnv_ec50.get_drug_id());
+            for(const auto &factor : cnv_ec50.get_factors()) {
+              spdlog::debug("\t\tfactor:{}",factor);
+            }
+          }
+          for(const auto &cnv_ec50 : genes.get_multiplicative_effect_on_ec50_for_2_or_more_mutations()){
+            spdlog::debug("\tcnv_ec50_2_or_more id:{}",cnv_ec50.get_drug_id());
+            spdlog::debug("\tcnv_ec50_2_or_more factor:{}",cnv_ec50.get_factor());
+          }
+          for(const auto &aa_pos : genes.get_aa_positions()) {
+            // spdlog::debug("\tpos {}",aa_pos.get_position());
+            //   spdlog::debug("\t\taa:{}",aa_pos.get_amino_acids_string());
+            //   spdlog::debug("\t\tcrs:{}",aa_pos.get_daily_crs_string());
+            //   spdlog::debug("\t\tmultiplicative_effect_on_EC50:{}",aa_pos.get_multiplicative_effect_on_EC50_string());
+            for(const auto & aa : aa_pos.get_amino_acids()) {
+              spdlog::debug("\t\taa:{}",aa);
+            }
+            for(const auto &crs : aa_pos.get_daily_crs()) {
+              spdlog::debug("\t\tcrs:{}",crs);
+            }
+            for(const auto &crs : aa_pos.get_multiplicative_effect_on_EC50()) {
+              spdlog::debug("\t\tmultiplicative_effect_on_EC50: {}",crs.get_drug_id());
+              for(const auto &factor : crs.get_factors()) {
+                spdlog::debug("\t\t\tfactor:{}",factor);
+              }
             }
           }
         }
@@ -610,37 +615,31 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate mosquito parameters
   ----------------------------*/
-  // MosquitoParameters mosquito_parameters = config_data_.mosquito_parameters;
-  // //Check if mosquito_mode is either grid_based or location_based
-  // if(mosquito_parameters.get_mosquito_config().get_mode() != "grid_based" && mosquito_parameters.get_mosquito_config().get_mode() != "location_based") {
-  //     throw std::invalid_argument("Mosquito mode should be either grid_based or location_based");
-  // }
-  //If mode is grid_based, check if all raster file paths are provided
-  // if(mosquito_parameters.get_mosquito_config().get_mode() == "grid_based") {
-  //   MosquitoParameters::GridBased grid_based = mosquito_parameters.get_mosquito_config().get_grid_based();
-  //   utils::AscFile *asc_file = new utils::AscFile();
-  //   if(asc_file->load_and_validate(grid_based.get_interrupted_feeding_rate_raster(),
-  //                                   utils::AscFile::Type::MOSQUITO_IFR)) {
-  //     std::cout << "Interrupted feeding rate raster file validated successfully" << std::endl;
-  //                                   }
-  //   if(asc_file->load_and_validate(grid_based.get_prmc_size_raster(),
-  //                          utils::AscFile::Type::MOSQUITO_SIZE)) {
-  //     std::cout << "PRMC size raster file validated successfully" << std::endl;
-  //   }
-  // }
-  //If location_based, check if all location sizes are equal
-  // if(mosquito_parameters.get_mosquito_config().get_mode() == "location_based") {
-  //   MosquitoParameters::LocationBased location_based = mosquito_parameters.get_mosquito_config().get_location_based();
-  //   if(location_based.get_interrupted_feeding_rate().empty() || location_based.get_prmc_size().empty()) {
-  //     throw std::invalid_argument("All locations should be provided for location based mosquito mode");
-  //   }
-  //   //Check if all location sizes are equal
-  //   SpatialSettings::LocationBased spatial_location_based = spatial_settings.get_location_based();
-  //   if(location_based.get_interrupted_feeding_rate().size() != location_based.get_prmc_size().size()
-  //     && location_based.get_interrupted_feeding_rate().size() != spatial_location_based.get_population_size_by_location().size()) {
-  //     throw std::invalid_argument("All location sizes should be equal");
-  //   }
-  // }
+   MosquitoParameters mosquito_parameters = config_data_.mosquito_parameters;
+   //Check if mosquito_mode is either grid_based or location_based
+   if(mosquito_parameters.get_mosquito_config().get_mode() != "grid_based" && mosquito_parameters.get_mosquito_config().get_mode() != "location_based") {
+       throw std::invalid_argument("Mosquito mode should be either grid_based or location_based");
+   }
+  // If mode is grid_based, check if all raster file paths are provided
+   if(mosquito_parameters.get_mosquito_config().get_mode() == "grid_based") {
+     MosquitoParameters::GridBased grid_based = mosquito_parameters.get_mosquito_config().get_grid_based();
+        if(grid_based.get_interrupted_feeding_rate_raster().empty() || grid_based.get_prmc_size_raster().empty()) {
+        throw std::invalid_argument("All raster file paths should be provided for grid based mosquito mode");
+        }
+   }
+  // If location_based, check if all location sizes are equal
+   if(mosquito_parameters.get_mosquito_config().get_mode() == "location_based") {
+     MosquitoParameters::LocationBased location_based = mosquito_parameters.get_mosquito_config().get_location_based();
+     if(location_based.get_interrupted_feeding_rate().empty() || location_based.get_prmc_size().empty()) {
+       throw std::invalid_argument("All locations should be provided for location based mosquito mode");
+     }
+     //Check if all location sizes are equal
+     SpatialSettings::LocationBased spatial_location_based = spatial_settings.get_location_based();
+     if(location_based.get_interrupted_feeding_rate().size() != location_based.get_prmc_size().size()
+       && location_based.get_interrupted_feeding_rate().size() != spatial_location_based.get_population_size_by_location().size()) {
+       throw std::invalid_argument("All location sizes should be equal");
+     }
+   }
 
   /*----------------------------
   Validate population events

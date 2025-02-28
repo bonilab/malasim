@@ -23,10 +23,10 @@ private:
 
   // Execute the annual coverage update event
   void execute() override {
-    auto tcm_db = Model::get_instance().get_treatment_coverage();
+    auto tcm_db = Model::get_treatment_coverage();
 
     // Iterate though and adjust the rates
-    auto count = Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
+    auto count = Model::get_config()->get_spatial_settings().get_number_of_locations();
     for (auto ndx = 0; ndx < count; ndx++) {
       tcm_db->p_treatment_under_5[ndx] =
           adjust(tcm_db->p_treatment_under_5[ndx], rate_);
@@ -46,7 +46,7 @@ private:
     spdlog::debug(
         "Annual coverage update event: {} - {} {}",
         StringHelpers::date_as_string(
-            date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}),
+            date::year_month_day{Model::get_scheduler()->calendar_date}),
         rate_,
         tcm_db->p_treatment_under_5[0]);
   }

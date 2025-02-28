@@ -20,27 +20,27 @@
 void ImportationPeriodicallyRandomEvent::execute() {
   // Start by finding the number of infections to inflict
   auto date =
-      static_cast<date::year_month_day>(Model::get_instance().get_scheduler()->calendar_date);
+      static_cast<date::year_month_day>(Model::get_scheduler()->calendar_date);
   auto days = TimeHelpers::days_in_month(
       static_cast<int>(date.year()), static_cast<unsigned int>(date.month()));
-  auto infections = Model::get_instance().get_random()->random_poisson((double)count_ / days);
+  auto infections = Model::get_random()->random_poisson((double)count_ / days);
 
   // Inflict the infections
   for (auto ndx = 0; ndx < infections; ndx++) {
     // Get the location and person index
     auto location = get_location();
-    auto* pi = Model::get_instance().get_population()
+    auto* pi = Model::get_population()
                    ->get_person_index<PersonIndexByLocationStateAgeClass>();
 
     // Get the age classes for the susceptible individuals
     unsigned long age_class;
     do {
-      age_class = Model::get_instance().get_random()->random_uniform(static_cast<unsigned long>(
+      age_class = Model::get_random()->random_uniform(static_cast<unsigned long>(
           pi->vPerson()[location][Person::HostStates::SUSCEPTIBLE].size()));
     } while (pi->vPerson()[location][0][age_class].empty());
 
     // Get the individual
-    unsigned long index = Model::get_instance().get_random()->random_uniform(
+    unsigned long index = Model::get_random()->random_uniform(
         pi->vPerson()[location][Person::HostStates::SUSCEPTIBLE][age_class]
             .size());
     auto* person = pi->vPerson()[location][Person::HostStates::SUSCEPTIBLE]
@@ -51,19 +51,19 @@ void ImportationPeriodicallyRandomEvent::execute() {
 
     // Log on demand
     spdlog::debug("{} - Introduced infection at {}",
-                  StringHelpers::date_as_string(date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}),
+                  StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}),
                   location);
   }
 
   // Minimum schedule update is one day
-  auto time = Model::get_instance().get_scheduler()->current_time() + 1;
+  auto time = Model::get_scheduler()->current_time() + 1;
   if (static_cast<unsigned int>(date.day()) == days) {
     // If it is the last day of the month, schedule for the first of the month,
     // next year
     auto nextRun = date::year_month_day(date.year() + date::years{1},
                                         date.month(), date::day{1});
     time = (date::sys_days{nextRun}
-            - date::sys_days{Model::get_instance().get_config()->get_simulation_timeframe().get_starting_date()})
+            - date::sys_days{Model::get_config()->get_simulation_timeframe().get_starting_date()})
                .count();
   }
 
@@ -77,9 +77,9 @@ void ImportationPeriodicallyRandomEvent::execute() {
 // selection)
 std::size_t ImportationPeriodicallyRandomEvent::get_location() {
   // Note the common values
-  auto locations = Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
+  auto locations = Model::get_config()->get_spatial_settings().get_number_of_locations();
   auto* pi =
-      Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
+      Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
   auto age_classes = pi->vPerson()[0][Person::HostStates::SUSCEPTIBLE].size();
 
   // Start by finding the total susceptible population
@@ -93,7 +93,7 @@ std::size_t ImportationPeriodicallyRandomEvent::get_location() {
   }
 
   // Get a random pull [0, population - 1]
-  auto target = Model::get_instance().get_random()->random_uniform_int(0, population - 1);
+  auto target = Model::get_random()->random_uniform_int(0, population - 1);
 
   // Find the index of location which has a cumulative sum less than the target
   // value
@@ -126,17 +126,17 @@ void ImportationPeriodicallyRandomEvent::infect(Person* person,
   person->set_host_state(Person::ASYMPTOMATIC);
 
   // Prepare the genotype
-  Genotype* genotype = Model::get_instance().get_config()->get_genotype_parameters().genotype_db->at(genotypeId);
+  Genotype* genotype = Model::get_config()->get_genotype_parameters().genotype_db->at(genotypeId);
 
   // Inflict the infection
   auto* blood_parasite = person->add_new_parasite_to_blood(genotype);
-  blood_parasite->set_gametocyte_level(Model::get_instance().get_config()->get_epidemiological_parameters().get_gametocyte_level_full());
+  blood_parasite->set_gametocyte_level(Model::get_config()->get_epidemiological_parameters().get_gametocyte_level_full());
   blood_parasite->set_last_update_log10_parasite_density(log_parasite_density_);
   blood_parasite->set_update_function(Model::get_instance().immunity_clearance_update_function());
 
   // Check if the configured log density is equal to or greater than the
   // standard for clinical
-  if (log_parasite_density_ >= Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_clinical()) {
+  if (log_parasite_density_ >= Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_clinical()) {
     blood_parasite->set_update_function(Model::get_instance().progress_to_clinical_update_function());
     person->schedule_progress_to_clinical_event_by(blood_parasite);
   }

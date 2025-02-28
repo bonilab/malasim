@@ -136,7 +136,8 @@ public:
     IStrategy *read_strategy(const YAML::Node &n, const int &strategy_id) {
       const auto s_id = NumberHelpers::number_to_string<int>(strategy_id);
       auto *result = StrategyBuilder::build(n[s_id], strategy_id);
-      std::cout << result->to_string()<<std::endl;
+      // std::cout << result->to_string()<<std::endl;
+      spdlog::info("Strategy {}: {}", s_id, result->to_string());
       return result;
     }
 
@@ -170,9 +171,9 @@ public:
 
         prob_individual_present_at_mda_distribution_.push_back(params);
        }
-      for (auto mda_prob : prob_individual_present_at_mda_distribution_) {
-        std::cout << "alpha: " << mda_prob.alpha << " beta: " << mda_prob.beta << std::endl;
-      }
+      // for (auto mda_prob : prob_individual_present_at_mda_distribution_) {
+      //   std::cout << "alpha: " << mda_prob.alpha << " beta: " << mda_prob.beta << std::endl;
+      // }
       mass_drug_administration_.set_prob_individual_present_at_mda_distribution(prob_individual_present_at_mda_distribution_);
     };
 

@@ -35,7 +35,7 @@ void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, 
   auto &location_db = config->get_spatial_settings().location_db;
   // for each location fill prmc at tracking_index row with sampling genotypes
   for (int loc = 0; loc < config->get_spatial_settings().get_number_of_locations(); loc++) {
-    spdlog::trace("Day {} ifr = {}", Model::get_instance().get_scheduler()->current_time(),
+    spdlog::trace("Day {} ifr = {}", Model::get_scheduler()->current_time(),
                   location_db[loc].mosquito_ifr);
     // if there is no parasites in location
     if (population->current_force_of_infection_by_location[loc] <= 0) {
@@ -104,7 +104,7 @@ void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, 
           // interrupted feeding occurs
           get_genotypes_profile_from_person(second_sampling[temp_if], sampled_genotypes, relative_infectivity_each_pp);
           //Count interrupted feeding events with within host induced recombination on
-          Model::get_instance().get_mdc()->mosquito_recombination_events_count()[loc][0]++;
+          Model::get_mdc()->mosquito_recombination_events_count()[loc][0]++;
         }
 
         if (sampled_genotypes.empty()) {
@@ -137,7 +137,7 @@ void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, 
                                                                         sampled_genotypes, false)[0];
           }
           //Count interrupted feeding events with within host induced recombination off
-          Model::get_instance().get_mdc()->mosquito_recombination_events_count()[loc][0]++;
+          Model::get_mdc()->mosquito_recombination_events_count()[loc][0]++;
         }
 
         sampled_genotypes.clear();
@@ -169,22 +169,22 @@ void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, 
       //Count DHA-PPQ(8) ASAQ(7) AL(6)
       //Count if male genotype resists to one drug and female genotype resists to another drug only, right now work on double and triple resistant only
       //when genotype ec50_power_n == min_ec50, it is sensitive to that drug
-        if (Model::get_instance().get_scheduler()->current_time() >= Model::get_instance().get_config()->get_simulation_timeframe().get_start_of_comparison_period())
+        if (Model::get_scheduler()->current_time() >= Model::get_config()->get_simulation_timeframe().get_start_of_comparison_period())
         {
             /*
              * Print our recombination for counting later
              * */
-            auto resistant_tracker_info = std::make_tuple(Model::get_instance().get_scheduler()->current_time(),
+            auto resistant_tracker_info = std::make_tuple(Model::get_scheduler()->current_time(),
               parent_genotypes[0]->genotype_id, parent_genotypes[1]->genotype_id, sampled_genotype->genotype_id);
-//            if (std::find(Model::get_instance().get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].begin(),
-//                          Model::get_instance().get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].end(), resistant_tracker_info)
-//                == Model::get_instance().get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].end()){
-//                Model::get_instance().get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].push_back(resistant_tracker_info);
+//            if (std::find(Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].begin(),
+//                          Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].end(), resistant_tracker_info)
+//                == Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].end()){
+//                Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].push_back(resistant_tracker_info);
 //            }
-            Model::get_instance().get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].push_back(resistant_tracker_info);
+            Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].push_back(resistant_tracker_info);
         }
       //Count number of bites
-      Model::get_instance().get_mdc()->mosquito_recombination_events_count()[loc][1]++;
+      Model::get_mdc()->mosquito_recombination_events_count()[loc][1]++;
     }
   }
 }
@@ -202,9 +202,9 @@ std::vector<unsigned int> Mosquito::build_interrupted_feeding_indices(utils::Ran
 }
 
 int Mosquito::random_genotype(int location, int tracking_index) {
-    auto genotype_index = Model::get_instance().get_random()->random_uniform_int(
+    auto genotype_index = Model::get_random()->random_uniform_int(
       0,
-      Model::get_instance().get_config()->get_spatial_settings().location_db[location].mosquito_size);
+      Model::get_config()->get_spatial_settings().location_db[location].mosquito_size);
     return genotypes_table[tracking_index][location][genotype_index]->genotype_id;
 }
 

@@ -22,7 +22,7 @@ void MFTMultiLocationStrategy::add_therapy(Therapy *therapy) {
 
 Therapy *MFTMultiLocationStrategy::get_therapy(Person *person) {
 
-  const auto p = Model::get_instance().get_random()->random_flat(0.0, 1.0);
+  const auto p = Model::get_random()->random_flat(0.0, 1.0);
   const auto loc = person->get_location();
 
   double sum = 0;
@@ -43,16 +43,14 @@ std::string MFTMultiLocationStrategy::to_string() const {
   for (auto i = 0; i < therapy_list.size() - 1; i++) {
     sstm << therapy_list[i]->get_id() <<  "::";
   }
-  sstm << therapy_list[therapy_list.size() - 1]->get_id() << "-" << std::endl;;
-
-  for (auto loc = 0; loc < distribution.size(); loc++) {
-    sstm << "[";
-    for (auto i = 0; i < distribution[loc].size() - 1; i++) {
-      sstm << distribution[loc][i] << ",";
-    }
-    sstm << distribution[loc][therapy_list.size() - 1] << "]" << std::endl;
-  }
-
+  sstm << therapy_list[therapy_list.size() - 1]->get_id();
+  // for (auto loc = 0; loc < distribution.size(); loc++) {
+  //   sstm << "[";
+  //   for (auto i = 0; i < distribution[loc].size() - 1; i++) {
+  //     sstm << distribution[loc][i] << ",";
+  //   }
+  //   sstm << distribution[loc][therapy_list.size() - 1] << "]" << std::endl;
+  // }
   return sstm.str();
 }
 
@@ -67,8 +65,8 @@ void MFTMultiLocationStrategy::adjust_started_time_point(const int &current_time
 void MFTMultiLocationStrategy::monthly_update() {
   if (peak_after==-1) {
     // inflation every year
-    for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-      const auto d_act = distribution[loc][0]*(1 + Model::get_instance().get_config()->get_epidemiological_parameters().get_inflation_factor()/12);
+    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+      const auto d_act = distribution[loc][0]*(1 + Model::get_config()->get_epidemiological_parameters().get_inflation_factor()/12);
       distribution[loc][0] = d_act;
       const auto other_d = (1 - d_act)/(distribution[loc].size() - 1);
       for (auto i = 1; i < distribution[loc].size(); i++) {
@@ -77,12 +75,12 @@ void MFTMultiLocationStrategy::monthly_update() {
     }
   } else {
     // increasing linearly
-    if (Model::get_instance().get_scheduler()->current_time() <= starting_time + peak_after) {
+    if (Model::get_scheduler()->current_time() <= starting_time + peak_after) {
       if (distribution[0][0] < 1) {
-        for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+        for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
           for (auto i = 0; i < distribution[loc].size(); i++) {
             const auto dist = (peak_distribution[loc][i] - start_distribution[loc][i])*
-                (Model::get_instance().get_scheduler()->current_time() - starting_time)
+                (Model::get_scheduler()->current_time() - starting_time)
                 /peak_after +
                 start_distribution[
                     loc][i];

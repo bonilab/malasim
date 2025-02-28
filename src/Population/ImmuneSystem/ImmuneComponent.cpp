@@ -16,7 +16,7 @@ ImmuneComponent::~ImmuneComponent() {
 }
 
 double ImmuneComponent::get_current_value() {
-  const auto currentTime = Model::get_instance().get_scheduler()->current_time();
+  const auto currentTime = Model::get_scheduler()->current_time();
   auto temp = 0.0;
   if (immune_system_!=nullptr) {
     if (immune_system_->person()!=nullptr) {
@@ -51,6 +51,6 @@ void ImmuneComponent::update() {
 }
 
 void ImmuneComponent::draw_random_immune() {
-  const auto ims = Model::get_instance().get_config()->get_immune_system_parameters();
-  latest_value_ = Model::get_instance().get_random()->random_beta(ims.alpha_immune, ims.beta_immune);
+  const auto ims = Model::get_config()->get_immune_system_parameters();
+  latest_value_ = Model::get_random()->random_beta(ims.alpha_immune, ims.beta_immune);
 }

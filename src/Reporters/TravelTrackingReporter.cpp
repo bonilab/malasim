@@ -58,9 +58,9 @@ void TravelTrackingReporter::after_run() {
   std::vector<int> cross_district_last_60_days(number_of_districts, 0);
   std::vector<int> cross_district_last_90_days(number_of_districts, 0);
 
-  auto current_time = Model::get_instance().get_scheduler()->current_time();
+  auto current_time = Model::get_scheduler()->current_time();
   auto* all_person_index =
-      Model::get_instance().get_population()->get_person_index<PersonIndexAll>();
+      Model::get_population()->get_person_index<PersonIndexAll>();
   for (auto* person : all_person_index->vPerson()) {
     auto district = district_lookup[person->get_location()];
     population[district]++;

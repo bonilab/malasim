@@ -27,18 +27,18 @@ void SQLitePixelReporter::initialize(int job_number, const std::string &path) {
 void SQLitePixelReporter::monthly_report_site_data(int monthId) {
   TransactionGuard transaction{db.get()};
   /* std::cout << "monthly_site_data" << std::endl; */
-  auto &ageClasses = Model::get_instance().get_config()->get_population_demographic().get_age_structure();
+  auto &ageClasses = Model::get_config()->get_population_demographic().get_age_structure();
 
   // collect data
   std::vector<std::string> values;
 
-  for (auto location = 0; location < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
+  for (auto location = 0; location < Model::get_config()->get_spatial_settings().get_number_of_locations();
        location++) {
     // Check the population, if there is nobody there, press on
-    if (Model::get_instance().get_population()->size(location) == 0) { continue; }
+    if (Model::get_population()->size(location) == 0) { continue; }
 
     // count the number of infected individuals by location
-    auto* index = Model::get_instance().get_population()
+    auto* index = Model::get_population()
                       ->get_person_index<PersonIndexByLocationStateAgeClass>();
     auto numAgeClasses = index->vPerson()[0][0].size();
     if (numAgeClasses != ageClasses.size()) {
@@ -66,17 +66,17 @@ void SQLitePixelReporter::monthly_report_site_data(int monthId) {
 
     // Determine the EIR and PfPR values
     auto eir =
-        Model::get_instance().get_mdc()->EIR_by_location_year()[location].empty()
+        Model::get_mdc()->EIR_by_location_year()[location].empty()
             ? 0
-            : Model::get_instance().get_mdc()->EIR_by_location_year()[location]
+            : Model::get_mdc()->EIR_by_location_year()[location]
                   .back();
     auto pfprUnder5 =
-        Model::get_instance().get_mdc()->get_blood_slide_prevalence(location, 0, 5)
+        Model::get_mdc()->get_blood_slide_prevalence(location, 0, 5)
         * 100.0;
     auto pfpr2to10 =
-        Model::get_instance().get_mdc()->get_blood_slide_prevalence(location, 2, 10)
+        Model::get_mdc()->get_blood_slide_prevalence(location, 2, 10)
         * 100.0;
-    auto pfprAll = Model::get_instance().get_mdc()
+    auto pfprAll = Model::get_mdc()
                        ->blood_slide_prevalence_by_location()[location]
                    * 100.0;
 
@@ -87,24 +87,24 @@ void SQLitePixelReporter::monthly_report_site_data(int monthId) {
     for (auto ndx = 0; ndx < ageClasses.size(); ndx++) {
       if (ageClasses[ndx] < 5) {
         treatmentsUnder5 +=
-            Model::get_instance().get_mdc()
+            Model::get_mdc()
                 ->monthly_number_of_treatment_by_location_age_class()[location]
                                                                      [ndx];
       } else {
         treatmentsOver5 +=
-            Model::get_instance().get_mdc()
+            Model::get_mdc()
                 ->monthly_number_of_treatment_by_location_age_class()[location]
                                                                      [ndx];
       }
     }
 
     std::string singleRow = fmt::format(
-        "({}, {}, {}, {}", monthId, location, Model::get_instance().get_population()->size(location),
-        Model::get_instance().get_mdc()
+        "({}, {}, {}, {}", monthId, location, Model::get_population()->size(location),
+        Model::get_mdc()
             ->monthly_number_of_clinical_episode_by_location()[location]);
 
     for (const auto &episodes :
-         Model::get_instance().get_mdc()
+         Model::get_mdc()
              ->monthly_number_of_clinical_episode_by_location_age_class()
                  [location]) {
       singleRow += fmt::format(", {}", episodes);
@@ -112,12 +112,12 @@ void SQLitePixelReporter::monthly_report_site_data(int monthId) {
 
     singleRow +=
         fmt::format(", {}, {}, {}, {}, {}, {}, {}, {}, {}, {})",
-                    Model::get_instance().get_mdc()
+                    Model::get_mdc()
                         ->monthly_number_of_treatment_by_location()[location],
                     eir, pfprUnder5, pfpr2to10, pfprAll, infectedIndividuals,
-                    Model::get_instance().get_mdc()
+                    Model::get_mdc()
                         ->monthly_treatment_failure_by_location()[location],
-                    Model::get_instance().get_mdc()
+                    Model::get_mdc()
                         ->monthly_nontreatment_by_location()[location],
                     treatmentsUnder5, treatmentsOver5);
 
@@ -133,18 +133,18 @@ void SQLitePixelReporter::monthly_report_genome_data(int monthId) {
   TransactionGuard transaction{db.get()};
 
   // Prepare the data structures
-  auto genotypes = Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size();
+  auto genotypes = Model::get_config()->get_genotype_parameters().genotype_db->size();
   std::vector<int> individual(genotypes, 0);
 
   // Cache some values
   auto* index =
-      Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
+      Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
   auto numAgeClasses = index->vPerson()[0][0].size();
 
   std::vector<std::string> insertValues;
 
   // Iterate over all the possible locations
-  for (auto location = 0; location < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
+  for (auto location = 0; location < Model::get_config()->get_spatial_settings().get_number_of_locations();
        location++) {
     std::vector<int> occurrences(genotypes, 0);
     std::vector<int> clinicalOccurrences(genotypes, 0);
@@ -218,7 +218,7 @@ void SQLitePixelReporter::monthly_report_genome_data(int monthId) {
 
   if (insertValues.empty()) {
     spdlog::info("No genotypes recorded in the simulation at timestep, {}",
-                 Model::get_instance().get_scheduler()->current_time());
+                 Model::get_scheduler()->current_time());
     return;
   }
   insert_monthly_genome_data(insertValues);

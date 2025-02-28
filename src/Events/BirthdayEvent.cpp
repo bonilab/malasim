@@ -22,7 +22,7 @@ void BirthdayEvent::schedule_event(Scheduler* scheduler, Person *person, const i
   if (scheduler!=nullptr) {
     auto* birthday_event = new BirthdayEvent();
     birthday_event->scheduler = scheduler;
-    birthday_event->set_id(Model::get_instance().get_random()->uuid());
+    birthday_event->set_id(Model::get_random()->uuid());
     birthday_event->time = time;
     birthday_event->executable = true;
     person->add_dispatcher(birthday_event);

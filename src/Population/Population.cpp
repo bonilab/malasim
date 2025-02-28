@@ -325,20 +325,20 @@ void Population::generate_individual(int location, int age_class) {
                        : model_->get_config()->get_population_demographic().get_initial_age_structure()[age_class - 1];
   unsigned long age_to = model_->get_config()->get_population_demographic().get_initial_age_structure()[age_class];
   p->set_age(static_cast<int>(
-      Model::get_instance().get_random()->random_uniform_int(age_from, age_to + 1)));
+      Model::get_random()->random_uniform_int(age_from, age_to + 1)));
 
-  auto days_to_next_birthday = static_cast<int>(Model::get_instance().get_random()->random_uniform(
+  auto days_to_next_birthday = static_cast<int>(Model::get_random()->random_uniform(
       static_cast<unsigned long>(Constants::DAYS_IN_YEAR)));
   auto simulation_time_birthday = TimeHelpers::get_simulation_time_birthday(
-      days_to_next_birthday, p->get_age(), Model::get_instance().get_scheduler()->calendar_date);
+      days_to_next_birthday, p->get_age(), Model::get_scheduler()->calendar_date);
   p->set_birthday(simulation_time_birthday);
 
   if (simulation_time_birthday > 0) {
     spdlog::error("simulation_time_birthday have to be <= 0 when initializing population");
   }
 
-  BirthdayEvent::schedule_event(Model::get_instance().get_scheduler(), p, days_to_next_birthday);
-  // RaptEvent::schedule_event(Model::get_instance().get_scheduler(), p, days_to_next_birthday);
+  BirthdayEvent::schedule_event(Model::get_scheduler(), p, days_to_next_birthday);
+  // RaptEvent::schedule_event(Model::get_scheduler(), p, days_to_next_birthday);
 
   // set immune component at 6 months
   if (simulation_time_birthday + Constants::DAYS_IN_YEAR / 2 >= 0) {
@@ -407,11 +407,11 @@ void Population::initialize_person_indices() {
 void Population::introduce_initial_cases() {
   if (model_ != nullptr) {
     // std::cout << Model::CONFIG->initial_parasite_info().size() << std::endl;
-    for (const auto p_info : Model::get_instance().get_config()->get_genotype_parameters().get_initial_parasite_info()) {
-      auto num_of_infections = Model::get_instance().get_random()->random_poisson(std::round(size_at(p_info.location) * p_info.prevalence));
+    for (const auto p_info : Model::get_config()->get_genotype_parameters().get_initial_parasite_info()) {
+      auto num_of_infections = Model::get_random()->random_poisson(std::round(size_at(p_info.location) * p_info.prevalence));
       num_of_infections = num_of_infections <= 0 ? 1 : num_of_infections;
 
-      auto* genotype = Model::get_instance().get_config()->get_genotype_parameters().genotype_db->at(p_info.parasite_type_id);
+      auto* genotype = Model::get_config()->get_genotype_parameters().genotype_db->at(p_info.parasite_type_id);
       spdlog::info("Introducing genotype {} with prevalence: {} : {} infections at location {}",
                 p_info.parasite_type_id, p_info.prevalence, num_of_infections, p_info.location);
       introduce_parasite(p_info.location, genotype, num_of_infections);
@@ -420,11 +420,11 @@ void Population::introduce_initial_cases() {
     update_current_foi();
 
     // update force of infection for N days
-    for (auto d = 0; d < Model::get_instance().get_config()->get_epidemiological_parameters().get_number_of_tracking_days(); d++) {
-      for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto d = 0; d < Model::get_config()->get_epidemiological_parameters().get_number_of_tracking_days(); d++) {
+      for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
         force_of_infection_for_N_days_by_location[d][loc] = current_force_of_infection_by_location[loc];
       }
-      Model::get_instance().get_mosquito()->infect_new_cohort_in_PRMC(Model::get_instance().get_config(), Model::get_instance().get_random(), this, d);
+      Model::get_mosquito()->infect_new_cohort_in_PRMC(Model::get_config(), Model::get_random(), this, d);
     }
   }
 }
@@ -509,7 +509,7 @@ void Population::give_1_birth(const int& location) {
       TimeHelpers::number_of_days_to_next_year(model_->get_scheduler()->calendar_date);
   BirthdayEvent::schedule_event(model_->get_scheduler(), p,
                                 model_->get_scheduler()->current_time() + number_of_days_to_next_birthday);
-  // RaptEvent::schedule_event(Model::get_instance().get_scheduler(), p, days_to_next_birthday);
+  // RaptEvent::schedule_event(Model::get_scheduler(), p, days_to_next_birthday);
 
   // schedule for switch
   SwitchImmuneComponentEvent::schedule_for_switch_immune_component_event(

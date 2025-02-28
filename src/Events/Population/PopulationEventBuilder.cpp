@@ -127,7 +127,7 @@ std::vector<Event*> PopulationEventBuilder::build_introduce_parasites_periodical
 
         const auto starting_date = event_node["parasite_info"][j]["start_date"].as<date::year_month_day>();
 
-        date::year_month_day end_date = Model::get_instance().get_config()->get_simulation_timeframe().get_ending_date();
+        date::year_month_day end_date = Model::get_config()->get_simulation_timeframe().get_ending_date();
 
         if (event_node["parasite_info"][j]["end_date"]) {
           end_date = event_node["parasite_info"][j]["end_date"].as<date::year_month_day>();
@@ -275,7 +275,7 @@ std::vector<Event*> PopulationEventBuilder::build_turn_on_mutation_event(const Y
     const auto starting_date = event_node["date"].as<date::year_month_day>();
     auto time = (date::sys_days { starting_date } - date::sys_days { config->get_simulation_timeframe().get_starting_date() }).count();
     double mutation_probability = event_node["mutation_probability"] ? event_node["mutation_probability"].as<double>()
-                                                                     : Model::get_instance().get_config()->get_genotype_parameters().get_mutation_probability_per_locus();
+                                                                     : Model::get_config()->get_genotype_parameters().get_mutation_probability_per_locus();
 
     auto* e = new TurnOnMutationEvent(time, mutation_probability);
     events.push_back(e);
@@ -499,8 +499,8 @@ PopulationEventBuilder::build_rotate_treatment_strategy_event(
             "RotateStrategyEvent");
         throw std::invalid_argument("Strategy id cannot be less than zero");
       }
-      if (first_strategy_id >= Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size()
-          || second_strategy_id >= Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size()) {
+      if (first_strategy_id >= Model::get_config()->get_genotype_parameters().genotype_db->size()
+          || second_strategy_id >= Model::get_config()->get_genotype_parameters().genotype_db->size()) {
         spdlog::error(
             "Strategy id should be less than the total number of "
             "strategies (zero-indexing) for RotateStrategyEvent");
@@ -673,7 +673,7 @@ PopulationEventBuilder::build_importation_periodically_random_event(
             ImportationPeriodicallyRandomEvent::EventName);
         throw std::invalid_argument("Genotype id cannot be less than zero");
       }
-      if (genotype_id >= Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size()) {
+      if (genotype_id >= Model::get_config()->get_genotype_parameters().genotype_db->size()) {
         spdlog::error(
             "Invalid genotype id supplied for {} genotype id cannot be greater than genotype_db size",
             ImportationPeriodicallyRandomEvent::EventName);
@@ -791,7 +791,7 @@ PopulationEventBuilder::build_import_district_mutant_daily_events(
 }
 
 std::vector<Event*> PopulationEventBuilder::build(const YAML::Node &node) {
-  Config* config = Model::get_instance().get_config();
+  Config* config = Model::get_config();
   std::vector<Event*> events;
   const auto name = node["name"].as<std::string>();
   spdlog::info("Building events of type: {}", name);

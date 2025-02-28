@@ -16,12 +16,12 @@
 double IntroduceMutantEventBase::calculate(std::vector<int> &locations) const {
   double mutant_fraction = 0.0;
   double parasite_population_count = 0;
-  auto* pi = Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
+  auto* pi = Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 
   // Calculate the frequency of the mutant type across the whole district
   for (auto location : locations) {
     for (auto hs : {Person::ASYMPTOMATIC, Person::CLINICAL}) {
-      for (auto ac = 0; ac < Model::get_instance().get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
+      for (auto ac = 0; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
         for (auto &person : pi->vPerson()[location][hs][ac]) {
           parasite_population_count +=
               person->get_all_clonal_parasite_populations()->size();
@@ -52,11 +52,11 @@ double IntroduceMutantEventBase::calculate(std::vector<int> &locations) const {
 int IntroduceMutantEventBase::mutate(std::vector<int> &locations,
                                      double target_fraction) const {
   auto* pi =
-      Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
+      Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 
   auto mutations_count = 0;
   for (auto location : locations) {
-    for (auto ac = 0; ac < Model::get_instance().get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
+    for (auto ac = 0; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
       // Note the infected individuals in the location
       auto infections = pi->vPerson()[location][Person::ASYMPTOMATIC][ac].size()
                         + pi->vPerson()[location][Person::CLINICAL][ac].size();
@@ -64,7 +64,7 @@ int IntroduceMutantEventBase::mutate(std::vector<int> &locations,
       // Use a Poisson distribution to determine the number of mutations in this
       // location
       auto mutations =
-          Model::get_instance().get_random()->random_poisson((double)infections * target_fraction);
+          Model::get_random()->random_poisson((double)infections * target_fraction);
       if (mutations == 0) { continue; }
       mutations_count += mutations;
 
@@ -76,7 +76,7 @@ int IntroduceMutantEventBase::mutate(std::vector<int> &locations,
       // individuals in the location and age class
       for (auto count = 0; count < mutations; count++) {
         // Use a uniform draw to get the index of an infected individual
-        auto index = Model::get_instance().get_random()->random_uniform(infections);
+        auto index = Model::get_random()->random_uniform(infections);
 
         // Select the person based upon the index
         Person* person;
@@ -92,7 +92,7 @@ int IntroduceMutantEventBase::mutate(std::vector<int> &locations,
              *(person->get_all_clonal_parasite_populations()->parasites())) {
           auto* old_genotype = pp->genotype();
           auto* new_genotype =
-              old_genotype->modify_genotype_allele(alleles_, Model::get_instance().get_config());
+              old_genotype->modify_genotype_allele(alleles_, Model::get_config());
           pp->set_genotype(new_genotype);
         }
       }

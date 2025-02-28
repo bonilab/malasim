@@ -114,7 +114,7 @@ void SingleHostClonalParasitePopulations::clear_cured_parasites() {
   //    std::vector<int> cured_parasites_index;
   for (int i = parasites_->size() - 1; i >= 0; i--) {
     if (parasites_->at(i)->last_update_log10_parasite_density()
-        <= Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured() + 0.00001) {
+        <= Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured() + 0.00001) {
       remove(i);
     } else {
       if (log10_total_infectious_denstiy == ClonalParasitePopulation::LOG_ZERO_PARASITE_DENSITY) {
@@ -137,10 +137,10 @@ void SingleHostClonalParasitePopulations::update_by_drugs(DrugsInBlood* drugs_in
       // remember to use mask to turn on and off mutation location
       // for a specific time
       Genotype* candidate_genotype = new_genotype->perform_mutation_by_drug(
-        Model::get_instance().get_config(),
-        Model::get_instance().get_random(),
+        Model::get_config(),
+        Model::get_random(),
         drug->drug_type(),
-        Model::get_instance().get_config()->get_genotype_parameters().get_mutation_probability_per_locus());
+        Model::get_config()->get_genotype_parameters().get_mutation_probability_per_locus());
 
         if (candidate_genotype->get_EC50_power_n(drug->drug_type())
             > new_genotype->get_EC50_power_n(drug->drug_type())) {
@@ -148,18 +148,18 @@ void SingleHostClonalParasitePopulations::update_by_drugs(DrugsInBlood* drugs_in
           new_genotype = candidate_genotype;
         }
         if (new_genotype != blood_parasite->genotype()) {
-          if(blood_parasite->genotype()->get_aa_sequence()[35] == 'C'
-             && new_genotype->get_aa_sequence()[35] == 'Y'){
-            spdlog::info("580 C -> Y");
-          }
-          if(new_genotype->get_aa_sequence()[35] == 'Y'){
-              spdlog::info("new 580Y {} -> {}",blood_parasite->genotype()->aa_sequence,new_genotype->aa_sequence);
-          }
+          // if(blood_parasite->genotype()->get_aa_sequence()[35] == 'C'
+          //    && new_genotype->get_aa_sequence()[35] == 'Y'){
+          //   spdlog::info("580 C -> Y");
+          // }
+          // if(new_genotype->get_aa_sequence()[35] == 'Y'){
+          //     spdlog::info("new 580Y {} -> {}",blood_parasite->genotype()->aa_sequence,new_genotype->aa_sequence);
+          // }
           // mutation occurs
-          Model::get_instance().get_mdc()->record_1_mutation(person_->get_location(), blood_parasite->genotype(), new_genotype);
-          Model::get_instance().get_mdc()->record_1_mutation_by_drug(person_->get_location(), blood_parasite->genotype(), new_genotype, drug_id);
+          Model::get_mdc()->record_1_mutation(person_->get_location(), blood_parasite->genotype(), new_genotype);
+          Model::get_mdc()->record_1_mutation_by_drug(person_->get_location(), blood_parasite->genotype(), new_genotype, drug_id);
 
-          //          LOG(TRACE) << Model::get_instance().get_scheduler()->current_time() << "\t" << blood_parasite->genotype()->genotype_id
+          //          LOG(TRACE) << Model::get_scheduler()->current_time() << "\t" << blood_parasite->genotype()->genotype_id
           //          << "\t"
           //                     << new_genotype->genotype_id << "\t"
           //                     << blood_parasite->genotype()->get_EC50_power_n(drug->drug_type()) << "\t"
@@ -180,7 +180,7 @@ void SingleHostClonalParasitePopulations::update_by_drugs(DrugsInBlood* drugs_in
 bool SingleHostClonalParasitePopulations::has_detectable_parasite() const {
   for (auto& parasite : *parasites_) {
     if (parasite->last_update_log10_parasite_density()
-        >= Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_detectable_pfpr()) {
+        >= Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_detectable_pfpr()) {
       return true;
     }
   }

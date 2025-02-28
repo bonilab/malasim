@@ -69,8 +69,8 @@ bool SpatialData::check_catalog(std::string &errors) {
 }
 
 void SpatialData::generate_distances() const {
-  auto &db = Model::get_instance().get_config()->get_spatial_settings().location_db;
-  auto &distances = Model::get_instance().get_config()->get_spatial_settings().get_spatial_distance_matrix();
+  auto &db = Model::get_config()->get_spatial_settings().location_db;
+  auto &distances = Model::get_config()->get_spatial_settings().get_spatial_distance_matrix();
 
   auto locations = db.size();
   distances.resize(static_cast<unsigned long>(locations));
@@ -108,7 +108,7 @@ void SpatialData::generate_locations() {
   }
 
   // Start by over allocating the location_db
-  auto &db = Model::get_instance().get_config()->get_spatial_settings().location_db;
+  auto &db = Model::get_config()->get_spatial_settings().location_db;
   db.clear();
   db.reserve(reference->NROWS * reference->NCOLS);
 
@@ -128,13 +128,13 @@ void SpatialData::generate_locations() {
   db.shrink_to_fit();
 
   // Update the configured count
-  Model::get_instance().get_config()->get_spatial_settings().set_number_of_locations(
-    static_cast<int>(Model::get_instance().get_config()->get_spatial_settings().location_db.size()));
-  if (Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations() == 0) {
+  Model::get_config()->get_spatial_settings().set_number_of_locations(
+    static_cast<int>(Model::get_config()->get_spatial_settings().location_db.size()));
+  if (Model::get_config()->get_spatial_settings().get_number_of_locations() == 0) {
     // This error should be redundant since the ASC loader should catch it
     spdlog::error("Zero locations loaded while parsing ASC file.");
   }
-  spdlog::debug("Generated {} locations", Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations());
+  spdlog::debug("Generated {} locations", Model::get_config()->get_spatial_settings().get_number_of_locations());
 }
 
 // NOTE: this function return distrct_id in NON_ZERO based index given a
@@ -147,7 +147,7 @@ int SpatialData::get_raster_district(int location) {
   }
 
   // Get the coordinate of the location
-  auto &coordinate = Model::get_instance().get_config()->get_spatial_settings().location_db[location].coordinate;
+  auto &coordinate = Model::get_config()->get_spatial_settings().location_db[location].coordinate;
 
   // Use the x, y to get the district id
   auto district =
@@ -164,7 +164,7 @@ int SpatialData::get_district(int location) {
   }
 
   // Get the coordinate of the location
-  auto &coordinate = Model::get_instance().get_config()->get_spatial_settings().location_db[location].coordinate;
+  auto &coordinate = Model::get_config()->get_spatial_settings().location_db[location].coordinate;
 
   // Use the x, y to get the district id
   auto district =
@@ -251,8 +251,8 @@ void SpatialData::load_raster(SpatialFileType type) {
   auto* values = data[type];
 
   // Grab a reference to the location_db to work with
-  auto &location_db = Model::get_instance().get_config()->get_spatial_settings().location_db;
-  auto count = Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
+  auto &location_db = Model::get_config()->get_spatial_settings().location_db;
+  auto count = Model::get_config()->get_spatial_settings().get_number_of_locations();
 
   // Iterate through the raster and locations to set the value
   auto id = 0;
@@ -354,8 +354,8 @@ bool SpatialData::parse(const YAML::Node &node) {
   refresh();
 
   // Grab a reference to the location_db to work with
-  auto &location_db = Model::get_instance().get_config()->get_spatial_settings().location_db;
-  auto number_of_locations = Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
+  auto &location_db = Model::get_config()->get_spatial_settings().location_db;
+  auto number_of_locations = Model::get_config()->get_spatial_settings().get_number_of_locations();
 
   // Load the age distribution from the YAML
   for (auto loc = 0; loc < number_of_locations; loc++) {
@@ -484,7 +484,7 @@ void SpatialData::populate_dependent_data() {
   // district_loookup must be populate after populate the first_district and
   // district_count
   district_lookup_.clear();
-  for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
     district_lookup_.emplace_back(
         SpatialData::get_instance().get_district(loc));
   }
@@ -518,7 +518,7 @@ void SpatialData::refresh() {
 
   // We have data, and we know that it should be located in the same geographic
   // space, so now we can now refresh the location_db
-  if (Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations() == 0) {
+  if (Model::get_config()->get_spatial_settings().get_number_of_locations() == 0) {
     generate_locations();
   }
 

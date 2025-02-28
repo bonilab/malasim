@@ -43,7 +43,7 @@ IStrategy* StrategyBuilder::build(const YAML::Node &ns, const int &strategy_id) 
 
 void StrategyBuilder::add_therapies(const YAML::Node &ns, IStrategy* result) {
   for (auto i = 0; i < ns["therapy_ids"].size(); i++) {
-    result->add_therapy(Model::get_instance().get_config()->get_therapy_parameters().therapy_db[ns["therapy_ids"][i].as<int>()]);
+    result->add_therapy(Model::get_config()->get_therapy_parameters().therapy_db[ns["therapy_ids"][i].as<int>()]);
   }
 }
 
@@ -57,7 +57,7 @@ IStrategy* StrategyBuilder::buildSFTStrategy(const YAML::Node &ns, const int &st
   auto* result = new SFTStrategy();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
-  result->add_therapy(Model::get_instance().get_config()->get_therapy_parameters().therapy_db[ns["therapy_ids"][0].as<int>()]);
+  result->add_therapy(Model::get_config()->get_therapy_parameters().therapy_db[ns["therapy_ids"][0].as<int>()]);
   return result;
 }
 
@@ -110,7 +110,7 @@ IStrategy* StrategyBuilder::buildNestedSwitchingStrategy(const YAML::Node &ns, c
 
   for (int i = 0; i < ns["strategy_ids"].size(); i++) {
     result->add_strategy(
-        Model::get_instance().get_config()->get_strategy_parameters().strategy_db[ns["strategy_ids"][i].as<int>()]);
+        Model::get_config()->get_strategy_parameters().strategy_db[ns["strategy_ids"][i].as<int>()]);
   }
 
   return result;
@@ -140,25 +140,25 @@ StrategyBuilder::buildMFTMultiLocationStrategy(const YAML::Node &ns, const int &
   result->name = ns["name"].as<std::string>();
 
   result->distribution.clear();
-  result->distribution.resize(static_cast<unsigned long long int>(Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations()));
+  result->distribution.resize(static_cast<unsigned long long int>(Model::get_config()->get_spatial_settings().get_number_of_locations()));
 
   result->start_distribution.clear();
-  result->start_distribution.resize(static_cast<unsigned long long int>(Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations()));
+  result->start_distribution.resize(static_cast<unsigned long long int>(Model::get_config()->get_spatial_settings().get_number_of_locations()));
 
   result->peak_distribution.clear();
-  result->peak_distribution.resize(static_cast<unsigned long long int>(Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations()));
+  result->peak_distribution.resize(static_cast<unsigned long long int>(Model::get_config()->get_spatial_settings().get_number_of_locations()));
 
-  for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations() ? 0 : loc;
+  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_config()->get_spatial_settings().get_number_of_locations() ? 0 : loc;
     add_distributions(ns["start_distribution_by_location"][input_loc], result->distribution[loc]);
   }
-  for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations() ? 0 : loc;
+  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_config()->get_spatial_settings().get_number_of_locations() ? 0 : loc;
     add_distributions(ns["start_distribution_by_location"][input_loc], result->start_distribution[loc]);
   }
 
-  for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-    auto input_loc = ns["peak_distribution_by_location"].size() < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations() ? 0 : loc;
+  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    auto input_loc = ns["peak_distribution_by_location"].size() < Model::get_config()->get_spatial_settings().get_number_of_locations() ? 0 : loc;
     add_distributions(ns["peak_distribution_by_location"][input_loc], result->peak_distribution[loc]);
   }
 
@@ -174,30 +174,30 @@ IStrategy* StrategyBuilder::buildNestedMFTDifferentDistributionByLocationStrateg
   result->name = ns["name"].as<std::string>();
 
   result->distribution.clear();
-  result->distribution.resize(static_cast<unsigned long long int>(Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations()));
+  result->distribution.resize(static_cast<unsigned long long int>(Model::get_config()->get_spatial_settings().get_number_of_locations()));
 
   result->start_distribution.clear();
-  result->start_distribution.resize(static_cast<unsigned long long int>(Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations()));
+  result->start_distribution.resize(static_cast<unsigned long long int>(Model::get_config()->get_spatial_settings().get_number_of_locations()));
 
   result->peak_distribution.clear();
-  result->peak_distribution.resize(static_cast<unsigned long long int>(Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations()));
+  result->peak_distribution.resize(static_cast<unsigned long long int>(Model::get_config()->get_spatial_settings().get_number_of_locations()));
 
-  for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations() ? 0 : loc;
+  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_config()->get_spatial_settings().get_number_of_locations() ? 0 : loc;
     add_distributions(ns["start_distribution_by_location"][input_loc], result->distribution[loc]);
   }
-  for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations() ? 0 : loc;
+  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_config()->get_spatial_settings().get_number_of_locations() ? 0 : loc;
     add_distributions(ns["start_distribution_by_location"][input_loc], result->start_distribution[loc]);
   }
 
-  for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-    auto input_loc = ns["peak_distribution_by_location"].size() < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations() ? 0 : loc;
+  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    auto input_loc = ns["peak_distribution_by_location"].size() < Model::get_config()->get_spatial_settings().get_number_of_locations() ? 0 : loc;
     add_distributions(ns["peak_distribution_by_location"][input_loc], result->peak_distribution[loc]);
   }
 
   for (auto i = 0; i < ns["strategy_ids"].size(); i++) {
-    result->add_strategy(Model::get_instance().get_config()->get_strategy_parameters().strategy_db[ns["strategy_ids"][i].as<int>()]);
+    result->add_strategy(Model::get_config()->get_strategy_parameters().strategy_db[ns["strategy_ids"][i].as<int>()]);
   }
 
   result->peak_after = ns["peak_after"].as<int>();
@@ -220,7 +220,7 @@ StrategyBuilder::buildNovelDrugIntroductionStrategy(const YAML::Node &ns, const 
 
   for (int i = 0; i < ns["strategy_ids"].size(); i++) {
     result->add_strategy(
-        Model::get_instance().get_config()->get_strategy_parameters().strategy_db[ns["strategy_ids"][i].as<int>()]);
+        Model::get_config()->get_strategy_parameters().strategy_db[ns["strategy_ids"][i].as<int>()]);
   }
 
   result->newly_introduced_strategy_id = ns["newly_introduced_strategy_id"].as<int>();

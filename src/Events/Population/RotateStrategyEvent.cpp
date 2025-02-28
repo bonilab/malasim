@@ -25,11 +25,11 @@ void RotateStrategyEvent::execute() {
   Model::get_instance().get_model()->set_treatment_strategy(new_strategy_id_);
   spdlog::info(
       "{}: Switching treatment strategy to {} ",
-      StringHelpers::date_as_string(date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}),
-      Model::get_instance().get_treatment_strategy()->name);
+      StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}),
+      Model::get_treatment_strategy()->name);
 
   // Queue the next iteration of this event
-  auto next_time = Model::get_instance().get_scheduler()->current_time() + (years_ * 365);
+  auto next_time = Model::get_scheduler()->current_time() + (years_ * 365);
   auto* event = new RotateStrategyEvent(next_time, years_, next_strategy_id_,
                                         new_strategy_id_);
   scheduler->schedule_population_event(event);

@@ -25,5 +25,5 @@ void UpdateEveryKDaysEvent::schedule_event(Scheduler* scheduler, Person* p,
 
 void UpdateEveryKDaysEvent::execute() {
   auto* person = static_cast<Person*>(dispatcher);
-  person->schedule_update_every_K_days_event(Model::get_instance().get_config()->get_epidemiological_parameters().get_update_frequency());
+  person->schedule_update_every_K_days_event(Model::get_config()->get_epidemiological_parameters().get_update_frequency());
 }

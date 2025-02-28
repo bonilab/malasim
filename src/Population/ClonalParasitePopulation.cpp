@@ -72,29 +72,29 @@ void ClonalParasitePopulation::set_genotype(Genotype *value) {
 }
 
 bool ClonalParasitePopulation::resist_to(const int &drug_id) const {
-  return genotype_->resist_to(Model::get_instance().get_config()->get_drug_parameters().drug_db->at(drug_id));
+  return genotype_->resist_to(Model::get_config()->get_drug_parameters().drug_db->at(drug_id));
 }
 
 void ClonalParasitePopulation::update() {
-  set_last_update_log10_parasite_density(get_current_parasite_density(Model::get_instance().get_scheduler()->current_time()));
+  set_last_update_log10_parasite_density(get_current_parasite_density(Model::get_scheduler()->current_time()));
 }
 
 void ClonalParasitePopulation::perform_drug_action(const double &percent_parasite_remove) {
   double newSize = last_update_log10_parasite_density_;
   if (percent_parasite_remove > 1) {
-    newSize = Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured();
+    newSize = Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured();
   } else {
-//    std::cout << "Day: " << Model::get_instance().get_scheduler()->current_time() << "\tDrug: old density: "
+//    std::cout << "Day: " << Model::get_scheduler()->current_time() << "\tDrug: old density: "
 //    << newSize << "\tremoved by drug: " << log10(1 - percent_parasite_remove);
     newSize += log10(1 - percent_parasite_remove);
 //    std::cout << "\tnew density: " << newSize << std::endl;
   }
 
-  if (newSize < Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured()) {
-    newSize = Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured();
+  if (newSize < Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured()) {
+    newSize = Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured();
   }
 
-//      std::cout << Model::get_instance().get_scheduler()->current_time() << "\t" <<parasite_population()->person()->last_therapy_id() << "\t"  <<
+//      std::cout << Model::get_scheduler()->current_time() << "\t" <<parasite_population()->person()->last_therapy_id() << "\t"  <<
 //      percent_parasite_remove << "\t"<<last_update_log10_parasite_density_ << "\t" <<newSize << std::endl;
   set_last_update_log10_parasite_density(newSize);
 }

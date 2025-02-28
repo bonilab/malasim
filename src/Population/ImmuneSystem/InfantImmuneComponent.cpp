@@ -19,7 +19,7 @@ double InfantImmuneComponent::get_decay_rate(const int &age) const {
 }
 
 double InfantImmuneComponent::get_current_value() {
-  const auto current_time = Model::get_instance().get_scheduler()->current_time();
+  const auto current_time = Model::get_scheduler()->current_time();
   auto temp = 0.0;
   if (immune_system()!=nullptr) {
     if (immune_system()->person()!=nullptr) {

@@ -40,7 +40,7 @@ void CirculateToTargetLocationNextDayEvent::execute() {
   person->set_location(target_location_);
 
   // Notify the population of the change
-  Model::get_instance().get_population()->notify_movement(source_location, target_location_);
+  Model::get_population()->notify_movement(source_location, target_location_);
 
   // Did we randomly arrive back at the residence location?
   if (target_location_ == person->get_residence_location()) {
@@ -56,11 +56,11 @@ void CirculateToTargetLocationNextDayEvent::execute() {
   // upon a gamma distribution
   auto length_of_trip = 0;
   while (length_of_trip < 1) {
-    length_of_trip = static_cast<int>(std::round(Model::get_instance().get_random()->random_gamma(
-        Model::get_instance().get_config()->get_movement_settings().get_length_of_stay_theta(),
-        Model::get_instance().get_config()->get_movement_settings().get_length_of_stay_k())));
+    length_of_trip = static_cast<int>(std::round(Model::get_random()->random_gamma(
+        Model::get_config()->get_movement_settings().get_length_of_stay_theta(),
+        Model::get_config()->get_movement_settings().get_length_of_stay_k())));
   }
   ReturnToResidenceEvent::schedule_event(
-      Model::get_instance().get_scheduler(), person,
-      Model::get_instance().get_scheduler()->current_time() + length_of_trip);
+      Model::get_scheduler(), person,
+      Model::get_scheduler()->current_time() + length_of_trip);
 }

@@ -55,10 +55,10 @@ double ImmuneSystem::get_parasite_size_after_t_days(const int &duration, const d
                                                     const double &fitness) const {
 
   const auto last_immune_level = get_lastest_immune_value();
-  const auto temp = Model::get_instance().get_config()->get_immune_system_parameters().c_max*(1 - last_immune_level)
-  + Model::get_instance().get_config()->get_immune_system_parameters().c_min*last_immune_level;
-// std::cout << "day: " << Model::get_instance().get_scheduler()->current_time() << "\tc_max: " << Model::CONFIG->immune_system_information().c_max << "\tc_min: " << Model::CONFIG->immune_system_information().c_min << "\tlast_immune_level: " << last_immune_level << "\ttemp: " << temp << std::endl;
-//  std::cout << "Day: " << Model::get_instance().get_scheduler()->current_time() << "\tImmune: old density: " << originalSize << "\t duration: " << duration << "\tfitness: "
+  const auto temp = Model::get_config()->get_immune_system_parameters().c_max*(1 - last_immune_level)
+  + Model::get_config()->get_immune_system_parameters().c_min*last_immune_level;
+// std::cout << "day: " << Model::get_scheduler()->current_time() << "\tc_max: " << Model::CONFIG->immune_system_information().c_max << "\tc_min: " << Model::CONFIG->immune_system_information().c_min << "\tlast_immune_level: " << last_immune_level << "\ttemp: " << temp << std::endl;
+//  std::cout << "Day: " << Model::get_scheduler()->current_time() << "\tImmune: old density: " << originalSize << "\t duration: " << duration << "\tfitness: "
 //  << fitness << "\tlast immune level: " << last_immune_level << "\ttemp: " << temp;
   const auto value = originalSize + duration*(log10(temp) + log10(fitness));
 //  std::cout << "\tnew density: " << value << std::endl;
@@ -71,7 +71,7 @@ const double mid_point = 0.4;
 double ImmuneSystem::get_clinical_progression_probability() const {
   const auto immune = get_current_value();
 
-  const auto isf = Model::get_instance().get_config()->get_immune_system_parameters();
+  const auto isf = Model::get_config()->get_immune_system_parameters();
 
   //    double PClinical = (isf.min_clinical_probability - isf.max_clinical_probability) * pow(immune, isf.immune_effect_on_progression_to_clinical) + isf.max_clinical_probability;
 

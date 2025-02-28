@@ -70,6 +70,30 @@ public:
     [[nodiscard]] const std::vector<MultiplicativeEffectOnEC50>& get_multiplicative_effect_on_EC50() const { return multiplicative_effect_on_EC50_; }
     void set_multiplicative_effect_on_EC50(const std::vector<MultiplicativeEffectOnEC50>& value) { multiplicative_effect_on_EC50_ = value; }
 
+    std::string get_amino_acids_string() const {
+        std::string result;
+        for (const auto& aa : amino_acids_) {
+            result += aa + " ";
+        }
+        return result;
+    }
+
+    std::string get_daily_crs_string() const {
+      std::string result;
+      for (const auto& crs : daily_crs_) {
+        result += std::to_string(crs) + " ";
+      }
+      return result;
+    }
+
+    std::string get_multiplicative_effect_on_EC50_string() const {
+      std::string result;
+      for (auto effect : multiplicative_effect_on_EC50_) {
+        result += effect.to_string() + " ";
+      }
+      return result;
+    }
+
     std::string to_string() const {
       std::string result = std::to_string(position_) + ": ";
       if (!amino_acids_.empty()) {
@@ -78,8 +102,9 @@ public:
         }
       }
       else {
-        result = std::to_string(position_) + ": empty";
+        result = std::to_string(position_) + ": cnv";
       }
+      result += "]";
       return result;
     }
   private:

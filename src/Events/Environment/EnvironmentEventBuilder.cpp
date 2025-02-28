@@ -17,7 +17,7 @@ std::vector<Event*> EnvironmentEventBuilder::build(const YAML::Node &node) {
   const auto name = node["name"].as<std::string>();
 
   if (name == UpdateEcozoneEvent::EventName) {
-    events = build_update_ecozone_event(node["info"], Model::get_instance().get_config());
+    events = build_update_ecozone_event(node["info"], Model::get_config());
   }
 
   return events;

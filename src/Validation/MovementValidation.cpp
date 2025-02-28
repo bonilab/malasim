@@ -41,7 +41,7 @@ void MovementValidation::write_movement_data() {
   const std::string ODDS = "./dump/odds.csv";
 
   // Before we do anything, check the size of the matrix
-  const auto location_count = Model::get_instance().get_config()->get_spatial_settings().get_spatial_distance_matrix().size();
+  const auto location_count = Model::get_config()->get_spatial_settings().get_spatial_distance_matrix().size();
   if (location_count > LOCATION_COUNT_CUTOFF) {
     std::string msg = fmt::format("Location count of {} exceeds maximum of {}, distances and odds not dumped.", location_count, LOCATION_COUNT_CUTOFF);
     spdlog::warn(msg);
@@ -58,16 +58,16 @@ void MovementValidation::write_movement_data() {
   // Get the distances matrix and dump it
   std::string msg = fmt::format("Dumping distance matrix to: {}", DISTANCES);
   spdlog::info(msg);
-  MatrixWriter<DoubleVector2>::write(Model::get_instance().get_config()->get_spatial_settings().get_spatial_distance_matrix(),
+  MatrixWriter<DoubleVector2>::write(Model::get_config()->get_spatial_settings().get_spatial_distance_matrix(),
                                      DISTANCES);
 
   // Setup the references and get the population
-  const auto distance_matrix = Model::get_instance().get_config()->get_spatial_settings().get_spatial_distance_matrix();
-  const auto spatial = Model::get_instance().get_config()->get_movement_settings().get_spatial_model();
+  const auto distance_matrix = Model::get_config()->get_spatial_settings().get_spatial_distance_matrix();
+  const auto spatial = Model::get_config()->get_movement_settings().get_spatial_model();
   IntVector residents_by_location(location_count, 0);
   for (std::size_t ndx = 0; ndx < location_count; ndx++) {
     residents_by_location[ndx] =
-        Model::get_instance().get_config()->get_spatial_settings().location_db[ndx].population_size;
+        Model::get_config()->get_spatial_settings().location_db[ndx].population_size;
   }
 
   // Calculate the odds for each row, then write the data

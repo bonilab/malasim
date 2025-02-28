@@ -44,7 +44,7 @@ void EndClinicalByNoTreatmentEvent::execute() {
     if (person->get_all_clonal_parasite_populations()->contain(
             clinical_caused_parasite_)) {
       clinical_caused_parasite_->set_last_update_log10_parasite_density(
-          Model::get_instance().get_config()->get_parasite_parameters()
+          Model::get_config()->get_parasite_parameters()
           .get_parasite_density_levels().get_log_parasite_density_asymptomatic());
 
       person->determine_relapse_or_not(clinical_caused_parasite_);

@@ -27,12 +27,12 @@ void CyclingStrategy::switch_therapy() {
   //    std::cout << "Switch from: " << index_ << "\t - to: " << index_ + 1;
   index++;
   index %= therapy_list.size();
-  Model::get_instance().get_mdc()->update_UTL_vector();
+  Model::get_mdc()->update_UTL_vector();
 
   // TODO: cycling_time should be match with calendar day
-  next_switching_day = Model::get_instance().get_scheduler()->current_time() + cycling_time;
+  next_switching_day = Model::get_scheduler()->current_time() + cycling_time;
   spdlog::info("{}: Cycling Strategy switch Therapy to: {}",
-    StringHelpers::date_as_string(date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}),
+    StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}),
     therapy_list[index]->get_id());
 }
 
@@ -55,14 +55,14 @@ std::string CyclingStrategy::to_string() const {
 }
 
 void CyclingStrategy::update_end_of_time_step() {
-  if (Model::get_instance().get_scheduler()->current_time()==next_switching_day) {
+  if (Model::get_scheduler()->current_time()==next_switching_day) {
     switch_therapy();
     //            std::cout << to_string() << std::endl;
   }
 }
 
 void CyclingStrategy::adjust_started_time_point(const int &current_time) {
-  next_switching_day = Model::get_instance().get_scheduler()->current_time() + cycling_time;
+  next_switching_day = Model::get_scheduler()->current_time() + cycling_time;
   index = 0;
 }
 

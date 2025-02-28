@@ -20,7 +20,7 @@ void SQLiteDbReporter::populate_genotype_table() {
     // Prepare the bulk query
     auto* stmt = db->prepare(insert_genotype_query_);
 
-    auto* config = Model::get_instance().get_config();
+    auto* config = Model::get_config();
 
     for (auto id = 0; id < config->get_genotype_parameters().genotype_db->size(); id++) {
       Genotype* genotype = config->get_genotype_parameters().genotype_db->get_genotype_by_id(id);
@@ -56,9 +56,9 @@ void SQLiteDbReporter::populate_db_schema() {
   )"""";
 
   std::string ageClassColumns;
-  for (auto ndx = 0; ndx < Model::get_instance().get_config()->get_population_demographic().get_age_structure().size(); ndx++) {
-    auto agFrom = ndx == 0 ? 0 : Model::get_instance().get_config()->get_population_demographic().get_age_structure()[ndx - 1];
-    auto agTo = Model::get_instance().get_config()->get_population_demographic().get_age_structure()[ndx];
+  for (auto ndx = 0; ndx < Model::get_config()->get_population_demographic().get_age_structure().size(); ndx++) {
+    auto agFrom = ndx == 0 ? 0 : Model::get_config()->get_population_demographic().get_age_structure()[ndx - 1];
+    auto agTo = Model::get_config()->get_population_demographic().get_age_structure()[ndx];
     ageClassColumns +=
         fmt::format("clinicalepisodes_by_age_class_{}_{}, ", agFrom, agTo);
   }
@@ -151,9 +151,9 @@ void SQLiteDbReporter::initialize(int job_number, const std::string &path) {
   populate_genotype_table();
 
   std::string ageClassColumns;
-  for (auto ndx = 0; ndx < Model::get_instance().get_config()->get_population_demographic().get_age_structure().size(); ndx++) {
-    auto agFrom = ndx == 0 ? 0 : Model::get_instance().get_config()->get_population_demographic().get_age_structure()[ndx - 1];
-    auto agTo = Model::get_instance().get_config()->get_population_demographic().get_age_structure()[ndx];
+  for (auto ndx = 0; ndx < Model::get_config()->get_population_demographic().get_age_structure().size(); ndx++) {
+    auto agFrom = ndx == 0 ? 0 : Model::get_config()->get_population_demographic().get_age_structure()[ndx - 1];
+    auto agTo = Model::get_config()->get_population_demographic().get_age_structure()[ndx];
     ageClassColumns +=
         fmt::format("clinicalepisodes_by_age_class_{}_{}, ", agFrom, agTo);
   }
@@ -168,18 +168,18 @@ void SQLiteDbReporter::initialize(int job_number, const std::string &path) {
 
 void SQLiteDbReporter::monthly_report() {
   // Get the relevant data
-  auto daysElapsed = Model::get_instance().get_scheduler()->current_time();
+  auto daysElapsed = Model::get_scheduler()->current_time();
   auto modelTime =
-      std::chrono::system_clock::to_time_t(Model::get_instance().get_scheduler()->calendar_date);
-  auto seasonalFactor = Model::get_instance().get_config()->get_seasonality_settings().get_seasonal_factor(
-      Model::get_instance().get_scheduler()->calendar_date, 0);
+      std::chrono::system_clock::to_time_t(Model::get_scheduler()->calendar_date);
+  auto seasonalFactor = Model::get_config()->get_seasonality_settings().get_seasonal_factor(
+      Model::get_scheduler()->calendar_date, 0);
 
   auto monthId = db->insert_data(insert_common_query_, daysElapsed, modelTime,
                                  seasonalFactor);
 
   monthly_report_site_data(monthId);
-  if (Model::get_instance().get_config()->get_model_settings().get_record_genome_db()
-      && Model::get_instance().get_mdc()->recording_data()) {
+  if (Model::get_config()->get_model_settings().get_record_genome_db()
+      && Model::get_mdc()->recording_data()) {
     // Add the genome information, this will also update infected individuals
     monthly_report_genome_data(monthId);
   }

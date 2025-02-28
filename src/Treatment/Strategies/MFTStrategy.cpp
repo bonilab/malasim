@@ -15,7 +15,7 @@ void MFTStrategy::add_therapy(Therapy *therapy) {
 
 Therapy *MFTStrategy::get_therapy(Person *person) {
 
-  const auto p = Model::get_instance().get_random()->random_flat(0.0, 1.0);
+  const auto p = Model::get_random()->random_flat(0.0, 1.0);
 
   double sum = 0;
   for (auto i = 0; i < distribution.size(); i++) {
