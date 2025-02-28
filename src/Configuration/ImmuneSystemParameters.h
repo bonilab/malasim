@@ -1,10 +1,10 @@
 #ifndef IMMUNESYSTEMPARAMETERS_H
 #define IMMUNESYSTEMPARAMETERS_H
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include "Utils/Helpers/NumberHelpers.hxx"
 #include <spdlog/spdlog.h>
 
-class ImmuneSystemParameters : IConfigClass {
+class ImmuneSystemParameters : public IConfigData {
 public:
     // Getters and Setters
     [[nodiscard]] double get_b1() const { return b1_; }

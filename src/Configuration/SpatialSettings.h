@@ -7,12 +7,12 @@
 #include <stdexcept>
 #include <spdlog/spdlog.h>
 
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include "Spatial/Location/Location.h"
 #include "Spatial/GIS/SpatialData.h"
 
 // Class for SpatialSettings
-class SpatialSettings : IConfigClass{
+class SpatialSettings : public IConfigData{
 public:
     // Class for GridBased settings
     class GridBased {

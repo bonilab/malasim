@@ -1,9 +1,9 @@
 #ifndef PARASITEPARAMETERS_H
 #define PARASITEPARAMETERS_H
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include <spdlog/spdlog.h>
 
-class ParasiteParameters : IConfigClass {
+class ParasiteParameters : public IConfigData {
 public:
     class ParasiteDensityLevels {
     public:

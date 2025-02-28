@@ -1,11 +1,11 @@
 #ifndef TRANSMISSION_SETTINGS_H
 #define TRANSMISSION_SETTINGS_H
 
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include <yaml-cpp/yaml.h>
 #include <stdexcept>
 
-class TransmissionSettings : IConfigClass {
+class TransmissionSettings : public IConfigData {
 public:
   // Getter for transmission_parameter
   [[nodiscard]] double get_transmission_parameter() const {

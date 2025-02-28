@@ -4,13 +4,13 @@
 #include <vector>
 #include <stdexcept>
 #include <yaml-cpp/yaml.h>
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include "Spatial/GIS/AscFile.h"
 #include "Spatial/GIS/SpatialData.h"
 #include "Spatial/Location/Location.h"
 #include "spdlog/spdlog.h"
 
-class MosquitoParameters : IConfigClass {
+class MosquitoParameters : public IConfigData {
 public:
     // Inner class: GridBased
     class GridBased {

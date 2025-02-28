@@ -9,7 +9,7 @@
 
 #include <fstream>
 
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include "Spatial/GIS/AscFile.h"
 #include "Spatial/GIS/SpatialData.h"
 #include "Simulation/Model.h"
@@ -18,7 +18,7 @@
 #include "Utils/TypeDef.hxx"
 
 // Class to hold seasonality settings, combining RainfallSettings and SimpleSettings
-class SeasonalitySettings : public IConfigClass{
+class SeasonalitySettings : public IConfigData{
 public:
   class ISeasonalInfo {
   public:

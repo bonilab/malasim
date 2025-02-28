@@ -8,12 +8,12 @@
 #include <string>
 #include <spdlog/spdlog.h>
 
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include "Utils/Helpers/NumberHelpers.hxx"
 #include "Treatment/Strategies/IStrategy.h"
 #include "Treatment/Strategies/StrategyBuilder.h"
 
-class StrategyParameters: IConfigClass {
+class StrategyParameters: public IConfigData {
 public:
     // Inner class: StrategyInfo
     class StrategyInfo {

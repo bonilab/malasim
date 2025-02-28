@@ -7,12 +7,12 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include "Parasites/GenotypeDatabase.h"
 
 class GenotypeDatabase;
 
-class GenotypeParameters: IConfigClass {
+class GenotypeParameters: public IConfigData {
 public:
   // Inner class: MultiplicativeEffectOnEC50For2OrMoreMutations
   class MultiplicativeEffectOnEC50For2OrMoreMutations {

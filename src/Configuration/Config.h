@@ -34,26 +34,6 @@ public:
   Config() = default;
   ~Config() = default;
 
-  struct ConfigData {
-    ModelSettings model_settings{};
-    TransmissionSettings transmission_settings{};
-    PopulationDemographic population_demographic{};
-    SimulationTimeframe simulation_timeframe{};
-    SpatialSettings spatial_settings{};
-    SeasonalitySettings seasonality_settings{};
-    MovementSettings movement_settings{};
-    ParasiteParameters parasite_parameters{};
-    ImmuneSystemParameters immune_system_parameters{};
-    GenotypeParameters genotype_parameters{};
-    DrugParameters drug_parameters{};
-    TherapyParameters therapy_parameters{};
-    StrategyParameters strategy_parameters{};
-    EpidemiologicalParameters epidemiological_parameters{};
-    MosquitoParameters mosquito_parameters{};
-    PopulationEvents population_events{};
-    RaptSettings rapt_settings{};
-  };
-
   // Load configuration from a YAML file
   bool load(const std::string &filename);
 
@@ -65,65 +45,65 @@ public:
 
   // Getters for entire configuration structures
   [[nodiscard]] const ModelSettings &get_model_settings() const {
-    return config_data_.model_settings;
+    return model_settings_;
   }
   [[nodiscard]] SimulationTimeframe &get_simulation_timeframe() {
-    return config_data_.simulation_timeframe;
+    return simulation_timeframe_;
   }
   [[nodiscard]] const TransmissionSettings &get_transmission_settings() const {
-    return config_data_.transmission_settings;
+    return transmission_settings_;
   }
   [[nodiscard]] const PopulationDemographic &get_population_demographic()
       const {
-    return config_data_.population_demographic;
+    return population_demographic_;
   }
   [[nodiscard]] SpatialSettings &get_spatial_settings() {
     /* no const here because Spatial Data class will need to access and modify later */
-    return config_data_.spatial_settings;
+    return spatial_settings_;
   }
   [[nodiscard]] SeasonalitySettings &get_seasonality_settings() {
-    return config_data_.seasonality_settings;
+    return seasonality_settings_;
   }
   [[nodiscard]] MovementSettings &get_movement_settings() {
-    return config_data_.movement_settings;
+    return movement_settings_;
   }
   [[nodiscard]] const ParasiteParameters &get_parasite_parameters() const {
-    return config_data_.parasite_parameters;
+    return parasite_parameters_;
   }
   [[nodiscard]] const ImmuneSystemParameters &get_immune_system_parameters()
       const {
-    return config_data_.immune_system_parameters;
+    return immune_system_parameters_;
   }
   [[nodiscard]] GenotypeParameters &get_genotype_parameters()
       {
-    return config_data_.genotype_parameters;
+    return genotype_parameters_;
   }
   [[nodiscard]] const DrugParameters &get_drug_parameters()
       const {
-    return config_data_.drug_parameters;
+    return drug_parameters_;
   }
   [[nodiscard]] const TherapyParameters &get_therapy_parameters()
       const {
-    return config_data_.therapy_parameters;
+    return therapy_parameters_;
   }
   [[nodiscard]] StrategyParameters &get_strategy_parameters()
       {
-    return config_data_.strategy_parameters;
+    return strategy_parameters_;
   }
   [[nodiscard]] const EpidemiologicalParameters &get_epidemiological_parameters()
       const {
-    return config_data_.epidemiological_parameters;
+    return epidemiological_parameters_;
   }
   [[nodiscard]] MosquitoParameters &get_mosquito_parameters()
       {
-    return config_data_.mosquito_parameters;
+    return mosquito_parameters_;
   }
   [[nodiscard]] PopulationEvents &get_population_events()
       {
-    return config_data_.population_events;
+    return population_events_;
   }
   [[nodiscard]] RaptSettings &get_rapt_settings() {
-    return config_data_.rapt_settings;
+    return rapt_settings_;
   }
 
 private:
@@ -132,7 +112,6 @@ private:
   [[nodiscard]] const T &get_field(const T &field) const {
     return field;
   }
-  ConfigData config_data_;
 
   // Template method for setting a field
   template <typename T>
@@ -143,6 +122,24 @@ private:
   // Configuration File Path
   std::string config_file_path_;
   Model *model_;
+
+  ModelSettings model_settings_;
+  TransmissionSettings transmission_settings_;
+  PopulationDemographic population_demographic_;
+  SimulationTimeframe simulation_timeframe_;
+  SpatialSettings spatial_settings_;
+  SeasonalitySettings seasonality_settings_;
+  MovementSettings movement_settings_;
+  ParasiteParameters parasite_parameters_;
+  ImmuneSystemParameters immune_system_parameters_;
+  GenotypeParameters genotype_parameters_;
+  DrugParameters drug_parameters_;
+  TherapyParameters therapy_parameters_;
+  StrategyParameters strategy_parameters_;
+  EpidemiologicalParameters epidemiological_parameters_;
+  MosquitoParameters mosquito_parameters_;
+  PopulationEvents population_events_;
+  RaptSettings rapt_settings_;
 };
 
 #endif  // CONFIG_H

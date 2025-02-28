@@ -27,7 +27,7 @@ void BirthdayEvent::schedule_event(Scheduler* scheduler, Person *person, const i
     birthday_event->executable = true;
     person->add_dispatcher(birthday_event);
     birthday_event->dispatcher = person;
-    person->add_dispatcher(birthday_event);
+    // person->add_dispatcher(birthday_event);
   }
 }
 

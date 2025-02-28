@@ -6,9 +6,9 @@
 #include <string>
 #include <spdlog/spdlog.h>
 
-#include "IConfigClass.h"
+#include "IConfigData.h"
 
-class EpidemiologicalParameters: IConfigClass {
+class EpidemiologicalParameters: public IConfigData {
 public:
     class BitingLevelDistributionGamma {
     public:

@@ -7,6 +7,7 @@
 #ifndef SPECIALISTREPORTERBASE_H
 #define SPECIALISTREPORTERBASE_H
 
+#include <vector>
 #include <sqlite3.h>
 #include "Reporters/Reporter.h"
 

@@ -6,13 +6,13 @@
 #include <vector>
 #include <map>
 #include <spdlog/spdlog.h>
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include "Treatment/Therapies/MACTherapy.h"
 #include "Treatment/Therapies/SCTherapy.h"
 #include "Treatment/Therapies/TherapyBuilder.h"
 #include "Utils/Helpers/NumberHelpers.hxx"
 
-class TherapyParameters: IConfigClass {
+class TherapyParameters: public IConfigData {
 public:
   // Inner class: TherapyInfo
   class TherapyInfo {
