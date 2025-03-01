@@ -183,6 +183,7 @@ void Population::perform_infection_event() {
       assert(person->get_host_state() != Person::DEAD);
       person->increase_number_of_times_bitten();
 
+      if (Model::get_population()->all_alive_persons_by_location[loc].empty()) continue;
       auto genotype_id = model_->get_mosquito()->random_genotype(loc, tracking_index);
 
       const auto p_infectious = model_->get_random()->random_flat(0.0, 1.0);
@@ -412,7 +413,7 @@ void Population::introduce_initial_cases() {
       num_of_infections = num_of_infections <= 0 ? 1 : num_of_infections;
 
       auto* genotype = Model::get_config()->get_genotype_parameters().genotype_db->at(p_info.parasite_type_id);
-      spdlog::info("Introducing genotype {} with prevalence: {} : {} infections at location {}",
+      spdlog::debug("Introducing genotype {} with prevalence: {} : {} infections at location {}",
                 p_info.parasite_type_id, p_info.prevalence, num_of_infections, p_info.location);
       introduce_parasite(p_info.location, genotype, num_of_infections);
     }
@@ -431,6 +432,7 @@ void Population::introduce_initial_cases() {
 
 void Population::introduce_parasite(const int& location, Genotype* parasite_type, const int& num_of_infections) {
   if (model_ != nullptr) {
+    if (model_->get_population()->all_alive_persons_by_location[location].empty()) return;
     auto persons_bitten_today = model_->get_random()->roulette_sampling<Person>(
         num_of_infections, model_->get_population()->individual_relative_biting_by_location[location],
         model_->get_population()->all_alive_persons_by_location[location], false);

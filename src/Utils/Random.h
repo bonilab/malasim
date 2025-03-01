@@ -521,6 +521,10 @@ std::vector<T *> utils::Random::multinomial_sampling(int size, std::vector<doubl
 template <class T>
 std::vector<T *> utils::Random::roulette_sampling(int number_of_samples, std::vector<double> &distribution,
                                                   std::vector<T *> &all_objects, bool is_shuffled, double sum_distribution) {
+  if (all_objects.empty() || distribution.empty()) {
+    spdlog::error("Error in roulette sampling. Empty distribution or all_objects.");
+    return std::vector<T *>(number_of_samples, nullptr);
+  }
   std::vector<T *> samples(number_of_samples, nullptr);
   double sum { sum_distribution };
   if (sum_distribution == 0) {
@@ -603,7 +607,7 @@ std::vector<std::tuple<T *, double>> utils::Random::roulette_sampling_tuple(int 
   }
 
   if (uniform_sampling_index < number_of_samples) {
-    spdlog::error("Error in roulette sampling. Sum weight: {}. Sum distribution: {}", sum_weight, sum_distribution);
+    spdlog::error("Error in roulette sampling tuple. Sum weight: {}. Sum distribution: {}", sum_weight, sum_distribution);
   }
 
   if (is_shuffled) {
