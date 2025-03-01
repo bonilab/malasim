@@ -93,6 +93,9 @@ public:
       const YAML::Node &node, Config* config);
 
   static std::vector<Event*> build_import_district_mutant_daily_events(
+  const YAML::Node &node, Config* config);
+
+  static std::vector<Event*> build_change_mutation_mask_events(
       const YAML::Node &node, Config* config);
 };
 

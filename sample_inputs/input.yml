@@ -138,7 +138,7 @@ spatial_settings:
 # ---------------------------------------------------------------
 seasonality_settings:
   # Seasonality of malaria (to be updated with specific country data)
-  enable: true
+  enable: false
   mode: "rainfall"
   rainfall:
     filename: "../../sample_inputs/dev_seasonality.csv"
@@ -936,6 +936,13 @@ population_events:
   - name: turn_on_mutation
     info:
       - date: 2000/1/1
+
+  - name: change_mutation_mask
+    info:
+      - date: 2000/1/1
+        mutation_mask: "||||111||1000000,0||||||0000000000000|1"
+      - date: 2001/1/1
+        mutation_mask: "||||111||1000000,0||||||0010000000001|1"
 
   - name: change_mutation_probability_per_locus
     info:

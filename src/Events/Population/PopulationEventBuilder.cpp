@@ -15,6 +15,7 @@
 #include "AnnualCoverageUpdateEvent.hxx"
 #include "ChangeCirculationPercentEvent.hxx"
 #include "ChangeInterruptedFeedingRateEvent.h"
+#include "ChangeMutationMaskEvent.h"
 #include "ChangeMutationProbabilityPerLocusEvent.h"
 #include "ChangeTreatmentCoverageEvent.h"
 #include "ChangeTreatmentStrategyEvent.h"
@@ -790,6 +791,23 @@ PopulationEventBuilder::build_import_district_mutant_daily_events(
   return events;
 }
 
+
+std::vector<Event*>
+PopulationEventBuilder::build_change_mutation_mask_events(
+const YAML::Node &node, Config* config) {
+  std::vector<Event*> events;
+  for (const auto& event_node : node) {
+    const auto starting_date = event_node["date"].as<date::year_month_day>();
+    auto time = (date::sys_days { starting_date } - date::sys_days { config->get_simulation_timeframe().get_starting_date() }).count();
+    auto mutation_mask = event_node["mutation_mask"].as<std::string>();
+
+    auto* e = new ChangeMutationMaskEvent( mutation_mask,time);
+    events.push_back(e);
+  }
+
+  return events;
+}
+
 std::vector<Event*> PopulationEventBuilder::build(const YAML::Node &node) {
   Config* config = Model::get_config();
   std::vector<Event*> events;
@@ -874,6 +892,9 @@ std::vector<Event*> PopulationEventBuilder::build(const YAML::Node &node) {
   }
   if (name == DistrictImportationDailyEvent::EventName) {
     events = build_import_district_mutant_daily_events(node["info"], config);
+  }
+  if (name == "change_mutation_mask") {
+    events = build_change_mutation_mask_events(node["info"], config);
   }
   return events;
 }
