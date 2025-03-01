@@ -73,7 +73,7 @@ std::vector<Event*> PopulationEventBuilder::build_introduce_mutant_event(
     std::vector<Event*> events;
     for (const auto &entry : node) {
       // Load the values
-      auto start_date = entry["day"].as<date::year_month_day>();
+      auto start_date = entry["date"].as<date::year_month_day>();
       auto time =
           (date::sys_days{start_date} - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
               .count();
@@ -135,7 +135,7 @@ std::vector<Event*> PopulationEventBuilder::build_introduce_mutant_raster_event(
     std::vector<Event*> events;
     for (const auto &entry : node) {
       // Load the values
-      auto start_date = entry["day"].as<date::year_month_day>();
+      auto start_date = entry["date"].as<date::year_month_day>();
       auto time =
           (date::sys_days{start_date} - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
               .count();

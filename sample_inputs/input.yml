@@ -138,7 +138,7 @@ spatial_settings:
 # ---------------------------------------------------------------
 seasonality_settings:
   # Seasonality of malaria (to be updated with specific country data)
-  enable: false
+  enable: true
   mode: "rainfall"
   rainfall:
     filename: "../../sample_inputs/dev_seasonality.csv"
