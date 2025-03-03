@@ -28,7 +28,7 @@ double IntroduceMutantEventBase::calculate(std::vector<int> &locations) const {
           for (auto &pp :
                *person->get_all_clonal_parasite_populations()->parasites()) {
               auto chromosome_strings = StringHelpers::split<char>(pp->genotype()->get_aa_sequence(),'|',false);
-              spdlog::info(StringHelpers::join(chromosome_strings,"#"));
+              // spdlog::info(StringHelpers::join(chromosome_strings,"#"));
             for (auto &allele_info : alleles_) {
               if (chromosome_strings[std::get<0>(allele_info)][std::get<1>(allele_info)] == std::get<2>(allele_info)) {
                 mutant_fraction++;
@@ -61,10 +61,16 @@ int IntroduceMutantEventBase::mutate(std::vector<int> &locations,
       auto infections = pi->vPerson()[location][Person::ASYMPTOMATIC][ac].size()
                         + pi->vPerson()[location][Person::CLINICAL][ac].size();
 
+      if (infections > 0) {
+        spdlog::debug("mutate location: {}, age class: {}, infections: {}",
+                      location, ac, infections);
+      }
       // Use a Poisson distribution to determine the number of mutations in this
       // location
       auto mutations =
-          Model::get_random()->random_poisson((double)infections * target_fraction);
+        Model::get_random()->random_poisson((double)infections * target_fraction);
+      // spdlog::debug("mutate location: {}, age class: {}, mutations: {}",
+      //               location, ac, mutations);
       if (mutations == 0) { continue; }
       mutations_count += mutations;
 
@@ -93,6 +99,7 @@ int IntroduceMutantEventBase::mutate(std::vector<int> &locations,
           auto* old_genotype = pp->genotype();
           auto* new_genotype =
               old_genotype->modify_genotype_allele(alleles_, Model::get_config());
+          spdlog::debug("location {} Introduce mutant new genotype: {}", location,new_genotype->get_aa_sequence());
           pp->set_genotype(new_genotype);
         }
       }

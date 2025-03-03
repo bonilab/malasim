@@ -36,7 +36,14 @@ void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, 
   auto &location_db = config->get_spatial_settings().location_db;
   // for each location fill prmc at tracking_index row with sampling genotypes
   for (int loc = 0; loc < config->get_spatial_settings().get_number_of_locations(); loc++) {
-    if (Model::get_population()->all_alive_persons_by_location[loc].empty()) continue;
+    if (!Model::get_population()->all_alive_persons_by_location[loc].empty()) {
+      // spdlog::info("tracking_index {} Location {} has {} alive persons", tracking_index,loc,
+      //   Model::get_population()->all_alive_persons_by_location[loc].size());
+    }
+    else {
+      // spdlog::info("infect_new_cohort_in_PRMC tracking_index {} Location {} has no alive persons", tracking_index,loc);
+      continue;
+    }
     spdlog::trace("Day {} ifr = {}", Model::get_scheduler()->current_time(),
                   location_db[loc].mosquito_ifr);
     // if there is no parasites in location
@@ -100,8 +107,16 @@ void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, 
           // this is to avoid recombination between the same person because in this case the interrupted feeding is true,
           // this is worst case scenario
           auto temp_if = if_index;
+          int same_person_counter = 0;
           while (second_sampling[temp_if] == first_sampling[if_index]) {
             temp_if = random->random_uniform(second_sampling.size());
+            if (second_sampling[temp_if] == first_sampling[if_index]) {
+              same_person_counter++;
+            }
+            if (same_person_counter > 10) {
+              spdlog::trace("second sampling is the same as first sampling, because there is 1 person and IFR is non-zero");
+              break;
+            }
           }
           // interrupted feeding occurs
           get_genotypes_profile_from_person(second_sampling[temp_if], sampled_genotypes, relative_infectivity_each_pp);
@@ -204,10 +219,20 @@ std::vector<unsigned int> Mosquito::build_interrupted_feeding_indices(utils::Ran
 }
 
 int Mosquito::random_genotype(int location, int tracking_index) {
-    auto genotype_index = Model::get_random()->random_uniform_int(
-      0,
-      Model::get_config()->get_spatial_settings().location_db[location].mosquito_size);
-    return genotypes_table[tracking_index][location][genotype_index]->genotype_id;
+    //Get number of genotypes in genotypes_table
+    int max_genotype_numbers = 0;
+  for (auto *genotype : genotypes_table[tracking_index][location]) {
+    if (genotype != nullptr) {
+      max_genotype_numbers++;
+    }
+  }
+  if (max_genotype_numbers == 0) {
+    return -1;
+  }
+  auto genotype_index = Model::get_random()->random_uniform_int(
+    0,
+    max_genotype_numbers);
+  return genotypes_table[tracking_index][location][genotype_index]->genotype_id;
 }
 
 void Mosquito::get_genotypes_profile_from_person(Person *person, std::vector<Genotype *> &sampling_genotypes,

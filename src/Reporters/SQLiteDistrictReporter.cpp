@@ -346,7 +346,7 @@ void SQLiteDistrictReporter::monthly_report_genome_data(int monthId) {
   build_up_genome_data_insert_values(monthId);
 
   if (insert_values.empty()) {
-    spdlog::info("No genotypes recorded in the simulation at timestep, {}",
+    spdlog::debug("No genotypes recorded in the simulation at timestep, {}",
                  Model::get_scheduler()->current_time());
     return;
   }

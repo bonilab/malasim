@@ -175,6 +175,10 @@ void Population::perform_infection_event() {
     // data_collector store number of bites
     model_->get_mdc()->collect_number_of_bites(loc, number_of_bites);
 
+    if (Model::get_population()->all_alive_persons_by_location[loc].empty()) {
+      spdlog::debug("all_alive_persons_by_location location {} is empty", loc);
+      continue;
+    }
     auto persons_bitten_today = model_->get_random()->roulette_sampling<Person>(
         number_of_bites, individual_relative_biting_by_location[loc], all_alive_persons_by_location[loc], false,
         sum_relative_biting_by_location[loc]);
@@ -183,8 +187,14 @@ void Population::perform_infection_event() {
       assert(person->get_host_state() != Person::DEAD);
       person->increase_number_of_times_bitten();
 
-      if (Model::get_population()->all_alive_persons_by_location[loc].empty()) continue;
+      if (model_->get_mosquito()->genotypes_table[tracking_index][loc].empty()) {
+        continue;
+      }
       auto genotype_id = model_->get_mosquito()->random_genotype(loc, tracking_index);
+      if (genotype_id == -1) {
+        spdlog::trace("mosquito genotypes_table[{}][{}] is empty", tracking_index, loc);
+        continue;
+      }
 
       const auto p_infectious = model_->get_random()->random_flat(0.0, 1.0);
       // only infect with real infectious bite
@@ -407,14 +417,16 @@ void Population::initialize_person_indices() {
 
 void Population::introduce_initial_cases() {
   if (model_ != nullptr) {
+    // update current foi
+    update_current_foi();
     // std::cout << Model::CONFIG->initial_parasite_info().size() << std::endl;
     for (const auto p_info : Model::get_config()->get_genotype_parameters().get_initial_parasite_info()) {
       auto num_of_infections = Model::get_random()->random_poisson(std::round(size_at(p_info.location) * p_info.prevalence));
       num_of_infections = num_of_infections <= 0 ? 1 : num_of_infections;
 
       auto* genotype = Model::get_config()->get_genotype_parameters().genotype_db->at(p_info.parasite_type_id);
-      spdlog::debug("Introducing genotype {} with prevalence: {} : {} infections at location {}",
-                p_info.parasite_type_id, p_info.prevalence, num_of_infections, p_info.location);
+      // spdlog::debug("Introducing genotype {} with prevalence: {} : {} infections at location {}",
+      //           p_info.parasite_type_id, p_info.prevalence, num_of_infections, p_info.location);
       introduce_parasite(p_info.location, genotype, num_of_infections);
     }
     // update current foi
@@ -432,7 +444,10 @@ void Population::introduce_initial_cases() {
 
 void Population::introduce_parasite(const int& location, Genotype* parasite_type, const int& num_of_infections) {
   if (model_ != nullptr) {
-    if (model_->get_population()->all_alive_persons_by_location[location].empty()) return;
+    if (model_->get_population()->all_alive_persons_by_location[location].empty()) {
+      // spdlog::debug("introduce_parasite all_alive_persons_by_location location {} is empty", location);
+      return;
+    }
     auto persons_bitten_today = model_->get_random()->roulette_sampling<Person>(
         num_of_infections, model_->get_population()->individual_relative_biting_by_location[location],
         model_->get_population()->all_alive_persons_by_location[location], false);
@@ -688,6 +703,7 @@ void Population::persist_current_force_of_infection_to_use_N_days_later() {
 void Population::update_current_foi() {
   auto pi = get_person_index<PersonIndexByLocationStateAgeClass>();
   for (int location = 0; location < model_->get_config()->get_spatial_settings().get_number_of_locations(); location++) {
+    // spdlog::info("location {} pop {}", location, size(location));
     // reset force of infection for each location
     current_force_of_infection_by_location[location] = 0.0;
     sum_relative_biting_by_location[location] = 0.0;
@@ -731,6 +747,8 @@ void Population::update_current_foi() {
     // spdlog::info("update_current_foi individual_relative_moving_by_location[{}] size: {} sum: {}",location,
     //                individual_relative_moving_by_location[location].size(),
     //                sum_relative_moving_by_location[location]);
+    // spdlog::info("update_current_foi all_alive_persons_by_location[{}] size: {}",location,
+    //                all_alive_persons_by_location[location].size());
   }
 }
 

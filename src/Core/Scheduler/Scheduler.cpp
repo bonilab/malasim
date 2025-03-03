@@ -67,6 +67,7 @@ void Scheduler::begin_time_step() {
 
 void Scheduler::daily_update() {
   if (model_ != nullptr) {
+
     model_->daily_update();
 
     if (is_today_first_day_of_month()) {

@@ -325,11 +325,11 @@ public:
           initial_parasite_info_.emplace_back(loc, parasite_type_id, prevalence);
         }
       }
-      for(auto &initial_genotype_info : get_initial_parasite_info()) {
-        spdlog::debug("Location: {} parasite_type_id: {} prevalence: {}",
-                     initial_genotype_info.location, initial_genotype_info.parasite_type_id,
-                     initial_genotype_info.prevalence);
-      }
+      // for(auto &initial_genotype_info : get_initial_parasite_info()) {
+        // spdlog::debug("Location: {} parasite_type_id: {} prevalence: {}",
+        //              initial_genotype_info.location, initial_genotype_info.parasite_type_id,
+                     // initial_genotype_info.prevalence);
+      // }
     }
   }
 
