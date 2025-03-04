@@ -186,6 +186,8 @@ public:
     double get_current_relative_biting_rate() const { return current_relative_biting_rate_; }
     void set_current_relative_biting_rate(double current_relative_biting_rate) { current_relative_biting_rate_ = current_relative_biting_rate; }
 
+    void update_relative_bitting_rate();
+
     void NotifyChange(const Property &property, const void *oldValue, const void *newValue);
 
     void set_location(const int& value);

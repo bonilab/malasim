@@ -80,6 +80,10 @@ public:
 
   void generate_individual(int location, int age_class);
 
+  std::vector<int> precompute_moving_levels(int count);
+
+  void generate_individual_safe(int location, int age_class, int moving_level);
+
   void give_1_birth(const int &location);
 
   void clear_all_dead_state_individual();
