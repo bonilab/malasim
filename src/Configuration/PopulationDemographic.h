@@ -6,9 +6,9 @@
 #include <stdexcept>
 #include <vector>
 
-#include "IConfigClass.h"
+#include "IConfigData.h"
 
-class PopulationDemographic : IConfigClass {
+class PopulationDemographic : public IConfigData {
 public:
   // Getters
   [[nodiscard]] int get_number_of_age_classes() const {

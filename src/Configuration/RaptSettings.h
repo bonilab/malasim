@@ -1,8 +1,8 @@
 #ifndef RAPTSETTINGS_H
 #define RAPTSETTINGS_H
-#include "IConfigClass.h"
+#include "IConfigData.h"
 
-class RaptSettings : public IConfigClass{
+class RaptSettings : public IConfigData{
 
 public:
   [[nodiscard]] bool get_is_defined() const { return is_defined_;}

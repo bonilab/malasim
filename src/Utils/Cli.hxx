@@ -97,6 +97,33 @@ public:
 
     input.record_movement = input.record_individual_movement || input.record_cell_movement || input.record_district_movement;
 
+    if (input.record_movement) {
+      spdlog::info("Movement data will be recorded.");
+    }
+
+    switch(input.verbosity) {
+      case 0: {
+        spdlog::set_level(spdlog::level::info);
+        spdlog::info("Verbosity level set to 0. Only info will be logged.");
+        break;
+      }
+      case 1: {
+        spdlog::set_level(spdlog::level::debug);
+        spdlog::info("Verbosity level set to 1. Info, debug will be logged.");
+        break;
+      }
+      case 2: {
+        spdlog::set_level(spdlog::level::trace);
+        spdlog::info("Verbosity level set to 2. Info, debug and trace will be logged.");
+        break;
+      }
+      default: {
+        spdlog::set_level(spdlog::level::info);
+        spdlog::info("Verbosity level set to 0. Only info will be logged.");
+        break;
+      }
+    }
+
     return true;
   }
 

@@ -17,9 +17,9 @@ std::ostream &operator<<(std::ostream &os, const Therapy &therapy) {
   if ( !therapy.name_.empty() ){
     os << therapy.name_;
   } else {
-    os << Model::get_instance().get_config()->get_drug_parameters().drug_db->at(therapy.drug_ids[0])->name();
+    os << Model::get_config()->get_drug_parameters().drug_db->at(therapy.drug_ids[0])->name();
     for (int i = 1; i < therapy.drug_ids.size(); ++i) {
-      os << "+" << Model::get_instance().get_config()->get_drug_parameters().drug_db->at(therapy.drug_ids[i])->name();
+      os << "+" << Model::get_config()->get_drug_parameters().drug_db->at(therapy.drug_ids[i])->name();
     }
   }
 

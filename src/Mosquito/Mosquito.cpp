@@ -23,6 +23,7 @@ void Mosquito::initialize(Config *config) {
                                            std::vector<Genotype *>(100, nullptr)));
 
   for(auto loc_index = 0; loc_index < config->get_spatial_settings().location_db.size(); ++loc_index) {
+    if (Model::get_population()->all_alive_persons_by_location[loc_index].empty()) continue;
     for(auto day = 0; day < config->get_epidemiological_parameters().get_number_of_tracking_days(); ++day) {
       genotypes_table[day][loc_index] = std::vector<Genotype *>(
           config->get_spatial_settings().location_db[loc_index].mosquito_size, nullptr);
@@ -35,7 +36,15 @@ void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, 
   auto &location_db = config->get_spatial_settings().location_db;
   // for each location fill prmc at tracking_index row with sampling genotypes
   for (int loc = 0; loc < config->get_spatial_settings().get_number_of_locations(); loc++) {
-    spdlog::trace("Day {} ifr = {}", Model::get_instance().get_scheduler()->current_time(),
+    if (!Model::get_population()->all_alive_persons_by_location[loc].empty()) {
+      // spdlog::info("tracking_index {} Location {} has {} alive persons", tracking_index,loc,
+      //   Model::get_population()->all_alive_persons_by_location[loc].size());
+    }
+    else {
+      // spdlog::info("infect_new_cohort_in_PRMC tracking_index {} Location {} has no alive persons", tracking_index,loc);
+      continue;
+    }
+    spdlog::trace("Day {} ifr = {}", Model::get_scheduler()->current_time(),
                   location_db[loc].mosquito_ifr);
     // if there is no parasites in location
     if (population->current_force_of_infection_by_location[loc] <= 0) {
@@ -98,13 +107,21 @@ void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, 
           // this is to avoid recombination between the same person because in this case the interrupted feeding is true,
           // this is worst case scenario
           auto temp_if = if_index;
+          int same_person_counter = 0;
           while (second_sampling[temp_if] == first_sampling[if_index]) {
             temp_if = random->random_uniform(second_sampling.size());
+            if (second_sampling[temp_if] == first_sampling[if_index]) {
+              same_person_counter++;
+            }
+            if (same_person_counter > 10) {
+              spdlog::trace("second sampling is the same as first sampling, because there is 1 person and IFR is non-zero");
+              break;
+            }
           }
           // interrupted feeding occurs
           get_genotypes_profile_from_person(second_sampling[temp_if], sampled_genotypes, relative_infectivity_each_pp);
           //Count interrupted feeding events with within host induced recombination on
-          Model::get_instance().get_mdc()->mosquito_recombination_events_count()[loc][0]++;
+          Model::get_mdc()->mosquito_recombination_events_count()[loc][0]++;
         }
 
         if (sampled_genotypes.empty()) {
@@ -137,7 +154,7 @@ void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, 
                                                                         sampled_genotypes, false)[0];
           }
           //Count interrupted feeding events with within host induced recombination off
-          Model::get_instance().get_mdc()->mosquito_recombination_events_count()[loc][0]++;
+          Model::get_mdc()->mosquito_recombination_events_count()[loc][0]++;
         }
 
         sampled_genotypes.clear();
@@ -169,22 +186,22 @@ void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, 
       //Count DHA-PPQ(8) ASAQ(7) AL(6)
       //Count if male genotype resists to one drug and female genotype resists to another drug only, right now work on double and triple resistant only
       //when genotype ec50_power_n == min_ec50, it is sensitive to that drug
-        if (Model::get_instance().get_scheduler()->current_time() >= Model::get_instance().get_config()->get_simulation_timeframe().get_start_of_comparison_period())
+        if (Model::get_scheduler()->current_time() >= Model::get_config()->get_simulation_timeframe().get_start_of_comparison_period())
         {
             /*
              * Print our recombination for counting later
              * */
-            auto resistant_tracker_info = std::make_tuple(Model::get_instance().get_scheduler()->current_time(),
+            auto resistant_tracker_info = std::make_tuple(Model::get_scheduler()->current_time(),
               parent_genotypes[0]->genotype_id, parent_genotypes[1]->genotype_id, sampled_genotype->genotype_id);
-//            if (std::find(Model::get_instance().get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].begin(),
-//                          Model::get_instance().get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].end(), resistant_tracker_info)
-//                == Model::get_instance().get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].end()){
-//                Model::get_instance().get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].push_back(resistant_tracker_info);
+//            if (std::find(Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].begin(),
+//                          Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].end(), resistant_tracker_info)
+//                == Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].end()){
+//                Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].push_back(resistant_tracker_info);
 //            }
-            Model::get_instance().get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].push_back(resistant_tracker_info);
+            Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].push_back(resistant_tracker_info);
         }
       //Count number of bites
-      Model::get_instance().get_mdc()->mosquito_recombination_events_count()[loc][1]++;
+      Model::get_mdc()->mosquito_recombination_events_count()[loc][1]++;
     }
   }
 }
@@ -202,10 +219,20 @@ std::vector<unsigned int> Mosquito::build_interrupted_feeding_indices(utils::Ran
 }
 
 int Mosquito::random_genotype(int location, int tracking_index) {
-    auto genotype_index = Model::get_instance().get_random()->random_uniform_int(
-      0,
-      Model::get_instance().get_config()->get_spatial_settings().location_db[location].mosquito_size);
-    return genotypes_table[tracking_index][location][genotype_index]->genotype_id;
+    //Get number of genotypes in genotypes_table
+    int max_genotype_numbers = 0;
+  for (auto *genotype : genotypes_table[tracking_index][location]) {
+    if (genotype != nullptr) {
+      max_genotype_numbers++;
+    }
+  }
+  if (max_genotype_numbers == 0) {
+    return -1;
+  }
+  auto genotype_index = Model::get_random()->random_uniform_int(
+    0,
+    max_genotype_numbers);
+  return genotypes_table[tracking_index][location][genotype_index]->genotype_id;
 }
 
 void Mosquito::get_genotypes_profile_from_person(Person *person, std::vector<Genotype *> &sampling_genotypes,

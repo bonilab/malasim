@@ -233,16 +233,16 @@ void ReporterUtils::output_genotype_frequency4(std::stringstream& ss, std::strin
 //    }
 
     std::map<int, int> prmc_genotype_map;
-    auto tracking_day = Model::get_instance().get_scheduler()->current_time() % Model::get_instance().get_config()->get_epidemiological_parameters().get_number_of_tracking_days();
+    auto tracking_day = Model::get_scheduler()->current_time() % Model::get_config()->get_epidemiological_parameters().get_number_of_tracking_days();
     int sum_nullptr = 0;
-    for(auto* prmc_genotypes : Model::get_instance().get_mosquito()->genotypes_table[tracking_day][loc]) {
+    for(auto* prmc_genotypes : Model::get_mosquito()->genotypes_table[tracking_day][loc]) {
         if (prmc_genotypes == nullptr) {
             sum_nullptr++;
             continue;
         }
     }
     if (sum_nullptr == 0){
-        for(auto* prmc_genotypes : Model::get_instance().get_mosquito()->genotypes_table[tracking_day][loc]) {
+        for(auto* prmc_genotypes : Model::get_mosquito()->genotypes_table[tracking_day][loc]) {
           const auto g_id = prmc_genotypes->genotype_id;
           if (prmc_genotype_map.find(g_id) == prmc_genotype_map.end()) {
               prmc_genotype_map[prmc_genotypes->genotype_id] = 1;
@@ -252,8 +252,8 @@ void ReporterUtils::output_genotype_frequency4(std::stringstream& ss, std::strin
           }
         }
         for (const auto genotype : prmc_genotype_map) {
-            prmc4[genotype.first] += genotype.second / static_cast<double>(Model::get_instance().get_mosquito()->genotypes_table[tracking_day][loc].size());
-            prmc4_all[genotype.first] += genotype.second / static_cast<double>(Model::get_instance().get_mosquito()->genotypes_table[tracking_day][loc].size());
+            prmc4[genotype.first] += genotype.second / static_cast<double>(Model::get_mosquito()->genotypes_table[tracking_day][loc].size());
+            prmc4_all[genotype.first] += genotype.second / static_cast<double>(Model::get_mosquito()->genotypes_table[tracking_day][loc].size());
         }
 
         for (auto& i : prmc4) {
@@ -451,13 +451,13 @@ void ReporterUtils::initialize_moi_file_logger() {
 //
 //
 // void MonthlyReporter::print_monthly_incidence_by_location() {
-//  for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
-//    ss << Model::get_instance().get_mdc()->monthly_number_of_treatment_by_location()[loc] << sep;
+//  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
+//    ss << Model::get_mdc()->monthly_number_of_treatment_by_location()[loc] << sep;
 //  }
 //
 //  ss << group_sep;
 //
-//  for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
-//    ss << Model::get_instance().get_mdc()->monthly_number_of_clinical_episode_by_location()[loc] << sep;
+//  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
+//    ss << Model::get_mdc()->monthly_number_of_clinical_episode_by_location()[loc] << sep;
 //  }
 //}

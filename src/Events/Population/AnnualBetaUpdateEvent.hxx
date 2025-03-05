@@ -23,10 +23,10 @@ private:
   // Execute the annual beta update event
   void execute() override {
     // Grab a reference to the location_db to work with
-    auto &location_db = Model::get_instance().get_config()->get_spatial_settings().location_db;
+    auto &location_db = Model::get_config()->get_spatial_settings().location_db;
 
     // Iterate through and adjust the betas
-    auto count = Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
+    auto count = Model::get_config()->get_spatial_settings().get_number_of_locations();
     for (auto ndx = 0; ndx < count; ndx++) {
       location_db[ndx].beta = adjust(location_db[ndx].beta, rate_);
     }
@@ -41,7 +41,7 @@ private:
     // Log on demand
     spdlog::debug(
         "Annual beta update event: {} - {} {}",
-        StringHelpers::date_as_string(date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}),
+        StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}),
         rate_,
         location_db[0].beta);
   }

@@ -16,18 +16,18 @@ ModifyNestedMFTEvent::ModifyNestedMFTEvent(const int &at_time,
 
 void ModifyNestedMFTEvent::execute() {
   IStrategy* new_strategy = nullptr;
-  if (Model::get_instance().get_treatment_strategy()->type == IStrategy::NestedMFTMultiLocation) {
-    new_strategy = Model::get_instance().get_config()->get_strategy_parameters().strategy_db[strategy_id];
-    dynamic_cast<NestedMFTMultiLocationStrategy*>(Model::get_instance().get_treatment_strategy())
+  if (Model::get_treatment_strategy()->type == IStrategy::NestedMFTMultiLocation) {
+    new_strategy = Model::get_config()->get_strategy_parameters().strategy_db[strategy_id];
+    dynamic_cast<NestedMFTMultiLocationStrategy*>(Model::get_treatment_strategy())
         ->strategy_list[0] = new_strategy;
-    new_strategy->adjust_started_time_point(Model::get_instance().get_scheduler()->current_time());
+    new_strategy->adjust_started_time_point(Model::get_scheduler()->current_time());
   }
 
-  if (Model::get_instance().get_treatment_strategy()->type == IStrategy::NestedMFT) {
-    new_strategy = Model::get_instance().get_config()->get_strategy_parameters().strategy_db[strategy_id];
-    dynamic_cast<NestedMFTStrategy*>(Model::get_instance().get_treatment_strategy())
+  if (Model::get_treatment_strategy()->type == IStrategy::NestedMFT) {
+    new_strategy = Model::get_config()->get_strategy_parameters().strategy_db[strategy_id];
+    dynamic_cast<NestedMFTStrategy*>(Model::get_treatment_strategy())
         ->strategy_list[0] = new_strategy;
-    new_strategy->adjust_started_time_point(Model::get_instance().get_scheduler()->current_time());
+    new_strategy->adjust_started_time_point(Model::get_scheduler()->current_time());
   }
 
   if (new_strategy == nullptr) {

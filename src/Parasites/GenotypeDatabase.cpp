@@ -43,32 +43,32 @@ Genotype *GenotypeDatabase::get_genotype(const std::string &aa_sequence) {
     new_genotype->resistant_recombinations_in_mosquito = std::vector<MosquitoRecombinedGenotypeInfo>();
 
     // check if aa_sequence is valid
-    if (!new_genotype->is_valid(Model::get_instance().get_config()->get_genotype_parameters().get_pf_genotype_info())) {
+    if (!new_genotype->is_valid(Model::get_config()->get_genotype_parameters().get_pf_genotype_info())) {
       spdlog::error("Invalid genotype: " + aa_sequence);
     }
 
     // calculate cost of resistance
-    new_genotype->calculate_daily_fitness(Model::get_instance().get_config()->get_genotype_parameters().get_pf_genotype_info());
+    new_genotype->calculate_daily_fitness(Model::get_config()->get_genotype_parameters().get_pf_genotype_info());
 
     // calculate ec50
-    new_genotype->calculate_EC50_power_n(Model::get_instance().get_config()->get_genotype_parameters().get_pf_genotype_info(),
-      Model::get_instance().get_config()->get_drug_parameters().drug_db);
+    new_genotype->calculate_EC50_power_n(Model::get_config()->get_genotype_parameters().get_pf_genotype_info(),
+      Model::get_config()->get_drug_parameters().drug_db);
 
-    new_genotype->override_EC50_power_n(Model::get_instance().get_config()->get_genotype_parameters().get_override_ec50_patterns(),
-      Model::get_instance().get_config()->get_drug_parameters().drug_db);
+    new_genotype->override_EC50_power_n(Model::get_config()->get_genotype_parameters().get_override_ec50_patterns(),
+      Model::get_config()->get_drug_parameters().drug_db);
 
     // add min ec50 of each drug to db
-    for(int drug_id = 0; drug_id <  Model::get_instance().get_config()->get_drug_parameters().drug_db->size(); drug_id++){
+    for(int drug_id = 0; drug_id <  Model::get_config()->get_drug_parameters().drug_db->size(); drug_id++){
       if (drug_id_ec50.find(drug_id) == drug_id_ec50.end()){
         if (drug_id_ec50[drug_id].find(new_genotype->get_aa_sequence()) == drug_id_ec50[drug_id].end()){
           drug_id_ec50[drug_id][new_genotype->get_aa_sequence()] = new_genotype->get_EC50_power_n(
-            Model::get_instance().get_config()->get_drug_parameters().drug_db->at(drug_id));
+            Model::get_config()->get_drug_parameters().drug_db->at(drug_id));
         }
         else{
           if (drug_id_ec50[drug_id][new_genotype->get_aa_sequence()] > new_genotype->get_EC50_power_n(
-            Model::get_instance().get_config()->get_drug_parameters().drug_db->at(drug_id))){
+            Model::get_config()->get_drug_parameters().drug_db->at(drug_id))){
             drug_id_ec50[drug_id][new_genotype->get_aa_sequence()] = new_genotype->get_EC50_power_n(
-              Model::get_instance().get_config()->get_drug_parameters().drug_db->at(drug_id));
+              Model::get_config()->get_drug_parameters().drug_db->at(drug_id));
           }
         }
       }

@@ -1,48 +1,42 @@
 #ifndef VALIDATIONREPORTER_H
 #define VALIDATIONREPORTER_H
 
-#include <fstream>
-#include <sstream>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <memory>
 #include "Reporter.h"
 
 class ValidationReporter : public Reporter {
-  //disallow copy, assign and move
+public:
+  // Disable copy, assignment, and move
   ValidationReporter(const ValidationReporter &) = delete;
   void operator=(const ValidationReporter &) = delete;
   ValidationReporter(ValidationReporter &&) = delete;
   void operator=(ValidationReporter &&) = delete;
 
 public:
-    const std::string group_sep = "-1111\t";
-    const std::string sep = "\t";
-    std::ofstream monthly_data_file;
-    std::ofstream summary_data_file;
-    std::ofstream gene_db_file;
-    std::ofstream gene_freq_file;
-    std::ofstream prmc_db_file;
-    std::ofstream prmc_freq_file;
-    std::ofstream monthly_mutation_file;
-    std::ofstream mosquito_res_count_file;
+  const std::string group_sep = "-1111\t";
+  const std::string sep = "\t";
+
+  std::shared_ptr<spdlog::logger> monthly_data_logger;
+  std::shared_ptr<spdlog::logger> summary_data_logger;
+  std::shared_ptr<spdlog::logger> gene_db_logger;
+  std::shared_ptr<spdlog::logger> gene_freq_logger;
+  // std::shared_ptr<spdlog::logger> prmc_db_logger;
+  // std::shared_ptr<spdlog::logger> prmc_freq_logger;
+  std::shared_ptr<spdlog::logger> monthly_mutation_logger;
+  std::shared_ptr<spdlog::logger> mosquito_res_count_logger;
 
 public:
-    ValidationReporter();
+  ValidationReporter();
+  ~ValidationReporter() override = default;
 
-    ~ValidationReporter() override;
-
-    void initialize(int job_number, const std::string &path) override;
-
-    void before_run() override;
-
-    void after_run() override;
-
-    void begin_time_step() override;
-
-    void monthly_report() override;
-
-    void print_EIR_PfPR_by_location(std::stringstream& ss);
-
-    //  void print_monthly_incidence_by_location();
+  void initialize(int job_number, const std::string &path) override;
+  void before_run() override;
+  void after_run() override;
+  void begin_time_step() override;
+  void monthly_report() override;
+  void print_EIR_PfPR_by_location(std::stringstream& ss);
 };
 
-
-#endif //VALIDATIONREPORTER_H
+#endif  // VALIDATIONREPORTER_H

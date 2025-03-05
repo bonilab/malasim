@@ -7,11 +7,11 @@
 #include <vector>
 #include <map>
 
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include "Utils/Helpers/NumberHelpers.hxx"
 #include "Treatment/Therapies/DrugDatabase.h"
 
-class DrugParameters: IConfigClass {
+class DrugParameters: public IConfigData {
 public:
     DrugDatabase* drug_db = new DrugDatabase();
     // Inner class: DrugInfo

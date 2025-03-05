@@ -14,11 +14,11 @@ NonInfantImmuneComponent::~NonInfantImmuneComponent() {
 double NonInfantImmuneComponent::get_acquire_rate(const int &age) const {
   //    return FastImmuneComponent::acquireRate;
 
-  return (age > 80) ? Model::get_instance().get_config()->get_immune_system_parameters().acquire_rate_by_age[80]
-                    : Model::get_instance().get_config()->get_immune_system_parameters().acquire_rate_by_age[age];
+  return (age > 80) ? Model::get_config()->get_immune_system_parameters().acquire_rate_by_age[80]
+                    : Model::get_config()->get_immune_system_parameters().acquire_rate_by_age[age];
 
 }
 
 double NonInfantImmuneComponent::get_decay_rate(const int &age) const {
-  return Model::get_instance().get_config()->get_immune_system_parameters().decay_rate;
+  return Model::get_config()->get_immune_system_parameters().decay_rate;
 }

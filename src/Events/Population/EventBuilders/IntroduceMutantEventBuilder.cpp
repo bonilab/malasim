@@ -22,7 +22,7 @@ std::vector<int> get_locations_from_raster(const std::string &filename) {
   auto* file = AscFileManager::read(filename);
 
   // Note the number of locations so that we can provide some error checking
-  auto count = Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
+  auto count = Model::get_config()->get_spatial_settings().get_number_of_locations();
 
   // Iterate through the raster and note the valid locations
   std::vector<int> locations;
@@ -73,7 +73,7 @@ std::vector<Event*> PopulationEventBuilder::build_introduce_mutant_event(
     std::vector<Event*> events;
     for (const auto &entry : node) {
       // Load the values
-      auto start_date = entry["day"].as<date::year_month_day>();
+      auto start_date = entry["date"].as<date::year_month_day>();
       auto time =
           (date::sys_days{start_date} - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
               .count();
@@ -135,7 +135,7 @@ std::vector<Event*> PopulationEventBuilder::build_introduce_mutant_raster_event(
     std::vector<Event*> events;
     for (const auto &entry : node) {
       // Load the values
-      auto start_date = entry["day"].as<date::year_month_day>();
+      auto start_date = entry["date"].as<date::year_month_day>();
       auto time =
           (date::sys_days{start_date} - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
               .count();

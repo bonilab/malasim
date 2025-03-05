@@ -9,7 +9,7 @@
 #include "Utils/Random.h"
 
 Event::Event() {
-  id_ = Model::get_instance().get_random()->uuid();
+  id_ = Model::get_random()->uuid();
 }
 
 Event::~Event(){

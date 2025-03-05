@@ -35,24 +35,6 @@ public:
   // Initialize the model
   bool initialize();
 
-  // Access configuration in a controlled manner
-  [[nodiscard]] Config* get_config() {
-    if (config_ == nullptr) {
-      throw std::runtime_error(
-          "Model not initialized. Call Initialize() first.");
-    }
-    return config_;
-  }
-
-  // Access scheduler in a controlled manner
-  [[nodiscard]] Scheduler* get_scheduler() const {
-    if (scheduler_ == nullptr) {
-      throw std::runtime_error(
-          "Model not initialized. Call Initialize() first.");
-    }
-    return scheduler_;
-  }
-
   // Prevent copying and moving
   Model(const Model &) = delete;
   void operator=(const Model &) = delete;
@@ -64,13 +46,10 @@ private:
   Model(const int &object_pool_size = 100000);
   ~Model() = default;
 
-  // Configuration managed by a smart pointer
-  Config* config_;
-
-  Scheduler* scheduler_;
-
   bool is_initialized_;
 
+  Config* config_;
+  Scheduler* scheduler_;
   Population* population_;
   utils::Random* random_;
   ModelDataCollector* mdc_;
@@ -93,12 +72,14 @@ public:
   void yearly_update();
   void release();
   Model* get_model();
-  utils::Random* get_random();
-  ModelDataCollector* get_mdc();
-  Population* get_population();
-  Mosquito* get_mosquito();
-  ITreatmentCoverageModel* get_treatment_coverage();
-  IStrategy* get_treatment_strategy();
+  static Config* get_config();
+  static Scheduler* get_scheduler();
+  static utils::Random* get_random();
+  static ModelDataCollector* get_mdc();
+  static Population* get_population();
+  static Mosquito* get_mosquito();
+  static ITreatmentCoverageModel* get_treatment_coverage();
+  static IStrategy* get_treatment_strategy();
   ClinicalUpdateFunction* progress_to_clinical_update_function() {
     return progress_to_clinical_update_function_;
   }

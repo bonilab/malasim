@@ -13,7 +13,7 @@ ChangeMutationProbabilityPerLocusEvent::ChangeMutationProbabilityPerLocusEvent(c
     time = at_time;
 }
 void ChangeMutationProbabilityPerLocusEvent::execute() {
-    Model::get_instance().get_config()->get_genotype_parameters().set_mutation_probability_per_locus(value);
+    Model::get_config()->get_genotype_parameters().set_mutation_probability_per_locus(value);
     spdlog::info("{}: Change mutation probability per locus to {}",
       StringHelpers::date_as_string(date::year_month_day{scheduler->calendar_date}),value);
 }

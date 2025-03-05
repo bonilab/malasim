@@ -796,9 +796,20 @@ strategy_parameters:
       name: Burnin-SFTStrategy
       type: SFT
       therapy_ids: [13]
+    16:
+      name: NovelDrugIntroductionStrategy
+      type: NovelDrugIntroduction
+      strategy_ids: [0,3]
+      start_distribution: [0.7,0.3]
+      peak_distribution: [0.7,0.3]
+      peak_after: 0
+      newly_introduced_strategy_id: 4
+      tf_threshold: 0.1
+      replacement_fraction: 0.1
+      replacement_duration: 0
 
   # Initial treatment strategy ID
-  initial_strategy_id: 15
+  initial_strategy_id: 10
 
   # this is second line treatment for recurrence cases
   # -1 means use the same first line treatment for second line treatment
@@ -898,7 +909,7 @@ epidemiological_parameters:
 #TODO: Check this implementation in Mosquito class
 mosquito_parameters:
   mosquito_config:
-    mode: "grid_based" # or "grid_based"
+    mode: "location_based" # or "grid_based"
     grid_based:
       interrupted_feeding_rate_raster: "../sample_inputs/dev_mosquito_ifr.asc"
       prmc_size_raster: "../sample_inputs/dev_mosquito_size.asc"
@@ -925,6 +936,13 @@ population_events:
   - name: turn_on_mutation
     info:
       - date: 2000/1/1
+
+  - name: change_mutation_mask
+    info:
+      - date: 2000/1/1
+        mutation_mask: "||||111||1000000,0||||||0000000000000|1"
+      - date: 2001/1/1
+        mutation_mask: "||||111||1000000,0||||||0010000000001|1"
 
   - name: change_mutation_probability_per_locus
     info:
@@ -1026,68 +1044,67 @@ population_events:
 #        date: 2002/3/21
 #        fraction: 0.01
 
-  - name: introduce_580Y_parasites
-    info:
-      - location: 1
-        date: 2002/7/15
-        fraction: 0.2
-        #index start from 1, check if locus mask is "1"
-        # allele must be 1 char
-        alleles:
-          - chromosome: 13
-            locus: 11
-            allele: "Y"
-          - chromosome: 13
-            locus: 12
-            allele: "I"
+#  - name: introduce_580Y_parasites
+#    info:
+#      - location: 1
+#        date: 2002/7/15
+#        fraction: 0.2
+#        #index start from 1, check if locus mask is "1"
+#        # allele must be 1 char
+#        alleles:
+#          - chromosome: 13
+#            locus: 11
+#            allele: "Y"
+#          - chromosome: 13
+#            locus: 12
+#            allele: "I"
 #
 #  - name: introduce_plas2_parasites
 #    info:
 #      - location: 0
 #        date: 2002/4/30
 #        fraction: 0.05
-
-  - name: introduce_amodiaquine_mutant_parasites
-    info:
-      - location: 0
-        date: 2002/4/30
-        fraction: 0.05
-        #index start from 1, check if locus mask is "1"
-        # allele must be 1 char
-        alleles:
-          - chromosome: 7
-            locus: 1
-            allele: "T"
-          - chromosome: 5
-            locus: 1
-            allele: "Y"
-          - chromosome: 5
-            locus: 2
-            allele: "Y"
-          - chromosome: 5
-            locus: 3
-            allele: "2"
-
-  - name: introduce_lumefantrine_mutant_parasites
-    info:
-      - location: 1
-        date: 2002/10/12
-        fraction: 0.03
-        #index start from 1, check if locus mask is "1"
-        # allele must be 1 char
-        alleles:
-          - chromosome: 7
-            locus: 1
-            allele: "K"
-          - chromosome: 5
-            locus: 1
-            allele: "N"
-          - chromosome: 5
-            locus: 2
-            allele: "F"
-          - chromosome: 5
-            locus: 3
-            allele: "1"
+#  - name: introduce_amodiaquine_mutant_parasites
+#    info:
+#      - location: 0
+#        date: 2002/4/30
+#        fraction: 0.05
+#        #index start from 1, check if locus mask is "1"
+#        # allele must be 1 char
+#        alleles:
+#          - chromosome: 7
+#            locus: 1
+#            allele: "T"
+#          - chromosome: 5
+#            locus: 1
+#            allele: "Y"
+#          - chromosome: 5
+#            locus: 2
+#            allele: "Y"
+#          - chromosome: 5
+#            locus: 3
+#            allele: "2"
+#
+#  - name: introduce_lumefantrine_mutant_parasites
+#    info:
+#      - location: 1
+#        date: 2002/10/12
+#        fraction: 0.03
+#        #index start from 1, check if locus mask is "1"
+#        # allele must be 1 char
+#        alleles:
+#          - chromosome: 7
+#            locus: 1
+#            allele: "K"
+#          - chromosome: 5
+#            locus: 1
+#            allele: "N"
+#          - chromosome: 5
+#            locus: 2
+#            allele: "F"
+#          - chromosome: 5
+#            locus: 3
+#            allele: "1"
 #
 #  - name: introduce_triple_mutant_to_dpm_parasites
 #    info:

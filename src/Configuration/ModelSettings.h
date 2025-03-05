@@ -5,11 +5,11 @@
 #include <stdexcept>
 #include <spdlog/spdlog.h>
 
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include "Utils/YamlFile.hxx"
 #include "Utils/Random.h"
 
-class ModelSettings : IConfigClass {
+class ModelSettings : public IConfigData {
 public:
   // Getters
   [[nodiscard]] int get_days_between_stdout_output() const {

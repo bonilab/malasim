@@ -7,12 +7,12 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include "Parasites/GenotypeDatabase.h"
 
 class GenotypeDatabase;
 
-class GenotypeParameters: IConfigClass {
+class GenotypeParameters: public IConfigData {
 public:
   // Inner class: MultiplicativeEffectOnEC50For2OrMoreMutations
   class MultiplicativeEffectOnEC50For2OrMoreMutations {
@@ -70,6 +70,30 @@ public:
     [[nodiscard]] const std::vector<MultiplicativeEffectOnEC50>& get_multiplicative_effect_on_EC50() const { return multiplicative_effect_on_EC50_; }
     void set_multiplicative_effect_on_EC50(const std::vector<MultiplicativeEffectOnEC50>& value) { multiplicative_effect_on_EC50_ = value; }
 
+    std::string get_amino_acids_string() const {
+        std::string result;
+        for (const auto& aa : amino_acids_) {
+            result += aa + " ";
+        }
+        return result;
+    }
+
+    std::string get_daily_crs_string() const {
+      std::string result;
+      for (const auto& crs : daily_crs_) {
+        result += std::to_string(crs) + " ";
+      }
+      return result;
+    }
+
+    std::string get_multiplicative_effect_on_EC50_string() const {
+      std::string result;
+      for (auto effect : multiplicative_effect_on_EC50_) {
+        result += effect.to_string() + " ";
+      }
+      return result;
+    }
+
     std::string to_string() const {
       std::string result = std::to_string(position_) + ": ";
       if (!amino_acids_.empty()) {
@@ -78,8 +102,9 @@ public:
         }
       }
       else {
-        result = std::to_string(position_) + ": empty";
+        result = std::to_string(position_) + ": cnv";
       }
+      result += "]";
       return result;
     }
   private:
@@ -300,11 +325,11 @@ public:
           initial_parasite_info_.emplace_back(loc, parasite_type_id, prevalence);
         }
       }
-      for(auto &initial_genotype_info : get_initial_parasite_info()) {
-        spdlog::info("Location: {} parasite_type_id: {} prevalence: {}",
-                     initial_genotype_info.location, initial_genotype_info.parasite_type_id,
-                     initial_genotype_info.prevalence);
-      }
+      // for(auto &initial_genotype_info : get_initial_parasite_info()) {
+        // spdlog::debug("Location: {} parasite_type_id: {} prevalence: {}",
+        //              initial_genotype_info.location, initial_genotype_info.parasite_type_id,
+                     // initial_genotype_info.prevalence);
+      // }
     }
   }
 

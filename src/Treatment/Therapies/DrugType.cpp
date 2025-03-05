@@ -45,11 +45,11 @@ int DrugType::get_total_duration_of_drug_activity(const int &dosing_days) const 
 
 void DrugType::populate_resistant_aa_locations() {
   resistant_aa_locations.clear();
-  for (const auto &chromosome_info : Model::get_instance().get_config()->get_genotype_parameters().get_pf_genotype_info().chromosome_infos) {
+  for (const auto &chromosome_info : Model::get_config()->get_genotype_parameters().get_pf_genotype_info().chromosome_infos) {
     for (int gene_id = 0; gene_id < chromosome_info.get_genes().size(); ++gene_id) {
       auto &gene_info = chromosome_info.get_genes()[gene_id];
 
-      auto aa_pos_in_sequence = Model::get_instance().get_config()->get_genotype_parameters().get_pf_genotype_info().calculate_aa_pos(
+      auto aa_pos_in_sequence = Model::get_config()->get_genotype_parameters().get_pf_genotype_info().calculate_aa_pos(
           chromosome_info.get_chromosome_id() - 1, gene_id, static_cast<int>(gene_info.get_aa_positions().size()), 0);
 
       for (int aa_id = 0; aa_id < gene_info.get_aa_positions().size(); ++aa_id) {

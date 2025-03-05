@@ -38,38 +38,38 @@ void ImportationEvent::schedule_event(Scheduler* scheduler, const int &location,
 
 void ImportationEvent::execute() {
   const auto number_of_importation_cases =
-      Model::get_instance().get_random()->random_poisson(number_of_cases_);
+      Model::get_random()->random_poisson(number_of_cases_);
   auto* pi =
-      Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
+      Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 
   for (auto i = 0; i < number_of_importation_cases; i++) {
-    const std::size_t ind_ac = Model::get_instance().get_random()->random_uniform(
+    const std::size_t ind_ac = Model::get_random()->random_uniform(
         static_cast<unsigned long>(pi->vPerson()[0][0].size()));
     if (pi->vPerson()[0][0][ind_ac].empty()) { continue; }
     const std::size_t index =
-        Model::get_instance().get_random()->random_uniform(pi->vPerson()[0][0][ind_ac].size());
+        Model::get_random()->random_uniform(pi->vPerson()[0][0][ind_ac].size());
     auto* p = pi->vPerson()[0][0][ind_ac][index];
 
     p->get_immune_system()->set_increase(true);
     p->set_host_state(Person::ASYMPTOMATIC);
 
     auto* blood_parasite =
-        p->add_new_parasite_to_blood(Model::get_instance().get_config()->get_genotype_parameters().genotype_db->at(
+        p->add_new_parasite_to_blood(Model::get_config()->get_genotype_parameters().genotype_db->at(
             static_cast<const unsigned long &>(genotype_id_)));
 
-    auto size = Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_asymptomatic();
+    auto size = Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_asymptomatic();
 
     blood_parasite->set_gametocyte_level(
-        Model::get_instance().get_config()->get_epidemiological_parameters().get_gametocyte_level_full());
+        Model::get_config()->get_epidemiological_parameters().get_gametocyte_level_full());
     blood_parasite->set_last_update_log10_parasite_density(size);
     blood_parasite->set_update_function(
         Model::get_instance().immunity_clearance_update_function());
 
-    //        Model::get_instance().get_population()->initial_infection(pi->vPerson()[0][0][ind_ac][index],
+    //        Model::get_population()->initial_infection(pi->vPerson()[0][0][ind_ac][index],
     //        Model::CONFIG->parasite_db()->get(0));
   }
   spdlog::info("Day {}: Importation event: {} at location {} with genotype {}",
-            Model::get_instance().get_scheduler()->current_time(),
+            Model::get_scheduler()->current_time(),
             number_of_cases_,location_,
-            Model::get_instance().get_config()->get_genotype_parameters().genotype_db->at(genotype_id_)->get_aa_sequence());
+            Model::get_config()->get_genotype_parameters().genotype_db->at(genotype_id_)->get_aa_sequence());
 }

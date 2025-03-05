@@ -33,6 +33,6 @@ void MatureGametocyteEvent::execute() {
   auto* person = dynamic_cast<Person*>(dispatcher);
   if (person->get_all_clonal_parasite_populations()->contain(blood_parasite_)) {
     blood_parasite_->set_gametocyte_level(
-        Model::get_instance().get_config()->get_epidemiological_parameters().get_gametocyte_level_full());
+        Model::get_config()->get_epidemiological_parameters().get_gametocyte_level_full());
   }
 }

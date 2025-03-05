@@ -2,7 +2,7 @@
 
 #include <string>
 #include <stdexcept>
-#include "IConfigClass.h"
+#include "IConfigData.h"
 
 #include "Spatial/Movement/BarabasiSM.hxx"
 #include "Spatial/Movement/BurkinaFasoSM.hxx"
@@ -14,7 +14,7 @@
 
 class MultinomialDistributionGenerator;
 
-class MovementSettings : IConfigClass {
+class MovementSettings : public IConfigData {
 public:
     class BarabasiSM {
     public:

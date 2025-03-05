@@ -28,9 +28,9 @@ void SQLiteDistrictReporter::initialize(int job_number, const std::string &path)
 void SQLiteDistrictReporter::count_infections_for_location(int location) {
   std::vector<int> districtLookup = SpatialData::get_instance().
       get_district_lookup();
-  auto &ageClasses = Model::get_instance().get_config()->get_population_demographic().get_age_structure();
+  auto &ageClasses = Model::get_config()->get_population_demographic().get_age_structure();
   auto* index =
-      Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
+      Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 
   // Calculate the correct index and update the count
   auto district = districtLookup[location];
@@ -53,45 +53,45 @@ void SQLiteDistrictReporter::collect_site_data_for_location(int location) {
   std::vector<int> districtLookup = SpatialData::get_instance().
       get_district_lookup();
   auto district = districtLookup[location];
-  auto &ageClasses = Model::get_instance().get_config()->get_population_demographic().get_age_structure();
+  auto &ageClasses = Model::get_config()->get_population_demographic().get_age_structure();
 
   count_infections_for_location(location);
 
-  auto locationPopulation = static_cast<int>(Model::get_instance().get_population()->size(location));
+  auto locationPopulation = static_cast<int>(Model::get_population()->size(location));
   // Collect the simple data
   monthly_site_data.population[district] +=
       static_cast<int>(locationPopulation);
 
   monthly_site_data.clinical_episodes[district] +=
-      Model::get_instance().get_mdc()
+      Model::get_mdc()
           ->monthly_number_of_clinical_episode_by_location()[location];
 
   monthly_site_data.treatments[district] +=
-      Model::get_instance().get_mdc()
+      Model::get_mdc()
           ->monthly_number_of_treatment_by_location()[location];
   monthly_site_data.treatment_failures[district] +=
-      Model::get_instance().get_mdc()
+      Model::get_mdc()
           ->monthly_treatment_failure_by_location()[location];
   monthly_site_data.nontreatment[district] +=
-      Model::get_instance().get_mdc()->monthly_nontreatment_by_location()[location];
+      Model::get_mdc()->monthly_nontreatment_by_location()[location];
 
   for (auto ndx = 0; ndx < ageClasses.size(); ndx++) {
     // Collect the treatment by age class, following the 0-59 month convention
     // for under-5
     if (ageClasses[ndx] < 5) {
       monthly_site_data.treatments_under5[district] +=
-          Model::get_instance().get_mdc()
+          Model::get_mdc()
               ->monthly_number_of_treatment_by_location_age_class()[location]
                                                                    [ndx];
     } else {
       monthly_site_data.treatments_over5[district] +=
-          Model::get_instance().get_mdc()
+          Model::get_mdc()
               ->monthly_number_of_treatment_by_location_age_class()[location]
                                                                    [ndx];
     }
     // collect the clinical episodes by age class
     monthly_site_data.clinical_episodes_by_age_class[district][ndx] +=
-        Model::get_instance().get_mdc()
+        Model::get_mdc()
             ->monthly_number_of_clinical_episode_by_location_age_class()
                 [location][ndx];
   }
@@ -99,21 +99,22 @@ void SQLiteDistrictReporter::collect_site_data_for_location(int location) {
   // EIR and PfPR is a bit more complicated since it could be an invalid value
   // early in the simulation, and when aggregating at the district level the
   // weighted mean needs to be reported instead
-  if (Model::get_instance().get_mdc()->recording_data()) {
+  if (Model::get_mdc()->recording_data()) {
     auto eirLocation =
-        Model::get_instance().get_mdc()->EIR_by_location_year()[location].empty()
+        Model::get_mdc()->EIR_by_location_year()[location].empty()
             ? 0
-            : Model::get_instance().get_mdc()->EIR_by_location_year()[location]
+            : Model::get_mdc()->EIR_by_location_year()[location]
                   .back();
+    // spdlog::info("collect_site_data_for_location eirLocation: district {} {} += {} x  {}", district,monthly_site_data.eir[district],eirLocation,locationPopulation);
     monthly_site_data.eir[district] += (eirLocation * locationPopulation);
     monthly_site_data.pfpr_under5[district] +=
-        (Model::get_instance().get_mdc()->get_blood_slide_prevalence(location, 0, 5)
+        (Model::get_mdc()->get_blood_slide_prevalence(location, 0, 5)
          * locationPopulation);
     monthly_site_data.pfpr2to10[district] +=
-        (Model::get_instance().get_mdc()->get_blood_slide_prevalence(location, 2, 10)
+        (Model::get_mdc()->get_blood_slide_prevalence(location, 2, 10)
          * locationPopulation);
     monthly_site_data.pfpr_all[district] +=
-        (Model::get_instance().get_mdc()
+        (Model::get_mdc()
              ->blood_slide_prevalence_by_location()[location]
          * locationPopulation);
   }
@@ -125,23 +126,25 @@ void SQLiteDistrictReporter::calculate_and_build_up_site_data_insert_values(
   insert_values.clear();
 
   for (auto district = 0; district < numDistricts; district++) {
-    double calculatedEir = (monthly_site_data.eir[district] != 0)
+    double calculatedEir = monthly_site_data.population[district] == 0
+                            ? 0 : (monthly_site_data.eir[district] != 0)
                                ? (monthly_site_data.eir[district]
                                   / monthly_site_data.population[district])
                                : 0;
-    double calculatedPfprUnder5 =
-        (monthly_site_data.pfpr_under5[district] != 0)
+    double calculatedPfprUnder5 = monthly_site_data.population[district] == 0
+     ? 0 : (monthly_site_data.pfpr_under5[district] != 0)
             ? (monthly_site_data.pfpr_under5[district]
                / monthly_site_data.population[district])
                   * 100.0
             : 0;
-    double calculatedPfpr2to10 =
-        (monthly_site_data.pfpr2to10[district] != 0)
+    double calculatedPfpr2to10 =monthly_site_data.population[district] == 0
+     ? 0 :  (monthly_site_data.pfpr2to10[district] != 0)
             ? (monthly_site_data.pfpr2to10[district]
                / monthly_site_data.population[district])
                   * 100.0
             : 0;
-    double calculatedPfprAll = (monthly_site_data.pfpr_all[district] != 0)
+    double calculatedPfprAll = monthly_site_data.population[district] == 0
+     ? 0 : (monthly_site_data.pfpr_all[district] != 0)
                                    ? (monthly_site_data.pfpr_all[district]
                                       / monthly_site_data.population[district])
                                          * 100.0
@@ -180,24 +183,24 @@ void SQLiteDistrictReporter::calculate_and_build_up_site_data_insert_values(
 void SQLiteDistrictReporter::monthly_report_site_data(int monthId) {
   TransactionGuard transaction{db.get()};
   auto numDistricts = SpatialData::get_instance().get_district_count() + 1;
-  auto &ageClasses = Model::get_instance().get_config()->get_population_demographic().get_age_structure();
+  auto &ageClasses = Model::get_config()->get_population_demographic().get_age_structure();
 
   // Prepare the data structures
   reset_site_data_structures(numDistricts, ageClasses.size());
 
-  for (auto location = 0; location < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
+  for (auto location = 0; location < Model::get_config()->get_spatial_settings().get_number_of_locations();
        location++) {
     // If the population is zero, press on
     auto locationPopulation =
-        static_cast<int>(Model::get_instance().get_population()->size(location));
+        static_cast<int>(Model::get_population()->size(location));
     if (locationPopulation == 0) { continue; }
        }
   // Collect the data
-  for (auto location = 0; location < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations();
+  for (auto location = 0; location < Model::get_config()->get_spatial_settings().get_number_of_locations();
        location++) {
     // If the population is zero, press on
     auto locationPopulation =
-        static_cast<int>(Model::get_instance().get_population()->size(location));
+        static_cast<int>(Model::get_population()->size(location));
     if (locationPopulation == 0) { continue; }
 
     collect_site_data_for_location(location);
@@ -212,7 +215,7 @@ void SQLiteDistrictReporter::collect_genome_data_for_location(size_t location) {
   const auto &districtLookup = SpatialData::get_instance().get_district_lookup();
   const auto district = districtLookup[location];
   auto* index =
-      Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
+      Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
   auto ageClasses = index->vPerson()[0][0].size();
 
   for (auto hs = 0; hs < Person::NUMBER_OF_STATE - 1; hs++) {
@@ -262,7 +265,7 @@ void SQLiteDistrictReporter::reset_genome_data_structures(int numDistricts,
 }
 void SQLiteDistrictReporter::collect_genome_data_for_a_person(Person* person,
                                                               int site) {
-  const auto numGenotypes = Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size();
+  const auto numGenotypes = Model::get_config()->get_genotype_parameters().genotype_db->size();
   auto individual = std::vector<int>(numGenotypes, 0);
   // Get the person, press on if they are not infected
   auto* parasites = person->get_all_clonal_parasite_populations()->parasites();
@@ -298,7 +301,7 @@ void SQLiteDistrictReporter::collect_genome_data_for_a_person(Person* person,
 }
 
 void SQLiteDistrictReporter::build_up_genome_data_insert_values(int monthId) {
-  auto numGenotypes = Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size();
+  auto numGenotypes = Model::get_config()->get_genotype_parameters().genotype_db->size();
   auto numDistricts = SpatialData::get_instance().get_district_count();
 
   insert_values.clear();
@@ -331,10 +334,10 @@ void SQLiteDistrictReporter::monthly_report_genome_data(int monthId) {
   TransactionGuard transaction{db.get()};
 
   // Cache some values
-  auto numGenotypes = Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size();
+  auto numGenotypes = Model::get_config()->get_genotype_parameters().genotype_db->size();
   auto numDistricts = SpatialData::get_instance().get_district_count();
   auto* index =
-      Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
+      Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 
   reset_genome_data_structures(numDistricts, numGenotypes);
 
@@ -346,8 +349,8 @@ void SQLiteDistrictReporter::monthly_report_genome_data(int monthId) {
   build_up_genome_data_insert_values(monthId);
 
   if (insert_values.empty()) {
-    spdlog::info("No genotypes recorded in the simulation at timestep, {}",
-                 Model::get_instance().get_scheduler()->current_time());
+    spdlog::debug("No genotypes recorded in the simulation at timestep, {}",
+                 Model::get_scheduler()->current_time());
     return;
   }
 

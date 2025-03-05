@@ -47,8 +47,8 @@ void MoveParasiteToBloodEvent::execute() {
   auto new_parasite = person->add_new_parasite_to_blood(parasite_type);
 
   new_parasite->set_last_update_log10_parasite_density(
-      Model::get_instance().get_random()->random_normal_truncated(
-          Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels()
+      Model::get_random()->random_normal_truncated(
+          Model::get_config()->get_parasite_parameters().get_parasite_density_levels()
               .get_log_parasite_density_asymptomatic(),
           0.5));
 
@@ -58,7 +58,7 @@ void MoveParasiteToBloodEvent::execute() {
         Model::get_instance().having_drug_update_function());
   } else {
     if (person->get_all_clonal_parasite_populations()->size() > 1) {
-      if (Model::get_instance().get_config()->get_epidemiological_parameters().get_allow_new_coinfection_to_cause_symptoms()) {
+      if (Model::get_config()->get_epidemiological_parameters().get_allow_new_coinfection_to_cause_symptoms()) {
         person->determine_clinical_or_not(new_parasite);
       } else {
         new_parasite->set_update_function(

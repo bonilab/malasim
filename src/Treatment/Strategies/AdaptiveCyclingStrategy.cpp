@@ -28,9 +28,9 @@ void AdaptiveCyclingStrategy::switch_therapy() {
   index++;
   index %= therapy_list.size();
 
-  Model::get_instance().get_mdc()->update_UTL_vector();
+  Model::get_mdc()->update_UTL_vector();
   spdlog::info("{}: Adaptive Cycling Strategy switch Therapy to: {}",
-    StringHelpers::date_as_string(date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}),
+    StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}),
     therapy_list[index]->get_id());
 }
 
@@ -51,16 +51,16 @@ std::string AdaptiveCyclingStrategy::to_string() const {
 
 void AdaptiveCyclingStrategy::update_end_of_time_step() {
 
-  if (Model::get_instance().get_scheduler()->current_time()==latest_switch_time) {
+  if (Model::get_scheduler()->current_time()==latest_switch_time) {
     switch_therapy();
     //            std::cout << to_string() << std::endl;
   } else {
-    if (Model::get_instance().get_mdc()->current_tf_by_therapy()[get_therapy(nullptr)->get_id()] > trigger_value) {
+    if (Model::get_mdc()->current_tf_by_therapy()[get_therapy(nullptr)->get_id()] > trigger_value) {
       // TODO:: turn_off_days and delay_until_actual_trigger should be match with calendar day
-      if (Model::get_instance().get_scheduler()->current_time() > latest_switch_time + turn_off_days) {
-        latest_switch_time = Model::get_instance().get_scheduler()->current_time() + delay_until_actual_trigger;
+      if (Model::get_scheduler()->current_time() > latest_switch_time + turn_off_days) {
+        latest_switch_time = Model::get_scheduler()->current_time() + delay_until_actual_trigger;
           spdlog::info("{}: Adaptive Cycling will switch therapy next year",
-          StringHelpers::date_as_string(date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}));
+          StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}));
       }
     }
   }

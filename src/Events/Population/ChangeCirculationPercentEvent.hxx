@@ -18,16 +18,16 @@ private:
   // Execute the event to change the circulation percentage
   void execute() override {
     MovementSettings::CirculationInfo circulation_info =
-        Model::get_instance().get_config()->get_movement_settings().get_circulation_info();
+        Model::get_config()->get_movement_settings().get_circulation_info();
     circulation_info.set_circulation_percent(rate_);
-    Model::get_instance().get_config()->get_movement_settings().set_circulation_info(
+    Model::get_config()->get_movement_settings().set_circulation_info(
         circulation_info);
 
     // Log on demand
     spdlog::debug(
         "Change circulation percent event: {} - {}",
         StringHelpers::date_as_string(
-            date::year_month_day{Model::get_instance().get_scheduler()->calendar_date}),
+            date::year_month_day{Model::get_scheduler()->calendar_date}),
         rate_);
   }
 

@@ -19,13 +19,13 @@ location_(location),fraction_(fraction), alleles_(alleles){
 IntroduceTrippleMutantToDPMEvent::~IntroduceTrippleMutantToDPMEvent() = default;
 
 void IntroduceTrippleMutantToDPMEvent::execute() {
-  auto* pi = Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
+  auto* pi = Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 
 
-  for (int j = 0; j < Model::get_instance().get_config()->get_population_demographic().get_number_of_age_classes(); ++j) {
+  for (int j = 0; j < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ++j) {
     const auto number_infected_individual_in_ac =
         pi->vPerson()[0][Person::ASYMPTOMATIC][j].size() + pi->vPerson()[0][Person::CLINICAL][j].size();
-    const auto number_of_importation_cases = Model::get_instance().get_random()->random_poisson(
+    const auto number_of_importation_cases = Model::get_random()->random_poisson(
         number_infected_individual_in_ac * fraction_
     );
     if (number_of_importation_cases == 0) {
@@ -33,7 +33,7 @@ void IntroduceTrippleMutantToDPMEvent::execute() {
     }
     for (auto i = 0; i < number_of_importation_cases; i++) {
 
-      const size_t index = Model::get_instance().get_random()->random_uniform(number_infected_individual_in_ac);
+      const size_t index = Model::get_random()->random_uniform(number_infected_individual_in_ac);
 
       Person* p = nullptr;
       if (index < pi->vPerson()[0][Person::ASYMPTOMATIC][j].size()) {
@@ -47,12 +47,12 @@ void IntroduceTrippleMutantToDPMEvent::execute() {
       for (auto* pp : *(p->get_all_clonal_parasite_populations()->parasites())) {
         // TODO: rework on this
         auto* old_genotype = pp->genotype();
-        auto* new_genotype = old_genotype->modify_genotype_allele(alleles_,Model::get_instance().get_config());
+        auto* new_genotype = old_genotype->modify_genotype_allele(alleles_,Model::get_config());
         pp->set_genotype(new_genotype);
       }
     }
   }
 
   spdlog::info("Day: {} - IntroduceTrippleMutantToDPMEvent at location {} with fraction {}",
-              Model::get_instance().get_scheduler()->current_time(), location_, fraction_);
+              Model::get_scheduler()->current_time(), location_, fraction_);
 }

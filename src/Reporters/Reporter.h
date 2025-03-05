@@ -38,17 +38,11 @@ public:
 public:
   enum ReportType {
     CONSOLE,
-    GUI,
     MONTHLY_REPORTER,
     MMC_REPORTER,
     TACT_REPORTER,
     NOVEL_DRUG_REPOTER,
     VALIDATION_REPORTER,
-
-    // SQLite reporter
-    SQLITE_DISTRICT_REPORTER,
-    SQLITE_PIXEL_REPORTER,
-    TRAVEL_TRACKING_REPORTER,
 
     // Specialist reporters for specific experiments
     MOVEMENT_REPORTER,
@@ -58,6 +52,13 @@ public:
     SEASONAL_IMMUNITY,
     AGE_BAND_REPORTER,
     THERAPY_RECORD_REPORTER,
+
+    // SQLite reporter
+    SQLITE_DISTRICT_REPORTER,
+    SQLITE_PIXEL_REPORTER,
+#ifdef ENABLE_TRAVEL_TRACKING
+    TRAVEL_TRACKING_REPORTER,
+#endif
   };
 
 

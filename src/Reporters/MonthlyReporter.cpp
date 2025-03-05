@@ -1,10 +1,7 @@
-//
-// Created by Nguyen Tran on 3/5/2018.
-//
-
 #include "MonthlyReporter.h"
 
 #include <date/date.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "Utils/Constants.h"
 #include "Configuration/Config.h"
@@ -20,15 +17,45 @@
 #include "Treatment/Strategies/IStrategy.h"
 #include "Utils/Cli.hxx"
 
+namespace fs = std::filesystem;
+
 MonthlyReporter::MonthlyReporter() = default;
 
-MonthlyReporter::~MonthlyReporter() = default;
-
 void MonthlyReporter::initialize(int job_number, const std::string &path) {
-  gene_freq_file.open(fmt::format("{}/gene_freq_{}.txt", path, job_number));
-  monthly_data_file.open(fmt::format("{}/monthly_data_{}.txt", path, job_number));
-  summary_data_file.open(fmt::format("{}/summary_{}.txt", path, job_number));
-  gene_db_file.open(fmt::format("{}/gene_db_{}.txt", path, job_number));
+  // Define file paths
+  std::string gene_freq_path = fmt::format("{}/gene_freq_{}.txt", path, job_number);
+  std::string monthly_data_path = fmt::format("{}/monthly_data_{}.txt", path, job_number);
+  std::string summary_data_path = fmt::format("{}/summary_{}.txt", path, job_number);
+  std::string gene_db_path = fmt::format("{}/gene_db_{}.txt", path, job_number);
+
+  // Remove old files if they exist
+  fs::remove(gene_freq_path);
+  fs::remove(monthly_data_path);
+  fs::remove(summary_data_path);
+  fs::remove(gene_db_path);
+
+  // Create separate loggers for each report type
+  gene_freq_logger = spdlog::basic_logger_mt("gene_freq", gene_freq_path);
+  monthly_data_logger = spdlog::basic_logger_mt("monthly_data", monthly_data_path);
+  summary_data_logger = spdlog::basic_logger_mt("summary", summary_data_path);
+  gene_db_logger = spdlog::basic_logger_mt("gene_db", gene_db_path);
+
+  // Set log pattern to only include the raw message (removes timestamps and log levels)
+  gene_freq_logger->set_pattern("%v");
+  monthly_data_logger->set_pattern("%v");
+  summary_data_logger->set_pattern("%v");
+  gene_db_logger->set_pattern("%v");
+
+  // Set up a default console logger
+  auto console_logger = spdlog::stdout_color_mt("console");
+  spdlog::set_default_logger(console_logger); // Make console logger the default
+  // spdlog::set_pattern("[%H:%M:%S] %v");  // Format console log with time
+
+  // Optional: Set logger flush levels
+  gene_freq_logger->flush_on(spdlog::level::info);
+  monthly_data_logger->flush_on(spdlog::level::info);
+  summary_data_logger->flush_on(spdlog::level::info);
+  gene_db_logger->flush_on(spdlog::level::info);
 }
 
 void MonthlyReporter::before_run() {}
@@ -38,104 +65,82 @@ void MonthlyReporter::begin_time_step() {}
 void MonthlyReporter::monthly_report() {
     std::stringstream ss;
 
-    ss << Model::get_instance().get_scheduler()->current_time() << sep;
-    ss << std::chrono::system_clock::to_time_t(Model::get_instance().get_scheduler()->calendar_date) << sep;
-    ss << date::format("%Y\t%m\t%d", Model::get_instance().get_scheduler()->calendar_date) << sep;
-    ss << Model::get_instance().get_config()->get_seasonality_settings().get_seasonal_factor(Model::get_instance().get_scheduler()->calendar_date, 0) << sep;
-    ss << Model::get_instance().get_treatment_coverage()->get_probability_to_be_treated(0, 1) << sep;
-    ss << Model::get_instance().get_treatment_coverage()->get_probability_to_be_treated(0, 10) << sep;
-    ss << Model::get_instance().get_population()->size() << sep;
+    ss << Model::get_scheduler()->current_time() << sep;
+    ss << std::chrono::system_clock::to_time_t(Model::get_scheduler()->calendar_date) << sep;
+    ss << date::format("%Y\t%m\t%d", Model::get_scheduler()->calendar_date) << sep;
+    ss << Model::get_config()->get_seasonality_settings().get_seasonal_factor(Model::get_scheduler()->calendar_date, 0) << sep;
+    ss << Model::get_treatment_coverage()->get_probability_to_be_treated(0, 1) << sep;
+    ss << Model::get_treatment_coverage()->get_probability_to_be_treated(0, 10) << sep;
+    ss << Model::get_population()->size() << sep;
     ss << group_sep;
 
     print_EIR_PfPR_by_location(ss);
     ss << group_sep;
-    for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-    ss << Model::get_instance().get_mdc()->monthly_number_of_new_infections_by_location()[loc] << sep;
+    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+        ss << Model::get_mdc()->monthly_number_of_new_infections_by_location()[loc] << sep;
     }
     ss << group_sep;
-    for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-    ss << Model::get_instance().get_mdc()->monthly_number_of_treatment_by_location()[loc] << sep;
+    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+        ss << Model::get_mdc()->monthly_number_of_treatment_by_location()[loc] << sep;
     }
     ss << group_sep;
-    for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-    ss << Model::get_instance().get_mdc()->monthly_number_of_clinical_episode_by_location()[loc] << sep;
-    }
-    ss << group_sep;
-    for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-        ss << Model::get_instance().get_mdc()->cumulative_NTF_by_location()[loc] << sep;
+    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+        ss << Model::get_mdc()->monthly_number_of_clinical_episode_by_location()[loc] << sep;
     }
     ss << group_sep;
 
-  // including total number of positive individuals
-  //  ReporterUtils::output_genotype_frequency3(ss, Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size(),
-  //                                            Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
+    // Log monthly data
+    monthly_data_logger->info(ss.str());
 
-  std::stringstream gene_freq_ss;
-  ReporterUtils::output_genotype_frequency3(gene_freq_ss, Model::get_instance().get_config()->get_genotype_parameters().genotype_db->size(),
-                                            Model::get_instance().get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
-
-  gene_freq_file << gene_freq_ss.str() << std::endl;
-
-  monthly_data_file << ss.str() << std::endl;
+    // Log gene frequency
+    std::stringstream gene_freq_ss;
+    ReporterUtils::output_genotype_frequency3(gene_freq_ss, Model::get_config()->get_genotype_parameters().genotype_db->size(),
+                                              Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
+    gene_freq_logger->info(gene_freq_ss.str());
 }
 
 void MonthlyReporter::after_run() {
   std::stringstream ss;
-
-  ss.str("");
-  ss << Model::get_instance().get_random()->get_seed() << sep << Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations() << sep;
-  ss << Model::get_instance().get_config()->get_spatial_settings().location_db[0].beta << sep;
-  ss << Model::get_instance().get_config()->get_spatial_settings().location_db[0].population_size << sep;
+  ss << Model::get_random()->get_seed() << sep
+     << Model::get_config()->get_spatial_settings().get_number_of_locations() << sep;
+  ss << Model::get_config()->get_spatial_settings().location_db[0].beta << sep;
+  ss << Model::get_config()->get_spatial_settings().location_db[0].population_size << sep;
   print_EIR_PfPR_by_location(ss);
 
   ss << group_sep;
-  // output last strategy information
-  ss << Model::get_instance().get_treatment_strategy()->id << sep;
+  ss << Model::get_treatment_strategy()->id << sep;
 
-  // output NTF
-  const auto total_time_in_years = (Model::get_instance().get_scheduler()->current_time() - Model::get_instance().get_config()->get_simulation_timeframe().get_start_of_comparison_period())
-                                   / static_cast<double>(Constants::DAYS_IN_YEAR);
+  // Calculate and log NTF
+  const auto total_time_in_years = (Model::get_scheduler()->current_time() -
+      Model::get_config()->get_simulation_timeframe().get_start_of_comparison_period())
+      / static_cast<double>(Constants::DAYS_IN_YEAR);
 
   auto sum_ntf = 0.0;
   ul pop_size = 0;
-  for (auto location = 0; location < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); location++) {
-    sum_ntf += Model::get_instance().get_mdc()->cumulative_NTF_by_location()[location];
-    pop_size += Model::get_instance().get_mdc()->popsize_by_location()[location];
+  for (auto location = 0; location < Model::get_config()->get_spatial_settings().get_number_of_locations(); location++) {
+      sum_ntf += Model::get_mdc()->cumulative_NTF_by_location()[location];
+      pop_size += Model::get_mdc()->popsize_by_location()[location];
   }
   ss << (sum_ntf * 100 / pop_size) / total_time_in_years << sep;
 
-  ss << group_sep;
-  for (auto location = 0; location < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); location++)
-  {
-    for (auto age = 0; age < 60; age++){
-      ss << Model::get_instance().get_mdc()->cumulative_clinical_episodes_by_location_age()[location][age]/total_time_in_years/Model::get_instance().get_mdc()->popsize_by_location_age()[location][age] << sep;
-    }
-  }
-  summary_data_file << ss.str() << std::endl;
+  summary_data_logger->info(ss.str());
 
-  for (auto [g_id, genotype] : *(Model::get_instance().get_config()->get_genotype_parameters().genotype_db)) {
-    gene_db_file << g_id << sep << genotype->aa_sequence << std::endl;
+  // Log gene database
+  for (auto [g_id, genotype] : *(Model::get_config()->get_genotype_parameters().genotype_db)) {
+    gene_db_logger->info("{}{}{}", g_id, sep, genotype->get_aa_sequence());
   }
-
-  gene_freq_file.close();
-  monthly_data_file.close();
-  summary_data_file.close();
-  gene_db_file.close();
 }
 
 void MonthlyReporter::print_EIR_PfPR_by_location(std::stringstream& ss) {
-  for (auto loc = 0; loc < Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
-    //
-    // EIR
-    if (Model::get_instance().get_mdc()->EIR_by_location_year()[loc].empty()) {
+  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
+    if (Model::get_mdc()->EIR_by_location_year()[loc].empty()) {
       ss << 0 << sep;
     } else {
-      ss << Model::get_instance().get_mdc()->EIR_by_location_year()[loc].back() << sep;
+      ss << Model::get_mdc()->EIR_by_location_year()[loc].back() << sep;
     }
     ss << group_sep;
-    // pfpr <5 , 2-10 and all
-    ss << Model::get_instance().get_mdc()->get_blood_slide_prevalence(loc, 2, 10) * 100 << sep;
-    ss << Model::get_instance().get_mdc()->get_blood_slide_prevalence(loc, 0, 5) * 100 << sep;
-    ss << Model::get_instance().get_mdc()->blood_slide_prevalence_by_location()[loc] * 100 << sep;
+    ss << Model::get_mdc()->get_blood_slide_prevalence(loc, 2, 10) * 100 << sep;
+    ss << Model::get_mdc()->get_blood_slide_prevalence(loc, 0, 5) * 100 << sep;
+    ss << Model::get_mdc()->blood_slide_prevalence_by_location()[loc] * 100 << sep;
   }
 }

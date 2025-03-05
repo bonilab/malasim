@@ -12,7 +12,7 @@ void NestedMFTStrategy::add_strategy(IStrategy* strategy) {
 void NestedMFTStrategy::add_therapy(Therapy* therapy) { }
 
 Therapy* NestedMFTStrategy::get_therapy(Person* person) {
-  const auto p = Model::get_instance().get_random()->random_flat(0.0, 1.0);
+  const auto p = Model::get_random()->random_flat(0.0, 1.0);
 
   double sum = 0;
   for (auto i = 0; i < distribution.size(); i++) {
@@ -50,7 +50,7 @@ void NestedMFTStrategy::update_end_of_time_step() {
 }
 
 void NestedMFTStrategy::monthly_update() {
-  adjust_distribution(Model::get_instance().get_scheduler()->current_time());
+  adjust_distribution(Model::get_scheduler()->current_time());
 
   for (auto* strategy : strategy_list) {
     strategy->monthly_update();

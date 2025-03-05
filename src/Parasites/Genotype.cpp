@@ -313,14 +313,14 @@ Genotype *Genotype::perform_mutation_by_drug(Config *pConfig, utils::Random *pRa
                   }
                 }
                 new_aa_sequence[aa_pos.aa_index_in_aa_string] = new_aa;
-                if (old_aa == 'C' && new_aa == 'Y'){
-                  spdlog::info("{} p: {} < {} select new_aa_id: {} from [0,{}] aa_list[new_aa_id] = aa_list[{}] = {}",
-                            Model::get_instance().get_scheduler()->current_time(), p, mutation_probability_by_locus,
-                            new_aa_id, aa_list.size() - 1, new_aa_id, aa_list[new_aa_id]);
-                  spdlog::info("{} Mutation {} -> {} old: {} new: {} aa_pos_id: {} aa_pos: {}",
-                            Model::get_instance().get_scheduler()->current_time(), p, mutation_probability_by_locus,
-                            old_aa, new_aa, aa_pos_id, aa_pos.aa_index_in_aa_string);
-                }
+                // if (old_aa == 'C' && new_aa == 'Y'){
+                //   spdlog::info("{} p: {} < {} select new_aa_id: {} from [0,{}] aa_list[new_aa_id] = aa_list[{}] = {}",
+                //             Model::get_scheduler()->current_time(), p, mutation_probability_by_locus,
+                //             new_aa_id, aa_list.size() - 1, new_aa_id, aa_list[new_aa_id]);
+                //   spdlog::info("{} Mutation {} -> {} old: {} new: {} aa_pos_id: {} aa_pos: {}",
+                //             Model::get_scheduler()->current_time(), p, mutation_probability_by_locus,
+                //             old_aa, new_aa, aa_pos_id, aa_pos.aa_index_in_aa_string);
+                // }
             }
         }
     }

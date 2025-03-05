@@ -35,7 +35,7 @@ Model::Model(const int &object_pool_size){
 
 void Model::set_treatment_strategy(const int& strategy_id) {
   treatment_strategy_ = strategy_id == -1 ? nullptr : config_->get_strategy_parameters().strategy_db[strategy_id];
-  treatment_strategy_->adjust_started_time_point(Model::get_instance().get_scheduler()->current_time());
+  treatment_strategy_->adjust_started_time_point(Model::get_scheduler()->current_time());
 }
 
 void Model::set_treatment_coverage(ITreatmentCoverageModel* tcm) {
@@ -285,28 +285,36 @@ Model* Model::get_model() {
   return this;
 }
 
+Config* Model::get_config() {
+  return get_instance().config_;
+}
+
+Scheduler* Model::get_scheduler() {
+  return get_instance().scheduler_;
+}
+
 utils::Random* Model::get_random() {
-  return random_;
+  return get_instance().random_;
 }
 
 ModelDataCollector* Model::get_mdc() {
-  return mdc_;
+  return get_instance().mdc_;
 }
 
 Population* Model::get_population() {
-  return population_;
+  return get_instance().population_;
 }
 
 Mosquito* Model::get_mosquito() {
-  return mosquito_;
+  return get_instance().mosquito_;
 }
 
 IStrategy* Model::get_treatment_strategy() {
-  return treatment_strategy_;
+  return get_instance().treatment_strategy_;
 }
 
 ITreatmentCoverageModel* Model::get_treatment_coverage() {
-  return treatment_coverage_;
+  return get_instance().treatment_coverage_;
 }
 
 

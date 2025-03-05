@@ -1,48 +1,64 @@
-/*
- * MovementReporter.h
- *
- * Define the MovementReporter class which is used to insert movement
- * information into the database. When running for large populations over long
- * periods of time, this will be a bit quicker since updates are buffered until
- * the end of the time step.
- */
 #ifndef MOVEMENTREPORTER_H
 #define MOVEMENTREPORTER_H
 
-#include "Reporters/SQLiteDbReporter.h"
+#include <sqlite3.h>
+#include <vector>
+#include <string>
+#include "Reporters/Reporter.h"
 
-class SQLiteSpecialistReporter;
-
-class MovementReporter : public SQLiteDbReporter {
+class MovementReporter : public Reporter {
 private:
+  sqlite3* db = nullptr;
+
+  const std::string CREATE_FINE_MOVEMENT_TABLE =
+      "CREATE TABLE IF NOT EXISTS Movement ("
+      "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+      "ReplicateId INTEGER, "
+      "Timestep INTEGER, "
+      "IndividualId INTEGER, "
+      "Source INTEGER, "
+      "Destination INTEGER"
+      ");";
+
+  const std::string CREATE_COARSE_MOVEMENT_TABLE =
+      "CREATE TABLE IF NOT EXISTS DistrictMovement ("
+      "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+      "ReplicateId INTEGER, "
+      "Timestep INTEGER, "
+      "Count INTEGER, "
+      "Source INTEGER, "
+      "Destination INTEGER"
+      ");";
+
   const std::string INSERT_FINE_MOVE =
-      "INSERT INTO Movement (ReplicateId, Timestep, IndividualId, Source, Destination) VALUES (?, ?, ?, ?, ?);";
+      "INSERT INTO Movement (ReplicateId, Timestep, IndividualId, Source, Destination) "
+      "VALUES (?, ?, ?, ?, ?);";
 
   const std::string INSERT_COARSE_MOVE =
-      "INSERT INTO DistrictMovement (ReplicateId, Timestep, Count, Source, Destination) VALUES (?, ?, ?, ?, ?);";
+      "INSERT INTO DistrictMovement (ReplicateId, Timestep, Count, Source, Destination) "
+      "VALUES (?, ?, ?, ?, ?);";
 
   int count = 0;
   int replicate = 0;
-  std::string fine_update_query;
+  std::string db_path;
 
   int division_count = 0;
   int** movement_counts = nullptr;
 
-  SQLiteSpecialistReporter* db_reporter = nullptr;  // SQLite database reporter
-
 public:
   MovementReporter() = default;
-  ~MovementReporter() override = default;
+  ~MovementReporter() override;
 
-  void initialize(int job_number, const std::string &path, SQLiteSpecialistReporter* db);
+  void initialize(int job_number, const std::string &path) override;
+  void before_run() override {}
+  void begin_time_step() override {}
   void monthly_report() override;
   void after_run() override;
 
+  void coarse_report();
   void add_coarse_move(int individual, int source, int destination);
   void add_fine_move(int individual, int source, int destination);
-  void coarse_report();
   void fine_report();
 };
 
-#endif
-
+#endif  // MOVEMENTREPORTER_H

@@ -4,11 +4,11 @@
 #include <stdexcept>
 #include <spdlog/spdlog.h>
 
-#include "IConfigClass.h"
+#include "IConfigData.h"
 #include "Utils/YamlFile.hxx"
 
 // Class to hold the simulation timeframe data
-class SimulationTimeframe : public IConfigClass{
+class SimulationTimeframe : public IConfigData{
 public:
   // Getters and Setters for starting_date
   [[nodiscard]] const date::year_month_day &get_starting_date() const {

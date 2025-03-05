@@ -51,7 +51,7 @@ Model::get_instance().get_mdc()
 
 Model::get_instance().get_mosquito()
 
-
+"||||111||1111111,0||||||0000000000100|1"
 
 
 

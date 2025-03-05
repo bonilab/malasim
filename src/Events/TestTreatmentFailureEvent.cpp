@@ -37,11 +37,11 @@ void TestTreatmentFailureEvent::execute() {
   if (person->get_all_clonal_parasite_populations()->contain(
           clinical_caused_parasite())
       && clinical_caused_parasite_->last_update_log10_parasite_density()
-             > Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_detectable()) {
-    Model::get_instance().get_mdc()->record_1_treatment_failure_by_therapy(
+             > Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_detectable()) {
+    Model::get_mdc()->record_1_treatment_failure_by_therapy(
         person->get_location(), person->get_age_class(), therapyId_);
   } else {
-    Model::get_instance().get_mdc()->record_1_treatment_success_by_therapy(
+    Model::get_mdc()->record_1_treatment_success_by_therapy(
         person->get_location(), person->get_age_class(), therapyId_);
   }
 }

@@ -110,10 +110,10 @@ public:
     char* err_msg = nullptr;
     if (sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &err_msg)
         != SQLITE_OK) {
-      std::string error = "SQL error: " + std::string(err_msg);
+      std::string error = "SQL error msg: " + std::string(err_msg);
       sqlite3_free(err_msg);
       /* throw std::runtime_error(error); */
-      spdlog::error("SQL error: {}", error);
+      spdlog::error("SQL error: {} {}", sql, error);
     }
   }
 

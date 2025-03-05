@@ -25,7 +25,7 @@ private:
     spdlog::info("Updating ecozone from {} to {}", from_, to_);
 
     // Defer to the object for the actual update
-    auto seasons =Model::get_instance().get_config()->get_seasonality_settings().get_seasonal_equation();
+    auto seasons =Model::get_config()->get_seasonality_settings().get_seasonal_equation();
     // if (seasons == nullptr) {
     //   throw std::runtime_error(
     //       "Configuration called for seasonality to be updated with a mode that "

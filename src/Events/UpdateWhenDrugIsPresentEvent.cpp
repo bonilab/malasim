@@ -33,7 +33,7 @@ void UpdateWhenDrugIsPresentEvent::execute() {
   if (person->drugs_in_blood()->size() > 0) {
     if (person->get_all_clonal_parasite_populations()->contain(clinical_caused_parasite_) && person->get_host_state()==
         Person::CLINICAL) {
-      if (clinical_caused_parasite_->last_update_log10_parasite_density() <= Model::get_instance().get_config()->get_parasite_parameters().
+      if (clinical_caused_parasite_->last_update_log10_parasite_density() <= Model::get_config()->get_parasite_parameters().
           get_parasite_density_levels().
           get_log_parasite_density_asymptomatic()) {
         person->set_host_state(Person::ASYMPTOMATIC);

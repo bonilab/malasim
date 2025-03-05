@@ -67,6 +67,7 @@ void Scheduler::begin_time_step() {
 
 void Scheduler::daily_update() {
   if (model_ != nullptr) {
+
     model_->daily_update();
 
     if (is_today_first_day_of_month()) {
@@ -137,7 +138,7 @@ void Scheduler::schedule_population_event(Event* event) {
 void Scheduler::schedule_event(EventPtrVector& time_events, Event* event) {
   // Schedule event in the future
   // Event time cannot exceed total time or less than current time
-  if (event->time > Model::get_instance().get_config()->get_simulation_timeframe().get_total_time() || event->time < current_time_) {
+  if (event->time > Model::get_config()->get_simulation_timeframe().get_total_time() || event->time < current_time_) {
     if (event->time < current_time()) {
       spdlog::error("Error when schedule event {} at {}. Current_time: {} - total time: {}",
       event->name(), event->time, current_time_, total_available_time_);
