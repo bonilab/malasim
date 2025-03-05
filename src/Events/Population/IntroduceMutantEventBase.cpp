@@ -62,7 +62,7 @@ int IntroduceMutantEventBase::mutate(std::vector<int> &locations,
                         + pi->vPerson()[location][Person::CLINICAL][ac].size();
 
       if (infections > 0) {
-        spdlog::debug("mutate location: {}, age class: {}, infections: {}",
+        spdlog::trace("mutate location: {}, age class: {}, infections: {}",
                       location, ac, infections);
       }
       // Use a Poisson distribution to determine the number of mutations in this
@@ -99,7 +99,7 @@ int IntroduceMutantEventBase::mutate(std::vector<int> &locations,
           auto* old_genotype = pp->genotype();
           auto* new_genotype =
               old_genotype->modify_genotype_allele(alleles_, Model::get_config());
-          spdlog::debug("location {} Introduce mutant new genotype: {}", location,new_genotype->get_aa_sequence());
+          spdlog::trace("location {} Introduce mutant new genotype: {}", location,new_genotype->get_aa_sequence());
           pp->set_genotype(new_genotype);
         }
       }

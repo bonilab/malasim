@@ -23,6 +23,9 @@
 // Fill the vector indicated with zeros, this should compile into a memset call
 // which is faster than a loop
 #define zero_fill(vector) std::fill(vector.begin(), vector.end(), 0)
+#define zero_fill_matrix_2d(vector) std::for_each(vector.begin(), vector.end(), [](auto& v) { zero_fill(v); })
+#define zero_fill_matrix_3d(vector) std::for_each(vector.begin(), vector.end(), [](auto& v) { zero_fill_matrix_2d(v); })
+
 
 class PersonIndexByLocationStateAgeClass;
 
@@ -321,65 +324,6 @@ void ModelDataCollector::initialize() {
 void ModelDataCollector::perform_population_statistic() {
   //this will do every time the reporter execute the report
   zero_population_statistics();
-  //reset vector
-  //    popsize_by_location_.clear();
-  //    popsize_by_location_.assign(Model::get_config()->get_spatial_settings().get_number_of_locations(), 0);
-  //
-  //    blood_slide_prevalence_by_location_.clear();
-  //    blood_slide_prevalence_by_location_.assign(Model::get_config()->get_spatial_settings().get_number_of_locations(), 0.0);
-  //
-  //    popsize_by_location_hoststate_.clear();
-  //    popsize_by_location_hoststate_.assign(Model::get_config()->get_spatial_settings().get_number_of_locations(), IntVector(Person::NUMBER_OF_STATE, 0));
-  //
-  //    total_immune_by_location_.clear();
-  //    total_immune_by_location_.assign(Model::get_config()->get_spatial_settings().get_number_of_locations(), 0.0);
-  //
-  //    total_immune_by_location_age_class_.clear();
-  //    total_immune_by_location_age_class_.assign(Model::get_config()->get_spatial_settings().get_number_of_locations(), DoubleVector(Model::get_config()->get_population_demographic().get_number_of_age_classes(), 0.0));
-
-
-  for (auto location = 0ul; location < Model::get_config()->get_spatial_settings().get_number_of_locations(); location++) {
-    popsize_by_location_[location] = 0;
-    popsize_residence_by_location_[location] = 0;
-    blood_slide_prevalence_by_location_[location] = 0.0;
-    fraction_of_positive_that_are_clinical_by_location_[location] = 0.0;
-    total_immune_by_location_[location] = 0.0;
-    total_parasite_population_by_location_[location] = 0;
-    number_of_positive_by_location_[location] = 0;
-
-    for (auto i = 0; i < Person::NUMBER_OF_STATE; i++) {
-      popsize_by_location_hoststate_[location][i] = 0;
-      for (auto ac = 0ul; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
-        popsize_by_location_hoststate_age_class_[location][i][ac] = 0.0;
-      }
-    }
-
-    for (auto ac = 0ul; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
-      total_immune_by_location_age_class_[location][ac] = 0.0;
-      total_parasite_population_by_location_age_group_[location][ac] = 0;
-      number_of_positive_by_location_age_group_[location][ac] = 0;
-      number_of_clinical_by_location_age_group_[location][ac] = 0;
-      number_of_clinical_by_location_age_group_by_5_[location][ac] = 0;
-
-      popsize_by_location_age_class_[location][ac] = 0;
-      popsize_by_location_age_class_by_5_[location][ac] = 0;
-      blood_slide_prevalence_by_location_age_group_[location][ac] = 0.0;
-      blood_slide_number_by_location_age_group_[location][ac] = 0.0;
-      blood_slide_prevalence_by_location_age_group_by_5_[location][ac] = 0.0;
-      blood_slide_number_by_location_age_group_by_5_[location][ac] = 0.0;
-    }
-    for (auto age = 0; age < 80; age++) {
-        blood_slide_prevalence_by_location_age_[location][age] = 0.0;
-        blood_slide_number_by_location_age_[location][age] = 0.0;
-    }
-    for (auto age = 0; age < 80; age++) {
-      popsize_by_location_age_[location][age] = 0;
-    }
-
-    for (auto i = 0; i < number_of_reported_MOI; i++) {
-      multiple_of_infection_by_location_[location][i] = 0;
-    }
-  }
 
   auto* pi = Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
   long long sum_moi = 0;
@@ -475,35 +419,27 @@ void ModelDataCollector::perform_population_statistic() {
     fraction_of_positive_that_are_clinical_by_location_[loc] = (blood_slide_prevalence_by_location_[loc] == 0)
                                                                ? 0
                                                                : static_cast<double>(popsize_by_location_hoststate_[
-            loc][Person::
-        CLINICAL]) /
-                                                                 blood_slide_prevalence_by_location_[loc];
+            loc][Person::CLINICAL]) /blood_slide_prevalence_by_location_[loc];
     const auto number_of_blood_slide_positive = blood_slide_prevalence_by_location_[loc];
-    blood_slide_prevalence_by_location_[loc] = blood_slide_prevalence_by_location_[loc] / static_cast<double>(
-        pop_sum_location);
+    blood_slide_prevalence_by_location_[loc] = blood_slide_prevalence_by_location_[loc] / static_cast<double>(pop_sum_location);
 
     current_EIR_by_location_[loc] =
         (total_number_of_bites_by_location_[loc] - last_update_total_number_of_bites_by_location_[loc]) /
         static_cast<double>(popsize_by_location_[loc]);
     last_update_total_number_of_bites_by_location_[loc] = total_number_of_bites_by_location_[loc];
 
-    last_10_blood_slide_prevalence_by_location_[loc][
-        (Model::get_scheduler()->current_time() / Model::get_config()->get_model_settings().get_days_between_stdout_output()) %
-        10] = blood_slide_prevalence_by_location_[loc];
-    last_10_fraction_positive_that_are_clinical_by_location_[loc][
-        (Model::get_scheduler()->current_time() / Model::get_config()->get_model_settings().get_days_between_stdout_output()) %
-        10] = fraction_of_positive_that_are_clinical_by_location_[loc];
+    auto report_index = (Model::get_scheduler()->current_time()
+      / Model::get_config()->get_model_settings().get_days_between_stdout_output()) % 10;
+
+    last_10_blood_slide_prevalence_by_location_[loc][report_index] = blood_slide_prevalence_by_location_[loc];
+    last_10_fraction_positive_that_are_clinical_by_location_[loc][report_index] = fraction_of_positive_that_are_clinical_by_location_[loc];
 
     for (int ac = 0; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
-      last_10_fraction_positive_that_are_clinical_by_location_age_class_[loc][ac][
-          (Model::get_scheduler()->current_time() / Model::get_config()->get_model_settings().get_days_between_stdout_output()) %
-          10] = (blood_slide_prevalence_by_location_age_group_[loc][ac] == 0)
+      last_10_fraction_positive_that_are_clinical_by_location_age_class_[loc][ac][report_index] = (blood_slide_prevalence_by_location_age_group_[loc][ac] == 0)
                 ? 0
                 : number_of_clinical_by_location_age_group_[loc][ac] /
                   static_cast<double>(blood_slide_prevalence_by_location_age_group_[loc][ac]);
-      last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_[loc][ac][
-          (Model::get_scheduler()->current_time() / Model::get_config()->get_model_settings().get_days_between_stdout_output()) %
-          10] = (number_of_blood_slide_positive == 0)
+      last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_[loc][ac][report_index] = (number_of_blood_slide_positive == 0)
                 ? 0
                 : number_of_clinical_by_location_age_group_by_5_[loc][ac] /
                   number_of_blood_slide_positive;
@@ -519,126 +455,6 @@ void ModelDataCollector::perform_population_statistic() {
         blood_slide_prevalence_by_location_age_[loc][age] =
         blood_slide_number_by_location_age_[loc][age] /
         static_cast<double>(popsize_by_location_age_[loc][age]);
-    }
-  }
-
-  /*
-   * From MainDataCollector
-   */
-
-  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-    // Calculate the basic statistics for the population in this location
-    for (auto hs = 0; hs < Person::NUMBER_OF_STATE - 1; hs++) {
-      for (auto ac = 0ul; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
-        std::size_t size = pi->vPerson()[loc][hs][ac].size();
-
-        popsize_by_location_hoststate_[loc][hs] += static_cast<int>(size);
-        popsize_by_location_age_class_[loc][ac] += static_cast<int>(size);
-
-        for (std::size_t i = 0; i < size; i++) {
-          Person* p = pi->vPerson()[loc][hs][ac][i];
-          popsize_residence_by_location_[p->get_residence_location()]++;
-
-          // this immune value will include maternal immunity value of the
-          // infants
-          double immune_value = p->get_immune_system()->get_lastest_immune_value();
-          total_immune_by_location_[loc] += immune_value;
-          total_immune_by_location_age_class_[loc][ac] += immune_value;
-
-          int ac1 = (p->get_age() > 70) ? 14 : p->get_age() / 5;
-          popsize_by_location_age_class_by_5_[loc][ac1] += 1;
-
-          if (hs == Person::ASYMPTOMATIC) {
-            number_of_positive_by_location_[loc]++;
-            number_of_positive_by_location_age_group_[loc][ac] += 1;
-
-            if (p->has_detectable_parasite()) {
-              blood_slide_prevalence_by_location_[loc] += 1;
-              blood_slide_number_by_location_age_group_[loc][ac] += 1;
-              blood_slide_number_by_location_age_group_by_5_[loc][ac1] += 1;
-            }
-
-          } else if (hs == Person::CLINICAL) {
-            number_of_positive_by_location_[loc]++;
-            number_of_positive_by_location_age_group_[loc][ac] += 1;
-            blood_slide_prevalence_by_location_[loc] += 1;
-            blood_slide_number_by_location_age_group_[loc][ac] += 1;
-            blood_slide_number_by_location_age_group_by_5_[loc][ac1] += 1;
-            number_of_clinical_by_location_age_group_[loc][ac] += 1;
-            number_of_clinical_by_location_age_group_by_5_[loc][ac1] += 1;
-          }
-
-          // Calculate the multiple of infection (MOI)
-          int moi = p->get_all_clonal_parasite_populations()->size();
-          if (moi > 0) {
-            total_parasite_population_by_location_[loc] += moi;
-            total_parasite_population_by_location_age_group_[loc]
-                                                            [p->get_age_class()] +=
-                moi;
-            if (moi <= NUMBER_OF_REPORTED_MOI) {
-              multiple_of_infection_by_location_[loc][moi - 1]++;
-            }
-          }
-        }
-      }
-    }
-
-    fraction_of_positive_that_are_clinical_by_location_[loc] =
-        (blood_slide_prevalence_by_location_[loc] == 0)
-            ? 0
-            : static_cast<double>(
-                  popsize_by_location_hoststate_[loc][Person::CLINICAL])
-                  / blood_slide_prevalence_by_location_[loc];
-
-    auto location_population =
-        static_cast<double>(Model::get_population()->size_at(loc));
-    const auto number_of_blood_slide_positive =
-        blood_slide_prevalence_by_location_[loc];
-    blood_slide_prevalence_by_location_[loc] =
-        blood_slide_prevalence_by_location_[loc] / location_population;
-
-    current_EIR_by_location_[loc] =
-        static_cast<double>(
-            total_number_of_bites_by_location_[loc]
-            - last_update_total_number_of_bites_by_location_[loc])
-        / location_population;
-
-    last_update_total_number_of_bites_by_location_[loc] =
-        total_number_of_bites_by_location_[loc];
-
-    auto report_index =
-        (Model::get_scheduler()->current_time() / Model::get_config()->get_model_settings().get_days_between_stdout_output())
-        % 10;
-    last_10_blood_slide_prevalence_by_location_[loc][report_index] =
-        blood_slide_prevalence_by_location_[loc];
-    last_10_fraction_positive_that_are_clinical_by_location_
-        [loc][report_index] =
-            fraction_of_positive_that_are_clinical_by_location_[loc];
-
-    for (std::size_t ac = 0; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes();
-         ac++) {
-      last_10_fraction_positive_that_are_clinical_by_location_age_class_
-          [loc][ac][report_index] =
-              (blood_slide_prevalence_by_location_age_group_[loc][ac] == 0)
-                  ? 0
-                  : number_of_clinical_by_location_age_group_[loc][ac]
-                        / static_cast<double>(
-                            blood_slide_prevalence_by_location_age_group_[loc]
-                                                                         [ac]);
-
-      last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_
-          [loc][ac][report_index] =
-              (number_of_blood_slide_positive == 0)
-                  ? 0
-                  : number_of_clinical_by_location_age_group_by_5_[loc][ac]
-                        / number_of_blood_slide_positive;
-
-      blood_slide_prevalence_by_location_age_group_[loc][ac] =
-          blood_slide_number_by_location_age_group_[loc][ac]
-          / static_cast<double>(popsize_by_location_age_class_[loc][ac]);
-      blood_slide_prevalence_by_location_age_group_by_5_[loc][ac] =
-          blood_slide_number_by_location_age_group_by_5_[loc][ac]
-          / static_cast<double>(popsize_by_location_age_class_by_5_[loc][ac]);
     }
   }
 }
@@ -1190,7 +1006,34 @@ void ModelDataCollector::monthly_update() {
 }
 
 void ModelDataCollector::zero_population_statistics() {
+  // // Vectors to be zeroed
+  // zero_fill(popsize_residence_by_location_);
+  // zero_fill(blood_slide_prevalence_by_location_);
+  // zero_fill(fraction_of_positive_that_are_clinical_by_location_);
+  // zero_fill(total_immune_by_location_);
+  // zero_fill(total_parasite_population_by_location_);
+  // zero_fill(number_of_positive_by_location_);
+  //
+  // // Matrices based on number of locations to be zeroed
+  // for (auto location = 0ul; location < Model::get_config()->get_spatial_settings().get_number_of_locations();
+  //      location++) {
+  //   zero_fill(popsize_by_location_hoststate_[location]);
+  //   zero_fill(total_immune_by_location_age_class_[location]);
+  //   zero_fill(total_parasite_population_by_location_age_group_[location]);
+  //   zero_fill(number_of_positive_by_location_age_group_[location]);
+  //   zero_fill(number_of_clinical_by_location_age_group_[location]);
+  //   zero_fill(number_of_clinical_by_location_age_group_by_5_[location]);
+  //   zero_fill(popsize_by_location_age_class_[location]);
+  //   zero_fill(popsize_by_location_age_class_by_5_[location]);
+  //   zero_fill(blood_slide_prevalence_by_location_age_group_[location]);
+  //   zero_fill(blood_slide_number_by_location_age_group_[location]);
+  //   zero_fill(blood_slide_prevalence_by_location_age_group_by_5_[location]);
+  //   zero_fill(blood_slide_number_by_location_age_group_by_5_[location]);
+  //   zero_fill(multiple_of_infection_by_location_[location]);
+  // }
+
   // Vectors to be zeroed
+  zero_fill(popsize_by_location_);
   zero_fill(popsize_residence_by_location_);
   zero_fill(blood_slide_prevalence_by_location_);
   zero_fill(fraction_of_positive_that_are_clinical_by_location_);
@@ -1198,21 +1041,21 @@ void ModelDataCollector::zero_population_statistics() {
   zero_fill(total_parasite_population_by_location_);
   zero_fill(number_of_positive_by_location_);
 
-  // Matrices based on number of locations to be zeroed
-  for (auto location = 0ul; location < Model::get_config()->get_spatial_settings().get_number_of_locations();
-       location++) {
-    zero_fill(popsize_by_location_hoststate_[location]);
-    zero_fill(total_immune_by_location_age_class_[location]);
-    zero_fill(total_parasite_population_by_location_age_group_[location]);
-    zero_fill(number_of_positive_by_location_age_group_[location]);
-    zero_fill(number_of_clinical_by_location_age_group_[location]);
-    zero_fill(number_of_clinical_by_location_age_group_by_5_[location]);
-    zero_fill(popsize_by_location_age_class_[location]);
-    zero_fill(popsize_by_location_age_class_by_5_[location]);
-    zero_fill(blood_slide_prevalence_by_location_age_group_[location]);
-    zero_fill(blood_slide_number_by_location_age_group_[location]);
-    zero_fill(blood_slide_prevalence_by_location_age_group_by_5_[location]);
-    zero_fill(blood_slide_number_by_location_age_group_by_5_[location]);
-    zero_fill(multiple_of_infection_by_location_[location]);
-       }
+  zero_fill_matrix_2d(popsize_by_location_hoststate_);
+  zero_fill_matrix_3d(popsize_by_location_hoststate_age_class_);
+  zero_fill_matrix_2d(total_immune_by_location_age_class_);
+  zero_fill_matrix_2d(total_parasite_population_by_location_age_group_);
+  zero_fill_matrix_2d(number_of_positive_by_location_age_group_);
+  zero_fill_matrix_2d(number_of_clinical_by_location_age_group_);
+  zero_fill_matrix_2d(number_of_clinical_by_location_age_group_by_5_);
+  zero_fill_matrix_2d(popsize_by_location_age_class_);
+  zero_fill_matrix_2d(popsize_by_location_age_class_by_5_);
+  zero_fill_matrix_2d(blood_slide_prevalence_by_location_age_group_);
+  zero_fill_matrix_2d(blood_slide_number_by_location_age_group_);
+  zero_fill_matrix_2d(blood_slide_prevalence_by_location_age_group_by_5_);
+  zero_fill_matrix_2d(blood_slide_number_by_location_age_group_by_5_);
+  zero_fill_matrix_2d(blood_slide_prevalence_by_location_age_);
+  zero_fill_matrix_2d(blood_slide_number_by_location_age_);
+  zero_fill_matrix_2d(popsize_by_location_age_);
+  zero_fill_matrix_2d(multiple_of_infection_by_location_);
 }

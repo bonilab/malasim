@@ -31,10 +31,12 @@ private:
         (target_fraction > 0) ? mutate(locations_, target_fraction) : 0;
 
     // Log the event's operation
-    spdlog::info(
-        "Introduce mutant event: {} : Introduce mutant by raster event, target "
-        "fraction: {}, mutations: {}",
-        StringHelpers::date_as_string(date::year_month_day{scheduler->calendar_date}), target_fraction, count);
+    for (auto allele : alleles_) {
+      spdlog::info("{}: Introduce mutant raster event {}: {} -> {}",
+                    StringHelpers::date_as_string(date::year_month_day{scheduler->calendar_date}),
+                   std::get<0>(allele), std::get<1>(allele), std::get<2>(allele),
+                   target_fraction, count);
+    }
   }
 
 public:
