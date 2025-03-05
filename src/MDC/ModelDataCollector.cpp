@@ -667,9 +667,14 @@ void ModelDataCollector::calculate_eir() {
           (Model::get_scheduler()->current_time() - Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) /
           static_cast<double>(Constants::
           DAYS_IN_YEAR);
-      double eir = (total_number_of_bites_by_location_year_[loc] /
+      double eir =
+          (person_days_by_location_year_[loc] == 0)
+              ? 0 : (total_number_of_bites_by_location_year_[loc] /
                     static_cast<double>(person_days_by_location_year_[loc
                     ])) * Constants::DAYS_IN_YEAR;
+      spdlog::info("calculate_eir: location {} eir {} =  {} / {} x {}",
+      loc, eir,total_number_of_bites_by_location_year_[loc],static_cast<double>(person_days_by_location_year_[loc
+       ]),Constants::DAYS_IN_YEAR);
       eir = eir / total_time_in_years;
       EIR_by_location_[loc] = eir;
     } else {
@@ -1005,7 +1010,9 @@ void ModelDataCollector::yearly_update() {
     }
   } else if (Model::get_scheduler()->current_time() > Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) {
     for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-      auto eir = (total_number_of_bites_by_location_year_[loc] /
+      auto eir = (person_days_by_location_year_[loc] == 0)
+              ? 0
+              : (total_number_of_bites_by_location_year_[loc] /
                   static_cast<double>(person_days_by_location_year_[loc
                   ])) *
                  Constants::DAYS_IN_YEAR;

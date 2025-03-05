@@ -105,6 +105,7 @@ void SQLiteDistrictReporter::collect_site_data_for_location(int location) {
             ? 0
             : Model::get_mdc()->EIR_by_location_year()[location]
                   .back();
+    // spdlog::info("collect_site_data_for_location eirLocation: district {} {} += {} x  {}", district,monthly_site_data.eir[district],eirLocation,locationPopulation);
     monthly_site_data.eir[district] += (eirLocation * locationPopulation);
     monthly_site_data.pfpr_under5[district] +=
         (Model::get_mdc()->get_blood_slide_prevalence(location, 0, 5)
@@ -125,23 +126,25 @@ void SQLiteDistrictReporter::calculate_and_build_up_site_data_insert_values(
   insert_values.clear();
 
   for (auto district = 0; district < numDistricts; district++) {
-    double calculatedEir = (monthly_site_data.eir[district] != 0)
+    double calculatedEir = monthly_site_data.population[district] == 0
+                            ? 0 : (monthly_site_data.eir[district] != 0)
                                ? (monthly_site_data.eir[district]
                                   / monthly_site_data.population[district])
                                : 0;
-    double calculatedPfprUnder5 =
-        (monthly_site_data.pfpr_under5[district] != 0)
+    double calculatedPfprUnder5 = monthly_site_data.population[district] == 0
+     ? 0 : (monthly_site_data.pfpr_under5[district] != 0)
             ? (monthly_site_data.pfpr_under5[district]
                / monthly_site_data.population[district])
                   * 100.0
             : 0;
-    double calculatedPfpr2to10 =
-        (monthly_site_data.pfpr2to10[district] != 0)
+    double calculatedPfpr2to10 =monthly_site_data.population[district] == 0
+     ? 0 :  (monthly_site_data.pfpr2to10[district] != 0)
             ? (monthly_site_data.pfpr2to10[district]
                / monthly_site_data.population[district])
                   * 100.0
             : 0;
-    double calculatedPfprAll = (monthly_site_data.pfpr_all[district] != 0)
+    double calculatedPfprAll = monthly_site_data.population[district] == 0
+     ? 0 : (monthly_site_data.pfpr_all[district] != 0)
                                    ? (monthly_site_data.pfpr_all[district]
                                       / monthly_site_data.population[district])
                                          * 100.0

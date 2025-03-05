@@ -178,7 +178,7 @@ void Population::perform_infection_event() {
     model_->get_mdc()->collect_number_of_bites(loc, number_of_bites);
 
     if (Model::get_population()->all_alive_persons_by_location[loc].empty()) {
-      spdlog::debug("all_alive_persons_by_location location {} is empty", loc);
+      spdlog::trace("all_alive_persons_by_location location {} is empty", loc);
       continue;
     }
     auto persons_bitten_today = model_->get_random()->roulette_sampling<Person>(
