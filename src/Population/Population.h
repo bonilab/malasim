@@ -99,6 +99,8 @@ public:
 
   void update_all_individuals();
 
+  void update_all_individual_events();
+
   void update_current_foi();
 
   // Notify the population that a person has moved from the source location, to

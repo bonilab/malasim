@@ -2,6 +2,7 @@
 #include <Configuration/Config.h>
 
 #include "Events/Event.h"
+#include "Population/Population.h"
 #include "Utils/Helpers/ObjectHelpers.h"
 
 Scheduler::Scheduler(Model* model)
@@ -14,7 +15,7 @@ Scheduler::~Scheduler() {
 void Scheduler::extend_total_time(int new_total_time) {
   if (total_available_time_ < new_total_time) {
     for (auto i = total_available_time_; i <= new_total_time; i++) {
-      individual_events_list_.push_back(EventPtrVector());
+      // individual_events_list_.push_back(EventPtrVector());
       population_events_list_.push_back(EventPtrVector());
     }
   }
@@ -22,7 +23,7 @@ void Scheduler::extend_total_time(int new_total_time) {
 }
 
 void Scheduler::clear_all_events() {
-  clear_all_events(individual_events_list_);
+  // clear_all_events(individual_events_list_);
   clear_all_events(population_events_list_);
 }
 
@@ -31,7 +32,7 @@ void Scheduler::set_total_available_time(const int& value) {
     clear_all_events();
   }
   total_available_time_ = value;
-  individual_events_list_.assign(total_available_time_, EventPtrVector());
+  // individual_events_list_.assign(total_available_time_, EventPtrVector());
   population_events_list_.assign(total_available_time_, EventPtrVector());
 }
 
@@ -82,7 +83,8 @@ void Scheduler::daily_update() {
     execute_events_list(population_events_list_[current_time_]);
 
     // Executing individual-related events
-    execute_events_list(individual_events_list_[current_time_]);
+    // execute_events_list(individual_events_list_[current_time_]);
+    model_->get_population()->update_all_individual_events();
   }
 }
 
@@ -125,9 +127,9 @@ bool Scheduler::is_today_last_day_of_month() {
   return ymd.day() == date::day{1};
 }
 
-void Scheduler::schedule_individual_event(Event* event) {
-  schedule_event(individual_events_list_[event->time], event);
-}
+// void Scheduler::schedule_individual_event(Event* event) {
+  // schedule_event(individual_events_list_[event->time], event);
+// }
 
 void Scheduler::schedule_population_event(Event* event) {
   if (event->time < population_events_list_.size()) {

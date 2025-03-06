@@ -25,8 +25,8 @@ void TestTreatmentFailureEvent::schedule_event(
   e->set_clinical_caused_parasite(clinical_caused_parasite);
   e->time = time;
   e->set_therapyId(t_id);
-  p->add_dispatcher(e);
-  scheduler->schedule_individual_event(e);
+  p->add_event(e);
+  //scheduler->schedule_individual_event(e);
 }
 
 void TestTreatmentFailureEvent::execute() {

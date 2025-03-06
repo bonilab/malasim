@@ -30,7 +30,7 @@ void ReportTreatmentFailureDeathEvent::schedule_event(Scheduler* scheduler,
   event->set_age_class(person->get_age_class());
   event->set_location_id(person->get_location());
   event->set_therapy_id(therapy_id);
-  scheduler->schedule_individual_event(event);
+  //scheduler->schedule_individual_event(event);
 }
 
 void ReportTreatmentFailureDeathEvent::execute() {

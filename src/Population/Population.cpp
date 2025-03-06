@@ -885,6 +885,13 @@ void Population::update_all_individuals() {
   }
 }
 
+void Population::update_all_individual_events() {
+  auto all_persons_index = get_person_index<PersonIndexAll>();
+  for (auto* person : all_persons_index->vPerson()) {
+    person->update_events(model_->get_scheduler()->current_time());
+  }
+}
+
 void Population::persist_current_force_of_infection_to_use_N_days_later() {
   for (auto loc = 0; loc < model_->get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
     force_of_infection_for_N_days_by_location[model_->get_scheduler()->current_time()

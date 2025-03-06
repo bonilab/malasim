@@ -23,9 +23,8 @@ void RaptEvent::schedule_event(Scheduler* scheduler, Person* p,
     auto* rapt_event = new RaptEvent();
     rapt_event->dispatcher = p;
     rapt_event->time = time;
-
-    p->add_dispatcher(rapt_event);
-    scheduler->schedule_individual_event(rapt_event);
+    p->add_event(rapt_event);
+    //scheduler->schedule_individual_event(rapt_event);
   }
 }
 

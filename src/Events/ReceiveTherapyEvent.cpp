@@ -18,9 +18,8 @@ void ReceiveTherapyEvent::schedule_event(Scheduler *scheduler, Person *p, Therap
     e->time = time;
     e->set_clinical_caused_parasite(clinical_caused_parasite);
     e->is_part_of_MAC_therapy = is_part_of_MAC_therapy;
-
-    p->add_dispatcher(e);
-    scheduler->schedule_individual_event(e);
+    p->add_event(e);
+    //scheduler->schedule_individual_event(e);
   }
 }
 

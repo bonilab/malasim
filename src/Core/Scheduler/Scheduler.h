@@ -21,7 +21,7 @@ public:
 
   date::sys_days calendar_date;
 
-  EventPtrVector2 individual_events_list_;
+  // EventPtrVector2 individual_events_list_;
   EventPtrVector2 population_events_list_;
 
   explicit Scheduler(Model *model = nullptr);
@@ -50,7 +50,7 @@ public:
 
   void clear_all_events(EventPtrVector2 &events_list);
 //
-  virtual void schedule_individual_event(Event *event);
+  // virtual void schedule_individual_event(Event *event);
 
   virtual void schedule_population_event(Event *event);
 

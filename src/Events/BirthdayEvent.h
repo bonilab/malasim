@@ -1,28 +1,37 @@
 #ifndef BIRTHDAYEVENT_H
-#define    BIRTHDAYEVENT_H
+#define BIRTHDAYEVENT_H
 
-#include "Event.h"
 #include <string>
+
+// #include "Core/ObjectPool.h"
+#include "Event.h"
 
 class Person;
 
 class BirthdayEvent : public Event {
- // OBJECTPOOL(BirthdayEvent);
- public:
-  // Disable copy and assignment
-  BirthdayEvent(const BirthdayEvent&) = delete;
-  void operator=(const BirthdayEvent&) = delete;
+public:
+  //disallow copy and assignment
+  BirthdayEvent(const BirthdayEvent& other) = delete;
+  void operator=(const BirthdayEvent& other) = delete;
+  BirthdayEvent(BirthdayEvent&& other) = delete;
+  BirthdayEvent& operator=(BirthdayEvent&& other) = delete;
 
+  // OBJECTPOOL(BirthdayEvent)
+
+  // DELETE_COPY_AND_MOVE(BirthdayEvent)
+
+public:
   BirthdayEvent();
 
   //    BirthdayEvent(const BirthdayEvent& orig);
   virtual ~BirthdayEvent();
 
+  static void schedule_event(Scheduler* scheduler, Person* p, const int &time);
+
   std::string name() override;
 
- static void schedule_event(Scheduler* scheduler, Person* person, const int &time);
- private:
+private:
   void execute() override;
 };
 
-#endif    /* BIRTHDAYEVENT_H */
+#endif /* BIRTHDAYEVENT_H */
