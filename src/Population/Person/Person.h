@@ -299,6 +299,8 @@ public:
 
   int complied_dosing_days(const SCTherapy* therapy);
 
+  double age_in_floating() const;
+
   void schedule_update_every_K_days_event(const int &time);
   // Check to see if the indicated event has been defined for the individual.
   template <typename T>

@@ -754,6 +754,11 @@ double Person::draw_random_relative_biting_rate(utils::Random* pRandom, Config* 
   return result + pConfig->get_epidemiological_parameters().get_relative_biting_info().get_min_relative_biting_value();
 }
 
+double Person::age_in_floating() const {
+  auto days = Model::get_scheduler()->current_time() - birthday_;
+  return days / static_cast<double>(Constants::DAYS_IN_YEAR);
+}
+
 /*
  * NEW KIEN
  */

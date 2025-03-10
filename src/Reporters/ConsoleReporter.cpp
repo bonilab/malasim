@@ -45,7 +45,7 @@ void ConsoleReporter::after_run() {
   //total time
   double total_time_in_years = (Model::get_scheduler()->current_time()
       - Model::get_config()->get_simulation_timeframe().get_start_collect_data_day())
-      /(double) Constants::DAYS_IN_YEAR;
+      / static_cast<double>(Constants::DAYS_IN_YEAR);
   std::cout << "Total time (from equilibrium) : " << total_time_in_years << " years" << std::endl;
 
   //report EIR

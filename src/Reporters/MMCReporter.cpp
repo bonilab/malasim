@@ -132,7 +132,7 @@ void MMCReporter::after_run() {
   //output NTF
   const auto total_time_in_years = (Model::get_scheduler()->current_time()
                                     - Model::get_config()->get_simulation_timeframe().get_start_of_comparison_period())
-                                    /static_cast<double>(Constants::DAYS_IN_YEAR);
+                                    / static_cast<double>(Constants::DAYS_IN_YEAR);
 
   auto sum_ntf = 0.0;
   ul pop_size = 0;

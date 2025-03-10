@@ -214,7 +214,7 @@ std::vector<unsigned int> Mosquito::build_interrupted_feeding_indices(utils::Ran
   std::vector<unsigned int> all_interrupted_feeding(number_of_interrupted_feeding, 1);
   all_interrupted_feeding.resize(prmc_size, 0);
 
-  random->random_shuffle(&all_interrupted_feeding[0], all_interrupted_feeding.size(), sizeof(unsigned int));
+  random->shuffle(all_interrupted_feeding);
   return all_interrupted_feeding;
 }
 
@@ -229,7 +229,7 @@ int Mosquito::random_genotype(int location, int tracking_index) {
   if (max_genotype_numbers == 0) {
     return -1;
   }
-  auto genotype_index = Model::get_random()->random_uniform_int(
+  auto genotype_index = Model::get_random()->random_uniform<int>(
     0,
     max_genotype_numbers);
   return genotypes_table[tracking_index][location][genotype_index]->genotype_id;

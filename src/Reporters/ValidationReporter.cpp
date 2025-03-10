@@ -425,8 +425,10 @@ void ValidationReporter::print_EIR_PfPR_by_location(std::stringstream& ss) {
         // EIR
         if (Model::get_mdc()->EIR_by_location_year()[loc].empty()) {
             ss << 0 << sep;
+            // spdlog::info("print_EIR_PfPR_by_location {}: EIR_by_location_year is empty", loc);
         } else {
             ss << Model::get_mdc()->EIR_by_location_year()[loc].back() << sep;
+            // spdlog::info("print_EIR_PfPR_by_location {}: EIR_by_location_year {:.8f}", loc, Model::get_mdc()->EIR_by_location_year()[loc].back());
         }
         ss << group_sep;//11
         // pfpr <5 , 2-10 and all

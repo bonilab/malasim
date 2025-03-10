@@ -329,12 +329,10 @@ void ModelDataCollector::perform_population_statistic() {
   long long sum_moi = 0;
 
   for (auto loc = 0ul; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-    auto pop_sum_location = 0;
     for (auto hs = 0; hs < Person::NUMBER_OF_STATE - 1; hs++) {
       for (auto ac = 0ul; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
         std::size_t size = pi->vPerson()[loc][hs][ac].size();
         popsize_by_location_hoststate_[loc][hs] += (int) size;
-        pop_sum_location += size;
         popsize_by_location_age_class_[loc][ac] += size;
         popsize_by_location_hoststate_age_class_[loc][hs][ac] += size;
 
@@ -404,7 +402,7 @@ void ModelDataCollector::perform_population_statistic() {
       }
     }
 
-    popsize_by_location_[loc] = pop_sum_location;
+    popsize_by_location_[loc] = Model::get_population()->size_at(static_cast<int>(loc));
 
     const auto sum_popsize_by_location = std::accumulate(
         popsize_by_location_.begin(), popsize_by_location_.end(),
@@ -421,11 +419,18 @@ void ModelDataCollector::perform_population_statistic() {
                                                                : static_cast<double>(popsize_by_location_hoststate_[
             loc][Person::CLINICAL]) /blood_slide_prevalence_by_location_[loc];
     const auto number_of_blood_slide_positive = blood_slide_prevalence_by_location_[loc];
-    blood_slide_prevalence_by_location_[loc] = blood_slide_prevalence_by_location_[loc] / static_cast<double>(pop_sum_location);
+    blood_slide_prevalence_by_location_[loc] = blood_slide_prevalence_by_location_[loc] / static_cast<double>(popsize_by_location_[loc]);
 
-    current_EIR_by_location_[loc] =
-        (total_number_of_bites_by_location_[loc] - last_update_total_number_of_bites_by_location_[loc]) /
-        static_cast<double>(popsize_by_location_[loc]);
+    current_EIR_by_location_[loc] = popsize_by_location_[loc] == 0? 0 :
+        static_cast<double>(
+            total_number_of_bites_by_location_[loc]
+            - last_update_total_number_of_bites_by_location_[loc]) /
+          static_cast<double>(popsize_by_location_[loc]);
+    // spdlog::info("perform_population_statistic: location {} current_EIR_by_location_ {} =  {} - {} / {}",
+    //   loc,current_EIR_by_location_[loc],
+    //   total_number_of_bites_by_location_[loc],
+    //   last_update_total_number_of_bites_by_location_[loc],
+    //   static_cast<double>(popsize_by_location_[loc]));
     last_update_total_number_of_bites_by_location_[loc] = total_number_of_bites_by_location_[loc];
 
     auto report_index = (Model::get_scheduler()->current_time()
@@ -474,34 +479,32 @@ void ModelDataCollector::calculate_eir() {
       < Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) {
     zero_fill(EIR_by_location_);
     return;
-      }
+  }
 
   for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
     if (EIR_by_location_year_[loc].empty()) {
       //collect data for less than 1 year
       const auto total_time_in_years =
           (Model::get_scheduler()->current_time() - Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) /
-          static_cast<double>(Constants::
-          DAYS_IN_YEAR);
+          static_cast<double>(Constants::DAYS_IN_YEAR);
       double eir =
           (person_days_by_location_year_[loc] == 0)
-              ? 0 : (total_number_of_bites_by_location_year_[loc] /
-                    static_cast<double>(person_days_by_location_year_[loc
-                    ])) * Constants::DAYS_IN_YEAR;
-      spdlog::info("calculate_eir: location {} eir {} =  {} / {} x {}",
-      loc, eir,total_number_of_bites_by_location_year_[loc],static_cast<double>(person_days_by_location_year_[loc
-       ]),Constants::DAYS_IN_YEAR);
+      ? 0 : (static_cast<double>(
+             total_number_of_bites_by_location_year_[loc])
+         / static_cast<double>(person_days_by_location_year_[loc]))
+            * static_cast<double>(Constants::DAYS_IN_YEAR);
       eir = eir / total_time_in_years;
       EIR_by_location_[loc] = eir;
     } else {
       double sum_eir = std::accumulate(EIR_by_location_year_[loc].begin(), EIR_by_location_year_[loc].end(), 0.0);
       auto number_of_0 = std::count(EIR_by_location_year_[loc].begin(), EIR_by_location_year_[loc].end(), 0);
 
-      EIR_by_location_[loc] = ((EIR_by_location_year_[loc].size() - number_of_0) == 0.0)
-                              ? 0.0
+      EIR_by_location_[loc] = (static_cast<double>(EIR_by_location_year_[loc].size() - number_of_0)
+                               == 0.0)
+                                  ? 0.0
                               : sum_eir /
-                                (EIR_by_location_year_[loc].size() -
-                                 number_of_0);
+                                static_cast<double>(EIR_by_location_year_[loc].size()
+                                - number_of_0);
     }
   }
 }
@@ -793,7 +796,7 @@ void ModelDataCollector::record_1_TF(const int& location, const bool& by_drug) {
   if (Model::get_scheduler()->current_time() >= Model::get_config()->get_simulation_timeframe().get_start_of_comparison_period()) {
     const auto current_discounted_tf = exp(
         log(0.97) * floor((Model::get_scheduler()->current_time() - Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) /
-                          Constants::DAYS_IN_YEAR));
+                          static_cast<double>(Constants::DAYS_IN_YEAR)));
 
     cumulative_discounted_NTF_by_location_[location] += current_discounted_tf;
     cumulative_NTF_by_location_[location] += 1;
@@ -826,16 +829,27 @@ void ModelDataCollector::yearly_update() {
     }
   } else if (Model::get_scheduler()->current_time() > Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) {
     for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-      auto eir = (person_days_by_location_year_[loc] == 0)
-              ? 0
-              : (total_number_of_bites_by_location_year_[loc] /
-                  static_cast<double>(person_days_by_location_year_[loc
-                  ])) *
-                 Constants::DAYS_IN_YEAR;
-      //only record year have positive EIR
-      //            if (EIR > 0) {
+      /*
+       * Here we calculate the EIR for each location
+       * instead of eir = (a / (b*c)) * c, just to a / b
+      */
+      // auto eir =
+      //     (person_days_by_location_year_[loc] == 0)
+      //         ? 0
+      //         : (static_cast<double>(
+      //                total_number_of_bites_by_location_year_[loc])
+      //            / static_cast<double>(person_days_by_location_year_[loc]))
+      //               * Constants::DAYS_IN_YEAR();
+      auto eir = (Model::get_population()->size_at(loc) == 0) ? 0.0
+      : static_cast<double>(total_number_of_bites_by_location_year_[loc])
+         / static_cast<double>(Model::get_population()->size_at(loc));
       EIR_by_location_year_[loc].push_back(eir);
-      //            }
+      // spdlog::info("yearly_update: location {} eir {:.8f} =  ({} / ({} x {})) x {}",
+      //   loc,eir,
+      //   total_number_of_bites_by_location_[loc],
+      //   Model::get_population()->size_at(loc),
+      //   Constants::DAYS_IN_YEAR,
+      //   Constants::DAYS_IN_YEAR);
 
       //this number will be changed whenever a birth or a death occurs
       // and also when the individual change location

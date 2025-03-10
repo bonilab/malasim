@@ -54,16 +54,18 @@ Model::get_instance().get_mosquito()
 "||||111||1111111,0||||||0000000000100|1"
 
 
-
-
 Merge from Temple Malaria Simulation to malasim
 MainDataCollector to ModelDataCollector
 SCTherapy (compliance), in Person.cpp complied_dosing_days
 UpdateEventEveryKdays in Events
 
 
-change:
+Changes:
 therapy_id to therapy_ids in all strategies
 day to date in all event dates
-DAYS_IN_YEAR -> DAYS_IN_YEAR
+DAYS_IN_YEAR() -> DAYS_IN_YEAR
 
+Conflict:
+TMS: const auto age = ((Model::SCHEDULER->current_time() - birthday_) / static_cast<double>(Constants::DAYS_IN_YEAR());
+malasim:  const auto age = ((Model::SCHEDULER->current_time() - birthday_) % Constants::DAYS_IN_YEAR())
+                              / static_cast<double>(Constants::DAYS_IN_YEAR());

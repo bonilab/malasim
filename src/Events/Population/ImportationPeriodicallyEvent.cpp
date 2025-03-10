@@ -60,7 +60,7 @@ void ImportationPeriodicallyEvent::execute() {
     Genotype* imported_genotype = nullptr;
 
     // TODO: rework on this function to have a random genotype string
-    uint32_t random_id = Model::get_random()->random_uniform_int(0, 1);
+    uint32_t random_id = Model::get_random()->random_uniform<int>(0, 1);
 
     switch (genotype_id_) {
       case -1:

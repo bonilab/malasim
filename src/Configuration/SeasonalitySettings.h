@@ -68,7 +68,7 @@ public:
       // multiplier = base + (a * sin⁺(b * pi * (t - phi) / 365))
       auto multiplier = A_[location]
                         * sin(B_[location] * M_PI * (day - phi_[location])
-                              / Constants::DAYS_IN_YEAR);
+                              / static_cast<double>(Constants::DAYS_IN_YEAR));
       multiplier = (multiplier < 0) ? 0 : multiplier;
       multiplier += base_[location];
 
@@ -318,7 +318,7 @@ public:
   }
 
 private:
-  bool enable_;
+  bool enable_ = false;
   std::string mode_;
   SeasonalEquation seasonal_equation_;
   SeasonalRainfall seasonal_rainfall_;

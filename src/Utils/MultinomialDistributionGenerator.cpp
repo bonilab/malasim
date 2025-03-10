@@ -28,5 +28,5 @@ void MultinomialDistributionGenerator::allocate(utils::Random* random) {
     for (auto j = 0u; j < n[i]; j++) { data.push_back(i); }
   }
   assert(data.size() == chunk_size);
-  random->random_shuffle(&data[0], data.size(), sizeof(int));
+  random->shuffle(data);
 }

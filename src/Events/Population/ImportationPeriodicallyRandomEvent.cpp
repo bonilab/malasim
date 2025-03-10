@@ -93,7 +93,7 @@ std::size_t ImportationPeriodicallyRandomEvent::get_location() {
   }
 
   // Get a random pull [0, population - 1]
-  auto target = Model::get_random()->random_uniform_int(0, population - 1);
+  auto target = Model::get_random()->random_uniform<int>(0, population - 1);
 
   // Find the index of location which has a cumulative sum less than the target
   // value

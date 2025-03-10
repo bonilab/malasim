@@ -48,7 +48,7 @@ void ProgressToClinicalEvent::execute() {
   //    Random* random = model->random();
   //    Config* config = model->config();
 
-  const auto density = Model::get_random()->random_uniform_double(
+  const auto density = Model::get_random()->random_uniform<double>(
       Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_clinical_from(),
       Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_clinical_to());
 

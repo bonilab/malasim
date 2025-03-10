@@ -77,7 +77,7 @@ void RaptEvent::execute() {
   const auto to =
       (date::sys_days(last_day) - Model::get_scheduler()->calendar_date).count();
   const auto days_to_next_event =
-      Model::get_random()->random_uniform_int(from, to + 1);
+      Model::get_random()->random_uniform<int>(from, to + 1);
 
   // Schedule the event
   schedule_event(scheduler, person,

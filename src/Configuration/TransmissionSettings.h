@@ -35,6 +35,9 @@ public:
 
   void process_config() override{
     spdlog::info("Processing TransmissionSettings");
+    if (get_transmission_parameter() > 0.0) {
+      spdlog::info("Using transmission_parameter: {}", get_transmission_parameter());
+    }
   }
 
 private:

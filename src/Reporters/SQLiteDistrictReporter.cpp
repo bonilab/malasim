@@ -105,7 +105,8 @@ void SQLiteDistrictReporter::collect_site_data_for_location(int location) {
             ? 0
             : Model::get_mdc()->EIR_by_location_year()[location]
                   .back();
-    // spdlog::info("collect_site_data_for_location eirLocation: district {} {} += {} x  {}", district,monthly_site_data.eir[district],eirLocation,locationPopulation);
+    // spdlog::info("collect_site_data_for_location eirLocation: district {} {} += {} x {}",
+    //   district,monthly_site_data.eir[district],eirLocation,locationPopulation);
     monthly_site_data.eir[district] += (eirLocation * locationPopulation);
     monthly_site_data.pfpr_under5[district] +=
         (Model::get_mdc()->get_blood_slide_prevalence(location, 0, 5)
