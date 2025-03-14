@@ -9,6 +9,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "Simulation/Model.h"
 #include "Spatial/GIS/SpatialData.h"
 #include "Utils/TypeDef.hxx"
 
@@ -23,23 +24,22 @@ class SpatialModel {
 
 protected:
   // Prepare the travel raster for the movement model
-  static double* prepare_surface(const SpatialData::SpatialFileType type, int number_of_locations) {
+  static std::vector<double> prepare_surface(const AscFile* travel_raster, int number_of_locations) {
     // Get the travel times raster
     spdlog::info("Preparing travel surface...");
-    AscFile* raster = SpatialData::get_instance().get_raster(type);
-    if (raster == nullptr) {
+    if (travel_raster == nullptr) {
       throw std::runtime_error(
           fmt::format("{} called without travel data loaded", __FUNCTION__));
     }
+    // Initialize vector with the correct size
+    std::vector<double> travel;
+    travel.reserve(number_of_locations);
 
-    // Use the min and max to normalize the raster into an array
-    auto id = 0;
-    auto* travel = new double[number_of_locations];
-    for (auto row = 0; row < raster->NROWS; row++) {
-      for (auto col = 0; col < raster->NCOLS; col++) {
-        if (raster->data[row][col] == raster->NODATA_VALUE) { continue; }
-        travel[id] = raster->data[row][col];
-        id++;
+    // Use the min and max to normalize the raster into a vector
+    for (auto row = 0; row < travel_raster->NROWS; row++) {
+      for (auto col = 0; col < travel_raster->NCOLS; col++) {
+        if (travel_raster->data[row][col] == travel_raster->NODATA_VALUE) { continue; }
+        travel.push_back(travel_raster->data[row][col]);
       }
     }
 

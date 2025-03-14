@@ -27,8 +27,6 @@
 #include "Population/Population.h"
 #include "Population/ImmuneSystem/ImmuneSystem.h"
 #include "Treatment/Therapies/Drug.h"
-#include "Utils/Cli.hxx"
-#include "Validation/MovementValidation.h"
 
 Person::Person() : age_(0),
                    age_class_(0),
@@ -581,12 +579,6 @@ void Person::randomly_choose_target_location() {
     target_location = today_target_locations_->at(index_random_location);
   }
 
-  // Report the movement if need be
-  if (utils::Cli::get_instance().get_record_cell_movement()) {
-    auto person_index = static_cast<int>(PersonIndexAllHandler::get_index());
-    MovementValidation::add_move(person_index, location_, target_location);
-  }
-
   schedule_move_to_target_location_next_day_event(target_location);
 
   today_target_locations_->clear();
@@ -602,8 +594,8 @@ void Person::randomly_choose_target_location() {
     auto &spatial_data = SpatialData::get_instance();
 
     // Determine the source and destination districts for the current trip.
-    int source_district = spatial_data.get_district_lookup()[location_];
-    int destination_district = spatial_data.get_district_lookup()[target_location];
+    int source_district = spatial_data.get_district(location_);
+    int destination_district = spatial_data.get_district(target_location);
 
     // If the trip crosses district boundaries, update the day of the last
     // outside-district trip to the next day from current time.

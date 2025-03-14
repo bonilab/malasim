@@ -37,12 +37,6 @@ void AgeBandReporter::initialize(int job_number, const std::string &path) {
 
   // Determine when we should start running
   start_recording = Model::get_config()->get_simulation_timeframe().get_total_time() - 366;
-
-  // Build a lookup for location to district
-  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
-    district_lookup.emplace_back(
-        SpatialData::get_instance().get_raster_district(loc));
-  }
 }
 
 void AgeBandReporter::monthly_report() {
@@ -50,14 +44,14 @@ void AgeBandReporter::monthly_report() {
   if (current_time < start_recording) { return; }
 
   auto age_classes = Model::get_config()->get_population_demographic().get_number_of_age_classes();
-  auto districts = SpatialData::get_instance().get_district_count();
+  auto districts = SpatialData::get_instance().max_district_id + 1;
   auto first_index = SpatialData::get_instance().get_first_district();
   std::vector<std::vector<int>> population(districts, std::vector<int>(age_classes));
   std::vector<std::vector<int>> cases(districts, std::vector<int>(age_classes));
 
   for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
     for (auto ac = 0; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
-      auto district = district_lookup[loc] - first_index;
+      auto district = SpatialData::get_instance().get_district(loc);
       population[district][ac] += Model::get_mdc()->popsize_by_location_age_class()[loc][ac];
       cases[district][ac] += Model::get_mdc()->blood_slide_number_by_location_age_group()[loc][ac];
     }

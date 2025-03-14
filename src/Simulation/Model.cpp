@@ -14,7 +14,6 @@
 #include "Reporters/Reporter.h"
 #include "Treatment/SteadyTCM.h"
 #include "Utils/Cli.hxx"
-#include "Validation/MovementValidation.h"
 
 // Private constructor: creates the Config instance
 Model::Model(const int &object_pool_size){
@@ -129,24 +128,6 @@ bool Model::initialize() {
             Reporter::MakeReport(Reporter::ReportType::MOVEMENT_REPORTER);
         add_reporter(reporter);
         reporter->initialize(utils::Cli::get_instance().get_job_number(), utils::Cli::get_instance().get_output_path());
-
-        // Get the validator and prepare it for the run
-        auto &validator = MovementValidation::get_instance();
-        validator.set_reporter((MovementReporter*)reporter);
-
-        // Set the flags on the validator
-        if (utils::Cli::get_instance().get_record_individual_movement()) {
-          spdlog::info("Tracking of individual movement enabled.");
-          validator.set_individual_movement(utils::Cli::get_instance().get_record_individual_movement());
-        }
-        if (utils::Cli::get_instance().get_record_cell_movement()) {
-          spdlog::info("Tracking of cell movement enabled.");
-          validator.set_cell_movement(utils::Cli::get_instance().get_record_cell_movement());
-        }
-        if (utils::Cli::get_instance().get_record_district_movement()) {
-          spdlog::info("Tracking of district movement enabled.");
-          validator.set_district_movement(utils::Cli::get_instance().get_record_district_movement());
-        }
       }
       is_initialized_ = true;
     }

@@ -46,9 +46,8 @@ void TravelTrackingReporter::after_run() {
   // percentage_cross_district_last_90_days
 
   // collect data
-  auto &district_lookup = SpatialData::get_instance().get_district_lookup();
 
-  auto number_of_districts = SpatialData::get_instance().get_district_count();
+  auto number_of_districts = SpatialData::get_instance().min_district_id + 1;
   std::vector<int> population(number_of_districts, 0);
   std::vector<int> traveled_last_30_days(number_of_districts, 0);
   std::vector<int> traveled_last_60_days(number_of_districts, 0);
@@ -62,7 +61,7 @@ void TravelTrackingReporter::after_run() {
   auto* all_person_index =
       Model::get_population()->get_person_index<PersonIndexAll>();
   for (auto* person : all_person_index->vPerson()) {
-    auto district = district_lookup[person->get_location()];
+    auto district = SpatialData::get_instance().get_district(person->get_location());
     population[district]++;
 
     if (person->get_day_that_last_trip_was_initiated() > current_time - 30) {

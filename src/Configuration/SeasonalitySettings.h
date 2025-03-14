@@ -81,10 +81,8 @@ public:
       // Get the raster data and make sure it is valid
       AscFile* raster = SpatialData::get_instance().get_raster(
           SpatialData::SpatialFileType::Ecoclimatic);
-      if (raster == nullptr) {
-        throw std::invalid_argument(
-            "Seasonal equation  raster flag set without eco-climatic raster "
-            "loaded.");
+      if (!raster) {
+          throw std::invalid_argument("Ecoclimatic raster not found.");
       }
 
       // Prepare to run
@@ -92,28 +90,25 @@ public:
 
       // Load the values based upon the raster data
       auto size = A_.size();
-      int index = 0;
       for (int row = 0; row < raster->NROWS; row++) {
         for (int col = 0; col < raster->NCOLS; col++) {
           // Pass if we have no data here
           if (raster->data[row][col] == raster->NODATA_VALUE) { continue; }
-          //
-          // // Verify the index
-          // int index = static_cast<int>(raster->data[row][col]);
-          // spdlog::info("Setting seasonal equation for location: {}", index);
-          // if (index < 0) {
-          //   throw std::out_of_range(fmt::format(
-          //       "Raster value at row: {}, col: {} is less than zero.", row, col));
-          // }
-          // if (index > (size - 1)) {
-          //   throw std::out_of_range(fmt::format(
-          //       "Raster value at row: {}, col: {} exceeds bounds of {}.", row, col,
-          //       size));
-          // }
+
+          // Verify the zone_index
+          int zone_index = static_cast<int>(raster->data[row][col]);
+          if (zone_index < 0) {
+            throw std::out_of_range(fmt::format(
+                "Raster value at row: {}, col: {} is less than zero.", row, col));
+          }
+          if (zone_index > (size - 1)) {
+            throw std::out_of_range(fmt::format(
+                "Raster value at row: {}, col: {} exceeds bounds of {}.", row, col,
+                size));
+          }
 
           // Set the seasonal period
-          set_seasonal_period(index);
-          index++;
+          set_seasonal_period(zone_index);
         }
       }
     }
@@ -245,6 +240,139 @@ public:
     int period_;
   };
 
+  class SeasonalPattern : public ISeasonalInfo {
+  public:
+    // Vector of vectors: [district][day/month]
+    std::vector<DoubleVector> district_adjustments;
+    int period{12};  // Either 365 for daily or 12 for monthly
+    bool is_monthly{true};  // Flag to indicate if we're using monthly data
+
+    int min_district_id{-1};
+    int max_district_id{-1};
+    std::string filename;
+    // Make this virtual so we can override it in tests
+    virtual int get_district_for_location(int location) const{
+      if (SpatialData::get_instance().district_count == -1) {
+        return min_district_id;
+      }
+      return SpatialData::get_instance().get_district(location);
+    }
+    void read(const std::string &filename){
+      std::ifstream in(filename);
+      if (!in.good()) {
+        throw std::runtime_error("Error opening the rainfall data file: "
+                                 + filename);
+      }
+
+      std::string line;
+      // Skip header
+      std::getline(in, line);
+
+      min_district_id = std::numeric_limits<int>::max();
+      max_district_id = std::numeric_limits<int>::min();
+
+      // Temporary storage for data
+      std::map<int, DoubleVector> temp_adjustments;
+
+      // Read each district's data
+      while (std::getline(in, line)) {
+        std::stringstream ss(line);
+        std::string token;
+
+        // Read district ID
+        std::getline(ss, token, ',');
+        int district_id = std::stoi(token);
+
+        min_district_id = std::min(min_district_id, district_id);
+        max_district_id = std::max(max_district_id, district_id);
+
+        // Read seasonal factors
+        DoubleVector factors;
+        while (std::getline(ss, token, ',')) {
+          double factor = std::stod(token);
+          if (factor < 0.0) {
+            throw std::runtime_error(
+                fmt::format("Rainfall factor less than zero: {0}", factor));
+          }
+          factors.push_back(factor);
+        }
+
+        // Validate number of factors
+        if (factors.size() != period) {
+          throw std::runtime_error(
+              fmt::format("Expected {} factors for district {}, got {}", period,
+                          district_id, factors.size()));
+        }
+
+        // Store in temporary map with original ID
+        temp_adjustments[district_id] = factors;
+      }
+
+      // Determine if input is 0-based or 1-based
+      bool is_one_based = (min_district_id == 1);
+      bool is_zero_based = (min_district_id == 0);
+
+      if (!is_one_based && !is_zero_based) {
+        throw std::runtime_error(fmt::format(
+            "District IDs must start at 0 or 1, but found minimum ID: {}",
+            min_district_id));
+      }
+
+      // Calculate actual district count
+      int actual_district_count = max_district_id - min_district_id + 1;
+
+      // Validate against SpatialData if available
+      if (SpatialData::get_instance().district_count != -1) {
+        if (actual_district_count
+            != SpatialData::get_instance().district_count) {
+          throw std::runtime_error(
+              fmt::format("Expected {} districts, got {}",
+                          SpatialData::get_instance().district_count,
+                          actual_district_count));
+        }
+      }
+
+      // Size the vector to accommodate direct indexing (size = count for 0-based, count+1 for 1-based)
+      district_adjustments.clear();
+      district_adjustments.resize(min_district_id == 0 ? actual_district_count : actual_district_count + 1);
+
+      // Store factors using original district IDs directly
+      for (const auto &[file_id, factors] : temp_adjustments) {
+        district_adjustments[file_id] = factors;
+      }
+      spdlog::info("Loaded {} districts from {} ({}-based indexing)",
+                               actual_district_count, filename,
+                               min_district_id);
+    }
+    void initialize();
+    void build(){
+      read(filename);
+    }
+    double get_seasonal_factor(const date::sys_days &today,
+    const int &location) override{
+      int district = get_district_for_location(location);
+
+      int doy = TimeHelpers::day_of_year(today);
+
+      // Get the month (0-11)
+      auto ymd = date::year_month_day{today};
+      int month = static_cast<unsigned>(ymd.month()) - 1;
+
+      // For monthly data, use the month directly
+      if (is_monthly) {
+        return district_adjustments[district][month];
+      } else {
+        // For daily data, use the day of year (0-364)
+        doy = (doy == 366) ? 364 : doy - 1;
+        return district_adjustments[district][doy];
+      }
+    }
+
+    // Getter methods for testing
+    bool get_is_monthly() const { return is_monthly; }
+    int get_period() const { return period; }
+  };
+
   // Getters
   [[nodiscard]] bool get_enable() const {
     return enable_;
@@ -261,6 +389,14 @@ public:
 
   void set_mode(std::string value) {
     mode_ = value;
+  }
+
+  [[nodiscard]]  SeasonalPattern get_seasonal_pattern() const {
+    return seasonal_pattern_;
+  }
+
+  void set_seasonal_pattern(const SeasonalPattern &value) {
+    seasonal_pattern_ = value;
   }
 
   [[nodiscard]]  SeasonalRainfall get_seasonal_rainfall() const {
@@ -288,6 +424,9 @@ public:
       if(mode_=="rainfall") {
         return get_seasonal_rainfall().get_seasonal_factor(today, location);
       }
+      if(mode_=="pattern") {
+        return get_seasonal_pattern().get_seasonal_factor(today, location);
+      }
     }
     return 1.0;
   }
@@ -303,10 +442,15 @@ public:
         // process equation based
         seasonal_equation_.build(number_of_locations);
       }
-      else if(mode_=="rainfall") {
+      else if(mode_== "rainfall") {
         spdlog::info("Rainfall based");
         // process rainfall based
         seasonal_rainfall_.build();
+      }
+      else if(mode_== "pattern") {
+        spdlog::info("Pattern based");
+        // process rainfall based
+        seasonal_pattern_.build();
       }
       else {
         throw std::runtime_error("Unknown mode in 'seasonality_settings'.");
@@ -322,6 +466,7 @@ private:
   std::string mode_;
   SeasonalEquation seasonal_equation_;
   SeasonalRainfall seasonal_rainfall_;
+  SeasonalPattern seasonal_pattern_;
 public:
   DoubleVector A;
   DoubleVector B;
@@ -387,6 +532,26 @@ struct convert<SeasonalitySettings::SeasonalRainfall> {
   }
 };
 
+// Convert specialization for SeasonalitySettings::SeasonalRainfall
+template <>
+struct convert<SeasonalitySettings::SeasonalPattern> {
+  static Node encode(const SeasonalitySettings::SeasonalPattern &rhs) {
+    Node node;
+    node["filename"] = rhs.filename;
+    node["period"] = rhs.period;
+    return node;
+  }
+
+  static bool decode(const Node &node, SeasonalitySettings::SeasonalPattern &rhs) {
+    if (!node["filename"] || !node["period"]) {
+      throw std::runtime_error("Missing fields in SeasonalPattern");
+    }
+    rhs.filename = node["filename"].as<std::string>();
+    rhs.period = node["period"].as<int>();
+    return true;
+  }
+};
+
 
 // Convert specialization for SeasonalitySettings
 template <>
@@ -405,17 +570,24 @@ struct convert<SeasonalitySettings> {
   }
 
   static bool decode(const Node &node, SeasonalitySettings &rhs) {
-    if (!node["enable"] || !node["mode"] || !node["rainfall"] || !node["equation"]) {
-      throw std::runtime_error("Missing fields in SeasonalitySettings");
+    if (!node["enable"]) {
+      throw std::runtime_error("Missing field enable in SeasonalitySettings");
     }
 
     rhs.set_enable(node["enable"].as<bool>());
+
+    if (node["enable"].as<bool>() && (!node["mode"] || !node["rainfall"] || !node["equation"] || !node["pattern"])) {
+      throw std::runtime_error("Missing fields in SeasonalitySettings when enable is true");
+    }
     rhs.set_mode(node["mode"].as<std::string>());
     if(node["equation"]) {
       rhs.set_seasonal_equation(node["equation"].as<SeasonalitySettings::SeasonalEquation>());
     }
     if(node["rainfall"]) {
       rhs.set_seasonal_rainfall(node["rainfall"].as<SeasonalitySettings::SeasonalRainfall>());
+    }
+    if(node["pattern"]) {
+      rhs.set_seasonal_pattern(node["pattern"].as<SeasonalitySettings::SeasonalPattern>());
     }
     return true;
   }

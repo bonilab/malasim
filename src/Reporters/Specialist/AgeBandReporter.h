@@ -24,9 +24,6 @@ private:
   // When to start logging the data
   int start_recording = -1;
 
-  // Mapping of the locations to their districts
-  std::vector<int> district_lookup;
-
   // SQLite database connection
   sqlite3* db;
 

@@ -244,10 +244,6 @@ public:
           spdlog::info("Grid based");
           /* Number of location, locations and spatial matrix are calculated in SpatialData class */
           SpatialData::get_instance().parse(node_);
-          if (SpatialData::get_instance().has_raster()) {
-            spdlog::info("Raster data detected, using it to generate distances");
-            SpatialData::get_instance().generate_distances();
-          }
         }
         else if(mode_=="location_based") {
           spdlog::info("Location based");
