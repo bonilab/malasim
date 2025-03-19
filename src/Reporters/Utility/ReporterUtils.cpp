@@ -451,13 +451,13 @@ void ReporterUtils::initialize_moi_file_logger() {
 //
 //
 // void MonthlyReporter::print_monthly_incidence_by_location() {
-//  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
+//  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); ++loc) {
 //    ss << Model::get_mdc()->monthly_number_of_treatment_by_location()[loc] << sep;
 //  }
 //
 //  ss << group_sep;
 //
-//  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
+//  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); ++loc) {
 //    ss << Model::get_mdc()->monthly_number_of_clinical_episode_by_location()[loc] << sep;
 //  }
 //}

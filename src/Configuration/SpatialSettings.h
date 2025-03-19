@@ -239,7 +239,6 @@ public:
 
     void process_config() override {
       spdlog::info("Processing SpatialSettings");
-        int number_of_location = 0;
         if(mode_=="grid_based") {
           spdlog::info("Grid based");
           /* Number of location, locations and spatial matrix are calculated in SpatialData class */
@@ -249,11 +248,11 @@ public:
           spdlog::info("Location based");
           // process location_based
           location_based_.set_number_of_locations(static_cast<int>(location_based_.get_population_size_by_location().size()));
-          number_of_location = location_based_.get_number_of_locations();
-          spatial_distance_matrix_ = std::vector<std::vector<double>>(static_cast<unsigned long long int>(number_of_location));
-          for (auto from_location = 0ul; from_location < number_of_location; from_location++) {
-              spatial_distance_matrix_[from_location].resize(static_cast<unsigned long long int>(number_of_location));
-              for (auto to_location = 0ul; to_location < number_of_location; to_location++) {
+          number_of_location_ = location_based_.get_number_of_locations();
+          spatial_distance_matrix_ = std::vector<std::vector<double>>(static_cast<unsigned long long int>(number_of_location_));
+          for (auto from_location = 0ul; from_location < number_of_location_; from_location++) {
+              spatial_distance_matrix_[from_location].resize(static_cast<unsigned long long int>(number_of_location_));
+              for (auto to_location = 0ul; to_location < number_of_location_; to_location++) {
                   spatial_distance_matrix_[from_location][to_location] = Spatial::Coordinate::calculate_distance_in_km(
                       *this->get_location_based().get_location_info()[from_location].coordinate,
                       *this->get_location_based().get_location_info()[to_location].coordinate);

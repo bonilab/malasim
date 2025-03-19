@@ -76,15 +76,15 @@ void MonthlyReporter::monthly_report() {
 
     print_EIR_PfPR_by_location(ss);
     ss << group_sep;
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->monthly_number_of_new_infections_by_location()[loc] << sep;
     }
     ss << group_sep;
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->monthly_number_of_treatment_by_location()[loc] << sep;
     }
     ss << group_sep;
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->monthly_number_of_clinical_episode_by_location()[loc] << sep;
     }
     ss << group_sep;
@@ -102,9 +102,9 @@ void MonthlyReporter::monthly_report() {
 void MonthlyReporter::after_run() {
   std::stringstream ss;
   ss << Model::get_random()->get_seed() << sep
-     << Model::get_config()->get_spatial_settings().get_number_of_locations() << sep;
-  ss << Model::get_config()->get_spatial_settings().location_db[0].beta << sep;
-  ss << Model::get_config()->get_spatial_settings().location_db[0].population_size << sep;
+     << Model::get_instance().number_of_locations() << sep;
+  ss << Model::get_instance().location_db()[0].beta << sep;
+  ss << Model::get_instance().location_db()[0].population_size << sep;
   print_EIR_PfPR_by_location(ss);
 
   ss << group_sep;
@@ -117,7 +117,7 @@ void MonthlyReporter::after_run() {
 
   auto sum_ntf = 0.0;
   ul pop_size = 0;
-  for (auto location = 0; location < Model::get_config()->get_spatial_settings().get_number_of_locations(); location++) {
+  for (auto location = 0; location < Model::get_instance().number_of_locations(); location++) {
       sum_ntf += Model::get_mdc()->cumulative_NTF_by_location()[location];
       pop_size += Model::get_mdc()->popsize_by_location()[location];
   }
@@ -132,7 +132,7 @@ void MonthlyReporter::after_run() {
 }
 
 void MonthlyReporter::print_EIR_PfPR_by_location(std::stringstream& ss) {
-  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
+  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); ++loc) {
     if (Model::get_mdc()->EIR_by_location_year()[loc].empty()) {
       ss << 0 << sep;
       // spdlog::info("print_EIR_PfPR_by_location {}: EIR_by_location_year is empty", loc);

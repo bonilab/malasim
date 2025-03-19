@@ -11,19 +11,19 @@
 
 #include "Utils/TypeDef.hxx"
 
-Model::get_config()->get_spatial_settings().get_number_of_locations()
+Model::get_instance().number_of_locations()
 
 Model::get_config()->get_epidemiological_parameters().get_number_of_tracking_days()
 
 Model::get_config()->get_genotype_parameters().genotype_db
 
-Model::get_config()->get_spatial_settings().location_db
+Model::get_instance().location_db()
 
 Model::get_config()->get_drug_parameters().drug_db
 
 Model::get_config()->get_therapy_parameters().therapy_db
 
-Model::get_config()->get_strategy_parameters().strategy_db
+Model::get_instance().strategy_db()
 
 Model::get_config()->get_immune_system_parameters()
 

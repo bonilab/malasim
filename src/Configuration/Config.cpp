@@ -1,7 +1,6 @@
 #include <filesystem>
 #include <yaml-cpp/yaml.h>
 #include "Config.h"
-
 #include "Utils/Cli.hxx"
 
 int inline get_pipe_count(const std::string &str) {
@@ -328,15 +327,15 @@ void Config::validate_all_cross_field_validations() {
   }
   //Check if rainfall file exists
   if(seasonality_settings.get_enable() && seasonality_settings.get_mode() == "rainfall"
-    && !std::filesystem::exists(seasonality_settings.get_seasonal_rainfall().get_filename())) {
+    && !std::filesystem::exists(seasonality_settings.get_seasonal_rainfall()->get_filename())) {
     throw std::invalid_argument("Rainfall file does not exist");
   }
   if(seasonality_settings.get_enable() && seasonality_settings.get_mode() == "rainfall"
-    && seasonality_settings.get_seasonal_rainfall().get_period() > 365) {
+    && seasonality_settings.get_seasonal_rainfall()->get_period() > 365) {
     throw std::invalid_argument("Rainfall period should be less than or equal to 365");
   }
   if(seasonality_settings.get_enable() && seasonality_settings.get_mode() == "equation") {
-    if(seasonality_settings.get_seasonal_equation().get_raster()
+    if(seasonality_settings.get_seasonal_equation()->get_raster()
       && spatial_settings.get_grid_based().get_ecoclimatic_raster().empty()) {
       throw std::invalid_argument("Ecoclimatic raster should be provided for equation based seasonality.");
       }

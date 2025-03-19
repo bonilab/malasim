@@ -5,6 +5,8 @@
  */
 #include "AscFile.h"
 
+#include <spdlog/spdlog.h>
+
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
@@ -50,6 +52,7 @@ AscFile* AscFileManager::read(const std::string &fileName) {
   // Open the file and verify it
   std::string field, value;
   std::ifstream in(fileName);
+
   if (!in.good()) {
     throw std::runtime_error("Error opening ASC file: " + fileName);
   }
@@ -107,7 +110,6 @@ AscFile* AscFileManager::read(const std::string &fileName) {
       results->data[ndx][ndy] = std::stof(value);
     }
   }
-
   // Clean-up and return
   in.close();
   return results;

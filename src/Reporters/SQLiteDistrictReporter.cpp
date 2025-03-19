@@ -186,7 +186,7 @@ void SQLiteDistrictReporter::monthly_report_site_data(int monthId) {
   // Prepare the data structures
   reset_site_data_structures(numDistricts, ageClasses.size());
 
-  for (auto location = 0; location < Model::get_config()->get_spatial_settings().get_number_of_locations();
+  for (auto location = 0; location < Model::get_instance().number_of_locations();
        location++) {
     // If the population is zero, press on
     auto locationPopulation =
@@ -194,7 +194,7 @@ void SQLiteDistrictReporter::monthly_report_site_data(int monthId) {
     if (locationPopulation == 0) { continue; }
        }
   // Collect the data
-  for (auto location = 0; location < Model::get_config()->get_spatial_settings().get_number_of_locations();
+  for (auto location = 0; location < Model::get_instance().number_of_locations();
        location++) {
     // If the population is zero, press on
     auto locationPopulation =

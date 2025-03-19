@@ -20,7 +20,7 @@
 
 void CellularReporter::initialize(int job_number, const std::string &path) {
   // Check the number of cells in the model, if it exceeds one, throw an error
-  if (Model::get_config()->get_spatial_settings().location_db.size() > 1) {
+  if (Model::get_instance().location_db().size() > 1) {
     throw std::runtime_error(
         "CellularReporter can only be used with one location configuration.");
   }

@@ -5,13 +5,14 @@
 #include <string>
 #include <Core/Scheduler/Dispatcher.h>
 #include <Utils/Random.h>
-
 #include "Population/ImmuneSystem/ImmunityClearanceUpdateFunction.h"
 #include "date/date.h"
 
+namespace Spatial {
+class Location;
+}
 
 class Reporter;
-// Forward declaration
 class Config;
 class Random;
 class Cli;
@@ -80,6 +81,9 @@ public:
   static Mosquito* get_mosquito();
   static ITreatmentCoverageModel* get_treatment_coverage();
   static IStrategy* get_treatment_strategy();
+  static void set_config(Config* config) {
+    get_instance().config_ = config;
+  }
   ClinicalUpdateFunction* progress_to_clinical_update_function() {
     return progress_to_clinical_update_function_;
   }
@@ -92,6 +96,11 @@ public:
   ImmunityClearanceUpdateFunction* clinical_update_function() {
     return clinical_update_function_;
   }
+  int number_of_locations() const;
+  int number_of_age_classes() const;
+  int get_number_of_tracking_days() const;
+  std::vector<Spatial::Location>& location_db();
+  std::vector<IStrategy *>& strategy_db();
 
   void set_treatment_coverage(ITreatmentCoverageModel* tcm);
   void set_treatment_strategy(const int &strategy_id);

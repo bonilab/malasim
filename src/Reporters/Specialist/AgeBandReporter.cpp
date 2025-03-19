@@ -49,7 +49,7 @@ void AgeBandReporter::monthly_report() {
   std::vector<std::vector<int>> population(districts, std::vector<int>(age_classes));
   std::vector<std::vector<int>> cases(districts, std::vector<int>(age_classes));
 
-  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
     for (auto ac = 0; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
       auto district = SpatialData::get_instance().get_district(loc);
       population[district][ac] += Model::get_mdc()->popsize_by_location_age_class()[loc][ac];

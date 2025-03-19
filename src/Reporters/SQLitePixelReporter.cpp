@@ -32,7 +32,7 @@ void SQLitePixelReporter::monthly_report_site_data(int monthId) {
   // collect data
   std::vector<std::string> values;
 
-  for (auto location = 0; location < Model::get_config()->get_spatial_settings().get_number_of_locations();
+  for (auto location = 0; location < Model::get_instance().number_of_locations();
        location++) {
     // Check the population, if there is nobody there, press on
     if (Model::get_population()->size(location) == 0) { continue; }
@@ -144,7 +144,7 @@ void SQLitePixelReporter::monthly_report_genome_data(int monthId) {
   std::vector<std::string> insertValues;
 
   // Iterate over all the possible locations
-  for (auto location = 0; location < Model::get_config()->get_spatial_settings().get_number_of_locations();
+  for (auto location = 0; location < Model::get_instance().number_of_locations();
        location++) {
     std::vector<int> occurrences(genotypes, 0);
     std::vector<int> clinicalOccurrences(genotypes, 0);

@@ -27,7 +27,7 @@ bool SpatialData::parse(const YAML::Node &node) {
   // Load and validate raster files
   load_files(node);
 
-  if (Model::get_config()->get_spatial_settings().get_number_of_locations() != 0) {
+  if (Model::get_instance().number_of_locations() != 0) {
     throw std::runtime_error("Location database is not empty");
   }
 
@@ -104,6 +104,10 @@ bool SpatialData::check_catalog(std::string &errors) {
     ref_raster_info.cellsize = raster->CELLSIZE;
     ref_raster_info.no_data_value = raster->NODATA_VALUE;
 
+    spdlog::info("Checking raster: {}x{} with cell size: {}",
+                 ref_raster_info.number_columns, ref_raster_info.number_rows,
+                 ref_raster_info.cellsize);
+
     if (!validate_raster_info(ref_raster_info, errors)) {
       errors = fmt::format("Header mismatch: {}", errors);
       spdlog::error("Raster error: {}", errors);
@@ -138,7 +142,7 @@ bool SpatialData::check_catalog(std::string &errors) {
 
 
 void SpatialData::generate_distances() const {
-  auto &db = Model::get_config()->get_spatial_settings().location_db;
+  auto &db = Model::get_instance().location_db();
   auto &distances = Model::get_config()->get_spatial_settings().get_spatial_distance_matrix();
 
   auto locations = db.size();
@@ -172,7 +176,7 @@ void SpatialData::generate_locations(AscFile* reference) {
     throw std::runtime_error("Raster Information is not initialized");
   }
   // Pre-allocate the location database
-  auto &db = Model::get_config()->get_spatial_settings().location_db;
+  auto &db = Model::get_instance().location_db();
   db.clear();
 
   // Calculate maximum possible size (all cells valid)
@@ -196,11 +200,11 @@ void SpatialData::generate_locations(AscFile* reference) {
 
   // Update the configured count
   Model::get_config()->get_spatial_settings().set_number_of_locations(
-    static_cast<int>(Model::get_config()->get_spatial_settings().location_db.size()));
-  if (Model::get_config()->get_spatial_settings().get_number_of_locations() == 0) {
+    static_cast<int>(db.size()));
+  if (Model::get_instance().number_of_locations() == 0) {
     // This error should be redundant since the ASC loader should catch it
     spdlog::error("Zero locations loaded while parsing ASC file.");
-  } const auto location_count = Model::get_config()->get_spatial_settings().get_number_of_locations();
+  } const auto location_count = Model::get_instance().number_of_locations();
 
   if (location_count == 0) {
     throw std::runtime_error(
@@ -214,7 +218,7 @@ void SpatialData::generate_locations(AscFile* reference) {
 
 int SpatialData::get_district_from_raster(int location) {
   // Check if location is within bounds
-  if (location < 0 || location >= Model::get_config()->get_spatial_settings().get_number_of_locations()) {
+  if (location < 0 || location >= Model::get_instance().number_of_locations()) {
     throw std::out_of_range(fmt::format("{} called with invalid location: {}",
                                         __FUNCTION__, location));
   }
@@ -226,7 +230,7 @@ int SpatialData::get_district_from_raster(int location) {
   }
 
   // Get the coordinate of the location
-  auto &coordinate = Model::get_config()->get_spatial_settings().location_db[location].coordinate;
+  auto &coordinate = Model::get_instance().location_db()[location].coordinate;
 
   // Check if coordinate is valid
   if (coordinate == nullptr) {
@@ -263,7 +267,7 @@ int SpatialData::get_raster_district(int location) {
   }
 
   // Get the coordinate of the location
-  auto &coordinate = Model::get_config()->get_spatial_settings().location_db[location].coordinate;
+  auto &coordinate = Model::get_instance().location_db()[location].coordinate;
 
   // Use the x, y to get the district id
   auto district =
@@ -273,7 +277,7 @@ int SpatialData::get_raster_district(int location) {
 }
 
 int SpatialData::get_district(int location) {
-  if (location < 0 || location >= Model::get_config()->get_spatial_settings().get_number_of_locations()) {
+  if (location < 0 || location >= Model::get_instance().number_of_locations()) {
     throw std::out_of_range(fmt::format("{} called with invalid location: {}",
                                         __FUNCTION__, location));
   }
@@ -336,8 +340,8 @@ void SpatialData::copy_raster_to_location_db(SpatialFileType type) {
   AscFile* raster = data_[type].get();
 
   // Get a reference to the location database
-  auto &db = Model::get_config()->get_spatial_settings().location_db;
-  auto count = Model::get_config()->get_spatial_settings().get_number_of_locations();
+  auto &db = Model::get_instance().location_db();
+  auto count = Model::get_instance().number_of_locations();
 
   // Scan the data and update the values
   auto id = -1;
@@ -429,8 +433,8 @@ void SpatialData::load_age_distribution(const YAML::Node &node) {
     throw std::runtime_error("Missing required age distribution data");
   }
 
-  auto &location_db = Model::get_config()->get_spatial_settings().location_db;
-  auto number_of_locations = Model::get_config()->get_spatial_settings().get_number_of_locations();
+  auto &location_db = Model::get_instance().location_db();
+  auto number_of_locations = Model::get_instance().number_of_locations();
 
   for (auto loc = 0ul; loc < number_of_locations; loc++) {
     auto input_loc =
@@ -450,8 +454,8 @@ void SpatialData::load_age_distribution(const YAML::Node &node) {
 }
 
 void SpatialData::load_treatment_data(const YAML::Node &node) {
-  auto &location_db = Model::get_config()->get_spatial_settings().location_db;
-  auto number_of_locations = Model::get_config()->get_spatial_settings().get_number_of_locations();
+  auto &location_db = Model::get_instance().location_db();
+  auto number_of_locations = Model::get_instance().number_of_locations();
 
   // Only load from YAML if raster not provided
   if (data_[SpatialFileType::PrTreatmentUnder5] != nullptr) {
@@ -490,8 +494,8 @@ void SpatialData::load_treatment_data(const YAML::Node &node) {
 }
 
 void SpatialData::load_location_data(const YAML::Node &node) {
-  auto &location_db = Model::get_config()->get_spatial_settings().location_db;
-  auto number_of_locations = Model::get_config()->get_spatial_settings().get_number_of_locations();
+  auto &location_db = Model::get_instance().location_db();
+  auto number_of_locations = Model::get_instance().number_of_locations();
 
   if (data_[SpatialFileType::Beta] != nullptr) {
     copy_raster_to_location_db(SpatialFileType::Beta);
@@ -576,10 +580,10 @@ void SpatialData::populate_dependent_data() {
   if (data_[SpatialFileType::Districts]) {
     // Size the vectors appropriately
     district_to_locations_.resize(max_district_id + 1);
-    location_to_district_.reserve(Model::get_config()->get_spatial_settings().get_number_of_locations());
+    location_to_district_.reserve(Model::get_instance().number_of_locations());
 
     // Single pass through locations to populate both mappings
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
       auto district = get_district_from_raster(loc);
       location_to_district_.push_back(district);
       district_to_locations_[district].push_back(loc);
