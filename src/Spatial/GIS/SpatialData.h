@@ -7,6 +7,7 @@
 #ifndef SPATIALDATA_H
 #define SPATIALDATA_H
 
+#include <spdlog/spdlog.h>
 #include <yaml-cpp/yaml.h>
 
 #include <string>
@@ -64,6 +65,36 @@ public:
 
     // The size of the cell, typically in meters
     double cellsize = NOT_SET;
+
+    double no_data_value = NOT_SET;
+
+    // Validate if the raster information matches another instance
+    bool matches(const RasterInformation &other) const {
+      return number_columns == other.number_columns
+             && number_rows == other.number_rows
+             && x_lower_left_corner == other.x_lower_left_corner
+             && y_lower_left_corner == other.y_lower_left_corner
+             && cellsize == other.cellsize
+             && no_data_value == other.no_data_value;
+    }
+
+    // Check if the raster information has been initialized
+    bool is_initialized() const {
+      return number_columns != NOT_SET && number_rows != NOT_SET
+             && x_lower_left_corner != NOT_SET && y_lower_left_corner != NOT_SET
+             && cellsize != NOT_SET
+             && no_data_value != NOT_SET;
+    }
+
+    /* For testing only */
+    void reset() {
+      number_columns = NOT_SET;
+      number_rows = NOT_SET;
+      x_lower_left_corner = NOT_SET;
+      y_lower_left_corner = NOT_SET;
+      cellsize = NOT_SET;
+      no_data_value = NOT_SET;
+    }
   };
 
   /**
@@ -78,10 +109,7 @@ public:
    * SpatialData::parse()) and remains constant throughout the
    * simulation, facilitating efficient spatial queries and analyses.
    */
-  // PROPERTY_REF(std::vector<int>, district_lookup)
-  std::vector<int> district_lookup_;
 
-private:
   const std::string BETA_RASTER = "beta_raster";
   const std::string DISTRICT_RASTER = "district_raster";
   const std::string LOCATION_RASTER = "location_raster";
@@ -90,12 +118,6 @@ private:
   const std::string ECOCLIMATIC_RASTER = "ecoclimatic_raster";
   const std::string TREATMENT_RATE_UNDER5 = "p_treatment_under_5_raster";
   const std::string TREATMENT_RATE_OVER5 = "p_treatment_over_5_raster";
-
-  // Array of the ASC file data, use SpatialFileType as the index
-  AscFile** data;
-
-  // Flag to indicate if data has been loaded since the last time it was checked
-  bool dirty = false;
 
   // The size of the cells in the raster, the units shouldn't matter, but this
   // was written when we were using 5x5 km cells
@@ -108,18 +130,50 @@ private:
   // actual value
   int district_count = 0;
 
+  int min_district_id = -1;
+  int max_district_id = -1;
+
+  // Add raster_info as a data member
+  RasterInformation raster_info;
+
+  // true if any raster file has been loaded, false otherwise
+  bool using_raster = false;
+
   // Constructor
   SpatialData();
 
   // Deconstructor
   ~SpatialData();
 
+public:
+  /**
+   * @brief Parses spatial configuration from YAML and initializes the spatial
+   * system, all reaster files must be defined in raster_db node for the check_catalog to work
+   *
+   * @param node YAML configuration node containing spatial settings
+   * @return true if parsing was successful
+   * @throws std::runtime_error if required configuration is missing or invalid
+   */
+  bool parse(const YAML::Node &node);
+
   // Check the loaded spatial catalog for errors, returns true if there are
   // errors
   bool check_catalog(std::string &errors);
 
-  // Generate the locations for the location_db
-  void generate_locations();
+  /**
+   * @brief Generates location database from a reference raster file
+   * @param raster The raster file to use as a reference for location generation
+   *
+   * This function creates location entries for each valid (non-NODATA) cell in
+   * the raster. Each location is assigned:
+   * - A unique sequential ID
+   * - Row and column coordinates from the raster
+   * - Initial elevation of 0
+   *
+   * @throws std::runtime_error if no valid raster files are available
+   * @throws std::runtime_error if no valid locations are found in the raster
+   */
+  void generate_locations(AscFile* raster);
 
   // Load the given raster file into the spatial catalog and assign the given
   // label
@@ -128,14 +182,13 @@ private:
   // Load all the spatial data from the node
   void load_files(const YAML::Node &node);
 
-  // Load the raster indicated into the location_db; works with betas and
-  // probability of treatment
-  void load_raster(SpatialFileType type);
+  // copy the raster to the location_db; works with betas and probability of
+  // treatment
+  void copy_raster_to_location_db(SpatialFileType type);
 
   // Perform any clean-up operations after parsing the YAML file is complete
   void parse_complete();
 
-public:
   // Not supported by singleton.
   SpatialData(SpatialData const &) = delete;
 
@@ -150,12 +203,6 @@ public:
 
   // Return the raster header or the default structure if no raster are loaded
   RasterInformation get_raster_header();
-
-  // Return true if any raster file has been loaded, false otherwise
-  bool has_raster();
-
-  // Return true if a raster file has been loaded, false otherwise
-  bool has_raster(SpatialFileType type) { return data[type] != nullptr; }
 
   // Generate the Euclidean distances for the location_db
   void generate_distances() const;
@@ -190,6 +237,17 @@ public:
   int get_district(int location);
 
   /**
+   * @brief Returns a vector of location IDs that belong to the specified district.
+   * Uses a pre-computed mapping for efficient lookups.
+   *
+   * @param district The district ID (matches IDs from the raster file, can be 0-based or 1-based)
+   * @return const reference to vector of location IDs in the district
+   * @throws std::runtime_error if districts are not loaded
+   * @throws std::out_of_range if district ID is invalid
+   */
+  const std::vector<int>& get_district_locations(int district) const;
+
+  /**
    * @brief Returns the adjusted district index matching the definition in
    * raster files, for external storage.
    *
@@ -210,9 +268,6 @@ public:
     return simulationDistrict + get_first_district();
   }
 
-  // Get the count of districts loaded, or -1 if they have not been loaded
-  int get_district_count();
-
   // Get the locations that are within the given district, throws an error if
   // not districts are loaded
   std::vector<int> get_district_locations(int district);
@@ -223,11 +278,7 @@ public:
   int get_first_district();
 
   // Get a reference to the AscFile raster, may be a nullptr
-  AscFile* get_raster(SpatialFileType type) { return data[type]; }
-
-  // Parse the YAML node provided to extract all the relevant information for
-  // the simulation
-  bool parse(const YAML::Node &node);
+  AscFile* get_raster(SpatialFileType type) { return data_[type].get(); }
 
   /**
    * @brief Populates dependent data structures after input data and raster
@@ -261,19 +312,83 @@ public:
    */
   void populate_dependent_data();
 
-  // Refresh the data from the model (i.e., Location DB) to the spatial data
-  void refresh();
-
-  // Write the current spatial data to the filename and path indicated, output
-  // will be an ASC file
-  void write(const std::string &filename, SpatialFileType type);
-
-  std::vector<int>& get_district_lookup() {
-    return district_lookup_;
+  // Reset the singleton instance for testing
+  void reset() {
+    // Reset each unique_ptr individually
+    for (auto &ptr : data_) { ptr.reset(); }
+    district_count = -1;
+    min_district_id = -1;
+    max_district_id = -1;
   }
-  void set_district_lookup(const std::vector<int> &district_lookup) {
-    district_lookup_ = district_lookup;
+
+  // Add method to validate raster information
+  bool validate_raster_info(const RasterInformation &new_info,
+                            std::string &errors);
+
+  /**
+   * @brief Loads age distribution data from YAML configuration
+   * @throws std::runtime_error if age distribution data is invalid
+   */
+  void load_age_distribution(const YAML::Node &node);
+
+  /**
+   * @brief Loads treatment data from YAML configuration if not provided by
+   * raster
+   * @throws std::runtime_error if treatment data is invalid
+   */
+  void load_treatment_data(const YAML::Node &node);
+
+  /**
+   * @brief Loads beta and population data from YAML if not provided by raster
+   * @throws std::runtime_error if required data is missing or invalid
+   */
+  void load_location_data(const YAML::Node &node);
+
+
+    /**
+   * @brief Retrieves the district ID from the district raster file for a given location.
+   *
+   * This is an internal method used during initialization to build the district lookup table.
+   * It performs coordinate-based lookups in the district raster file.
+   *
+   * @param location The location ID for which the district ID is requested.
+   * @return The district ID from the raster file for the given location.
+   * @throws std::out_of_range if location or coordinates are invalid
+   * @throws std::runtime_error if district data is not loaded or coordinates are null
+   */
+  int get_district_from_raster(int location);
+
+  /*
+   * Reset the raster information, clearing all raster data.
+   */
+  void reset_raster_info() {
+    spdlog::warn("Reset raster info. All raster data will be lost.");
+    raster_info.reset();
   }
+
+private:
+  /**
+  * @brief This property holds a pre-populated map from location to district ID
+  * as defined in the GIS raster file.
+  *
+  * The vector contains district IDs where each element represents a specific
+  * location, and the value at each index corresponds to the actual district ID
+  * from the raster file. The district IDs can be either 0-based or 1-based,
+  * depending on how they are defined in the input GIS raster file. This mapping
+  * is essential for quickly determining the district of any given location
+  * within the simulation. It is assumed that the mapping is set up during the
+  * initialization phase (in SpatialData::parse()) and remains constant
+  * throughout the simulation, facilitating efficient spatial queries and
+  * analyses.
+  */
+  std::vector<int> location_to_district_;
+
+  // Maps district IDs to their corresponding location IDs
+  // Index is 0 to max_district_id+1 to handle both 0-based and 1-based IDs
+  std::vector<std::vector<int>> district_to_locations_;
+
+  // Initialize array with nullptr
+  std::array<std::unique_ptr<AscFile>, SpatialFileType::Count> data_{};
 };
 
 #endif

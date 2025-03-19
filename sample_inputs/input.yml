@@ -14,7 +14,7 @@ model_settings:
   days_between_stdout_output: 30
 
   # Initial seed number for random number generator; set to -1 to use a random seed
-  initial_seed_number: 218103809 #-1
+  initial_seed_number: 0
 
   # Record the genomic data (set to true for a real run)
   record_genome_db: true
@@ -42,7 +42,7 @@ transmission_settings:
   # Transmission parameter based on data; adjusts the odds that an individual
   # will be infected when challenged by sporozoites
   # NOTE: this from Robert's sporozoites challenged, Kien to review this
-  transmission_parameter: 0.55
+  transmission_parameter: 0.55 #from v4, disabled if it is set to 0
 
   # Probability that an infectious bite on a human causes a blood-stage malaria infection
   p_infection_from_an_infectious_bite: 0.1
@@ -139,7 +139,10 @@ spatial_settings:
 seasonality_settings:
   # Seasonality of malaria (to be updated with specific country data)
   enable: true
-  mode: "rainfall"
+  mode: "pattern"
+  pattern:
+    filename: "../../sample_inputs/dev_seasonality_pattern.csv"
+    period: 365
   rainfall:
     filename: "../../sample_inputs/dev_seasonality.csv"
     period: 365

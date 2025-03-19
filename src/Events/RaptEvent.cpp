@@ -23,9 +23,8 @@ void RaptEvent::schedule_event(Scheduler* scheduler, Person* p,
     auto* rapt_event = new RaptEvent();
     rapt_event->dispatcher = p;
     rapt_event->time = time;
-
-    p->add_dispatcher(rapt_event);
-    scheduler->schedule_individual_event(rapt_event);
+    p->add_event(rapt_event);
+    //scheduler->schedule_individual_event(rapt_event);
   }
 }
 
@@ -43,9 +42,9 @@ void RaptEvent::execute() {
     // we are following the Malaria Indicator Survey convention of under-5 being
     // 0 - 59 months.
     auto pr_treatment = person->get_age() < 5
-                            ? Model::get_config()->get_spatial_settings().location_db[person->get_location()]
+                            ? Model::get_instance().location_db()[person->get_location()]
                                   .p_treatment_under_5
-                            : Model::get_config()->get_spatial_settings().location_db[person->get_location()]
+                            : Model::get_instance().location_db()[person->get_location()]
                                   .p_treatment_over_5;
 
     // Adjust the probability based upon the configured compliance rate with
@@ -78,7 +77,7 @@ void RaptEvent::execute() {
   const auto to =
       (date::sys_days(last_day) - Model::get_scheduler()->calendar_date).count();
   const auto days_to_next_event =
-      Model::get_random()->random_uniform_int(from, to + 1);
+      Model::get_random()->random_uniform<int>(from, to + 1);
 
   // Schedule the event
   schedule_event(scheduler, person,

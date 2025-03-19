@@ -11,49 +11,47 @@
 
 #include "Utils/TypeDef.hxx"
 
-Model::get_instance().get_config()->get_spatial_settings().get_number_of_locations()
+Model::get_instance().number_of_locations()
 
-Model::get_instance().get_config()->get_epidemiological_parameters().get_number_of_tracking_days()
+Model::get_config()->get_epidemiological_parameters().get_number_of_tracking_days()
 
-Model::get_instance().get_config()->get_genotype_parameters().genotype_db
+Model::get_config()->get_genotype_parameters().genotype_db
 
-Model::get_instance().get_config()->get_spatial_settings().location_db
+Model::get_instance().location_db()
 
-Model::get_instance().get_config()->get_drug_parameters().drug_db
+Model::get_config()->get_drug_parameters().drug_db
 
-Model::get_instance().get_config()->get_therapy_parameters().therapy_db
+Model::get_config()->get_therapy_parameters().therapy_db
 
-Model::get_instance().get_config()->get_strategy_parameters().strategy_db
+Model::get_instance().strategy_db()
 
-Model::get_instance().get_config()->get_immune_system_parameters()
+Model::get_config()->get_immune_system_parameters()
 
-Model::get_instance().get_config()->get_movement_settings().get_v_moving_level_value()
+Model::get_config()->get_movement_settings().get_v_moving_level_value()
 
-Model::get_instance().get_config()->get_population_demographic()
+Model::get_config()->get_population_demographic()
 
-Model::get_instance().get_config()->get_population_demographic().get_number_of_age_classes()
+Model::get_config()->get_population_demographic().get_number_of_age_classes()
 
-Model::get_instance().get_config()->get_parasite_parameters().get_parasite_density_levels().get_
+Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_
 
-Model::get_instance().get_config()->get_epidemiological_parameters().get_
+Model::get_config()->get_epidemiological_parameters().get_
 
-Model::get_instance().get_scheduler()
+Model::get_scheduler()
 
-Model::get_instance().get_config()->get_seasonality_settings().get_seasonal_factor()
+Model::get_config()->get_seasonality_settings().get_seasonal_factor()
 
-Model::get_instance().get_config()->get_spatial_settings().get_spatial_distance_matrix()
+Model::get_config()->get_spatial_settings().get_spatial_distance_matrix()
 
-Model::get_instance().get_population()
+Model::get_population()
 
-Model::get_instance().get_random()
+Model::get_random()
 
-Model::get_instance().get_mdc()
+Model::get_mdc()
 
-Model::get_instance().get_mosquito()
+Model::get_mosquito()
 
 "||||111||1111111,0||||||0000000000100|1"
-
-
 
 
 Merge from Temple Malaria Simulation to malasim
@@ -62,8 +60,12 @@ SCTherapy (compliance), in Person.cpp complied_dosing_days
 UpdateEventEveryKdays in Events
 
 
-change:
+Changes:
 therapy_id to therapy_ids in all strategies
 day to date in all event dates
-DAYS_IN_YEAR -> DAYS_IN_YEAR
+DAYS_IN_YEAR() -> DAYS_IN_YEAR
 
+Conflict:
+TMS: const auto age = ((Model::SCHEDULER->current_time() - birthday_) / static_cast<double>(Constants::DAYS_IN_YEAR());
+malasim:  const auto age = ((Model::SCHEDULER->current_time() - birthday_) % Constants::DAYS_IN_YEAR())
+                              / static_cast<double>(Constants::DAYS_IN_YEAR());

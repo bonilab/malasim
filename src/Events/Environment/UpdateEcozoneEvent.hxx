@@ -31,7 +31,7 @@ private:
     //       "Configuration called for seasonality to be updated with a mode that "
     //       "does not support it.");
     // }
-    seasons.update_seasonality(from_, to_);
+    seasons->update_seasonality(from_, to_);
   }
 
 public:

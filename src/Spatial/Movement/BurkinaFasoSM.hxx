@@ -17,8 +17,9 @@
 
 namespace Spatial {
 class BurkinaFasoSM : public SpatialModel {
+public:
   BurkinaFasoSM(const BurkinaFasoSM &) = delete;
-  void operator=(const BurkinaFasoSM &) = delete;
+  BurkinaFasoSM operator=(const BurkinaFasoSM &) = delete;
   BurkinaFasoSM(BurkinaFasoSM &&) = delete;
   BurkinaFasoSM &operator=(BurkinaFasoSM &&) = delete;
 
@@ -44,26 +45,26 @@ private:
   double rho_;
   double capital_;
   double penalty_;
-  int number_of_locations_;
+  unsigned long number_of_locations_;
   std::vector<std::vector<double>> spatial_distance_matrix_;
 
   // These variables will be computed when the prepare method is called
-  double* travel = nullptr;
-  double** kernel = nullptr;
+  std::vector<double> travel_;
+  std::vector<std::vector<double>> kernel_;
 
   // Precompute the kernel function for the movement model
   void prepare_kernel() {
     // Prepare the kernel object
-    kernel = new double*[number_of_locations_];
+    kernel_.resize(number_of_locations_);
 
     // Iterate through all the locations and calculate the kernel
-    for (auto source = 0; source < number_of_locations_; source++) {
-      kernel[source] = new double[number_of_locations_];
-      for (auto destination = 0; destination < number_of_locations_; destination++) {
+    for (auto source = 0UL; source < number_of_locations_; source++) {
+      kernel_[source].resize(number_of_locations_);
+      for (auto destination = 0UL; destination < number_of_locations_; destination++) {
         // spdlog::info(
         //     "Calculating kernel for source {} and destination {} spatial_distance {}",
         //     source, destination, spatial_distance_matrix_[source][destination]);
-        kernel[source][destination] =
+        kernel_[source][destination] =
             std::pow(1 + (spatial_distance_matrix_[source][destination] / rho_), (-alpha_));
       }
     }
@@ -76,21 +77,14 @@ public:
       : tau_(tau), alpha_(alpha), rho_(rho), capital_(capital), penalty_(penalty),
         number_of_locations_(number_of_locations), spatial_distance_matrix_(spatial_distance_matrix) {}
 
-  ~BurkinaFasoSM() override {
-    // Delete memory allocated to the kernel
-    if (kernel != nullptr) {
-      for (auto ndx = 0; ndx < number_of_locations_; ndx++) { delete kernel[ndx]; }
-      delete kernel;
-    }
-
-    // Delete everything else
-    delete travel;
-  }
+  // Destructor can be removed or simplified since vectors handle cleanup automatically
+  ~BurkinaFasoSM() override = default;
 
   void prepare() override {
     // Allow the work to be done
     prepare_kernel();
-    travel = prepare_surface(SpatialData::SpatialFileType::Travel, number_of_locations_);
+    AscFile* travel_raster = SpatialData::get_instance().get_raster(SpatialData::SpatialFileType::Travel);
+    travel_ = std::move(prepare_surface(travel_raster, number_of_locations_));
   }
 
   [[nodiscard]] DoubleVector get_v_relative_out_movement_to_destination(
@@ -99,7 +93,7 @@ public:
       const IntVector &v_number_of_residents_by_location) const override {
     // Dependent objects should have been created already, so throw an exception
     // if they are not
-    if (kernel == nullptr || travel == nullptr) {
+    if (kernel_.empty() || travel_.empty()) {
       throw std::runtime_error(fmt::format(
           "{} called without kernel or travel surface prepared", __FUNCTION__));
     }
@@ -109,7 +103,7 @@ public:
 
     // Note the source district
     auto source_district =
-        SpatialData::get_instance().get_raster_district(from_location);
+        SpatialData::get_instance().get_district(from_location);
 
     // Prepare the vector for results
     std::vector<double> results(number_of_locations, 0.0);
@@ -123,16 +117,16 @@ public:
 
       // Calculate the proportional probability
       double probability =
-          std::pow(population, tau_) * kernel[from_location][destination];
+          std::pow(population, tau_) * kernel_[from_location][destination];
 
       // Adjust the probability by the friction surface
       probability =
-          probability / (1 + travel[from_location] + travel[destination]);
+          probability / (1 + travel_[from_location] + travel_[destination]);
 
       // If the source and the destination are both in the capital district,
       // penalize the travel by 50%
       if (source_district == capital_
-          && SpatialData::get_instance().get_raster_district(destination)
+          && SpatialData::get_instance().get_district(destination)
                  == capital_) {
         probability /= penalty_;
       }

@@ -20,9 +20,8 @@ void ReceiveMDATherapyEvent::schedule_event(Scheduler* scheduler, Person* p,
     e->dispatcher = p;
     e->set_received_therapy(therapy);
     e->time = time;
-
-    p->add_dispatcher(e);
-    scheduler->schedule_individual_event(e);
+    p->add_event(e);
+    //scheduler->schedule_individual_event(e);
   }
 }
 

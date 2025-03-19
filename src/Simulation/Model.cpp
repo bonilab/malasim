@@ -5,7 +5,6 @@
 #include <Population/Population.h>
 #include <Utils/Random.h>
 
-#include "Configuration/Config.h"  // Assuming Config is defined here
 #include "Utils/Helpers/ObjectHelpers.h"
 #include "MDC/ModelDataCollector.h"
 #include "Mosquito/Mosquito.h"
@@ -14,7 +13,6 @@
 #include "Reporters/Reporter.h"
 #include "Treatment/SteadyTCM.h"
 #include "Utils/Cli.hxx"
-#include "Validation/MovementValidation.h"
 
 // Private constructor: creates the Config instance
 Model::Model(const int &object_pool_size){
@@ -129,24 +127,6 @@ bool Model::initialize() {
             Reporter::MakeReport(Reporter::ReportType::MOVEMENT_REPORTER);
         add_reporter(reporter);
         reporter->initialize(utils::Cli::get_instance().get_job_number(), utils::Cli::get_instance().get_output_path());
-
-        // Get the validator and prepare it for the run
-        auto &validator = MovementValidation::get_instance();
-        validator.set_reporter((MovementReporter*)reporter);
-
-        // Set the flags on the validator
-        if (utils::Cli::get_instance().get_record_individual_movement()) {
-          spdlog::info("Tracking of individual movement enabled.");
-          validator.set_individual_movement(utils::Cli::get_instance().get_record_individual_movement());
-        }
-        if (utils::Cli::get_instance().get_record_cell_movement()) {
-          spdlog::info("Tracking of cell movement enabled.");
-          validator.set_cell_movement(utils::Cli::get_instance().get_record_cell_movement());
-        }
-        if (utils::Cli::get_instance().get_record_district_movement()) {
-          spdlog::info("Tracking of district movement enabled.");
-          validator.set_district_movement(utils::Cli::get_instance().get_record_district_movement());
-        }
       }
       is_initialized_ = true;
     }
@@ -316,6 +296,28 @@ IStrategy* Model::get_treatment_strategy() {
 ITreatmentCoverageModel* Model::get_treatment_coverage() {
   return get_instance().treatment_coverage_;
 }
+
+int Model::number_of_locations() const {
+  return config_->get_spatial_settings().get_number_of_locations();
+}
+
+int Model::number_of_age_classes() const {
+  return config_->get_population_demographic().get_number_of_age_classes();
+}
+
+int Model::get_number_of_tracking_days() const {
+  return config_->get_epidemiological_parameters().get_number_of_tracking_days();
+}
+
+std::vector<Spatial::Location>& Model::location_db() {
+  return config_->get_spatial_settings().location_db;
+}
+
+std::vector<IStrategy *>& Model::strategy_db() {
+  return config_->get_strategy_parameters().strategy_db;
+}
+
+
 
 
 

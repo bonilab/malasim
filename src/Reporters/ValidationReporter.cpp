@@ -96,65 +96,65 @@ void ValidationReporter::monthly_report() {
     ss << group_sep;//9 - index 0
     print_EIR_PfPR_by_location(ss);//11
     ss << group_sep;//15
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->monthly_number_of_new_infections_by_location()[loc] << sep;
         ss << group_sep;//17
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->monthly_number_of_treatment_by_location()[loc] << sep; //Incidence
         ss << group_sep;//19
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->monthly_number_of_clinical_episode_by_location()[loc] << sep;
         ss << group_sep;///21
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         for(auto moi : Model::get_mdc()->multiple_of_infection_by_location()[loc]){
             ss << moi << sep;
         }
         ss << group_sep;///32
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         for (auto ac = 0ul; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++){
             ss << Model::get_mdc()->blood_slide_prevalence_by_location_age_group()[loc][ac] << sep;
         }
         ss << group_sep;//48
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         for (int age = 0; age < 80; age++){
             ss << Model::get_mdc()->blood_slide_prevalence_by_location_age()[loc][age] << sep;
         }
         ss << group_sep;///129
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->current_TF_by_location()[loc] << sep;
     }
     ss << group_sep;//131
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->monthly_number_of_mutation_events_by_location()[loc] << sep;
         ss << group_sep;//133
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         for (auto ac = 0ul; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++){
             ss << Model::get_mdc()->number_of_treatments_by_location_age_year()[loc][ac] << sep;
         }
         ss << group_sep;//149
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->total_number_of_bites_by_location()[loc] << sep;
     }
     ss << group_sep;//151
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->total_number_of_bites_by_location_year()[loc] << sep;
         ss << group_sep;//153
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->today_number_of_treatments_by_location()[loc] << sep;
         ss << group_sep;//155
     }
     ss << Model::get_mdc()->current_number_of_mutation_events_in_this_year() << sep;
     ss << group_sep;//157
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         if ((Model::get_mdc()->popsize_by_location_hoststate()[loc][Person::ASYMPTOMATIC] + Model::get_mdc()->popsize_by_location_hoststate()[loc][Person::CLINICAL]) == 0){
             ss << 0 << sep;
         }
@@ -164,19 +164,19 @@ void ValidationReporter::monthly_report() {
         }
         ss << group_sep;//159
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         for (auto age = 0; age < 80; age++){
             ss << Model::get_mdc()->popsize_by_location_age()[loc][age] << sep;
         }
         ss << group_sep;//240
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         for (auto age = 0; age < 80; age++){
             ss << Model::get_mdc()->monthly_number_of_clinical_episode_by_location_age()[loc][age] << sep;
         }
         ss << group_sep;//321
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         for (auto ac = 0; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++){
             int all_infected_pop = Model::get_mdc()->popsize_by_location_hoststate_age_class()[loc][Person::ASYMPTOMATIC][ac]
                                  + Model::get_mdc()->popsize_by_location_hoststate_age_class()[loc][Person::CLINICAL][ac];
@@ -189,11 +189,11 @@ void ValidationReporter::monthly_report() {
         }
         ss << group_sep;//337
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->total_immune_by_location()[loc] / Model::get_population()->size_at(loc) << sep;
         ss << group_sep;//339
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         int all_infected_pop = Model::get_mdc()->popsize_by_location_hoststate()[loc][Person::ASYMPTOMATIC]
                                + Model::get_mdc()->popsize_by_location_hoststate()[loc][Person::CLINICAL];
         if (all_infected_pop == 0){
@@ -204,7 +204,7 @@ void ValidationReporter::monthly_report() {
         }
         ss << group_sep;//341
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->cumulative_NTF_by_location()[loc] << sep;
         ss << group_sep;//343
     }
@@ -212,7 +212,7 @@ void ValidationReporter::monthly_report() {
         ss << tf_by_therapy << sep;
     }
     ss << group_sep;//358
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->monthly_number_of_TF_by_location()[loc] << sep;
         ss << group_sep;//360
     }
@@ -224,37 +224,37 @@ void ValidationReporter::monthly_report() {
         ss << nTreaments << sep << nSuccess << sep << nFail << sep << pSuccess << sep;
     }
     ss << group_sep;//417
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->cumulative_number_treatments_by_location()[loc] << sep;
         ss << group_sep;//419
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->cumulative_TF_by_location()[loc] << sep;
         ss << group_sep;//421
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
         ss << group_sep;//423
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         for (int age = 0; age < 80; age++){
             ss << Model::get_mdc()->number_of_untreated_cases_by_location_age_year()[loc][age] << sep;
         }
         ss << group_sep;///504
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         for (int age = 0; age < 80; age++){
             ss << Model::get_mdc()->number_of_deaths_by_location_age_year()[loc][age] << sep;
         }
         ss << group_sep;///585
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         for (int age = 0; age < 80; age++){
             ss << Model::get_mdc()->number_of_malaria_deaths_treated_by_location_age_year()[loc][age] << sep;
         }
         ss << group_sep;///666
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         for (int age = 0; age < 80; age++){
             ss << Model::get_mdc()->number_of_malaria_deaths_non_treated_by_location_age_year()[loc][age] << sep;
         }
@@ -274,7 +274,7 @@ void ValidationReporter::monthly_report() {
 
     ss.str("");
     int sum = 0;
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         sum += Model::get_mdc()->mutation_tracker[loc].size();
         for (int i = 0; i < Model::get_mdc()->mutation_tracker[loc].size(); i++) {
             ss << std::get<0>(Model::get_mdc()->mutation_tracker[loc][i]) << sep;
@@ -287,14 +287,14 @@ void ValidationReporter::monthly_report() {
     }
     if(sum > 0){
         monthly_mutation_logger->info(ss.str());
-        for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+        for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
             Model::get_mdc()->mutation_tracker[loc].clear();
         }
     }
 
     ss.str("");
     sum = 0;
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         sum += Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].size();
         for (int i = 0; i < Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].size(); i++) {
             ss << std::get<0>(Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc][i]) << sep;
@@ -305,7 +305,7 @@ void ValidationReporter::monthly_report() {
     }
     if(sum > 0){
         mosquito_res_count_logger->info(ss.str());
-        for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+        for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
             Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].clear();
         }
     }
@@ -315,9 +315,9 @@ void ValidationReporter::after_run() {
     std::stringstream ss;
 
     ss.str("");
-    ss << Model::get_random()->get_seed() << sep << Model::get_config()->get_spatial_settings().get_number_of_locations() << sep;
-    ss << Model::get_config()->get_spatial_settings().location_db[0].beta << sep;
-    ss << Model::get_config()->get_spatial_settings().location_db[0].population_size << sep;
+    ss << Model::get_random()->get_seed() << sep << Model::get_instance().number_of_locations() << sep;
+    ss << Model::get_instance().location_db()[0].beta << sep;
+    ss << Model::get_instance().location_db()[0].population_size << sep;
     print_EIR_PfPR_by_location(ss);
     ss << group_sep;//9
     // output last strategy information
@@ -328,23 +328,23 @@ void ValidationReporter::after_run() {
                                      / static_cast<double>(Constants::DAYS_IN_YEAR);
     auto sum_ntf = 0.0;
     ul pop_size = 0;
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         sum_ntf += Model::get_mdc()->cumulative_NTF_by_location()[loc];
         pop_size += Model::get_mdc()->popsize_by_location()[loc];
     }
     ss << (sum_ntf * 100 / pop_size) / total_time_in_years << sep;
     ss << group_sep;//12
-    for (int loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (int loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
 //        std::cout << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << "\t";
         ss << group_sep;//14
     }
-    for (int loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (int loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->percentage_bites_on_top_20_by_location()[loc] * 100 << "%"  << sep;
 //        std::cout << Model::get_mdc()->percentage_bites_on_top_20_by_location()[loc] * 100 << "%" << "\t";
         ss << group_sep;//16
     }
-    for (int loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (int loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         double location_NTF = Model::get_mdc()->cumulative_NTF_by_location()[loc] * 100 /
                               (double) Model::get_mdc()->popsize_by_location()[loc];
         location_NTF /= total_time_in_years;
@@ -352,26 +352,26 @@ void ValidationReporter::after_run() {
 //        std::cout << location_NTF << "\t";
         ss << group_sep;//18
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++)
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++)
     {
         for (auto age = 0; age < 80; age++){
             ss << Model::get_mdc()->cumulative_clinical_episodes_by_location_age()[loc][age]/total_time_in_years/Model::get_mdc()->popsize_by_location_age()[loc][age] << sep;
         }
         ss << group_sep;//99
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->cumulative_number_treatments_by_location()[loc] << sep;
         ss << group_sep;//101
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->cumulative_TF_by_location()[loc] << sep;
         ss << group_sep;//103
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
         ss << group_sep;//105
     }
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
         ss << Model::get_mdc()->mosquito_recombination_events_count()[loc][0] << sep;
         ss << Model::get_mdc()->mosquito_recombination_events_count()[loc][1] << sep;
         ss << group_sep;//107
@@ -420,13 +420,15 @@ void ValidationReporter::after_run() {
 }
 
 void ValidationReporter::print_EIR_PfPR_by_location(std::stringstream& ss) {
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); ++loc) {
         //
         // EIR
         if (Model::get_mdc()->EIR_by_location_year()[loc].empty()) {
             ss << 0 << sep;
+            // spdlog::info("print_EIR_PfPR_by_location {}: EIR_by_location_year is empty", loc);
         } else {
             ss << Model::get_mdc()->EIR_by_location_year()[loc].back() << sep;
+            // spdlog::info("print_EIR_PfPR_by_location {}: EIR_by_location_year {:.8f}", loc, Model::get_mdc()->EIR_by_location_year()[loc].back());
         }
         ss << group_sep;//11
         // pfpr <5 , 2-10 and all

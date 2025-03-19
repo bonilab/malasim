@@ -22,10 +22,10 @@ public:
           "days_between_stdout_output must be greater than 0");
     days_between_stdout_output_ = value;
   }
-  [[nodiscard]] int get_initial_seed_number() const {
+  [[nodiscard]] long get_initial_seed_number() const {
     return initial_seed_number_;
   }
-  void set_initial_seed_number(int value) {
+  void set_initial_seed_number(long value) {
     if (value < 0) {
       spdlog::info("Using random seed number");
     }
@@ -43,7 +43,7 @@ public:
 
 private:
   int days_between_stdout_output_;
-  int initial_seed_number_;
+  long initial_seed_number_;
   bool record_genome_db_;
 };
 
@@ -71,7 +71,7 @@ struct convert<ModelSettings> {
 
     rhs.set_days_between_stdout_output(
         node["days_between_stdout_output"].as<int>());
-    rhs.set_initial_seed_number(node["initial_seed_number"].as<int>());
+    rhs.set_initial_seed_number(node["initial_seed_number"].as<long>());
     rhs.set_record_genome_db(node["record_genome_db"].as<bool>());
     return true;
   }

@@ -22,7 +22,7 @@ std::vector<int> get_locations_from_raster(const std::string &filename) {
   auto* file = AscFileManager::read(filename);
 
   // Note the number of locations so that we can provide some error checking
-  auto count = Model::get_config()->get_spatial_settings().get_number_of_locations();
+  auto count = Model::get_instance().number_of_locations();
 
   // Iterate through the raster and note the valid locations
   std::vector<int> locations;
@@ -100,7 +100,7 @@ std::vector<Event*> PopulationEventBuilder::build_introduce_mutant_event(
         throw std::invalid_argument(
             "Target district must be greater than or equal to zero");
       }
-      if (district > SpatialData::get_instance().get_district_count()) {
+      if (district > SpatialData::get_instance().district_count) {
         spdlog::error("Target district is greater than the district count.");
         throw std::invalid_argument(
             "Target district greater than district count.");

@@ -27,10 +27,9 @@ namespace utils {
  */
 class Random {
 public:
-  gsl_rng *G_RNG;
   // Delete copy constructor and copy assignment operator
   Random(const Random &) = delete;
-  void operator=(const Random &) = delete;
+  Random &operator=(const Random &) = delete;
 
   // Delete move constructor and move assignment operator
   Random(Random &&) = delete;
@@ -322,62 +321,6 @@ public:
   unsigned int random_binomial(double probability, unsigned int trials);
 
   /**
-   * @brief Generates a random double in the range [from, to).
-   * @param from The lower bound of the range.
-   * @param to The upper bound of the range.
-   * @return A random double in the range [from, to).
-   */
-  double random_uniform_double(const double &from, const double &to);
-
-  /**
-    * @brief Generates a random integer in the range [from, to).
-    * @param from The lower bound of the range.
-    * @param to The upper bound of the range.
-    * @return A random integer in the range [from, to).
-   */
-  unsigned long random_uniform_int(const unsigned long &from, const unsigned long &to);
-
-  /**
-   *
-   * @param mean 
-   * @param sd
-   * @return
-   */
-  double random_normal(const double &mean, const double &sd);
-
-  /**
-   * 
-   * @param mean 
-   * @param sd 
-   * @return 
-   */
-  double random_normal_truncated(const double &mean, const double &sd);
-
-  /**
-   * 
-   * @param mean 
-   * @param sd 
-   * @return 
-   */
-  int random_normal(const int &mean, const int &sd);
-
-  /**
-   * 
-   * @param mean 
-   * @param sd 
-   * @return 
-   */
-  int random_normal_truncated(const int &mean, const int &sd);
-
-  /**
-   * 
-   * @param base 
-   * @param base_length 
-   * @param size_of_type 
-   */
-  void random_shuffle(void *base, size_t base_length, size_t size_of_type);
-
-  /**
    * @brief Shuffles the elements of a vector in place using the current random
    *number generator.
    *
@@ -512,7 +455,7 @@ std::vector<T *> utils::Random::multinomial_sampling(int size, std::vector<doubl
     }
   }
   if (is_shuffled) {
-    random_shuffle(&samples[0], samples.size(), sizeof(T *));
+    shuffle(samples);
   }
   return samples;
 }
@@ -563,7 +506,7 @@ std::vector<T *> utils::Random::roulette_sampling(int number_of_samples, std::ve
   }
 
   if (is_shuffled) {
-    random_shuffle(&samples[0], samples.size(), sizeof(T *));
+    shuffle(samples);
   }
   return samples;
 }
@@ -611,7 +554,7 @@ std::vector<std::tuple<T *, double>> utils::Random::roulette_sampling_tuple(int 
   }
 
   if (is_shuffled) {
-    random_shuffle(&samples[0], samples.size(), sizeof(T *));
+    shuffle(samples);
   }
   return samples;
 }

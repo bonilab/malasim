@@ -68,11 +68,11 @@ void TACTReporter::before_run() {
 void TACTReporter::monthly_report() {
   ss << Model::get_scheduler()->current_time() << sep;
 
-  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
+  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); ++loc) {
     ss << Model::get_mdc()->blood_slide_prevalence_by_location()[loc] * 100 << sep;
   }
 
-  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
+  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); ++loc) {
     ss << Model::get_mdc()->monthly_number_of_mutation_events_by_location()[loc] << sep;
     ss << Model::get_mdc()->monthly_number_of_treatment_by_location()[loc] << sep;
     ss << Model::get_mdc()->monthly_number_of_TF_by_location()[loc] << sep;
@@ -101,8 +101,8 @@ void TACTReporter::monthly_report() {
 
 void TACTReporter::after_run() {
   ss.str("");
-  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); ++loc) {
-    ss << Model::get_config()->get_spatial_settings().location_db[loc].beta << sep;
+  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); ++loc) {
+    ss << Model::get_instance().location_db()[loc].beta << sep;
     if (Model::get_mdc()->EIR_by_location_year()[loc].empty()) {
       ss << 0 << sep;
     } else {

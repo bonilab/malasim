@@ -21,9 +21,8 @@ void MatureGametocyteEvent::schedule_event(
     e->dispatcher = p;
     e->set_blood_parasite(blood_parasite);
     e->time = time;
-
-    p->add_dispatcher(e);
-    scheduler->schedule_individual_event(e);
+    p->add_event(e);
+    //scheduler->schedule_individual_event(e);
     // spdlog::info("Mature gametocyte event scheduled {}", e->get_id());
   }
 }

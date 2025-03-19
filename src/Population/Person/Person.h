@@ -57,7 +57,7 @@ public:
   };
 
   // Priority queue of Event
-  // std::priority_queue<Event*, std::vector<Event*>, EventComparator> event_queue;
+  std::priority_queue<Event*, std::vector<Event*>, EventComparator> event_queue;
 
   Person();
 
@@ -98,23 +98,21 @@ public:
     void initialize();
 
     // // Method to run events before a certain time
-    // void execute_events(int time);
+    void execute_events(int time);
 
-    // // Method to add an event
-    // void add_event(Event* event);
-    //
-    // // Method to remove an event
-    // void remove_event(Event* event);
+    // Method to add an event
+    void add_event(Event* event);
+
+    // Method to remove an event
+    void remove_event(Event* event);
 
     void increase_age_by_1_year();
 
     [[nodiscard]] uuids::uuid get_id_raw() const { return id_; }
     [[nodiscard]] std::string get_id() const { return to_string(id_).substr(to_string(id_).length()-8, 8); }
 
-    //Old update method
     void update();
-    //new update method
-    void update(int time);
+    void update_events(int time);
     
     Population* get_population() const { return population_; }
     void set_population(Population* population) { population_ = population; }
@@ -300,6 +298,8 @@ public:
   void receive_therapy(SCTherapy* sc_therapy, bool is_mac_therapy);
 
   int complied_dosing_days(const SCTherapy* therapy);
+
+  double age_in_floating() const;
 
   void schedule_update_every_K_days_event(const int &time);
   // Check to see if the indicated event has been defined for the individual.

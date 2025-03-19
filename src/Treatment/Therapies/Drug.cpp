@@ -38,19 +38,19 @@ double Drug::get_current_drug_concentration(int currentTime) {
   if (days <= dosing_days_) {
     if (drug_type()->id() == 0) {
       // drug is artemisinin
-      const auto starting_value_temp_ = Model::get_random()->random_uniform_double(-0.2, 0.2);
+      const auto starting_value_temp_ = Model::get_random()->random_uniform<double>(-0.2, 0.2);
 
       // std::cout << "days: " << days << " start: " << starting_value_ << " uniform: " << starting_value_temp_ << " = " << starting_value_ + starting_value_temp_ << std::endl;
       return starting_value_ + starting_value_temp_;
       //       return  Model::get_random()->random_normal(starting_value_, Model::CONFIG->as_iov());
 
-      // starting_value_ += Model::get_random()->random_uniform_double(0, 0.2);
+      // starting_value_ += Model::get_random()->random_uniform<double>(0, 0.2);
       // return starting_value_;
       //            return starting_value_;
     }
 
-    starting_value_ += days >= 1 ? Model::get_random()->random_uniform_double(0, 0.1) : 0;
-    //        return starting_value_ + Model::get_random()->random_uniform_double(-0.1, 0.1);
+    starting_value_ += days >= 1 ? Model::get_random()->random_uniform<double>(0, 0.1) : 0;
+    //        return starting_value_ + Model::get_random()->random_uniform<double>(-0.1, 0.1);
     return starting_value_;
   }
   else

@@ -106,6 +106,10 @@ public:
     return rapt_settings_;
   }
 
+  int get_number_of_locations() const {
+    return spatial_settings_.get_number_of_locations();
+  }
+
 private:
   // Template method for getting a field
   template <typename T>

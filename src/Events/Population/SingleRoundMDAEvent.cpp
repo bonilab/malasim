@@ -20,7 +20,7 @@ void SingleRoundMDAEvent::execute() {
     StringHelpers::date_as_string(date::year_month_day{scheduler->calendar_date}));
 
   // for all location
-  for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
     // step 1: get number of individuals for MDA
     auto pi_lsa = Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
     std::vector<Person *> all_persons_in_location;

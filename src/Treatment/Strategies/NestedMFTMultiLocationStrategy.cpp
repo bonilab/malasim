@@ -59,7 +59,7 @@ void NestedMFTMultiLocationStrategy::update_end_of_time_step() {
 void NestedMFTMultiLocationStrategy::adjust_distribution(const int& time) {
   if (peak_after == -1) {
     // inflation every year
-    for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
       const auto d_act = distribution[loc][0] * (1 + Model::get_config()->get_epidemiological_parameters().get_inflation_factor() / 12);
       distribution[loc][0] = d_act;
       const auto other_d = (1 - d_act) / (distribution[loc].size() - 1);
@@ -71,7 +71,7 @@ void NestedMFTMultiLocationStrategy::adjust_distribution(const int& time) {
     // increasing linearly
     if (time <= starting_time + peak_after) {
       if (distribution[0][0] < 1) {
-        for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+        for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
           for (auto i = 0; i < distribution[loc].size(); i++) {
 
             auto dist = peak_after == 0 ? peak_distribution[loc][i] :
@@ -101,7 +101,7 @@ void NestedMFTMultiLocationStrategy::monthly_update() {
     strategy->monthly_update();
   }
 
-  // for (auto loc = 0; loc < Model::get_config()->get_spatial_settings().get_number_of_locations(); loc++) {
+  // for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
   //   std::cout << distribution[loc] << std::endl;
   // }
 

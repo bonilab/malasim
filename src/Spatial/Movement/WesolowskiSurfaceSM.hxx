@@ -29,7 +29,7 @@ class WesolowskiSurfaceSM : public SpatialModel {
   double gamma_;
   int number_of_locations_;
   // Travel surface, computed when the prepare method is called
-  double* travel = nullptr;
+  std::vector<double> travel;
 
 public:
   [[nodiscard]] double get_kappa() const { return kappa_; }
@@ -49,12 +49,20 @@ public:
 
   ~WesolowskiSurfaceSM() override = default;
 
-  void prepare() override { travel = prepare_surface(SpatialData::Travel, number_of_locations_); }
+  void prepare() override {
+    AscFile* travel_raster = SpatialData::get_instance().get_raster(SpatialData::SpatialFileType::Travel);
+    travel = std::move(prepare_surface(travel_raster, number_of_locations_));
+  }
 
   [[nodiscard]] DoubleVector get_v_relative_out_movement_to_destination(
       const int &from_location, const int &number_of_locations,
       const DoubleVector &relative_distance_vector,
       const IntVector &v_number_of_residents_by_location) const override {
+    // Check if travel surface is prepared
+    if (travel.empty()) {
+      throw std::runtime_error(fmt::format(
+          "{} called without travel surface prepared", __FUNCTION__));
+    }
     std::vector<double> results(number_of_locations, 0);
     for (int destination = 0; destination < number_of_locations;
          destination++) {

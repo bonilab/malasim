@@ -16,7 +16,7 @@
 void SQLiteDistrictReporter::initialize(int job_number, const std::string &path) {
   // Inform the user of the reporter type and make sure there are districts
   spdlog::info("Using SQLiteDbReporter with aggregation at the district level.");
-  if (!SpatialData::get_instance().has_raster(SpatialData::Districts)) {
+  if (SpatialData::get_instance().district_count == 0) {
     spdlog::error("District raster must be present when aggregating data at "
                   "the district level.");
     throw std::invalid_argument("No district raster present");
@@ -26,14 +26,12 @@ void SQLiteDistrictReporter::initialize(int job_number, const std::string &path)
 }
 
 void SQLiteDistrictReporter::count_infections_for_location(int location) {
-  std::vector<int> districtLookup = SpatialData::get_instance().
-      get_district_lookup();
   auto &ageClasses = Model::get_config()->get_population_demographic().get_age_structure();
   auto* index =
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 
   // Calculate the correct index and update the count
-  auto district = districtLookup[location];
+  auto district = SpatialData::get_instance().get_district(location);
 
   for (auto hs = 0; hs < Person::NUMBER_OF_STATE - 1; hs++) {
     for (unsigned int ac = 0; ac < ageClasses.size(); ac++) {
@@ -50,9 +48,7 @@ void SQLiteDistrictReporter::count_infections_for_location(int location) {
 }
 
 void SQLiteDistrictReporter::collect_site_data_for_location(int location) {
-  std::vector<int> districtLookup = SpatialData::get_instance().
-      get_district_lookup();
-  auto district = districtLookup[location];
+  auto district = SpatialData::get_instance().get_district(location);
   auto &ageClasses = Model::get_config()->get_population_demographic().get_age_structure();
 
   count_infections_for_location(location);
@@ -105,7 +101,8 @@ void SQLiteDistrictReporter::collect_site_data_for_location(int location) {
             ? 0
             : Model::get_mdc()->EIR_by_location_year()[location]
                   .back();
-    // spdlog::info("collect_site_data_for_location eirLocation: district {} {} += {} x  {}", district,monthly_site_data.eir[district],eirLocation,locationPopulation);
+    // spdlog::info("collect_site_data_for_location eirLocation: district {} {} += {} x {}",
+    //   district,monthly_site_data.eir[district],eirLocation,locationPopulation);
     monthly_site_data.eir[district] += (eirLocation * locationPopulation);
     monthly_site_data.pfpr_under5[district] +=
         (Model::get_mdc()->get_blood_slide_prevalence(location, 0, 5)
@@ -121,11 +118,12 @@ void SQLiteDistrictReporter::collect_site_data_for_location(int location) {
 }
 
 void SQLiteDistrictReporter::calculate_and_build_up_site_data_insert_values(
-    int monthId) {
-  auto numDistricts = SpatialData::get_instance().get_district_count();
+int monthId) {
+  auto min_district_id = SpatialData::get_instance().min_district_id;
+  auto max_district_id = SpatialData::get_instance().max_district_id;
   insert_values.clear();
 
-  for (auto district = 0; district < numDistricts; district++) {
+  for (auto district = min_district_id; district < max_district_id; district++) {
     double calculatedEir = monthly_site_data.population[district] == 0
                             ? 0 : (monthly_site_data.eir[district] != 0)
                                ? (monthly_site_data.eir[district]
@@ -182,13 +180,13 @@ void SQLiteDistrictReporter::calculate_and_build_up_site_data_insert_values(
 // database
 void SQLiteDistrictReporter::monthly_report_site_data(int monthId) {
   TransactionGuard transaction{db.get()};
-  auto numDistricts = SpatialData::get_instance().get_district_count() + 1;
+  auto numDistricts = SpatialData::get_instance().max_district_id + 1;
   auto &ageClasses = Model::get_config()->get_population_demographic().get_age_structure();
 
   // Prepare the data structures
   reset_site_data_structures(numDistricts, ageClasses.size());
 
-  for (auto location = 0; location < Model::get_config()->get_spatial_settings().get_number_of_locations();
+  for (auto location = 0; location < Model::get_instance().number_of_locations();
        location++) {
     // If the population is zero, press on
     auto locationPopulation =
@@ -196,7 +194,7 @@ void SQLiteDistrictReporter::monthly_report_site_data(int monthId) {
     if (locationPopulation == 0) { continue; }
        }
   // Collect the data
-  for (auto location = 0; location < Model::get_config()->get_spatial_settings().get_number_of_locations();
+  for (auto location = 0; location < Model::get_instance().number_of_locations();
        location++) {
     // If the population is zero, press on
     auto locationPopulation =
@@ -212,8 +210,7 @@ void SQLiteDistrictReporter::monthly_report_site_data(int monthId) {
 }
 
 void SQLiteDistrictReporter::collect_genome_data_for_location(size_t location) {
-  const auto &districtLookup = SpatialData::get_instance().get_district_lookup();
-  const auto district = districtLookup[location];
+  const auto district = SpatialData::get_instance().get_district(location);
   auto* index =
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
   auto ageClasses = index->vPerson()[0][0].size();
@@ -302,13 +299,14 @@ void SQLiteDistrictReporter::collect_genome_data_for_a_person(Person* person,
 
 void SQLiteDistrictReporter::build_up_genome_data_insert_values(int monthId) {
   auto numGenotypes = Model::get_config()->get_genotype_parameters().genotype_db->size();
-  auto numDistricts = SpatialData::get_instance().get_district_count();
+  auto min_district_id = SpatialData::get_instance().min_district_id;
+  auto max_district_id = SpatialData::get_instance().max_district_id;
 
   insert_values.clear();
   // Iterate over the districts and append the query
   std::string insertGenotypes;
   std::string updateInfections;
-  for (auto district = 0; district < numDistricts; district++) {
+  for (auto district = min_district_id; district < max_district_id; district++) {
     if (monthly_site_data.infections_by_district[district] == 0) { continue; }
 
     for (auto genotype = 0; genotype < numGenotypes; genotype++) {
@@ -335,7 +333,7 @@ void SQLiteDistrictReporter::monthly_report_genome_data(int monthId) {
 
   // Cache some values
   auto numGenotypes = Model::get_config()->get_genotype_parameters().genotype_db->size();
-  auto numDistricts = SpatialData::get_instance().get_district_count();
+  auto numDistricts = SpatialData::get_instance().max_district_id + 1;
   auto* index =
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 

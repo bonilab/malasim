@@ -23,9 +23,8 @@ void CirculateToTargetLocationNextDayEvent::schedule_event(
     e->dispatcher = p;
     e->set_target_location(target_location);
     e->time = time;
-
-    p->add_dispatcher(e);
-    scheduler->schedule_individual_event(e);
+    p->add_event(e);
+    //scheduler->schedule_individual_event(e);
   }
 }
 

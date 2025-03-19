@@ -17,9 +17,8 @@ void UpdateEveryKDaysEvent::schedule_event(Scheduler* scheduler, Person* p,
     auto* e = new UpdateEveryKDaysEvent();
     e->dispatcher = p;
     e->time = time;
-
-    p->add_dispatcher(e);
-    scheduler->schedule_individual_event(e);
+    p->add_event(e);
+    //scheduler->schedule_individual_event(e);
   }
 }
 

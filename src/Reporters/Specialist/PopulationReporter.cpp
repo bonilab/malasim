@@ -55,7 +55,7 @@ void PopulationReporter::monthly_report() {
 
   // Calculate the summary data
   for (std::size_t location = 0;
-       location < Model::get_config()->get_spatial_settings().get_number_of_locations(); location++) {
+       location < Model::get_instance().number_of_locations(); location++) {
     population += Model::get_population()->size_at(location);
     births += Model::get_mdc()->births_by_location()[location];
     deaths += Model::get_mdc()->deaths_by_location()[location];
