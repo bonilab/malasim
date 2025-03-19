@@ -3,8 +3,11 @@
 #include <vector>
 #include <iostream>
 #include "date/date.h"
-#include "Utils/YamlFile.h"
+#include "Utils/YamlFile.hxx"
 #include <stdexcept>
+#include "Events/Environment/EnvironmentEventBuilder.h"
+#include "Events/Population/PopulationEventBuilder.h"
+#include <spdlog/spdlog.h>
 
 class PopulationEvents {
 public:
@@ -14,13 +17,8 @@ public:
         // Getters and Setters
         [[nodiscard]] const date::year_month_day& get_date() const { return date_; }
         void set_date(const date::year_month_day& value) { date_ = value; }
-
-        [[nodiscard]] int get_location_id() const { return location_id_; }
-        void set_location_id(int value) { location_id_ = value; }
-
     private:
         date::year_month_day date_;
-        int location_id_ = -1;
     };
 
     // Inner class: PopulationEvent
@@ -39,11 +37,15 @@ public:
     };
 
     // Getters and Setters for PopulationEvents
-    [[nodiscard]] const std::vector<PopulationEvent>& get_events() const { return events_; }
-    void set_events(const std::vector<PopulationEvent>& value) { events_ = value; }
+    [[nodiscard]] const std::vector<PopulationEvent>& get_events_raw() const { return events_raw_; }
+    void set_events_raw(const std::vector<PopulationEvent>& value) { events_raw_ = value; }
+
+    [[nodiscard]] const std::vector<Event*>& get_events() { return events_; }
+    void set_events(const std::vector<Event*>& value) { events_ = value; }
 
 private:
-    std::vector<PopulationEvent> events_;  // Changed from std::map to std::vector
+    std::vector<PopulationEvent> events_raw_;
+    std::vector<Event*> events_;
 };
 
 // Conversion functions inside namespace YAML
@@ -54,21 +56,14 @@ struct convert<PopulationEvents::EventInfo> {
     static Node encode(const PopulationEvents::EventInfo& rhs) {
         Node node;
         node["date"] = rhs.get_date();
-        node["location_id"] = rhs.get_location_id();
         return node;
     }
 
     static bool decode(const Node& node, PopulationEvents::EventInfo& rhs) {
-        if (!node["date"]) {
-            throw std::runtime_error("Missing 'date' field in EventInfo.");
-        }
-        if (!node["location_id"]) {
-            throw std::runtime_error("Missing 'location_id' field in EventInfo.");
-        }
-
+      if (node["date"]) {
         rhs.set_date(node["date"].as<date::year_month_day>());
-        rhs.set_location_id(node["location_id"].as<int>());
-        return true;
+      }
+      return true;
     }
 };
 
@@ -99,19 +94,36 @@ template <>
 struct convert<PopulationEvents> {
     static Node encode(const PopulationEvents& rhs) {
         Node node;
-        for (const auto& event : rhs.get_events()) {
+        for (const auto& event : rhs.get_events_raw()) {
             node["population_events"].push_back(event);  // Push each event into the list
         }
         return node;
     }
     static bool decode(const YAML::Node& node, PopulationEvents& rhs) {
-        std::vector<PopulationEvents::PopulationEvent> events;
-        for (const auto &eventNode : node["population_events"]) {
+        spdlog::info("Decoding PopulationEvents");
+        std::vector<PopulationEvents::PopulationEvent> events_raw;
+        std::vector<Event*> events;
+        for (const auto &eventNode : node) {
             PopulationEvents::PopulationEvent event;
             convert<PopulationEvents::PopulationEvent>::decode(eventNode, event);
-            events.push_back(event);
+            events_raw.push_back(event);
+            spdlog::info("Parsing event: {}", eventNode["name"].as<std::string>());
+            // Attempt to add a population event
+            auto built_events = PopulationEventBuilder::build(eventNode);
+            if (!built_events.empty()) {
+              events.insert(events.end(), built_events.begin(), built_events.end());
+              continue;
+            }
+
+            // Attempt to add an enviornment event
+            built_events = EnvironmentEventBuilder::build(eventNode);
+            if (!built_events.empty()) {
+              events.insert(events.end(), built_events.begin(), built_events.end());
+            }
         }
+        rhs.set_events_raw(events_raw);
         rhs.set_events(events);
+
         return true;
     }
 };

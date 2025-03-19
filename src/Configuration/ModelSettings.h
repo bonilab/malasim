@@ -4,10 +4,12 @@
 #include <yaml-cpp/yaml.h>
 #include <stdexcept>
 #include <spdlog/spdlog.h>
-#include "Utils/YamlFile.h"
+
+#include "IConfigData.h"
+#include "Utils/YamlFile.hxx"
 #include "Utils/Random.h"
 
-class ModelSettings {
+class ModelSettings : public IConfigData {
 public:
   // Getters
   [[nodiscard]] int get_days_between_stdout_output() const {
@@ -20,10 +22,10 @@ public:
           "days_between_stdout_output must be greater than 0");
     days_between_stdout_output_ = value;
   }
-  [[nodiscard]] int get_initial_seed_number() const {
+  [[nodiscard]] long get_initial_seed_number() const {
     return initial_seed_number_;
   }
-  void set_initial_seed_number(int value) {
+  void set_initial_seed_number(long value) {
     if (value < 0) {
       spdlog::info("Using random seed number");
     }
@@ -35,9 +37,13 @@ public:
   [[nodiscard]] bool get_record_genome_db() const { return record_genome_db_; }
   void set_record_genome_db(bool value) { record_genome_db_ = value; }
 
+  void process_config() override {
+    spdlog::info("Processing ModelSettings");
+  }
+
 private:
   int days_between_stdout_output_;
-  int initial_seed_number_;
+  long initial_seed_number_;
   bool record_genome_db_;
 };
 
@@ -65,7 +71,7 @@ struct convert<ModelSettings> {
 
     rhs.set_days_between_stdout_output(
         node["days_between_stdout_output"].as<int>());
-    rhs.set_initial_seed_number(node["initial_seed_number"].as<int>());
+    rhs.set_initial_seed_number(node["initial_seed_number"].as<long>());
     rhs.set_record_genome_db(node["record_genome_db"].as<bool>());
     return true;
   }

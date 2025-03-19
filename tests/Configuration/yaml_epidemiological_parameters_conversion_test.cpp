@@ -12,10 +12,15 @@ protected:
         gamma.set_mean(5.0);
         gamma.set_sd(1.5);
 
+        // Initialize ExponentialDistribution
+        EpidemiologicalParameters::BitingLevelDistributionExponential exponential;
+        exponential.set_scale(2.5);
+
         // Initialize BitingLevelDistribution
         EpidemiologicalParameters::BitingLevelDistribution biting_level;
-        biting_level.set_distribution("gamma");
+        biting_level.set_distribution("Gamma");
         biting_level.set_gamma(gamma);
+        biting_level.set_exponential(exponential);
 
         // Initialize RelativeBitingInfo
         EpidemiologicalParameters::RelativeBitingInfo biting_info;
@@ -23,11 +28,14 @@ protected:
         biting_info.set_min_relative_biting_value(0.5);
         biting_info.set_number_of_biting_levels(3);
         biting_info.set_biting_level_distribution(biting_level);
+        biting_info.set_scale(1.0);
+        biting_info.set_mean(5.0);
+        biting_info.set_sd(1.5);
 
         // Initialize RelativeInfectivity
         EpidemiologicalParameters::RelativeInfectivity infectivity;
         infectivity.set_sigma(1.2);
-        infectivity.set_ro(0.8);
+        infectivity.set_ro_star(0.8);
         infectivity.set_blood_meal_volume(2.0);
 
         // Set values in EpidemiologicalParameters
@@ -84,7 +92,8 @@ TEST_F(EpidemiologicalParametersYAMLTest, DecodeEpidemiologicalParameters) {
     node["relative_biting_info"]["biting_level_distribution"]["distribution"] = "Gamma";
     node["relative_biting_info"]["biting_level_distribution"]["Gamma"]["mean"] = 5.0;
     node["relative_biting_info"]["biting_level_distribution"]["Gamma"]["sd"] = 1.5;
-    node["gametocyte_level_under_artemisinin_action"] = 1.0;
+    node["relative_biting_info"]["biting_level_distribution"]["Exponential"]["scale"] = 2.5;
+    node["gametocyte_level_under_artemisinin_action"] = 0.3;
     node["gametocyte_level_full"] = 1.0;
     node["relative_infectivity"]["sigma"] = 1.2;
     node["relative_infectivity"]["ro"] = 0.8;
@@ -96,7 +105,9 @@ TEST_F(EpidemiologicalParametersYAMLTest, DecodeEpidemiologicalParameters) {
     node["allow_new_coinfection_to_cause_symptoms"] = true;
     node["tf_window_size"] = 10;
     node["fraction_mosquitoes_interrupted_feeding"] = 0.1;
-    node["inflation_factor"] = 0.01;
+    node["inflation_factor"] = 1.5;
+    node["using_age_dependent_biting_level"] = false;
+    node["using_variable_probability_infectious_bites_cause_infection"] = false;
 
     EpidemiologicalParameters decoded_parameters;
     EXPECT_NO_THROW(YAML::convert<EpidemiologicalParameters>::decode(node, decoded_parameters));

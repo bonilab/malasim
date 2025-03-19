@@ -1,7 +1,9 @@
 #ifndef PARASITEPARAMETERS_H
 #define PARASITEPARAMETERS_H
+#include "IConfigData.h"
+#include <spdlog/spdlog.h>
 
-class ParasiteParameters {
+class ParasiteParameters : public IConfigData {
 public:
     class ParasiteDensityLevels {
     public:
@@ -65,6 +67,10 @@ public:
 
     [[nodiscard]] const RecombinationParameters& get_recombination_parameters() const { return recombination_parameters_; }
     void set_recombination_parameters(const RecombinationParameters& value) { recombination_parameters_ = value; }
+
+    void process_config() override {
+      spdlog::info("Processing ParasiteParameters");
+    };
 
 private:
     ParasiteDensityLevels parasite_density_levels_;

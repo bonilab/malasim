@@ -22,10 +22,7 @@ protected:
         grid.set_district_raster("../sample_inputs/kag_district.asc");
         grid.set_p_treatment_under_5_raster("../sample_inputs/kag_treatment.asc");
         grid.set_p_treatment_over_5_raster("../sample_inputs/kag_treatment.asc");
-        grid.set_p_treatment_under_5_by_location({-1});
-        grid.set_p_treatment_over_5_by_location({-1});
         grid.set_beta_raster("../sample_inputs/kag_beta_r1.asc");
-        grid.set_beta_by_location({-1});
         grid.set_cell_size(5.0);
         grid.set_age_distribution_by_location({{0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0}});
         default_settings.set_grid_based(grid);
@@ -101,9 +98,9 @@ TEST_F(SpatialSettingsTest, DecodeSpatialSettings) {
     EXPECT_EQ(location.get_p_treatment_under_5_by_location(), std::vector<double>{0.5});
     EXPECT_EQ(location.get_p_treatment_over_5_by_location(), std::vector<double>{0.5});
     for (size_t i = 0; i < location.get_location_info().size(); ++i) {
-      EXPECT_EQ(location.get_location_info()[i].get_id(),0);
-      EXPECT_EQ(location.get_location_info()[i].get_latitude(),0);
-      EXPECT_EQ(location.get_location_info()[i].get_longitude(),0);
+      EXPECT_EQ(location.get_location_info()[i].id,0);
+      EXPECT_EQ(location.get_location_info()[i].coordinate->latitude,0);
+      EXPECT_EQ(location.get_location_info()[i].coordinate->longitude,0);
     }
     for (size_t i = 0; i < location.get_age_distribution_by_location().size(); ++i) {
       CompareVectors(location.get_age_distribution_by_location()[i],

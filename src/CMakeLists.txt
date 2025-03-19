@@ -2,22 +2,30 @@ find_package(fmt CONFIG REQUIRED)
 find_package(GSL REQUIRED)
 find_package(yaml-cpp CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
-find_package(Lua REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(date CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
+find_package(stduuid CONFIG REQUIRED)
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
+
+option(ENABLE_TRAVEL_TRACKING "Enable tracking of individual travel data and generating travel reports" OFF)
+
+if(ENABLE_TRAVEL_TRACKING)
+    message(STATUS "Travel tracking feature is enabled")
+    # Add definitions or configurations specific to the travel tracking feature
+    add_definitions(-DENABLE_TRAVEL_TRACKING)
+endif()
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/src
-  ${LUA_INCLUDE_DIR}
 )
 
 # craete source files
 # Add source files for the core library
 file(GLOB_RECURSE MALASIM_CORE_SOURCES
   "*.cpp"
-  "Configuration/*.cpp"
-  "Utils/*.cpp"
+  "*.hxx"
+  "*.h"
 )
 
 # Add source files for the core library
@@ -31,11 +39,12 @@ target_link_libraries(MalaSimCore PUBLIC
   fmt::fmt
   GSL::gsl GSL::gslcblas
   yaml-cpp::yaml-cpp
-  ${LUA_LIBRARIES}
   sol2
   spdlog::spdlog
   date::date date::date-tz
   CLI11::CLI11
+  stduuid
+  unofficial::sqlite3::sqlite3
 )
 
 set_property(TARGET MalaSimCore PROPERTY CXX_STANDARD 20)

@@ -1,7 +1,6 @@
 // RandomTest_random_poisson.cpp
 
 #include <gtest/gtest.h>
-
 #include "RandomTestBase.h"
 
 // Test that the sample mean is close to poissonMean

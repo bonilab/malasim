@@ -9,8 +9,8 @@ protected:
     void SetUp() override {
         // Set up grid-based mosquito parameters
         MosquitoParameters::GridBased grid_based;
-        grid_based.set_interrupted_feeding_rate_raster("../input/kag_mosquito_ifr.asc");
-        grid_based.set_prmc_size_raster("../input/kag_mosquito_size.asc");
+        grid_based.set_interrupted_feeding_rate_raster("../input/dev_mosquito_ifr.asc");
+        grid_based.set_prmc_size_raster("../input/dev_mosquito_size.asc");
 
         // Set up location-based mosquito parameters
         MosquitoParameters::LocationBased location_based;
@@ -24,6 +24,7 @@ protected:
         config.set_location_based(location_based);
 
         mosquito_parameters.set_mosquito_config(config);
+        mosquito_parameters.set_within_host_induced_free_recombination(true);
     }
 };
 
@@ -33,24 +34,25 @@ TEST_F(MosquitoParametersTest, EncodeMosquitoParameters) {
 
     // Validate encoding of mosquito_config and grid-based mode
     EXPECT_EQ(node["mosquito_config"]["mode"].as<std::string>(), "grid_based");
-    EXPECT_EQ(node["mosquito_config"]["grid_based"]["interrupted_feeding_rate_raster"].as<std::string>(), "../input/kag_mosquito_ifr.asc");
-    EXPECT_EQ(node["mosquito_config"]["grid_based"]["prmc_size_raster"].as<std::string>(), "../input/kag_mosquito_size.asc");
+    EXPECT_EQ(node["mosquito_config"]["grid_based"]["interrupted_feeding_rate_raster"].as<std::string>(), "../input/dev_mosquito_ifr.asc");
+    EXPECT_EQ(node["mosquito_config"]["grid_based"]["prmc_size_raster"].as<std::string>(), "../input/dev_mosquito_size.asc");
 }
 
 // Test decoding functionality for MosquitoParameters (grid-based)
 TEST_F(MosquitoParametersTest, DecodeMosquitoParametersGridBased) {
     YAML::Node node;
     node["mosquito_config"]["mode"] = "grid_based";
-    node["mosquito_config"]["grid_based"]["interrupted_feeding_rate_raster"] = "../input/kag_mosquito_ifr.asc";
-    node["mosquito_config"]["grid_based"]["prmc_size_raster"] = "../input/kag_mosquito_size.asc";
+    node["mosquito_config"]["grid_based"]["interrupted_feeding_rate_raster"] = "../input/dev_mosquito_ifr.asc";
+    node["mosquito_config"]["grid_based"]["prmc_size_raster"] = "../input/dev_mosquito_size.asc";
+    node["within_host_induced_free_recombination"] = true;
 
     MosquitoParameters decoded_parameters;
     EXPECT_NO_THROW(YAML::convert<MosquitoParameters>::decode(node, decoded_parameters));
 
     // Validate decoding of grid-based mode
     EXPECT_EQ(decoded_parameters.get_mosquito_config().get_mode(), "grid_based");
-    EXPECT_EQ(decoded_parameters.get_mosquito_config().get_grid_based().get_interrupted_feeding_rate_raster(), "../input/kag_mosquito_ifr.asc");
-    EXPECT_EQ(decoded_parameters.get_mosquito_config().get_grid_based().get_prmc_size_raster(), "../input/kag_mosquito_size.asc");
+    EXPECT_EQ(decoded_parameters.get_mosquito_config().get_grid_based().get_interrupted_feeding_rate_raster(), "../input/dev_mosquito_ifr.asc");
+    EXPECT_EQ(decoded_parameters.get_mosquito_config().get_grid_based().get_prmc_size_raster(), "../input/dev_mosquito_size.asc");
 }
 
 // Test decoding functionality for MosquitoParameters (location-based)
@@ -59,6 +61,7 @@ TEST_F(MosquitoParametersTest, DecodeMosquitoParametersLocationBased) {
     node["mosquito_config"]["mode"] = "location_based";
     node["mosquito_config"]["location_based"]["interrupted_feeding_rate"] = std::vector<double>{0.19};
     node["mosquito_config"]["location_based"]["prmc_size"] = std::vector<int>{100};
+    node["within_host_induced_free_recombination"] = true;
 
     MosquitoParameters decoded_parameters;
     EXPECT_NO_THROW(YAML::convert<MosquitoParameters>::decode(node, decoded_parameters));

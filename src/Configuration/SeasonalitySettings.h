@@ -1,86 +1,28 @@
 #ifndef SEASONALITYSETTINGS_H
 #define SEASONALITYSETTINGS_H
 
+#include <Utils/Helpers/TimeHelpers.h>
+
 #include <string>
 #include <vector>
+#include <spdlog/spdlog.h>
+
+#include <fstream>
+
+#include "IConfigData.h"
+#include "Environment/SeasonalEquation.h"
+#include "Environment/SeasonalPattern.h"
+#include "Environment/SeasonalRainfall.h"
+#include "Spatial/GIS/AscFile.h"
+#include "Spatial/GIS/SpatialData.h"
+#include "Simulation/Model.h"
+#include "Utils/Constants.h"
 #include "date/date.h"
+#include "Utils/TypeDef.hxx"
 
 // Class to hold seasonality settings, combining RainfallSettings and SimpleSettings
-class SeasonalitySettings {
+class SeasonalitySettings : public IConfigData{
 public:
-  // Class to hold the 'rainfall' settings
-  class RainfallSettings {
-  public:
-    // Getters
-    [[nodiscard]] const std::string &get_filename() const {
-      return filename_;
-    }
-
-    // Setters
-    void set_filename(const std::string &value) {
-      filename_ = value;
-    }
-
-    [[nodiscard]] const date::days &get_period() const {
-      return period_;
-    }
-
-    void set_period(const date::days &value) {
-      if (value.count() <= 0)
-        throw std::invalid_argument("Period must be greater than 0");
-      period_ = value;
-    }
-
-  private:
-    std::string filename_;
-    date::days period_;
-  };
-
-  // Class to hold the 'simple' settings
-  class SimpleSettings {
-  public:
-    // Getters
-    [[nodiscard]] const std::vector<double> &get_a() const {
-      return a_;
-    }
-
-    // Setters
-    void set_a(const std::vector<double> &value) {
-      a_ = value;
-    }
-
-    [[nodiscard]] const std::vector<int> &get_phi() const {
-      return phi_;
-    }
-
-    void set_phi(const std::vector<int> &value) {
-      phi_ = value;
-    }
-
-    [[nodiscard]] const std::vector<double> &get_min_value() const {
-      return min_value_;
-    }
-
-    void set_min_value(const std::vector<double> &value) {
-      min_value_ = value;
-    }
-
-    [[nodiscard]] const date::days &get_period() const {
-      return period_;
-    }
-
-    void set_period(const date::days &value) {
-      if (value.count() <= 0)
-        throw std::invalid_argument("Period must be greater than 0");
-      period_ = value;
-    }
-
-  private:
-    std::vector<double> a_;
-    std::vector<int> phi_;
-    std::vector<double> min_value_;
-    date::days period_;
-  };
 
   // Getters
   [[nodiscard]] bool get_enable() const {
@@ -92,81 +34,174 @@ public:
     enable_ = value;
   }
 
-  [[nodiscard]] const std::string &get_mode() const {
+  [[nodiscard]] std::string get_mode() const {
     return mode_;
   }
 
-  void set_mode(const std::string &value) {
+  void set_mode(std::string value) {
     mode_ = value;
   }
 
-  [[nodiscard]] const RainfallSettings &get_rainfall() const {
-    return rainfall_;
+  [[nodiscard]]  SeasonalPattern* get_seasonal_pattern() const {
+    return seasonal_pattern_;
   }
 
-  void set_rainfall(const RainfallSettings &value) {
-    rainfall_ = value;
+  void set_seasonal_pattern(SeasonalPattern* value) {
+    seasonal_pattern_ = value;
   }
 
-  [[nodiscard]] const SimpleSettings &get_simple() const {
-    return simple_;
+  [[nodiscard]]  SeasonalRainfall* get_seasonal_rainfall() const {
+    return seasonal_rainfall_;
   }
 
-  void set_simple(const SimpleSettings &value) {
-    simple_ = value;
+  void set_seasonal_rainfall(SeasonalRainfall* value) {
+    seasonal_rainfall_ = value;
+  }
+
+  [[nodiscard]]  SeasonalEquation* get_seasonal_equation() const {
+    return seasonal_equation_;
+  }
+
+  void set_seasonal_equation(SeasonalEquation* value) {
+    seasonal_equation_ = value;
+  }
+
+  [[nodiscard]] double get_seasonal_factor(const date::sys_days &today,
+                                             const int &location) {
+    if(enable_) {
+      if(mode_=="equation") {
+        return get_seasonal_equation()->get_seasonal_factor(today, location);
+      }
+      if(mode_=="rainfall") {
+        return get_seasonal_rainfall()->get_seasonal_factor(today, location);
+      }
+      if(mode_=="pattern") {
+        return get_seasonal_pattern()->get_seasonal_factor(today, location);
+      }
+    }
+    return 1.0;
+  }
+
+  void process_config() override {};
+
+  void process_config_using_number_of_locations(int number_of_locations) {
+    spdlog::info("Processing SeasonalitySettings");
+    if(enable_) {
+      spdlog::info("Seasonality enabled");
+      if(mode_=="equation") {
+        spdlog::info("Equation based");
+        // process equation based
+        seasonal_equation_->build(number_of_locations);
+      }
+      else if(mode_== "rainfall") {
+        spdlog::info("Rainfall based");
+        // process rainfall based
+        seasonal_rainfall_->build();
+      }
+      else if(mode_== "pattern") {
+        spdlog::info("Pattern based");
+        // process rainfall based
+        seasonal_pattern_->build();
+      }
+      else {
+        throw std::runtime_error("Unknown mode in 'seasonality_settings'.");
+      }
+    }
+    else {
+      spdlog::info("Seasonality disabled, using default value of 1.0");
+    }
   }
 
 private:
-  bool enable_;
+  bool enable_ = false;
   std::string mode_;
-  RainfallSettings rainfall_;
-  SimpleSettings simple_;
+  SeasonalEquation* seasonal_equation_;
+  SeasonalRainfall* seasonal_rainfall_;
+  SeasonalPattern* seasonal_pattern_;
 };
 
 namespace YAML {
-// Convert specialization for RainfallSettings
+//convert specialization for SeasonalitySettings::SeasonalEquation
 template <>
-struct convert<SeasonalitySettings::RainfallSettings> {
-  static Node encode(const SeasonalitySettings::RainfallSettings &rhs) {
+struct convert<SeasonalEquation*> {
+  static Node encode(const SeasonalEquation* rhs) {
     Node node;
-    node["filename"] = rhs.get_filename();
-    node["period"] = static_cast<int>(rhs.get_period().count()); // Storing period as an int (days)
+    node["raster"] = rhs->get_raster();
+    node["base"] = rhs->get_raster_base();
+    node["a"] = rhs->get_raster_A();
+    node["b"] = rhs->get_raster_B();
+    node["phi"] = rhs->get_raster_phi();
     return node;
   }
 
-  static bool decode(const Node &node, SeasonalitySettings::RainfallSettings &rhs) {
+  static bool decode(const Node &node, SeasonalEquation* rhs) {
+    if (!node["base"] || !node["a"] || !node["b"] || !node["phi"] || !node["raster"]) {
+      throw std::runtime_error("Missing fields in SeasonalEquation");
+    }
+    rhs->set_raster(node["raster"].as<bool>());
+    rhs->set_raster_base(node["base"].as<std::vector<double>>());
+    rhs->set_raster_A(node["a"].as<std::vector<double>>());
+    rhs->set_raster_B(node["b"].as<std::vector<double>>());
+    rhs->set_raster_phi(node["phi"].as<std::vector<int>>());
+    rhs->set_A(rhs->get_raster_A());
+    rhs->set_B(rhs->get_raster_B());
+    rhs->set_base(rhs->get_raster_base());
+    rhs->set_phi(rhs->get_raster_phi());
+    rhs->set_reference_A(rhs->get_raster_A());
+    rhs->set_reference_B(rhs->get_raster_B());
+    rhs->set_reference_base(rhs->get_raster_base());
+    rhs->set_reference_phi(rhs->get_raster_phi());
+
+    spdlog::info("SeasonalEquation initialized {}",rhs->get_raster_A().back());
+    return true;
+  }
+};
+
+// Convert specialization for SeasonalitySettings::SeasonalRainfall
+template <>
+struct convert<SeasonalRainfall*> {
+  static Node encode(const SeasonalRainfall* rhs) {
+    Node node;
+    node["filename"] = rhs->get_filename();
+    node["period"] = rhs->get_period();
+    return node;
+  }
+
+  static bool decode(const Node &node, SeasonalRainfall* rhs) {
     if (!node["filename"] || !node["period"]) {
-      throw std::runtime_error("Missing fields in RainfallSettings");
+      throw std::runtime_error("Missing fields in SeasonalRainfall");
     }
-    rhs.set_filename(node["filename"].as<std::string>());
-    rhs.set_period(date::days(node["period"].as<int>()));
+    rhs->set_filename(node["filename"].as<std::string>());
+    rhs->set_period(node["period"].as<int>());
     return true;
   }
 };
 
-// Convert specialization for SimpleSettings
+// Convert specialization for SeasonalitySettings::SeasonalRainfall
 template <>
-struct convert<SeasonalitySettings::SimpleSettings> {
-  static Node encode(const SeasonalitySettings::SimpleSettings &rhs) {
+struct convert<SeasonalPattern*> {
+  static Node encode(const SeasonalPattern* rhs) {
     Node node;
-    node["a"] = rhs.get_a();
-    node["phi"] = rhs.get_phi();
-    node["min_value"] = rhs.get_min_value();
-    node["period"] = static_cast<int>(rhs.get_period().count());
+    node["filename"] = rhs->get_filename();
+    node["period"] = rhs->get_period();
     return node;
   }
 
-  static bool decode(const Node &node, SeasonalitySettings::SimpleSettings &rhs) {
-    if (!node["a"] || !node["phi"] || !node["min_value"] || !node["period"]) {
-      throw std::runtime_error("Missing fields in SimpleSettings");
+  static bool decode(const Node &node, SeasonalPattern* rhs) {
+    if (!node["filename"] || !node["period"]) {
+      throw std::runtime_error("Missing fields in SeasonalPattern");
     }
-    rhs.set_a(node["a"].as<std::vector<double>>());
-    rhs.set_phi(node["phi"].as<std::vector<int>>());
-    rhs.set_min_value(node["min_value"].as<std::vector<double>>());
-    rhs.set_period(date::days(node["period"].as<int>()));
+    rhs->set_filename(node["filename"].as<std::string>());
+    rhs->set_period(node["period"].as<int>());
+    if (rhs->get_period() != 12 && rhs->get_period() != 365) {
+      throw std::invalid_argument(
+          "Period must be either 12 (monthly) or 365 (daily)");
+    }
+    rhs->set_is_monthly(rhs->get_period() == 12);
     return true;
   }
 };
+
 
 // Convert specialization for SeasonalitySettings
 template <>
@@ -175,20 +210,46 @@ struct convert<SeasonalitySettings> {
     Node node;
     node["enable"] = rhs.get_enable();
     node["mode"] = rhs.get_mode();
-    node["rainfall"] = rhs.get_rainfall();
-    node["simple"] = rhs.get_simple();
+    node["equation"]["base"] = rhs.get_seasonal_equation()->get_base();
+    node["equation"]["a"] = rhs.get_seasonal_equation()->get_A();
+    node["equation"]["b"] = rhs.get_seasonal_equation()->get_B();
+    node["equation"]["phi"] = rhs.get_seasonal_equation()->get_phi();
+    node["rainfall"]["filename"] = rhs.get_seasonal_rainfall()->get_filename();
+    node["rainfall"]["period"] = rhs.get_seasonal_rainfall()->get_period();
     return node;
   }
 
   static bool decode(const Node &node, SeasonalitySettings &rhs) {
-    if (!node["enable"] || !node["mode"] || !node["rainfall"] || !node["simple"]) {
-      throw std::runtime_error("Missing fields in SeasonalitySettings");
+    if (!node["enable"]) {
+      throw std::runtime_error("Missing field enable in SeasonalitySettings");
     }
 
     rhs.set_enable(node["enable"].as<bool>());
+
+    if (!node["mode"]) {
+      throw std::runtime_error("Missing fields mode in SeasonalitySettings when enable is true");
+    }
     rhs.set_mode(node["mode"].as<std::string>());
-    rhs.set_rainfall(node["rainfall"].as<SeasonalitySettings::RainfallSettings>());
-    rhs.set_simple(node["simple"].as<SeasonalitySettings::SimpleSettings>());
+
+    if (!node["equation"] && !node["rainfall"] && !node["pattern"]) {
+      throw std::runtime_error("Missing equation/rainfall/pattern node in SeasonalitySettings when mode is set");
+    }
+
+    if(rhs.get_mode() == "equation") {
+      auto model = new SeasonalEquation();
+      convert<SeasonalEquation*>::decode(node["equation"], model);
+      rhs.set_seasonal_equation(model);
+    }
+    if(rhs.get_mode() == "rainfall") {
+      auto model = new SeasonalRainfall();
+      convert<SeasonalRainfall*>::decode(node["rainfall"], model);
+      rhs.set_seasonal_rainfall(model);
+    }
+    if(rhs.get_mode() == "pattern") {
+      auto model = new SeasonalPattern();
+      convert<SeasonalPattern*>::decode(node["pattern"], model);
+      rhs.set_seasonal_pattern(model);
+    }
     return true;
   }
 };

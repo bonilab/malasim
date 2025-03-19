@@ -41,7 +41,7 @@ void Random::initialize(uint64_t initial_seed) {
     throw std::runtime_error("Failed to allocate GSL random number generator.");
   }
 
-  // Use std::random_device to generate a random seed if seed is 0
+  // Use std::random_device to generate a random seed if seed is < 0
   std::random_device rd;
   seed_ = (initial_seed == -1) ? rd() : initial_seed;
 
@@ -59,6 +59,7 @@ uint64_t Random::get_seed() const noexcept { return seed_; }
 void Random::set_seed(uint64_t new_seed) {
   if (rng_) { gsl_rng_set(rng_.get(), new_seed); }
   seed_ = new_seed;
+  initialize(seed_);
 }
 
 // Generates a Poisson-distributed random number
@@ -174,3 +175,6 @@ double Random::cdf_standard_normal_distribution(double value) {
   return gsl_cdf_ugaussian_P(value);
 }
 
+double Random::random_flat(const double &from, const double &to) {
+  return gsl_ran_flat(rng_.get(), from, to);
+}

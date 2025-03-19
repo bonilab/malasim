@@ -1,11 +1,11 @@
 #ifndef TRANSMISSION_SETTINGS_H
 #define TRANSMISSION_SETTINGS_H
 
+#include "IConfigData.h"
 #include <yaml-cpp/yaml.h>
-
 #include <stdexcept>
 
-class TransmissionSettings {
+class TransmissionSettings : public IConfigData {
 public:
   // Getter for transmission_parameter
   [[nodiscard]] double get_transmission_parameter() const {
@@ -31,6 +31,13 @@ public:
       throw std::invalid_argument(
           "p_infection_from_an_infectious_bite must be between 0 and 1");
     p_infection_from_an_infectious_bite_ = value;
+  }
+
+  void process_config() override{
+    spdlog::info("Processing TransmissionSettings");
+    if (get_transmission_parameter() > 0.0) {
+      spdlog::info("Using transmission_parameter: {}", get_transmission_parameter());
+    }
   }
 
 private:

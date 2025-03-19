@@ -10,6 +10,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <uuid.h>
+#include <spdlog/spdlog.h>
+
 #include <vector>
 
 namespace utils {
@@ -251,6 +254,9 @@ public:
    */
   double random_gamma(double shape, double scale);
 
+
+  double random_flat(const double &from, const double &to);
+
   /**
    * @brief Computes the CDF of the Gamma distribution.
    *
@@ -361,8 +367,23 @@ public:
     gsl_ran_shuffle(rng_.get(), vec.data(), vec.size(), sizeof(T));
   }
 
+    /**
+     * @brief Generates a new UUID.
+     *
+     * This function uses the `uuid_random_generator` to produce a new universally
+     * unique identifier (UUID). It can be used to generate unique IDs for various
+     * purposes, such as object identifiers or session tokens.
+     *
+     * @return uuids::uuid A newly generated UUID.
+     */
+    uuids::uuid uuid() {
+      std::random_device rd;
+      std::mt19937 generator{rd()};
+      return uuids::uuid_random_generator{generator}();
+  }
+
 private:
-  uint64_t seed_;
+    uint64_t seed_;
 
   // Custom deleter for gsl_rng
   struct GslRngDeleter {
@@ -385,7 +406,157 @@ private:
    * @throws std::runtime_error If RNG allocation fails.
    */
   void initialize(uint64_t initial_seed = 0);
+
+public:
+
+  template <class T>
+  [[nodiscard]] std::vector<T *> multinomial_sampling(int size, std::vector<double> &distribution,
+                                                    std::vector<T *> &all_objects, bool is_shuffled,
+                                                    double sum_distribution = -1);
+
+  template <class T>
+  [[nodiscard]] std::vector<T *> roulette_sampling(int number_of_samples, std::vector<double> &distribution,
+                                                   std::vector<T *> &all_objects, bool is_shuffled,
+                                                   double sum_distribution = -1);
+
+  template <class T>
+  [[nodiscard]] std::vector<std::tuple<T *, double>> roulette_sampling_tuple(int number_of_samples,
+                                                                             std::vector<double> &distribution,
+                                                                             std::vector<T *> &all_objects,
+                                                                             bool is_shuffled,
+                                                                             double sum_distribution = -1);
 };
 }  // namespace utils
+
+
+template <class T>
+std::vector<T *> utils::Random::multinomial_sampling(int size, std::vector<double> &distribution,
+                                                     std::vector<T *> &all_objects, bool is_shuffled,
+                                                     double sum_distribution) {
+  std::vector<T *> samples(size, nullptr);
+  if (sum_distribution == 0) {
+    return samples;
+  } else if (sum_distribution < 0) {
+    auto found = std::find_if(distribution.begin(), distribution.end(), [](double d) { return d > 0; });
+
+    if (found == distribution.end()) {
+      return samples;
+    }
+  }
+
+  std::vector<unsigned int> hit_per_object(distribution.size());
+  random_multinomial(distribution.size(), size, distribution, hit_per_object);
+
+  auto index = 0;
+  for (auto i = 0; i < hit_per_object.size(); i++) {
+    for (int j = 0; j < hit_per_object[i]; ++j) {
+      samples[index] = all_objects[i];
+      index++;
+    }
+  }
+  if (is_shuffled) {
+    shuffle(samples);
+  }
+  return samples;
+}
+
+/* Roulette sampling is without replacement, means 1 person can be selected multiple times */
+template <class T>
+std::vector<T *> utils::Random::roulette_sampling(int number_of_samples, std::vector<double> &distribution,
+                                                  std::vector<T *> &all_objects, bool is_shuffled, double sum_distribution) {
+  if (all_objects.empty() || distribution.empty()) {
+    spdlog::error("Error in roulette sampling. Empty distribution or all_objects.");
+    return std::vector<T *>(number_of_samples, nullptr);
+  }
+  std::vector<T *> samples(number_of_samples, nullptr);
+  double sum { sum_distribution };
+  if (sum_distribution == 0) {
+    return samples;
+  } else if (sum_distribution < 0) {
+    sum = 0;
+    for (auto d : distribution) {
+      sum += d;
+    }
+  }
+
+  std::vector<double> uniform_sampling(number_of_samples, 0.0);
+  for (auto &index : uniform_sampling) {
+    index = this->random_uniform() * sum;
+  }
+
+  std::sort(uniform_sampling.begin(), uniform_sampling.end());
+
+  double sum_weight = 0;
+  int uniform_sampling_index = 0;
+
+  for (auto pi = 0; pi < distribution.size(); pi++) {
+    if (distribution[pi] == 0) continue;
+    sum_weight += distribution[pi];
+    while (uniform_sampling_index < number_of_samples && uniform_sampling[uniform_sampling_index] < sum_weight) {
+      samples[uniform_sampling_index] = all_objects[pi];
+      uniform_sampling_index++;
+    }
+    if (uniform_sampling_index == number_of_samples) {
+      break;
+    }
+  }
+
+  if (uniform_sampling_index < number_of_samples) {
+    spdlog::error("Error in roulette sampling. Sum weight: {}. Sum distribution: {}", sum_weight, sum_distribution);
+  }
+
+  if (is_shuffled) {
+    shuffle(samples);
+  }
+  return samples;
+}
+
+template <class T>
+std::vector<std::tuple<T *, double>> utils::Random::roulette_sampling_tuple(int number_of_samples,
+                                                                            std::vector<double> &distribution,
+                                                                            std::vector<T *> &all_objects, bool is_shuffled,
+                                                                            double sum_distribution) {
+  std::vector<std::tuple<T *, double>> samples(number_of_samples, std::make_tuple(nullptr, 0.0));
+  double sum { sum_distribution };
+  if (sum_distribution == 0) {
+    return samples;
+  } else if (sum_distribution < 0) {
+    sum = 0;
+    for (auto d : distribution) {
+      sum += d;
+    }
+  }
+
+  std::vector<double> uniform_sampling(number_of_samples, 0.0);
+  for (auto &index : uniform_sampling) {
+    index = this->random_uniform() * sum;
+  }
+
+  std::sort(uniform_sampling.begin(), uniform_sampling.end());
+
+  double sum_weight = 0;
+  int uniform_sampling_index = 0;
+
+  for (auto pi = 0; pi < distribution.size(); pi++) {
+    if (distribution[pi] == 0) continue;
+    sum_weight += distribution[pi];
+    while (uniform_sampling_index < number_of_samples && uniform_sampling[uniform_sampling_index] < sum_weight) {
+      samples[uniform_sampling_index] = std::make_tuple(all_objects[pi], distribution[pi]);
+      uniform_sampling_index++;
+    }
+    if (uniform_sampling_index == number_of_samples) {
+      break;
+    }
+  }
+
+  if (uniform_sampling_index < number_of_samples) {
+    spdlog::error("Error in roulette sampling tuple. Sum weight: {}. Sum distribution: {}", sum_weight, sum_distribution);
+  }
+
+  if (is_shuffled) {
+    shuffle(samples);
+  }
+  return samples;
+}
 #endif  // RANDOM_H
 

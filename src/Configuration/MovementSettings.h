@@ -1,10 +1,22 @@
+#include <gsl/gsl_cdf.h>
+
 #include <string>
 #include <stdexcept>
-#include "date/date.h"
+#include "IConfigData.h"
 
-class MovementSettings {
+#include "Spatial/Movement/BarabasiSM.hxx"
+#include "Spatial/Movement/BurkinaFasoSM.hxx"
+#include "Spatial/Movement/MarshallSM.hxx"
+#include "Spatial/Movement/WesolowskiSM.hxx"
+#include "Spatial/Movement/WesolowskiSurfaceSM.hxx"
+#include "Utils/MultinomialDistributionGenerator.h"
+#include "spdlog/spdlog.h"
+
+class MultinomialDistributionGenerator;
+
+class MovementSettings : public IConfigData {
 public:
-    class BarabasiSettings {
+    class BarabasiSM {
     public:
         // Getters and Setters
         [[nodiscard]] double get_r_g_0() const { return r_g_0_; }
@@ -25,7 +37,7 @@ public:
         int kappa_;
     };
 
-    class WesolowskiSettings {
+    class WesolowskiSM{
     public:
         // Getters and Setters
         [[nodiscard]] double get_kappa() const { return kappa_; }
@@ -47,22 +59,130 @@ public:
         double gamma_;
     };
 
-    class SpatialModel {
+    class WesolowskiSurfaceSM{
+    public:
+      // Getters and Setters
+      [[nodiscard]] double get_kappa() const { return kappa_; }
+      void set_kappa(double value) { kappa_ = value; }
+
+      [[nodiscard]] double get_alpha() const { return alpha_; }
+      void set_alpha(double value) { alpha_ = value; }
+
+      [[nodiscard]] double get_beta() const { return beta_; }
+      void set_beta(double value) { beta_ = value; }
+
+      [[nodiscard]] double get_gamma() const { return gamma_; }
+      void set_gamma(double value) { gamma_ = value; }
+
+    private:
+      double kappa_;
+      double alpha_;
+      double beta_;
+      double gamma_;
+    };
+
+    class MarshallSM {
+    public:
+      [[nodiscard]] double get_tau() const { return tau_; }
+      void set_tau(double value) { tau_ = value; }
+
+      [[nodiscard]] double get_alpha() const { return alpha_; }
+      void set_alpha(double value) { alpha_ = value; }
+
+      [[nodiscard]] double get_log_rho() const { return log_rho_; }
+      void set_log_rho(double value) { log_rho_ = value; }
+
+    private:
+      double tau_;
+      double alpha_;
+      double log_rho_;
+    };
+
+    class BurkinaFasoSM {
+    public:
+      [[nodiscard]] double get_tau() const { return tau_; }
+      void set_tau(double value) { tau_ = value; }
+
+      [[nodiscard]] double get_alpha() const { return alpha_; }
+      void set_alpha(double value) { alpha_ = value; }
+
+      [[nodiscard]] double get_log_rho() const { return log_rho_; }
+      void set_log_rho(double value) { log_rho_ = value; }
+
+      [[nodiscard]] double get_capital() const { return capital_; }
+      void set_capital(double value) { capital_ = value; }
+
+      [[nodiscard]] double get_penalty() const { return penalty_; }
+      void set_penalty(double value) { penalty_ = value; }
+
+    private:
+      double tau_;
+      double alpha_;
+      double log_rho_;
+      double capital_;
+      double penalty_;
+    };
+
+  class SpatialModelSettings {
     public:
         // Getters and Setters
         [[nodiscard]] const std::string& get_name() const { return name_; }
         void set_name(const std::string& value) { name_ = value; }
 
-        [[nodiscard]] const BarabasiSettings& get_barabasi() const { return barabasi_; }
-        void set_barabasi(const BarabasiSettings& value) { barabasi_ = value; }
+        [[nodiscard]] const BarabasiSM& get_barabasi_sm() const { return barabasi_sm_; }
+        void set_barabasi_sm(const BarabasiSM& value) { barabasi_sm_ = value; }
 
-        [[nodiscard]] const WesolowskiSettings& get_wesolowski() const { return wesolowski_; }
-        void set_wesolowski(const WesolowskiSettings& value) { wesolowski_ = value; }
+        [[nodiscard]] const WesolowskiSM& get_wesolowski_sm() const { return wesolowski_sm_; }
+        void set_wesolowski_sm(const WesolowskiSM& value) { wesolowski_sm_ = value; }
+
+        [[nodiscard]] const MarshallSM& get_marshall_sm() const { return marshall_sm_; }
+        void set_marshall_sm(const MarshallSM& value) { marshall_sm_ = value; }
+
+        [[nodiscard]] const BurkinaFasoSM& get_burkina_faso_sm() const { return burkina_faso_sm_; }
+        void set_burkina_faso_sm(const BurkinaFasoSM& value) { burkina_faso_sm_ = value; }
+
+        [[nodiscard]] const WesolowskiSurfaceSM& get_wesolowski_surface_sm() const { return wesolowski_surface_sm_; }
+        void set_wesolowski_surface_sm(const WesolowskiSurfaceSM& value) { wesolowski_surface_sm_ = value; }
 
     private:
         std::string name_;
-        BarabasiSettings barabasi_;
-        WesolowskiSettings wesolowski_;
+        BarabasiSM barabasi_sm_;
+        WesolowskiSM wesolowski_sm_;
+        WesolowskiSurfaceSM wesolowski_surface_sm_;
+        MarshallSM marshall_sm_;
+        BurkinaFasoSM burkina_faso_sm_;
+    };
+
+    class MovingLevelDistributionExponential {
+    public:
+        // Getters and Setters
+        [[nodiscard]] double get_mean() const { return mean_; }
+        void set_mean(double value) { mean_ = value; }
+
+        [[nodiscard]] double get_sd() const { return sd_; }
+        void set_sd(double value) { sd_ = value; }
+
+        [[nodiscard]] double get_scale() const { return scale_; }
+        void set_scale(double value) { scale_ = value; }
+
+    private:
+        double scale_;
+        double mean_;
+        double sd_;
+    };
+
+    class LengthOfStay {
+    public:
+      // Getters and Setters
+      [[nodiscard]] double get_mean() const { return mean_; }
+      void set_mean(double value) { mean_ = value; }
+
+      [[nodiscard]] double get_sd() const { return sd_; }
+      void set_sd(double value) { sd_ = value; }
+
+    private:
+      double mean_;
+      double sd_;
     };
 
     class MovingLevelDistributionGamma {
@@ -88,9 +208,13 @@ public:
         [[nodiscard]] const MovingLevelDistributionGamma& get_gamma() const { return gamma_; }
         void set_gamma(const MovingLevelDistributionGamma& value) { gamma_ = value; }
 
+        [[nodiscard]] const MovingLevelDistributionExponential& get_exponential() const { return exponential_; }
+        void set_exponential(const MovingLevelDistributionExponential& value) { exponential_ = value; }
+
     private:
         std::string distribution_;
         MovingLevelDistributionGamma gamma_;
+        MovingLevelDistributionExponential exponential_;
     };
 
     class CirculationInfo {
@@ -117,34 +241,177 @@ public:
             circulation_percent_ = value;
         }
 
-        [[nodiscard]] const MovingLevelDistributionGamma& get_length_of_stay() const { return length_of_stay_; }
-        void set_length_of_stay(const MovingLevelDistributionGamma& value) { length_of_stay_ = value; }
+        [[nodiscard]] const LengthOfStay& get_length_of_stay() const { return length_of_stay_; }
+        void set_length_of_stay(const LengthOfStay& value) { length_of_stay_ = value; }
+
+        [[nodiscard]] double get_relative_probability_that_child_travels_compared_to_adult() const {
+          return relative_probability_that_child_travels_compared_to_adult_;
+        }
+
+        void set_relative_probability_that_child_travels_compared_to_adult(double value) {
+          relative_probability_that_child_travels_compared_to_adult_ = value;
+        }
+
+        [[nodiscard]] double get_relative_probability_for_clinical_to_travel() const {
+          return relative_probability_for_clinical_to_travel_;
+        }
+
+        void set_relative_probability_for_clinical_to_travel(double value) {
+          relative_probability_for_clinical_to_travel_ = value;
+        }
 
     private:
-        int max_relative_moving_value_;
-        int number_of_moving_levels_;
         MovingLevelDistribution moving_level_distribution_;
+        MovingLevelDistributionGamma moving_level_distribution_gamma_;
+        LengthOfStay length_of_stay_;
+
+        double max_relative_moving_value_;
+        int number_of_moving_levels_;
         double circulation_percent_;
-        MovingLevelDistributionGamma length_of_stay_;
+
+        double relative_probability_that_child_travels_compared_to_adult_ = 1.0;
+        double relative_probability_for_clinical_to_travel_ = 1.0;
     };
-public:
+
     // Getters and Setters
-    [[nodiscard]] const SpatialModel& get_spatial_model() const { return spatial_model_; }
-    void set_spatial_model(const SpatialModel& value) { spatial_model_ = value; }
+    [[nodiscard]] const SpatialModelSettings& get_spatial_model_settings() const { return spatial_model_settings_; }
+    void set_spatial_model_settings(const SpatialModelSettings& value) { spatial_model_settings_ = value; }
+
+    [[nodiscard]] Spatial::SpatialModel* get_spatial_model() const { return spatial_model_; }
+    void set_spatial_model(Spatial::SpatialModel* value) { spatial_model_ = value; }
 
     [[nodiscard]] const CirculationInfo& get_circulation_info() const { return circulation_info_; }
     void set_circulation_info(const CirculationInfo& value) { circulation_info_ = value; }
 
+    [[nodiscard]] const std::vector<double>& get_v_moving_level_density() const { return v_moving_level_density; }
+    void set_v_moving_level_density(const std::vector<double>& value) { v_moving_level_density = value; }
+
+    [[nodiscard]] const std::vector<double>& get_v_moving_level_value() const { return v_moving_level_value; }
+    void set_v_moving_level_value(const std::vector<double>& value) { v_moving_level_value = value; }
+
+    [[nodiscard]] double get_length_of_stay_theta() const { return length_of_stay_theta; }
+    void set_length_of_stay_theta(double value) { length_of_stay_theta = value; }
+
+    [[nodiscard]] double get_length_of_stay_k() const { return length_of_stay_k; }
+    void set_length_of_stay_k(double value) { length_of_stay_k = value; }
+
+    [[nodiscard]] MultinomialDistributionGenerator get_moving_level_generator() const {
+      return moving_level_generator_;
+    }
+
+  void process_config() override {}
+
+  void process_config_using_spatial_settings(
+    std::vector<std::vector<double>> spatial_distance_matrix,int number_of_locations) {
+    spdlog::info("Processing MovementSettings");
+    if(spatial_model_settings_.get_name() == "Barabasi") {
+      spdlog::info("Processing BarabasiSM");
+      spatial_model_ = new Spatial::BarabasiSM(spatial_model_settings_.get_barabasi_sm().get_r_g_0(),
+                                               spatial_model_settings_.get_barabasi_sm().get_beta_r(),
+                                               spatial_model_settings_.get_barabasi_sm().get_kappa());
+    } else if(spatial_model_settings_.get_name() == "Wesolowski") {
+      spdlog::info("Processing WesolowskiSM");
+      spatial_model_ = new Spatial::WesolowskiSM(spatial_model_settings_.get_wesolowski_sm().get_kappa(),
+                                                 spatial_model_settings_.get_wesolowski_sm().get_alpha(),
+                                                 spatial_model_settings_.get_wesolowski_sm().get_beta(),
+                                                 spatial_model_settings_.get_wesolowski_sm().get_gamma());
+    } else if(spatial_model_settings_.get_name() == "WesolowskiSurface") {
+      spdlog::info("Processing WesolowskiSurfaceSM");
+      spatial_model_ = new Spatial::WesolowskiSurfaceSM(spatial_model_settings_.get_wesolowski_surface_sm().get_kappa(),
+                                                            spatial_model_settings_.get_wesolowski_surface_sm().get_alpha(),
+                                                            spatial_model_settings_.get_wesolowski_surface_sm().get_beta(),
+                                                            spatial_model_settings_.get_wesolowski_surface_sm().get_gamma(),
+                                                            number_of_locations);
+    } else if(spatial_model_settings_.get_name() == "Marshall") {
+      spdlog::info("Processing MarshallSM");
+      spatial_model_ = new Spatial::MarshallSM(spatial_model_settings_.get_marshall_sm().get_tau(),
+                                               spatial_model_settings_.get_marshall_sm().get_alpha(),
+                                               spatial_model_settings_.get_marshall_sm().get_log_rho(),
+                                               number_of_locations,
+                                               spatial_distance_matrix);
+    } else if(spatial_model_settings_.get_name() == "BurkinaFaso") {
+      spdlog::info("Processing BurkinaFasoSM");
+      spatial_model_ = new Spatial::BurkinaFasoSM(spatial_model_settings_.get_burkina_faso_sm().get_tau(),
+                                                  spatial_model_settings_.get_burkina_faso_sm().get_alpha(),
+                                                  spatial_model_settings_.get_burkina_faso_sm().get_log_rho(),
+                                                  spatial_model_settings_.get_burkina_faso_sm().get_capital(),
+                                                  spatial_model_settings_.get_burkina_faso_sm().get_penalty(),
+                                                  number_of_locations,
+                                                  spatial_distance_matrix);
+    }
+      // Circulation Info
+      // calculate density and level value here
+      const auto var = get_circulation_info().get_moving_level_distribution().get_gamma().get_sd()
+      * get_circulation_info().get_moving_level_distribution().get_gamma().get_sd();
+      const auto b = var / (get_circulation_info().get_moving_level_distribution().get_gamma().get_mean() - 1);  // theta
+      const auto a = (get_circulation_info().get_moving_level_distribution().get_gamma().get_mean() - 1) / b;    // k
+
+      v_moving_level_density.clear();
+      v_moving_level_value.clear();
+
+      const auto max =
+          get_circulation_info().get_max_relative_moving_value() - 1;  // maxRelativeBiting -1
+      const auto number_of_level = get_circulation_info().get_number_of_moving_levels();
+
+      const auto step = max / static_cast<double>(number_of_level - 1);
+
+      auto j = 0;
+      double old_p = 0;
+      double sum = 0;
+      for (double i = 0; i <= max + 0.0001; i += step) {
+        const auto p = gsl_cdf_gamma_P(i + step, a, b);
+        double value = 0;
+        value = (j == 0) ? p : p - old_p;
+        v_moving_level_density.push_back(value);
+        old_p = p;
+        v_moving_level_value.push_back(i + 1);
+        sum += value;
+        j++;
+      }
+
+      // normalized
+      double t = 0;
+      for (auto &i : v_moving_level_density) {
+        i = i + (1 - sum) / v_moving_level_density.size();
+        t += i;
+      }
+
+      assert((unsigned)get_circulation_info().get_number_of_moving_levels()
+             == v_moving_level_density.size());
+      assert((unsigned)get_circulation_info().get_number_of_moving_levels()
+             == v_moving_level_value.size());
+      assert(fabs(t - 1) < 0.0001);
+
+      const auto stay_variance = get_circulation_info().get_length_of_stay().get_sd()
+      * get_circulation_info().get_length_of_stay().get_sd();
+      const auto k = stay_variance / get_circulation_info().get_length_of_stay().get_mean();  // k
+      const auto theta = get_circulation_info().get_length_of_stay().get_mean() / k;          // theta
+
+      length_of_stay_theta = theta;
+      length_of_stay_k = k;
+
+      moving_level_generator_.level_density = v_moving_level_density;
+  }
+
 private:
-    SpatialModel spatial_model_;
+    SpatialModelSettings spatial_model_settings_;
+    Spatial::SpatialModel* spatial_model_;
     CirculationInfo circulation_info_;
+    DoubleVector v_moving_level_value;
+    DoubleVector v_moving_level_density;
+    MultinomialDistributionGenerator moving_level_generator_{};
+    double length_of_stay;
+    double length_of_stay_mean;
+    double length_of_stay_sd;
+    double length_of_stay_theta;
+    double length_of_stay_k;
 };
 
 namespace YAML {
-// BarabasiSettings YAML conversion
+// BarabasiSM YAML conversion
 template<>
-struct convert<MovementSettings::BarabasiSettings> {
-    static Node encode(const MovementSettings::BarabasiSettings& rhs) {
+struct convert<MovementSettings::BarabasiSM> {
+    static Node encode(const MovementSettings::BarabasiSM& rhs) {
         Node node;
         node["r_g_0"] = rhs.get_r_g_0();
         node["beta_r"] = rhs.get_beta_r();
@@ -152,7 +419,7 @@ struct convert<MovementSettings::BarabasiSettings> {
         return node;
     }
 
-    static bool decode(const Node& node, MovementSettings::BarabasiSettings& rhs) {
+    static bool decode(const Node& node, MovementSettings::BarabasiSM& rhs) {
         if(!node["r_g_0"] || !node["beta_r"] || !node["kappa"])
             throw std::runtime_error("Missing fields in BarabasiSettings");
 
@@ -163,10 +430,11 @@ struct convert<MovementSettings::BarabasiSettings> {
     }
 };
 
-// WesolowskiSettings YAML conversion
+
+// WesolowskiSM YAML conversion
 template<>
-struct convert<MovementSettings::WesolowskiSettings> {
-    static Node encode(const MovementSettings::WesolowskiSettings& rhs) {
+struct convert<MovementSettings::WesolowskiSM> {
+    static Node encode(const MovementSettings::WesolowskiSM& rhs) {
         Node node;
         node["kappa"] = rhs.get_kappa();
         node["alpha"] = rhs.get_alpha();
@@ -175,9 +443,9 @@ struct convert<MovementSettings::WesolowskiSettings> {
         return node;
     }
 
-    static bool decode(const Node& node, MovementSettings::WesolowskiSettings& rhs) {
+    static bool decode(const Node& node, MovementSettings::WesolowskiSM& rhs) {
         if(!node["kappa"] || !node["alpha"] || !node["beta"] || !node["gamma"])
-            throw std::runtime_error("Missing fields in WesolowskiSettings");
+            throw std::runtime_error("Missing fields in WesolowskiSM");
 
         rhs.set_kappa(node["kappa"].as<double>());
         rhs.set_alpha(node["alpha"].as<double>());
@@ -187,24 +455,131 @@ struct convert<MovementSettings::WesolowskiSettings> {
     }
 };
 
+// WesolowskiSurfaceSM YAML conversion
+template<>
+struct convert<MovementSettings::WesolowskiSurfaceSM> {
+  static Node encode(const MovementSettings::WesolowskiSurfaceSM& rhs) {
+    Node node;
+    node["kappa"] = rhs.get_kappa();
+    node["alpha"] = rhs.get_alpha();
+    node["beta"] = rhs.get_beta();
+    node["gamma"] = rhs.get_gamma();
+    return node;
+  }
+
+  static bool decode(const Node& node, MovementSettings::WesolowskiSurfaceSM& rhs) {
+    if(!node["kappa"] || !node["alpha"] || !node["beta"] || !node["gamma"])
+      throw std::runtime_error("Missing fields in WesolowskiSurfaceSM");
+
+    rhs.set_kappa(node["kappa"].as<double>());
+    rhs.set_alpha(node["alpha"].as<double>());
+    rhs.set_beta(node["beta"].as<double>());
+    rhs.set_gamma(node["gamma"].as<double>());
+    return true;
+  }
+};
+
+// MarshallSM YAML conversion
+template<>
+struct convert<MovementSettings::MarshallSM> {
+  static Node encode(const MovementSettings::MarshallSM& rhs) {
+    Node node;
+    node["tau"] = rhs.get_tau();
+    node["alpha"] = rhs.get_alpha();
+    node["log_rho"] = rhs.get_log_rho();
+    return node;
+  }
+
+  static bool decode(const Node& node, MovementSettings::MarshallSM& rhs) {
+    if(!node["tau"] || !node["alpha"] || !node["log_rho"])
+      throw std::runtime_error("Missing fields in MarshallSM");
+
+    rhs.set_tau(node["tau"].as<double>());
+    rhs.set_alpha(node["alpha"].as<double>());
+    rhs.set_log_rho(node["log_rho"].as<double>());
+    return true;
+  }
+};
+
+// BurkinaFasoSM YAML conversion
+template<>
+struct convert<MovementSettings::BurkinaFasoSM> {
+  static Node encode(const MovementSettings::BurkinaFasoSM& rhs) {
+    Node node;
+    node["tau"] = rhs.get_tau();
+    node["alpha"] = rhs.get_alpha();
+    node["log_rho"] = rhs.get_log_rho();
+    node["capital"] = rhs.get_capital();
+    node["penalty"] = rhs.get_penalty();
+    return node;
+  }
+
+  static bool decode(const Node& node, MovementSettings::BurkinaFasoSM& rhs) {
+    if(!node["tau"] || !node["alpha"] || !node["log_rho"] || !node["capital"] || !node["penalty"])
+      throw std::runtime_error("Missing fields in BurkinaFasoSM");
+
+    rhs.set_tau(node["tau"].as<double>());
+    rhs.set_alpha(node["alpha"].as<double>());
+    rhs.set_log_rho(node["log_rho"].as<double>());
+    rhs.set_capital(node["capital"].as<double>());
+    rhs.set_penalty(node["penalty"].as<double>());
+    return true;
+  }
+};
+
 // SpatialModel YAML conversion
 template<>
-struct convert<MovementSettings::SpatialModel> {
-    static Node encode(const MovementSettings::SpatialModel& rhs) {
+struct convert<MovementSettings::SpatialModelSettings> {
+    static Node encode(const MovementSettings::SpatialModelSettings& rhs) {
         Node node;
         node["name"] = rhs.get_name();
-        node["Barabasi"] = rhs.get_barabasi();
-        node["Wesolowski"] = rhs.get_wesolowski();
+        node["Barabasi"] = rhs.get_barabasi_sm();
+        node["Wesolowski"] = rhs.get_wesolowski_sm();
+        node["Marshall"] = rhs.get_marshall_sm();
+        node["BurkinaFaso"] = rhs.get_burkina_faso_sm();
+        node["WesolowskiSurface"] = rhs.get_wesolowski_surface_sm();
         return node;
     }
 
-    static bool decode(const Node& node, MovementSettings::SpatialModel& rhs) {
-        if(!node["name"] || !node["Barabasi"] || !node["Wesolowski"])
-            throw std::runtime_error("Missing fields in MovementSettings/SpatialModel");
+    static bool decode(const Node& node, MovementSettings::SpatialModelSettings& rhs) {
+      if(!node["name"]) {
+        throw std::runtime_error("Missing fields in SpatialModel");
+        }
+      rhs.set_name(node["name"].as<std::string>());
 
-        rhs.set_name(node["name"].as<std::string>());
-        rhs.set_barabasi(node["Barabasi"].as<MovementSettings::BarabasiSettings>());
-        rhs.set_wesolowski(node["Wesolowski"].as<MovementSettings::WesolowskiSettings>());
+      if(node["Barabasi"]) {
+        rhs.set_barabasi_sm(node["Barabasi"].as<MovementSettings::BarabasiSM>());
+      }
+      if(node["Wesolowski"]) {
+          rhs.set_wesolowski_sm(node["Wesolowski"].as<MovementSettings::WesolowskiSM>());
+      }
+      if(node["Marshall"]) {
+          rhs.set_marshall_sm(node["Marshall"].as<MovementSettings::MarshallSM>());
+      }
+      if(node["BurkinaFaso"]) {
+          rhs.set_burkina_faso_sm(node["BurkinaFaso"].as<MovementSettings::BurkinaFasoSM>());
+      }
+      if(node["WesolowskiSurface"]) {
+          rhs.set_wesolowski_surface_sm(node["WesolowskiSurface"].as<MovementSettings::WesolowskiSurfaceSM>());
+      }
+      return true;
+    }
+};
+
+// ExponentialDistribution YAML conversion
+template<>
+struct convert<MovementSettings::MovingLevelDistributionExponential> {
+    static Node encode(const MovementSettings::MovingLevelDistributionExponential& rhs) {
+        Node node;
+        node["scale"] = rhs.get_scale();
+        return node;
+    }
+
+    static bool decode(const Node& node, MovementSettings::MovingLevelDistributionExponential& rhs) {
+        if(!node["scale"])
+            throw std::runtime_error("Missing fields in ExponentialDistribution");
+
+        rhs.set_scale(node["scale"].as<double>());
         return true;
     }
 };
@@ -229,6 +604,26 @@ struct convert<MovementSettings::MovingLevelDistributionGamma> {
     }
 };
 
+// LengthOfStay YAML conversion
+template<>
+struct convert<MovementSettings::LengthOfStay> {
+  static Node encode(const MovementSettings::LengthOfStay& rhs) {
+    Node node;
+    node["mean"] = rhs.get_mean();
+    node["sd"] = rhs.get_sd();
+    return node;
+  }
+
+  static bool decode(const Node& node, MovementSettings::LengthOfStay& rhs) {
+    if(!node["mean"] || !node["sd"])
+      throw std::runtime_error("Missing fields in LengthOfStay");
+
+    rhs.set_mean(node["mean"].as<double>());
+    rhs.set_sd(node["sd"].as<double>());
+    return true;
+  }
+};
+
 // MovingLevelDistribution YAML conversion
 template<>
 struct convert<MovementSettings::MovingLevelDistribution> {
@@ -236,15 +631,17 @@ struct convert<MovementSettings::MovingLevelDistribution> {
         Node node;
         node["distribution"] = rhs.get_distribution();
         node["Gamma"] = rhs.get_gamma();
+        node["Exponential"] = rhs.get_exponential();
         return node;
     }
 
     static bool decode(const Node& node, MovementSettings::MovingLevelDistribution& rhs) {
-        if(!node["distribution"] || !node["Gamma"])
+        if(!node["distribution"] || !node["Gamma"] || !node["Exponential"])
             throw std::runtime_error("Missing fields in MovingLevelDistribution");
 
         rhs.set_distribution(node["distribution"].as<std::string>());
         rhs.set_gamma(node["Gamma"].as<MovementSettings::MovingLevelDistributionGamma>());
+        rhs.set_exponential(node["Exponential"].as<MovementSettings::MovingLevelDistributionExponential>());
         return true;
     }
 };
@@ -259,6 +656,8 @@ struct convert<MovementSettings::CirculationInfo> {
         node["moving_level_distribution"] = rhs.get_moving_level_distribution();
         node["circulation_percent"] = rhs.get_circulation_percent();
         node["length_of_stay"] = rhs.get_length_of_stay();
+        node["relative_probability_that_child_travels_compared_to_adult"] = rhs.get_relative_probability_that_child_travels_compared_to_adult();
+        node["relative_probability_for_clinical_to_travel"] = rhs.get_relative_probability_for_clinical_to_travel();
         return node;
     }
 
@@ -272,7 +671,26 @@ struct convert<MovementSettings::CirculationInfo> {
         rhs.set_number_of_moving_levels(node["number_of_moving_levels"].as<int>());
         rhs.set_moving_level_distribution(node["moving_level_distribution"].as<MovementSettings::MovingLevelDistribution>());
         rhs.set_circulation_percent(node["circulation_percent"].as<double>());
-        rhs.set_length_of_stay(node["length_of_stay"].as<MovementSettings::MovingLevelDistributionGamma>());
+        rhs.set_length_of_stay(node["length_of_stay"].as<MovementSettings::LengthOfStay>());
+        if (node["relative_probability_that_child_travels_compared_to_adult"]) {
+          rhs.set_relative_probability_that_child_travels_compared_to_adult(
+            node["relative_probability_that_child_travels_compared_to_adult"]
+                  .as<double>());
+        } else {
+          spdlog::info("Relative probability that child travels compared to adult is "
+                       "not set in input file, defaulting to 1.0");
+          rhs.set_relative_probability_that_child_travels_compared_to_adult(1.0);
+        }
+        if (node["relative_probability_for_clinical_to_travel"]) {
+          rhs.set_relative_probability_for_clinical_to_travel(
+            node["relative_probability_that_child_travels_compared_to_adult"]
+                  .as<double>());
+        } else {
+          // log warning
+          spdlog::info("Relative probability for a clinical case to travel is "
+                       "not set in input file, defaulting to 1.0");
+          rhs.set_relative_probability_for_clinical_to_travel(1.0);
+        }
         return true;
     }
 };
@@ -282,7 +700,7 @@ template<>
 struct convert<MovementSettings> {
     static Node encode(const MovementSettings& rhs) {
         Node node;
-        node["spatial_model"] = rhs.get_spatial_model();
+        node["spatial_model"] = rhs.get_spatial_model_settings();
         node["circulation_info"] = rhs.get_circulation_info();
         return node;
     }
@@ -291,7 +709,7 @@ struct convert<MovementSettings> {
         if(!node["spatial_model"] || !node["circulation_info"])
             throw std::runtime_error("Missing fields in MovementSettings");
 
-        rhs.set_spatial_model(node["spatial_model"].as<MovementSettings::SpatialModel>());
+        rhs.set_spatial_model_settings(node["spatial_model"].as<MovementSettings::SpatialModelSettings>());
         rhs.set_circulation_info(node["circulation_info"].as<MovementSettings::CirculationInfo>());
         return true;
     }

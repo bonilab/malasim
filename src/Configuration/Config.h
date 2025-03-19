@@ -2,21 +2,37 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <date/date.h>
 #include <string>
-#include "ConfigData.h"
 
-class Config {
+#include "DrugParameters.h"
+#include "EpidemiologicalParameters.h"
+#include "GenotypeParameters.h"
+#include "ImmuneSystemParameters.h"
+#include "ModelSettings.h"
+#include "MosquitoParameters.h"
+#include "MovementSettings.h"
+#include "ParasiteParameters.h"
+#include "PopulationDemographic.h"
+#include "PopulationEvents.h"
+#include "RaptSettings.h"
+#include "TransmissionSettings.h"
+#include "SimulationTimeframe.h"
+#include "SpatialSettings.h"
+#include "SeasonalitySettings.h"
+#include "StrategyParameters.h"
+#include "TherapyParameters.h"
+
+class Config{
 public:
+  //disallow copy, assign and move
+  Config(const Config&) = delete;
+  void operator=(const Config&) = delete;
+  Config(Config&&) = delete;
+  Config& operator=(Config&&) = delete;
+
   // Constructor and Destructor
   Config() = default;
   ~Config() = default;
-
-  // delete copy and move constructors and assign operators
-  Config(const Config &) = delete;
-  Config &operator=(const Config &) = delete;
-  Config(Config &&) = delete;
-  Config &operator=(Config &&) = delete;
 
   // Load configuration from a YAML file
   bool load(const std::string &filename);
@@ -29,61 +45,69 @@ public:
 
   // Getters for entire configuration structures
   [[nodiscard]] const ModelSettings &get_model_settings() const {
-    return config_data_.model_settings;
+    return model_settings_;
   }
-  [[nodiscard]] const SimulationTimeframe &get_simulation_timeframe() const {
-    return config_data_.simulation_timeframe;
+  [[nodiscard]] SimulationTimeframe &get_simulation_timeframe() {
+    return simulation_timeframe_;
   }
   [[nodiscard]] const TransmissionSettings &get_transmission_settings() const {
-    return config_data_.transmission_settings;
+    return transmission_settings_;
   }
   [[nodiscard]] const PopulationDemographic &get_population_demographic()
       const {
-    return config_data_.population_demographic;
+    return population_demographic_;
   }
-  [[nodiscard]] const SpatialSettings &get_spatial_settings() const {
-    return config_data_.spatial_settings;
+  [[nodiscard]] SpatialSettings &get_spatial_settings() {
+    /* no const here because Spatial Data class will need to access and modify later */
+    return spatial_settings_;
   }
-  [[nodiscard]] const SeasonalitySettings &get_seasonality_settings() const {
-    return config_data_.seasonality_settings;
+  [[nodiscard]] SeasonalitySettings &get_seasonality_settings() {
+    return seasonality_settings_;
   }
-  [[nodiscard]] const MovementSettings &get_movement_settings() const {
-    return config_data_.movement_settings;
+  [[nodiscard]] MovementSettings &get_movement_settings() {
+    return movement_settings_;
   }
   [[nodiscard]] const ParasiteParameters &get_parasite_parameters() const {
-    return config_data_.parasite_parameters;
+    return parasite_parameters_;
   }
   [[nodiscard]] const ImmuneSystemParameters &get_immune_system_parameters()
       const {
-    return config_data_.immune_system_parameters;
+    return immune_system_parameters_;
   }
-  [[nodiscard]] const GenotypeParameters &get_genotype_parameters()
-      const {
-    return config_data_.genotype_parameters;
+  [[nodiscard]] GenotypeParameters &get_genotype_parameters()
+      {
+    return genotype_parameters_;
   }
   [[nodiscard]] const DrugParameters &get_drug_parameters()
       const {
-    return config_data_.drug_parameters;
+    return drug_parameters_;
   }
   [[nodiscard]] const TherapyParameters &get_therapy_parameters()
       const {
-    return config_data_.therapy_parameters;
+    return therapy_parameters_;
   }
-  [[nodiscard]] const StrategyParameters &get_strategy_parameters()
-      const {
-    return config_data_.strategy_parameters;
+  [[nodiscard]] StrategyParameters &get_strategy_parameters()
+      {
+    return strategy_parameters_;
   }
   [[nodiscard]] const EpidemiologicalParameters &get_epidemiological_parameters()
       const {
-    return config_data_.epidemiological_parameters;
+    return epidemiological_parameters_;
   }
-  [[nodiscard]] const MosquitoParameters &get_mosquito_parameters()
-      const {
-    return config_data_.mosquito_parameters;
+  [[nodiscard]] MosquitoParameters &get_mosquito_parameters()
+      {
+    return mosquito_parameters_;
   }
-  [[nodiscard]] const PopulationEvents &get_population_events()
-      const {
-    return config_data_.population_events;
+  [[nodiscard]] PopulationEvents &get_population_events()
+      {
+    return population_events_;
+  }
+  [[nodiscard]] RaptSettings &get_rapt_settings() {
+    return rapt_settings_;
+  }
+
+  int get_number_of_locations() const {
+    return spatial_settings_.get_number_of_locations();
   }
 
 private:
@@ -98,11 +122,28 @@ private:
   void set_field(T &field, const T &value) {
     field = value;
   }
-  // Configuration Data
-  ConfigData config_data_;
 
   // Configuration File Path
   std::string config_file_path_;
+  Model *model_;
+
+  ModelSettings model_settings_;
+  TransmissionSettings transmission_settings_;
+  PopulationDemographic population_demographic_;
+  SimulationTimeframe simulation_timeframe_;
+  SpatialSettings spatial_settings_;
+  SeasonalitySettings seasonality_settings_;
+  MovementSettings movement_settings_;
+  ParasiteParameters parasite_parameters_;
+  ImmuneSystemParameters immune_system_parameters_;
+  GenotypeParameters genotype_parameters_;
+  DrugParameters drug_parameters_;
+  TherapyParameters therapy_parameters_;
+  StrategyParameters strategy_parameters_;
+  EpidemiologicalParameters epidemiological_parameters_;
+  MosquitoParameters mosquito_parameters_;
+  PopulationEvents population_events_;
+  RaptSettings rapt_settings_;
 };
 
 #endif  // CONFIG_H

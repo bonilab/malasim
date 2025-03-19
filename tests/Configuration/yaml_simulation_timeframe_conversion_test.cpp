@@ -12,7 +12,7 @@ protected:
     // Set up default values for the tests
     void SetUp() override {
         default_timeframe.set_starting_date(date::year_month_day{date::year{2000}, date::month{1}, date::day{1}});
-        default_timeframe.set_start_of_comparison_period(date::year_month_day{date::year{2010}, date::month{1}, date::day{1}});
+        default_timeframe.set_start_of_comparison_period_date(date::year_month_day{date::year{2010}, date::month{1}, date::day{1}});
         default_timeframe.set_ending_date(date::year_month_day{date::year{2030}, date::month{1}, date::day{1}});
         default_timeframe.set_start_collect_data_day(0);
     }
@@ -41,7 +41,7 @@ TEST_F(SimulationTimeframeTest, DecodeSimulationTimeframe) {
 
     // Wrap braced initializer lists in parentheses
     EXPECT_EQ(decoded_timeframe.get_starting_date(), (date::year_month_day{date::year{2000}, date::month{1}, date::day{1}}));
-    EXPECT_EQ(decoded_timeframe.get_start_of_comparison_period(), (date::year_month_day{date::year{2010}, date::month{1}, date::day{1}}));
+    EXPECT_EQ(decoded_timeframe.get_start_of_comparison_period_date(), (date::year_month_day{date::year{2010}, date::month{1}, date::day{1}}));
     EXPECT_EQ(decoded_timeframe.get_ending_date(), (date::year_month_day{date::year{2030}, date::month{1}, date::day{1}}));
     EXPECT_EQ(decoded_timeframe.get_start_collect_data_day(), 0);
 }

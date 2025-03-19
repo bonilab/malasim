@@ -1,7 +1,7 @@
 #include <filesystem>
 #include <yaml-cpp/yaml.h>
 #include "Config.h"
-#include "Utils/AscFile.h"
+#include "Utils/Cli.hxx"
 
 int inline get_pipe_count(const std::string &str) {
   int pipe_count = 0;
@@ -18,60 +18,162 @@ bool Config::load(const std::string &filename) {
   try {
     YAML::Node config = YAML::LoadFile(filename);
 
-    std::cout << "Configuration file loaded successfully" << std::endl;
+    spdlog::info("Configuration file loaded successfully: " + utils::Cli::get_instance().get_input_path());
 
-    config_data_.model_settings = config["model_settings"].as<ModelSettings>();
-    config_data_.simulation_timeframe  =
+    model_settings_ = config["model_settings"].as<ModelSettings>();
+    simulation_timeframe_  =
       config["simulation_timeframe"].as<SimulationTimeframe>();
 
-    config_data_.transmission_settings =
+    transmission_settings_ =
         config["transmission_settings"].as<TransmissionSettings>();
 
-    config_data_.population_demographic =
+    population_demographic_ =
       config["population_demographic"].as<PopulationDemographic>();
 
-    config_data_.spatial_settings =
+    spatial_settings_ =
        config["spatial_settings"].as<SpatialSettings>();
 
-    config_data_.seasonality_settings =
+    seasonality_settings_ =
       config["seasonality_settings"].as<SeasonalitySettings>();
 
-    config_data_.movement_settings =
+    movement_settings_ =
       config["movement_settings"].as<MovementSettings>();
 
-    config_data_.parasite_parameters =
+    parasite_parameters_ =
       config["parasite_parameters"].as<ParasiteParameters>();
 
-    config_data_.immune_system_parameters =
+    immune_system_parameters_ =
       config["immune_system_parameters"].as<ImmuneSystemParameters>();
 
-    config_data_.genotype_parameters =
+    genotype_parameters_ =
       config["genotype_parameters"].as<GenotypeParameters>();
 
-    config_data_.drug_parameters =
+    drug_parameters_ =
       config["drug_parameters"].as<DrugParameters>();
 
-    config_data_.therapy_parameters =
+    therapy_parameters_ =
       config["therapy_parameters"].as<TherapyParameters>();
 
-    config_data_.strategy_parameters =
+    strategy_parameters_ =
       config["strategy_parameters"].as<StrategyParameters>();
 
-    config_data_.epidemiological_parameters =
+    epidemiological_parameters_ =
       config["epidemiological_parameters"].as<EpidemiologicalParameters>();
 
-    config_data_.mosquito_parameters =
+    mosquito_parameters_ =
       config["mosquito_parameters"].as<MosquitoParameters>();
 
-    config_data_.population_events =
-      config["population_events"].as<PopulationEvents>();
+    rapt_settings_ =
+      config["rapt_settings"].as<RaptSettings>();
 
-    std::cout << "Configuration file parsed successfully" << std::endl;
+    spdlog::info("Configuration file parsed successfully");
 
     // Validate all cross field validations
     validate_all_cross_field_validations();
 
-    std::cout << "Configuration file validated successfully" << std::endl;
+    spdlog::info("Configuration file validated successfully");
+
+    //test config
+    spdlog::info("Genotype info:");
+    for(const auto& parasites : get_genotype_parameters().get_initial_parasite_info_raw()) {
+
+      for(const auto& parasite : parasites.get_parasite_info()) {
+        spdlog::info("{} {}",
+          parasite.get_aa_sequence(),
+          parasite.get_prevalence());
+      }
+    }
+
+    spdlog::debug("Pf genotype info: {}",
+      get_genotype_parameters().get_pf_genotype_info().chromosome_infos.back()
+      .get_genes().back()
+      .get_cnv_multiplicative_effect_on_EC50().back()
+      .get_drug_id());
+    for(const auto& chromosome : get_genotype_parameters().get_pf_genotype_info().chromosome_infos) {
+      if (chromosome.get_chromosome_id() != -1) {
+        spdlog::debug("chromosome:{}",chromosome.get_chromosome_id());
+        for(const auto& genes : chromosome.get_genes()) {
+          spdlog::debug("\tgene:{}",genes.get_name());
+          if(genes.get_max_copies() != -1) {
+            spdlog::debug("\tmax copies:{}",genes.get_max_copies());
+          }
+          if(genes.get_average_daily_crs() != -1) {
+            spdlog::debug("\taverage crs:{}",genes.get_average_daily_crs());
+          }
+          for(const auto &cnv_crs : genes.get_cnv_daily_crs()){
+            spdlog::debug("\tcnv crs:{}",cnv_crs);
+          }
+          for(const auto &cnv_ec50 : genes.get_cnv_multiplicative_effect_on_EC50()){
+            spdlog::debug("\tcnv ec50:{}",cnv_ec50.get_drug_id());
+            for(const auto &factor : cnv_ec50.get_factors()) {
+              spdlog::debug("\t\tfactor:{}",factor);
+            }
+          }
+          for(const auto &cnv_ec50 : genes.get_multiplicative_effect_on_ec50_for_2_or_more_mutations()){
+            spdlog::debug("\tcnv_ec50_2_or_more id:{}",cnv_ec50.get_drug_id());
+            spdlog::debug("\tcnv_ec50_2_or_more factor:{}",cnv_ec50.get_factor());
+          }
+          for(const auto &aa_pos : genes.get_aa_positions()) {
+            // spdlog::debug("\tpos {}",aa_pos.get_position());
+            //   spdlog::debug("\t\taa:{}",aa_pos.get_amino_acids_string());
+            //   spdlog::debug("\t\tcrs:{}",aa_pos.get_daily_crs_string());
+            //   spdlog::debug("\t\tmultiplicative_effect_on_EC50:{}",aa_pos.get_multiplicative_effect_on_EC50_string());
+            for(const auto & aa : aa_pos.get_amino_acids()) {
+              spdlog::debug("\t\taa:{}",aa);
+            }
+            for(const auto &crs : aa_pos.get_daily_crs()) {
+              spdlog::debug("\t\tcrs:{}",crs);
+            }
+            for(const auto &crs : aa_pos.get_multiplicative_effect_on_EC50()) {
+              spdlog::debug("\t\tmultiplicative_effect_on_EC50: {}",crs.get_drug_id());
+              for(const auto &factor : crs.get_factors()) {
+                spdlog::debug("\t\t\tfactor:{}",factor);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    /* Any settings processed using settings from other settings should be called
+     * with setting names rather than process_config()
+     * This is to avoid circular linking of settings
+     * SeasonalitySettings and MovementSettings are examples of such settings
+     */
+
+    model_settings_.process_config();
+    simulation_timeframe_.process_config();
+    transmission_settings_.process_config();
+    population_demographic_.process_config();
+    spatial_settings_.process_config();
+    seasonality_settings_.process_config_using_number_of_locations(
+      get_spatial_settings().get_number_of_locations());
+    movement_settings_.process_config_using_spatial_settings(
+      get_spatial_settings().get_spatial_distance_matrix(),
+      get_spatial_settings().get_number_of_locations());
+    parasite_parameters_.process_config();
+    immune_system_parameters_.process_config_with_parasite_density(
+      get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_asymptomatic(),
+      get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured());
+    /* Drug mut be parsed before genotype */
+    drug_parameters_.process_config();
+    therapy_parameters_.process_config();
+    strategy_parameters_.process_config();
+    genotype_parameters_.process_config_with_number_of_locations(
+      get_spatial_settings().get_number_of_locations());
+    epidemiological_parameters_.process_config();
+    mosquito_parameters_.process_config_using_locations(
+    get_spatial_settings().location_db);
+    rapt_settings_.process_config_with_starting_date(
+      get_simulation_timeframe().get_starting_date());
+
+    /*
+     * Parse population events last because it depends on all other settings
+     */
+    population_events_ =
+      config["population_events"].as<PopulationEvents>();
+
+    spdlog::info("Population events parsed successfully");
 
     return true;
   }
@@ -83,26 +185,26 @@ bool Config::load(const std::string &filename) {
 }
 
 void Config::validate_all_cross_field_validations() {
+  spdlog::info("Validating all cross field validations");
   /*----------------------------
   Validate model settings
   ----------------------------*/
-  ModelSettings model_settings = config_data_.model_settings;
   //Check if days between stdout output is a positive number
-  if(model_settings.get_days_between_stdout_output() < 0) {
+  if(model_settings_.get_days_between_stdout_output() < 0) {
     throw std::invalid_argument("Days between stdout output should be a positive number");
   }
 
   /*----------------------------
   Validate simulation timeframe
   ----------------------------*/
-  SimulationTimeframe simulation_timeframe = config_data_.simulation_timeframe;
+  SimulationTimeframe simulation_timeframe = simulation_timeframe_;
   //Check if ending date is greater than starting date
   if(simulation_timeframe.get_starting_date() > simulation_timeframe.get_ending_date()) {
       throw std::invalid_argument("Simulation ending date should be greater than starting date");
   }
   //Comparison period should be in between starting and ending date
-  if(simulation_timeframe.get_start_of_comparison_period() < simulation_timeframe.get_starting_date() ||
-       simulation_timeframe.get_start_of_comparison_period() > simulation_timeframe.get_ending_date()) {
+  if(simulation_timeframe.get_start_of_comparison_period_date() < simulation_timeframe.get_starting_date() ||
+       simulation_timeframe.get_start_of_comparison_period_date() > simulation_timeframe.get_ending_date()) {
       throw std::invalid_argument("Comparison period should be in between starting and ending date");
   }
   //start_collect_data_day should be >= 0
@@ -113,7 +215,7 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate transmission settings
   ----------------------------*/
-  TransmissionSettings transmission_settings = config_data_.transmission_settings;
+  TransmissionSettings transmission_settings = transmission_settings_;
   //Check transmission_parameter in range [0,1]
   if(transmission_settings.get_transmission_parameter() < 0 || transmission_settings.get_transmission_parameter() > 1) {
     throw std::invalid_argument("Transmission parameter should be in range [0,1]");
@@ -126,7 +228,7 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate population demographic
   ----------------------------*/
-  PopulationDemographic population_demographic = config_data_.population_demographic;
+  PopulationDemographic population_demographic = population_demographic_;
   //Check if number_of_age_classes is a positive number
   if(population_demographic.get_number_of_age_classes() <= 0) {
       throw std::invalid_argument("Number of age classes should be a positive number");
@@ -171,7 +273,7 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate spatial settings
   ----------------------------*/
-  SpatialSettings spatial_settings = config_data_.spatial_settings;
+  SpatialSettings spatial_settings = spatial_settings_;
   //Check if mode is either grid_based or location_based
   if(spatial_settings.get_mode() != "grid_based" && spatial_settings.get_mode() != "location_based") {
       throw std::invalid_argument("Spatial mode should be either grid_based or location_based");
@@ -183,28 +285,6 @@ void Config::validate_all_cross_field_validations() {
        grid_based.get_beta_raster().empty() || grid_based.get_p_treatment_over_5_raster().empty() ||
        grid_based.get_p_treatment_under_5_raster().empty()) {
       throw std::invalid_argument("All raster file paths should be provided for grid based spatial mode");
-    }
-    // Validate all raster file paths
-    utils::AscFile *asc_file = new utils::AscFile();
-    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_population_raster(),
-                          utils::AscFile::Type::Population)) {
-      std::cout << "Population raster file validated successfully" << std::endl;
-    }
-    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_district_raster(),
-                           utils::AscFile::Type::District)) {
-      std::cout << "District raster file validated successfully" << std::endl;
-    }
-    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_beta_raster(),
-                           utils::AscFile::Type::Beta)) {
-      std::cout << "Beta raster file validated successfully" << std::endl;
-    }
-    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_p_treatment_over_5_raster(),
-                            utils::AscFile::Type::Treatment)) {
-      std::cout << "P treatment over 5 raster file validated successfully" << std::endl;
-    }
-    if(asc_file->load_and_validate(config_data_.spatial_settings.get_grid_based().get_p_treatment_under_5_raster(),
-                            utils::AscFile::Type::Treatment)) {
-      std::cout << "P treatment under 5 raster file validated successfully" << std::endl;
     }
     //Check if age_distribution_by_location size is different from 1
     if(grid_based.get_age_distribution_by_location().size() != 1) {
@@ -232,7 +312,7 @@ void Config::validate_all_cross_field_validations() {
       throw std::invalid_argument("All location sizes should be equal");
     }
     //Check if age_distribution_by_location size matched initial_age_structure size
-    if(location_based.get_age_distribution_by_location()[0].size() != population_demographic.get_initial_age_structure().size()) {
+    if(location_based.get_age_distribution_by_location().size() != population_demographic.get_initial_age_structure().size()) {
       throw std::invalid_argument("Age distribution by location size should match initial age structure size");
     }
   }
@@ -240,34 +320,69 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate seasonality settings
   ----------------------------*/
-  SeasonalitySettings seasonality_settings = config_data_.seasonality_settings;
+  SeasonalitySettings seasonality_settings = seasonality_settings_;
   //Check if rainfall file name is provided
-  if(seasonality_settings.get_rainfall().get_filename().empty()) {
-    throw std::invalid_argument("Rainfall file name should be provided");
+  if(seasonality_settings.get_enable() && seasonality_settings.get_mode().empty()) {
+    throw std::invalid_argument("Rainfall is enabled but mode is not provided");
   }
   //Check if rainfall file exists
-  if(!std::filesystem::exists(seasonality_settings.get_rainfall().get_filename())) {
+  if(seasonality_settings.get_enable() && seasonality_settings.get_mode() == "rainfall"
+    && !std::filesystem::exists(seasonality_settings.get_seasonal_rainfall()->get_filename())) {
     throw std::invalid_argument("Rainfall file does not exist");
+  }
+  if(seasonality_settings.get_enable() && seasonality_settings.get_mode() == "rainfall"
+    && seasonality_settings.get_seasonal_rainfall()->get_period() > 365) {
+    throw std::invalid_argument("Rainfall period should be less than or equal to 365");
+  }
+  if(seasonality_settings.get_enable() && seasonality_settings.get_mode() == "equation") {
+    if(seasonality_settings.get_seasonal_equation()->get_raster()
+      && spatial_settings.get_grid_based().get_ecoclimatic_raster().empty()) {
+      throw std::invalid_argument("Ecoclimatic raster should be provided for equation based seasonality.");
+      }
   }
 
   /*----------------------------
   Validate movement settings
   ----------------------------*/
-  MovementSettings movement_settings = config_data_.movement_settings;
+  MovementSettings movement_settings = movement_settings_;
   //Check if Barabasi parameters are valid
-  if(movement_settings.get_spatial_model().get_name() == "Barabasi") {
-      MovementSettings::BarabasiSettings barabasi = movement_settings.get_spatial_model().get_barabasi();
+  if(movement_settings.get_spatial_model_settings().get_name() == "Barabasi") {
+      MovementSettings::BarabasiSM barabasi = movement_settings.get_spatial_model_settings().get_barabasi_sm();
       if(barabasi.get_r_g_0() <= 0 || barabasi.get_beta_r() <= 0 || barabasi.get_kappa() <= 0) {
       throw std::invalid_argument("Barabasi parameters should be positive numbers");
       }
   }
   //Check if Wesolowski parameters are valid
-  if(movement_settings.get_spatial_model().get_name() == "Wesolowski") {
-      MovementSettings::WesolowskiSettings wesolowski = movement_settings.get_spatial_model().get_wesolowski();
-      if(wesolowski.get_alpha() <= 0 || wesolowski.get_beta() <= 0 || wesolowski.get_gamma() <= 0 || wesolowski.get_kappa() <= 0) {
+  if(movement_settings.get_spatial_model_settings().get_name() == "Wesolowski") {
+      MovementSettings::WesolowskiSM wesolowski = movement_settings.get_spatial_model_settings().get_wesolowski_sm();
+      if(wesolowski.get_alpha() <= 0 || wesolowski.get_beta() <= 0
+        || wesolowski.get_gamma() <= 0 || wesolowski.get_kappa() <= 0) {
       throw std::invalid_argument("Wesolowski parameters should be positive numbers");
       }
   }
+  //Check if WesolowskiSurface parameters are valid
+  if(movement_settings.get_spatial_model_settings().get_name() == "WesolowskiSurface") {
+      MovementSettings::WesolowskiSurfaceSM wesolowski_surface = movement_settings.get_spatial_model_settings().get_wesolowski_surface_sm();
+      if(wesolowski_surface.get_alpha() <= 0 || wesolowski_surface.get_beta() <= 0
+        || wesolowski_surface.get_gamma() <= 0 || wesolowski_surface.get_kappa() <= 0) {
+      throw std::invalid_argument("WesolowskiSurface parameters should be positive numbers");
+      }
+  }
+  //Check if Marshall parameters are valid
+  if(movement_settings.get_spatial_model_settings().get_name() == "Marshall") {
+      MovementSettings::MarshallSM marshall = movement_settings.get_spatial_model_settings().get_marshall_sm();
+      if(marshall.get_alpha() <= 0 || marshall.get_log_rho() <= 0 || marshall.get_tau() <= 0) {
+      throw std::invalid_argument("Marshall parameters should be positive numbers");
+      }
+  }
+  //Check if BurkinaFaso parameters are valid
+    if(movement_settings.get_spatial_model_settings().get_name() == "BurkinaFaso") {
+        MovementSettings::BurkinaFasoSM burkina_faso = movement_settings.get_spatial_model_settings().get_burkina_faso_sm();
+        if(burkina_faso.get_alpha() <= 0 || burkina_faso.get_tau() <= 0 || burkina_faso.get_log_rho() <= 0 ||
+             burkina_faso.get_capital() <= 0 || burkina_faso.get_penalty() <= 0) {
+        throw std::invalid_argument("BurkinaFaso parameters should be positive numbers");
+        }
+    }
   //Check if circular parameters are valid
   MovementSettings::CirculationInfo circulation_info = movement_settings.get_circulation_info();
   if(circulation_info.get_max_relative_moving_value() < 0 || circulation_info.get_number_of_moving_levels() <= 0) {
@@ -281,7 +396,7 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate parasite parameters
   ----------------------------*/
-  ParasiteParameters parasite_parameters = config_data_.parasite_parameters;
+  ParasiteParameters parasite_parameters = parasite_parameters_;
   //All log numbers should be smaller than 6
   if(parasite_parameters.get_parasite_density_levels().get_log_parasite_density_cured() >= 6 ||
      parasite_parameters.get_parasite_density_levels().get_log_parasite_density_from_liver() >= 6 ||
@@ -303,7 +418,7 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate immune system parameters
   ----------------------------*/
-    ImmuneSystemParameters immune_system_parameters = config_data_.immune_system_parameters;
+    ImmuneSystemParameters immune_system_parameters = immune_system_parameters_;
   //Check if all parameters are positive numbers
     if(immune_system_parameters.get_b1() < 0 || immune_system_parameters.get_b2() < 0
       || immune_system_parameters.get_duration_for_naive() < 0 || immune_system_parameters.get_duration_for_naive() < 0
@@ -318,7 +433,7 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate genotype parameters
   ----------------------------*/
-    GenotypeParameters genotype_parameters = config_data_.genotype_parameters;
+    GenotypeParameters genotype_parameters = genotype_parameters_;
   //Check if mask contains 13 "|" characters
   if(get_pipe_count(genotype_parameters.get_mutation_mask()) != 13) {
     throw std::invalid_argument("Override EC50 pattern should contain 13 '|' characters");
@@ -337,13 +452,13 @@ void Config::validate_all_cross_field_validations() {
       throw std::invalid_argument("Override EC50 pattern should contain 13 '|' characters");
     }
   }
-  //Check if aa_sequence in genotype_info of initial_genotype_info has correct string size and format
-  for(auto initial_genotype_info : genotype_parameters.get_initial_genotype_info()) {
-    for(auto genotype_info : initial_genotype_info.get_genotype_info()) {
-      if(get_pipe_count(genotype_info.get_aa_sequence()) != 13) {
+  //Check if aa_sequence in parasite_info of initial_parasite_info has correct string size and format
+  for(auto initial_parasite_info : genotype_parameters.get_initial_parasite_info_raw()) {
+    for(auto parasite_info : initial_parasite_info.get_parasite_info()) {
+      if(get_pipe_count(parasite_info.get_aa_sequence()) != 13) {
         throw std::invalid_argument("Initial genotype aa sequence should contain 13 '|' characters");
       }
-      if(genotype_info.get_aa_sequence().size() != genotype_parameters.get_mutation_mask().size()) {
+      if(parasite_info.get_aa_sequence().size() != genotype_parameters.get_mutation_mask().size()) {
         throw std::invalid_argument("Initial genotype aa sequence size should match mutation mask size");
       }
     }
@@ -353,8 +468,8 @@ void Config::validate_all_cross_field_validations() {
   Validate drug parameters
   ----------------------------*/
   //Loop through all drug parameters
-  DrugParameters drug_parameters = config_data_.drug_parameters;
-  for(auto drug: drug_parameters.get_drug_db()) {
+  DrugParameters drug_parameters = drug_parameters_;
+  for(auto drug: drug_parameters.get_drug_db_raw()) {
     if(drug.second.get_half_life() < 0 || drug.second.get_maximum_parasite_killing_rate() < 0
       || drug.second.get_n() < 0 || drug.second.get_k() < 0 || drug.second.get_base_EC50() < 0) {
         throw std::invalid_argument("All drug parameters should be positive numbers");
@@ -375,7 +490,7 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate therapy parameters
   ----------------------------*/
-  TherapyParameters therapy_parameters = config_data_.therapy_parameters;
+  TherapyParameters therapy_parameters = therapy_parameters_;
   //Check if tf_testing_day is positive number
   if(therapy_parameters.get_tf_testing_day() < 0) {
       throw std::invalid_argument("TF testing day should be a positive number");
@@ -386,10 +501,10 @@ void Config::validate_all_cross_field_validations() {
   }
   int therapy_max_dosing_days = 0;
   //Loop through therapy_db
-  for(auto therapy : therapy_parameters.get_therapy_db()) {
+  for(auto therapy : therapy_parameters.get_therapy_db_raw()) {
     for(auto drug_id : therapy.second.get_drug_ids()) {
       //Check if drug id is in drug_db keys
-      if(drug_parameters.get_drug_db().find(drug_id) == drug_parameters.get_drug_db().end()) {
+      if(drug_parameters.get_drug_db_raw().find(drug_id) == drug_parameters.get_drug_db_raw().end()) {
         throw std::invalid_argument("Drug id should be in drug db keys");
       }
       // Check if dosing days are positive numbers
@@ -407,16 +522,16 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate strategy parameters
   ----------------------------*/
-  StrategyParameters strategy_parameters = config_data_.strategy_parameters;
+  StrategyParameters strategy_parameters = strategy_parameters_;
   //Check if initial_strategy_id is in strategy_db keys
-  if(strategy_parameters.get_strategy_db().find(strategy_parameters.get_initial_strategy_id()) == strategy_parameters.get_strategy_db().end()) {
+  if(strategy_parameters.get_strategy_db_raw().find(strategy_parameters.get_initial_strategy_id()) == strategy_parameters.get_strategy_db_raw().end()) {
       throw std::invalid_argument("Initial strategy id should be in strategy db keys");
   }
 
   /*----------------------------
   Validate epidemiological parameters
   ----------------------------*/
-  EpidemiologicalParameters epidemiological_parameters = config_data_.epidemiological_parameters;
+  EpidemiologicalParameters epidemiological_parameters = epidemiological_parameters_;
   //Check if number_of_tracking_days is a positive number
   if(epidemiological_parameters.get_number_of_tracking_days() <= 0) {
       throw std::invalid_argument("Number of tracking days should be a positive number");
@@ -492,7 +607,7 @@ void Config::validate_all_cross_field_validations() {
   }
   EpidemiologicalParameters::RelativeInfectivity relative_infectivity = epidemiological_parameters.get_relative_infectivity();
   //Check if relative_infectivity is positive number
-  if(relative_infectivity.get_sigma() < 0 || relative_infectivity.get_ro() <= 0
+  if(relative_infectivity.get_sigma() < 0 || relative_infectivity.get_ro_star() <= 0
       || relative_infectivity.get_blood_meal_volume() <= 0) {
       throw std::invalid_argument("Relative infectivity should be positive numbers");
   }
@@ -500,52 +615,46 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate mosquito parameters
   ----------------------------*/
-  MosquitoParameters mosquito_parameters = config_data_.mosquito_parameters;
-  //Check if mosquito_mode is either grid_based or location_based
-  if(mosquito_parameters.get_mosquito_config().get_mode() != "grid_based" && mosquito_parameters.get_mosquito_config().get_mode() != "location_based") {
-      throw std::invalid_argument("Mosquito mode should be either grid_based or location_based");
-  }
-  //If mode is grid_based, check if all raster file paths are provided
-  if(mosquito_parameters.get_mosquito_config().get_mode() == "grid_based") {
-    MosquitoParameters::GridBased grid_based = mosquito_parameters.get_mosquito_config().get_grid_based();
-    utils::AscFile *asc_file = new utils::AscFile();
-    if(asc_file->load_and_validate(grid_based.get_interrupted_feeding_rate_raster(),
-                                    utils::AscFile::Type::Mosquito_IFR)) {
-      std::cout << "Interrupted feeding rate raster file validated successfully" << std::endl;
-                                    }
-    if(asc_file->load_and_validate(grid_based.get_prmc_size_raster(),
-                           utils::AscFile::Type::Mosquito_Size)) {
-      std::cout << "PRMC size raster file validated successfully" << std::endl;
-    }
-  }
-  //If location_based, check if all location sizes are equal
-  if(mosquito_parameters.get_mosquito_config().get_mode() == "location_based") {
-    MosquitoParameters::LocationBased location_based = mosquito_parameters.get_mosquito_config().get_location_based();
-    if(location_based.get_interrupted_feeding_rate().empty() || location_based.get_prmc_size().empty()) {
-      throw std::invalid_argument("All locations should be provided for location based mosquito mode");
-    }
-    //Check if all location sizes are equal
-    SpatialSettings::LocationBased spatial_location_based = spatial_settings.get_location_based();
-    if(location_based.get_interrupted_feeding_rate().size() != location_based.get_prmc_size().size()
-      && location_based.get_interrupted_feeding_rate().size() != spatial_location_based.get_population_size_by_location().size()) {
-      throw std::invalid_argument("All location sizes should be equal");
-    }
-  }
+   MosquitoParameters mosquito_parameters = mosquito_parameters_;
+   //Check if mosquito_mode is either grid_based or location_based
+   if(mosquito_parameters.get_mosquito_config().get_mode() != "grid_based" && mosquito_parameters.get_mosquito_config().get_mode() != "location_based") {
+       throw std::invalid_argument("Mosquito mode should be either grid_based or location_based");
+   }
+  // If mode is grid_based, check if all raster file paths are provided
+   if(mosquito_parameters.get_mosquito_config().get_mode() == "grid_based") {
+     MosquitoParameters::GridBased grid_based = mosquito_parameters.get_mosquito_config().get_grid_based();
+        if(grid_based.get_interrupted_feeding_rate_raster().empty() || grid_based.get_prmc_size_raster().empty()) {
+        throw std::invalid_argument("All raster file paths should be provided for grid based mosquito mode");
+        }
+   }
+  // If location_based, check if all location sizes are equal
+   if(mosquito_parameters.get_mosquito_config().get_mode() == "location_based") {
+     MosquitoParameters::LocationBased location_based = mosquito_parameters.get_mosquito_config().get_location_based();
+     if(location_based.get_interrupted_feeding_rate().empty() || location_based.get_prmc_size().empty()) {
+       throw std::invalid_argument("All locations should be provided for location based mosquito mode");
+     }
+     //Check if all location sizes are equal
+     SpatialSettings::LocationBased spatial_location_based = spatial_settings.get_location_based();
+     if(location_based.get_interrupted_feeding_rate().size() != location_based.get_prmc_size().size()
+       && location_based.get_interrupted_feeding_rate().size() != spatial_location_based.get_population_size_by_location().size()) {
+       throw std::invalid_argument("All location sizes should be equal");
+     }
+   }
 
   /*----------------------------
   Validate population events
   ----------------------------*/
-  PopulationEvents population_events = config_data_.population_events;
+  PopulationEvents population_events = population_events_;
   //Loop through all events
-  for(auto population_event : population_events.get_events()) {
+  for(auto population_event : population_events.get_events_raw()) {
     //Check if name is provided
     if(population_event.get_name().empty()) {
       throw std::invalid_argument("Name should be provided for all population events");
     }
     for(auto event_info : population_event.get_info()) {
       //Check if event date is valid
-      if(event_info.get_date() <= simulation_timeframe.get_starting_date() ||
-           event_info.get_date() >= simulation_timeframe.get_ending_date()) {
+      if(event_info.get_date() < simulation_timeframe.get_starting_date() ||
+           event_info.get_date() > simulation_timeframe.get_ending_date()) {
           throw std::invalid_argument("Event date should be in between simulation starting and ending date");
       }
     }

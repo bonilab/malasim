@@ -4,12 +4,13 @@
 #include <chrono>
 #include "date/date.h"
 #include "Simulation/Model.h" // Assuming Model is defined in a separate header file
+#include "Utils/TypeDef.hxx"
 
 class Scheduler {
 public:
   // Disable copy and assignment
   Scheduler(const Scheduler&) = delete;
-  Scheduler& operator=(const Scheduler&) = delete;
+  void operator=(const Scheduler&) = delete;
   Scheduler(Scheduler&&) = delete;
   Scheduler& operator=(Scheduler&&) = delete;
 
@@ -19,6 +20,9 @@ public:
   bool is_force_stop_;
 
   date::sys_days calendar_date;
+
+  // EventPtrVector2 individual_events_list_;
+  EventPtrVector2 population_events_list_;
 
   explicit Scheduler(Model *model = nullptr);
 
@@ -30,7 +34,7 @@ public:
 
   // Getter and Setter for total_available_time
   [[nodiscard]] int total_available_time() const { return total_available_time_; }
-  void set_total_available_time(int total_time) { total_available_time_ = total_time; }
+  void set_total_available_time(const int& value);
 
   // Getter and Setter for model
   [[nodiscard]] Model* model() const { return model_; }
@@ -44,41 +48,42 @@ public:
 
   void clear_all_events();
 
-//  void clear_all_events(EventPtrVector2 &events_list) const;
+  void clear_all_events(EventPtrVector2 &events_list);
 //
-//  virtual void schedule_individual_event(Event *event);
-//
-//  virtual void schedule_population_event(Event *event);
-//
-//  virtual void schedule_event(EventPtrVector &time_events, Event *event);
-//
-//  virtual void cancel(Event *event);
-//
-//  void execute_events_list(EventPtrVector &events_list) const;
+  // virtual void schedule_individual_event(Event *event);
 
-  void initialize(const date::year_month_day &starting_date, const int &total_time);
+  virtual void schedule_population_event(Event *event);
+
+  virtual void schedule_event(EventPtrVector &time_events, Event *event);
+
+  virtual void cancel(Event *event);
+
+  void execute_events_list(EventPtrVector &events_list);
+
+  void initialize(const date::year_month_day &starting_date,
+    const date::year_month_day &ending_date);
 
   void run();
 
-  void begin_time_step() const;
+  void begin_time_step();
 
-  void end_time_step() const;
+  void end_time_step();
 
-  [[nodiscard]] bool can_stop() const;
+  [[nodiscard]] bool can_stop();
 
-  [[nodiscard]] int current_day_in_year() const;
+  [[nodiscard]] int current_day_in_year();
 
-  [[nodiscard]] int current_month_in_year() const;
+  [[nodiscard]] int current_month_in_year();
 
-  [[nodiscard]] bool is_today_last_day_of_month() const;
+  [[nodiscard]] bool is_today_last_day_of_month();
 
-  [[nodiscard]] bool is_today_first_day_of_month() const;
+  [[nodiscard]] bool is_today_first_day_of_month();
 
-  [[nodiscard]] bool is_today_first_day_of_year() const;
+  [[nodiscard]] bool is_today_first_day_of_year();
 
-  [[nodiscard]] bool is_today_last_day_of_year() const;
+  [[nodiscard]] bool is_today_last_day_of_year();
 
-  void daily_update() const;
+  void daily_update();
 };
 
 #endif  /* SCHEDULER_H */
