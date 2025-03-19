@@ -56,11 +56,7 @@ TEST_F(BasicOperationsTest, SetupDistrictBoundary) {
     EXPECT_TRUE(manager.has_level("district"));
     EXPECT_TRUE(manager.has_district());
 
-    for (const auto& entry : std::filesystem::directory_iterator(".")) {
-      std::cout << entry.path() << std::endl;
-    }
-
-    SpatialData::get_instance().load("test_district.asc",SpatialData::Districts);
+  SpatialData::get_instance().load("test_district.asc",SpatialData::Districts);
     SpatialData::get_instance().using_raster = true;
     // Check to make sure our data is OK
     std::string errors;
@@ -100,10 +96,6 @@ TEST_F(BasicOperationsTest, SetupMultipleBoundariesSafely) {
         {3, 3, 3}
     };
     create_custom_raster("test_district.asc", district_values);
-
-    for (const auto& entry : std::filesystem::directory_iterator(".")) {
-      std::cout << entry.path() << std::endl;
-    }
 
     SpatialData::get_instance().load("test_district.asc",SpatialData::Districts);
     SpatialData::get_instance().using_raster = true;
