@@ -23,6 +23,7 @@ protected:
         };
         create_custom_raster("test_district.asc", district_values);
 
+        SpatialData::get_instance().reset_raster_info();
         SpatialData::get_instance().load("test_district.asc",SpatialData::Districts);
         SpatialData::get_instance().using_raster = true;
         // Check to make sure our data is OK

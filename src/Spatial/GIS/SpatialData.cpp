@@ -68,9 +68,11 @@ bool SpatialData::validate_raster_info(const RasterInformation &new_info,
     std::vector<std::string> error_messages;
 
     if (new_info.number_columns != raster_info.number_columns) {
+      spdlog::info("{} vs {}", new_info.number_columns, raster_info.number_columns);
       error_messages.push_back("mismatched number of columns");
     }
     if (new_info.number_rows != raster_info.number_rows) {
+      spdlog::info("{} vs {}", new_info.number_rows, raster_info.number_rows);
       error_messages.push_back("mismatched number of rows");
     }
     if (new_info.x_lower_left_corner != raster_info.x_lower_left_corner) {
@@ -108,9 +110,14 @@ bool SpatialData::check_catalog(std::string &errors) {
                  ref_raster_info.number_columns, ref_raster_info.number_rows,
                  ref_raster_info.cellsize);
 
+    if (ref_raster_info.number_columns == 0
+      || ref_raster_info.number_rows == 0
+      || ref_raster_info.cellsize == 0) {
+      return true;
+    }
+
     if (!validate_raster_info(ref_raster_info, errors)) {
       errors = fmt::format("Header mismatch: {}", errors);
-      spdlog::error("Raster error: {}", errors);
       return true;
     }
   }

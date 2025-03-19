@@ -53,8 +53,8 @@ protected:
             treatment_under5.push_back(0.5);
             treatment_over5.push_back(0.5);
         }
-        node["p_treatment_for_less_than_5_by_location"] = treatment_under5;
-        node["p_treatment_for_more_than_5_by_location"] = treatment_over5;
+        node["p_treatment_for_under_5_by_location"] = treatment_under5;
+        node["p_treatment_for_over_5_by_location"] = treatment_over5;
         
         // Add beta and population size for all locations
         YAML::Node betas;

@@ -25,10 +25,12 @@ TEST_F(BoundaryValidationTest, InvalidRasterDimensions) {
     file << "xllcorner 0.0\nyllcorner 0.0\ncellsize 1.0\nNODATA_value -9999\n";
     file << "1 1 1\n1 1 1\n1 1 1\n";
     file.close();
-
-    EXPECT_NO_THROW(manager.register_level("district"));
-    EXPECT_THROW(manager.setup_boundary("district",
-        std::unique_ptr<AscFile>(AscFileManager::read("test_invalid.asc"))), std::runtime_error);
+    SpatialData::get_instance().load("test_invalid.asc",SpatialData::Districts);
+    SpatialData::get_instance().using_raster = true;
+    std::string errors;
+    EXPECT_TRUE(SpatialData::get_instance().check_catalog(errors));
+    SpatialData::get_instance().using_raster = false;
+    SpatialData::get_instance().parse_complete();
 }
 
 TEST_F(BoundaryValidationTest, InvalidIndexingValues) {
@@ -40,9 +42,18 @@ TEST_F(BoundaryValidationTest, InvalidIndexingValues) {
     };
     create_custom_raster("test_invalid.asc", invalid_values);
 
-    EXPECT_NO_THROW(manager.register_level("district"));
-    EXPECT_THROW(manager.setup_boundary("district",
-        std::unique_ptr<AscFile>(AscFileManager::read("test_invalid.asc"))), std::runtime_error);
+    SpatialData::get_instance().load("test_invalid.asc",SpatialData::Districts);
+    SpatialData::get_instance().using_raster = true;
+    // Check to make sure our data is OK
+    std::string errors;
+    if (SpatialData::get_instance().check_catalog(errors)) {
+      throw std::runtime_error(errors);
+    }
+    auto district_raster = SpatialData::get_instance().get_raster(SpatialData::Districts);
+    SpatialData::get_instance().generate_locations(district_raster);
+    EXPECT_THROW(SpatialData::get_instance().populate_dependent_data(), std::invalid_argument);
+    SpatialData::get_instance().using_raster = false;
+    SpatialData::get_instance().parse_complete();
 }
 
 TEST_F(BoundaryValidationTest, AllNODATAValues) {
@@ -53,9 +64,16 @@ TEST_F(BoundaryValidationTest, AllNODATAValues) {
     };
     create_custom_raster("test_invalid.asc", nodata_values);
 
-    EXPECT_NO_THROW(manager.register_level("district"));
-    EXPECT_THROW(manager.setup_boundary("district",
-        std::unique_ptr<AscFile>(AscFileManager::read("test_invalid.asc"))), std::runtime_error);
+    SpatialData::get_instance().load("test_invalid.asc",SpatialData::Districts);
+    SpatialData::get_instance().using_raster = true;
+    // Check to make sure our data is OK
+    std::string errors;
+    if (SpatialData::get_instance().check_catalog(errors)) {
+      throw std::runtime_error(errors);
+    }
+    auto district_raster = SpatialData::get_instance().get_raster(SpatialData::Districts);
+    EXPECT_THROW(SpatialData::get_instance().generate_locations(district_raster),std::runtime_error);
+    SpatialData::get_instance().parse_complete();
 }
 
 TEST_F(BoundaryValidationTest, SameDimensionsAreAccepted) {
@@ -111,23 +129,33 @@ TEST_F(BoundaryValidationTest, DifferentDimensionsAreRejected) {
     };
     create_custom_raster("test_district.asc", district_values);
 
+    SpatialData::get_instance().load("test_district.asc",SpatialData::Districts);
+    SpatialData::get_instance().using_raster = true;
+    std::string errors;
+    if (SpatialData::get_instance().check_catalog(errors)) {
+      throw std::runtime_error(errors);
+    }
+    auto district_raster = SpatialData::get_instance().get_raster(SpatialData::Districts);
+    SpatialData::get_instance().generate_locations(district_raster);
+    SpatialData::get_instance().parse_complete();
+    auto raster = std::make_unique<AscFile>(*district_raster);
+    EXPECT_NO_THROW(manager.register_level("district"));
+    EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster)));
+    raster.reset();
+
     // Create province raster with different dimensions (4x4)
     std::vector<std::vector<int>> province_values = {
-        {1, 1, 1, 1},
-        {1, 1, 1, 1},
-        {2, 2, 2, 2},
-        {2, 2, 2, 2}
+      {1, 1, 1, 1},
+      {1, 1, 1, 1},
+      {2, 2, 2, 2},
+      {2, 2, 2, 2}
     };
     create_custom_raster("test_province.asc", province_values);
 
-    EXPECT_NO_THROW(manager.register_level("district"));
-    EXPECT_NO_THROW(manager.setup_boundary("district",
-        std::unique_ptr<AscFile>(AscFileManager::read("test_district.asc"))));
-
-    EXPECT_NO_THROW(manager.register_level("province"));
-    EXPECT_THROW(manager.setup_boundary("province",
-        std::unique_ptr<AscFile>(AscFileManager::read("test_province.asc"))),
-        std::runtime_error);
+    SpatialData::get_instance().load("test_province.asc",SpatialData::Districts);
+    SpatialData::get_instance().using_raster = true;
+    EXPECT_TRUE(SpatialData::get_instance().check_catalog(errors));
+    SpatialData::get_instance().parse_complete();
 }
 
 TEST_F(BoundaryValidationTest, MissingDistrictLevel) {
@@ -142,8 +170,19 @@ TEST_F(BoundaryValidationTest, UninitializedBoundary) {
 
 TEST_F(BoundaryValidationTest, ValidConfigurationWithDistrict) {
     create_test_raster("test_district.asc");
+
+    SpatialData::get_instance().load("test_district.asc",SpatialData::Districts);
+    SpatialData::get_instance().using_raster = true;
+    std::string errors;
+    if (SpatialData::get_instance().check_catalog(errors)) {
+      throw std::runtime_error(errors);
+    }
+    auto district_raster = SpatialData::get_instance().get_raster(SpatialData::Districts);
+    SpatialData::get_instance().generate_locations(district_raster);
+    SpatialData::get_instance().parse_complete();
+    auto raster = std::make_unique<AscFile>(*district_raster);
     EXPECT_NO_THROW(manager.register_level("district"));
-    EXPECT_NO_THROW(manager.setup_boundary("district",
-        std::unique_ptr<AscFile>(AscFileManager::read("test_district.asc"))));
+    EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster)));
     EXPECT_NO_THROW(manager.validate());
+    raster.reset();
 }

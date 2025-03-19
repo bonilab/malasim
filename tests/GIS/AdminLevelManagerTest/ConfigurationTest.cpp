@@ -61,6 +61,7 @@ TEST_F(ConfigurationTest, OneBasedIndexing) {
 TEST_F(ConfigurationTest, DifferentRasterDimensions) {
   create_test_raster("test_district.asc", true, 5, 4);  // 5x4 raster
 
+  SpatialData::get_instance().reset_raster_info();
   SpatialData::get_instance().load("test_district.asc",SpatialData::Districts);
   SpatialData::get_instance().using_raster = true;
   std::string errors;

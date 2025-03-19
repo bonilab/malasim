@@ -7,6 +7,7 @@
 #ifndef SPATIALDATA_H
 #define SPATIALDATA_H
 
+#include <spdlog/spdlog.h>
 #include <yaml-cpp/yaml.h>
 
 #include <string>
@@ -83,6 +84,16 @@ public:
              && x_lower_left_corner != NOT_SET && y_lower_left_corner != NOT_SET
              && cellsize != NOT_SET
              && no_data_value != NOT_SET;
+    }
+
+    /* For testing only */
+    void reset() {
+      number_columns = NOT_SET;
+      number_rows = NOT_SET;
+      x_lower_left_corner = NOT_SET;
+      y_lower_left_corner = NOT_SET;
+      cellsize = NOT_SET;
+      no_data_value = NOT_SET;
     }
   };
 
@@ -346,6 +357,14 @@ public:
    * @throws std::runtime_error if district data is not loaded or coordinates are null
    */
   int get_district_from_raster(int location);
+
+  /*
+   * Reset the raster information, clearing all raster data.
+   */
+  void reset_raster_info() {
+    spdlog::warn("Reset raster info. All raster data will be lost.");
+    raster_info.reset();
+  }
 
 private:
   /**

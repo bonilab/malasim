@@ -56,7 +56,7 @@ TEST_F(ErrorHandlingTest, InvalidDistrictNumbering) {
     create_population_raster("test_population.asc");
     auto node = createBasicNode();
     node["district_raster"] = "test_invalid.asc";
-    EXPECT_THROW(spatial_data.parse(node), std::invalid_argument);
+    EXPECT_THROW(spatial_data.parse(node), std::runtime_error);
     std::remove("test_invalid.asc");
     std::remove("test_population.asc");
 }
@@ -74,8 +74,6 @@ TEST_F(ErrorHandlingTest, MismatchedRasterDimensions) {
 }
 
 TEST_F(ErrorHandlingTest, InvalidLocationAccess) {
-    SetUp();
     auto& spatial_data = SpatialData::get_instance();
     EXPECT_THROW(spatial_data.get_district(999), std::out_of_range);
-    TearDown();
 }
