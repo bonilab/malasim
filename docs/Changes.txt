@@ -11,19 +11,19 @@
 
 #include "Utils/TypeDef.hxx"
 
-Model::get_instance().number_of_locations()
+Model::get_config()->number_of_locations()
 
-Model::get_config()->get_epidemiological_parameters().get_number_of_tracking_days()
+Model::get_config()->number_of_tracking_days()
 
 Model::get_config()->get_genotype_parameters().genotype_db
 
-Model::get_instance().location_db()
+Model::get_config()->location_db()
 
 Model::get_config()->get_drug_parameters().drug_db
 
 Model::get_config()->get_therapy_parameters().therapy_db
 
-Model::get_instance().strategy_db()
+Model::get_config()->strategy_db()
 
 Model::get_config()->get_immune_system_parameters()
 
@@ -31,7 +31,7 @@ Model::get_config()->get_movement_settings().get_v_moving_level_value()
 
 Model::get_config()->get_population_demographic()
 
-Model::get_config()->get_population_demographic().get_number_of_age_classes()
+Model::get_config()->number_of_age_classes()
 
 Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_
 

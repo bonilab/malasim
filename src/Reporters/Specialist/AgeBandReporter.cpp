@@ -4,91 +4,95 @@
  * Implementation of the AgeBandReporter class using SQLite.
  */
 #include "AgeBandReporter.h"
-
 #include "Configuration/Config.h"
 #include "MDC/ModelDataCollector.h"
 #include "Simulation/Model.h"
-#include "sqlite3.h"
 #include "Core/Scheduler/Scheduler.h"
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <memory>
 
 void AgeBandReporter::initialize(int job_number, const std::string &path) {
-  // Open SQLite database
-  std::string db_filename = fmt::format("{}age_band_report_{}.db", path, job_number);
-  if (sqlite3_open(db_filename.c_str(), &db) != SQLITE_OK) {
-    throw std::runtime_error("Failed to open SQLite database");
+  // Setup spdlog multi-sink loggers
+  auto pfpr_file = fmt::format("{}age_band_pfpr_{}.csv", path, job_number);
+  auto cases_file = fmt::format("{}age_band_cases_{}.csv", path, job_number);
+
+  auto pfpr_file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(pfpr_file, true);
+  auto pfpr_console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+  pfpr_logger = std::make_shared<spdlog::logger>("age_band_pfpr", spdlog::sinks_init_list{pfpr_file_sink, pfpr_console_sink});
+  pfpr_logger->set_pattern("%v");
+  spdlog::register_logger(pfpr_logger);
+
+  auto cases_file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(cases_file, true);
+  auto cases_console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+  cases_logger = std::make_shared<spdlog::logger>("age_band_cases", spdlog::sinks_init_list{cases_file_sink, cases_console_sink});
+  cases_logger->set_pattern("%v");
+  spdlog::register_logger(cases_logger);
+
+  // Determine when to start reporting
+  start_recording = Model::get_config()->get_simulation_timeframe().get_total_time();
+  start_recording -= 366;
+
+  spdlog::info("Logging of age-banded blood slide prevalence will start at model day {}", start_recording);
+
+  // Build district lookup
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    district_lookup.emplace_back(
+        SpatialData::get_instance().get_admin_unit("district", loc));
   }
 
-  // Create tables
-  const char* create_table_query =
-      "CREATE TABLE IF NOT EXISTS age_band_report ("
-      "model_days INTEGER,"
-      "district INTEGER,"
-      "age_band INTEGER,"
-      "cases INTEGER,"
-      "population INTEGER"
-      ");";
-
-
-  char* err_msg;
-  if (sqlite3_exec(db, create_table_query, nullptr, nullptr, &err_msg) != SQLITE_OK) {
-    sqlite3_free(err_msg);
-    throw std::runtime_error("Failed to create database table");
+  // Log headers
+  pfpr << "ModelDays" << Csv::sep << "District" << Csv::sep;
+  cases << "ModelDays" << Csv::sep << "District" << Csv::sep;
+  for (auto ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
+    pfpr << Model::get_config()->get_population_demographic().get_age_structure()[ac] << Csv::sep;
+    auto band = Model::get_config()->get_population_demographic().get_age_structure()[ac];
+    cases << "cases_" << band << Csv::sep << "pop_" << band << Csv::sep;
   }
-
-  // Determine when we should start running
-  start_recording = Model::get_config()->get_simulation_timeframe().get_total_time() - 366;
+  pfpr << Csv::end_line;
+  cases << Csv::end_line;
+  pfpr_logger->info(pfpr.str());
+  cases_logger->info(cases.str());
+  pfpr.str("");
+  cases.str("");
 }
 
 void AgeBandReporter::monthly_report() {
   auto current_time = Model::get_scheduler()->current_time();
   if (current_time < start_recording) { return; }
 
-  auto age_classes = Model::get_config()->get_population_demographic().get_number_of_age_classes();
-  auto districts = SpatialData::get_instance().max_district_id + 1;
-  auto first_index = SpatialData::get_instance().get_first_district();
+  auto age_classes = Model::get_config()->number_of_age_classes();
+  auto districts = SpatialData::get_instance().get_boundary("district")->unit_count;
+
   std::vector<std::vector<int>> population(districts, std::vector<int>(age_classes));
-  std::vector<std::vector<int>> cases(districts, std::vector<int>(age_classes));
+  std::vector<std::vector<double>> prevalence(districts, std::vector<double>(age_classes));
 
-  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
-    for (auto ac = 0; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
-      auto district = SpatialData::get_instance().get_district(loc);
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    auto district = district_lookup[loc];
+    for (auto ac = 0; ac < age_classes; ac++) {
       population[district][ac] += Model::get_mdc()->popsize_by_location_age_class()[loc][ac];
-      cases[district][ac] += Model::get_mdc()->blood_slide_number_by_location_age_group()[loc][ac];
+      prevalence[district][ac] += Model::get_mdc()->blood_slide_number_by_location_age_group()[loc][ac];
     }
-  }
-
-  sqlite3_stmt* stmt;
-  const char* insert_query = "INSERT INTO age_band_report VALUES (?, ?, ?, ?, ?);";
-  if (sqlite3_prepare_v2(db, insert_query, -1, &stmt, nullptr) != SQLITE_OK) {
-    throw std::runtime_error("Failed to prepare SQLite insert statement");
   }
 
   for (auto district = 0; district < districts; district++) {
+    pfpr << current_time << Csv::sep << district << Csv::sep;
+    cases << current_time << Csv::sep << district << Csv::sep;
     for (auto ac = 0; ac < age_classes; ac++) {
-      sqlite3_bind_int(stmt, 1, current_time);
-      sqlite3_bind_int(stmt, 2, district + first_index);
-      sqlite3_bind_int(stmt, 3, ac);
-      sqlite3_bind_int(stmt, 4, cases[district][ac]);
-      sqlite3_bind_int(stmt, 5, population[district][ac]);
-
-      if (sqlite3_step(stmt) != SQLITE_DONE) {
-        sqlite3_finalize(stmt);
-        throw std::runtime_error("Failed to insert data into SQLite database");
-      }
-      sqlite3_reset(stmt);
+      pfpr << ((prevalence[district][ac] != 0)
+                   ? (prevalence[district][ac] / population[district][ac]) * 100.0
+                   : 0)
+           << Csv::sep;
+      cases << prevalence[district][ac] << Csv::sep << population[district][ac] << Csv::sep;
     }
+    pfpr << Csv::end_line;
+    cases << Csv::end_line;
   }
-  sqlite3_finalize(stmt);
+
+  pfpr_logger->info(pfpr.str());
+  cases_logger->info(cases.str());
+  pfpr.str("");
+  cases.str("");
 }
 
-void AgeBandReporter::after_run() {
-  if (db) {
-    sqlite3_close(db);
-  }
-}
-
-AgeBandReporter::~AgeBandReporter() {
-  if (db) {
-    sqlite3_close(db);
-  }
-}

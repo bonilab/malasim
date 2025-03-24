@@ -146,7 +146,7 @@ bool Config::load(const std::string &filename) {
     transmission_settings_.process_config();
     population_demographic_.process_config();
     spatial_settings_.process_config();
-    seasonality_settings_.process_config_using_number_of_locations(
+    seasonality_settings_.process_config_using_number_of_locations(&SpatialData::get_instance(),
       get_spatial_settings().get_number_of_locations());
     movement_settings_.process_config_using_spatial_settings(
       get_spatial_settings().get_spatial_distance_matrix(),
@@ -182,6 +182,38 @@ bool Config::load(const std::string &filename) {
     return false;
   }
   return false;
+}
+
+int Config::number_of_parasite_types() const {
+  return genotype_parameters_.genotype_db->size();
+}
+
+int Config::number_of_locations() const {
+  return spatial_settings_.get_number_of_locations();
+}
+
+int Config::number_of_age_classes() const {
+  return population_demographic_.get_number_of_age_classes();
+}
+
+int Config::number_of_tracking_days() const {
+  return epidemiological_parameters_.get_number_of_tracking_days();
+}
+
+std::vector<int> Config::age_structure() {
+  return population_demographic_.get_age_structure();
+}
+
+std::vector<Spatial::Location>& Config::location_db() {
+  return spatial_settings_.location_db;
+}
+
+std::vector<IStrategy *>& Config::strategy_db() {
+  return strategy_parameters_.strategy_db;
+}
+
+GenotypeDatabase* Config::genotype_db() {
+  return genotype_parameters_.genotype_db;
 }
 
 void Config::validate_all_cross_field_validations() {
@@ -281,8 +313,8 @@ void Config::validate_all_cross_field_validations() {
   //If mode is grid_based, check if all raster file paths are provided
   if(spatial_settings.get_mode() == "grid_based") {
     SpatialSettings::GridBased grid_based = spatial_settings.get_grid_based();
-    if(grid_based.get_population_raster().empty() || grid_based.get_district_raster().empty() ||
-       grid_based.get_beta_raster().empty() || grid_based.get_p_treatment_over_5_raster().empty() ||
+    if(grid_based.get_population_raster().empty() || grid_based.get_beta_raster().empty()
+      || grid_based.get_p_treatment_over_5_raster().empty() ||
        grid_based.get_p_treatment_under_5_raster().empty()) {
       throw std::invalid_argument("All raster file paths should be provided for grid based spatial mode");
     }

@@ -19,7 +19,6 @@ protected:
 
         SpatialSettings::GridBased grid;
         grid.set_population_raster("../sample_inputs/kag_init_pop.asc");
-        grid.set_district_raster("../sample_inputs/kag_district.asc");
         grid.set_p_treatment_under_5_raster("../sample_inputs/kag_treatment.asc");
         grid.set_p_treatment_over_5_raster("../sample_inputs/kag_treatment.asc");
         grid.set_beta_raster("../sample_inputs/kag_beta_r1.asc");
@@ -37,7 +36,6 @@ TEST_F(SpatialSettingsTest, EncodeSpatialSettings) {
 
     const auto &grid = default_settings.get_grid_based();
     EXPECT_EQ(node["grid_based"]["population_raster"].as<std::string>(), grid.get_population_raster());
-    EXPECT_EQ(node["grid_based"]["district_raster"].as<std::string>(), grid.get_district_raster());
     EXPECT_EQ(node["grid_based"]["p_treatment_under_5_raster"].as<std::string>(), grid.get_p_treatment_under_5_raster());
     EXPECT_EQ(node["grid_based"]["p_treatment_over_5_raster"].as<std::string>(), grid.get_p_treatment_over_5_raster());
 
@@ -53,7 +51,8 @@ TEST_F(SpatialSettingsTest, DecodeSpatialSettings) {
     YAML::Node node;
     node["mode"] = "grid_based";
     node["grid_based"]["population_raster"] = "../sample_inputs/kag_init_pop.asc";
-    node["grid_based"]["district_raster"] = "../sample_inputs/kag_district.asc";
+    node["grid_based"]["administrative_boundaries"][0]["name"] = "district";
+    node["grid_based"]["administrative_boundaries"][0]["raster"] = "../sample_inputs/kag_district.asc";
     node["grid_based"]["p_treatment_under_5_raster"] = "../sample_inputs/kag_treatment.asc";
     node["grid_based"]["p_treatment_over_5_raster"] = "../sample_inputs/kag_treatment.asc";
     node["grid_based"]["p_treatment_under_5_by_location"] = std::vector<double>{-1};
@@ -71,7 +70,6 @@ TEST_F(SpatialSettingsTest, DecodeSpatialSettings) {
 
     const auto &grid = decoded_settings.get_grid_based();
     EXPECT_EQ(grid.get_population_raster(), "../sample_inputs/kag_init_pop.asc");
-    EXPECT_EQ(grid.get_district_raster(), "../sample_inputs/kag_district.asc");
     EXPECT_EQ(grid.get_p_treatment_under_5_raster(), "../sample_inputs/kag_treatment.asc");
     EXPECT_EQ(grid.get_p_treatment_over_5_raster(), "../sample_inputs/kag_treatment.asc");
 

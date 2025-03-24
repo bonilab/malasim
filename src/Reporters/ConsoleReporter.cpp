@@ -26,7 +26,7 @@ void report_number_by_state(const int &location, PersonIndexByLocationStateAgeCl
   //    std::cout << std::setw(10) << std::setprecision(3);
   for (int hs = 0; hs < Person::NUMBER_OF_STATE - 1; hs++) {
     //        int sum = 0;
-    //        for (int ac = 0; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
+    //        for (int ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
     //            sum += pi->vPerson()[location][hs][ac].size();
     //        }
     double v = Model::get_mdc()->popsize_by_location_hoststate()[location][hs] * 100 /
@@ -50,32 +50,32 @@ void ConsoleReporter::after_run() {
 
   //report EIR
   std::cout << "EIR by location:" << std::endl;
-  for (int location = 0; location < Model::get_instance().number_of_locations(); location++) {
+  for (int location = 0; location < Model::get_config()->number_of_locations(); location++) {
     std::cout << Model::get_mdc()->EIR_by_location()[location] << "\t";
   }
   std::cout << std::endl;
 
   //total number of bites
   std::cout << "Number of infectious bites:" << std::endl;
-  for (int location = 0; location < Model::get_instance().number_of_locations(); location++) {
+  for (int location = 0; location < Model::get_config()->number_of_locations(); location++) {
     std::cout << Model::get_mdc()->total_number_of_bites_by_location()[location] << "\t";
   }
   std::cout << std::endl;
 
   std::cout << "Number of clinical episodes:" << std::endl;
-  for (int location = 0; location < Model::get_instance().number_of_locations(); location++) {
+  for (int location = 0; location < Model::get_config()->number_of_locations(); location++) {
     std::cout << Model::get_mdc()->cumulative_clinical_episodes_by_location()[location] << "\t";
   }
   std::cout << std::endl;
 
   std::cout << "Percentage of bites on top 20% bitten" << std::endl;
-  for (int location = 0; location < Model::get_instance().number_of_locations(); location++) {
+  for (int location = 0; location < Model::get_config()->number_of_locations(); location++) {
     std::cout << Model::get_mdc()->percentage_bites_on_top_20_by_location()[location] * 100 << "%" << "\t";
   }
   std::cout << std::endl;
 
   std::cout << "NTF by location: " << std::endl;
-  for (int location = 0; location < Model::get_instance().number_of_locations(); location++) {
+  for (int location = 0; location < Model::get_config()->number_of_locations(); location++) {
     double location_NTF = Model::get_mdc()->cumulative_NTF_by_location()[location] * 100 /
                           (double) Model::get_mdc()->popsize_by_location()[location];
     location_NTF /= total_time_in_years;
@@ -85,7 +85,7 @@ void ConsoleReporter::after_run() {
   std::cout << std::endl;
 
   std::cout << "Number of mutations by location: " << std::endl;
-  for (int location = 0; location < Model::get_instance().number_of_locations(); location++) {
+  for (int location = 0; location < Model::get_config()->number_of_locations(); location++) {
     std::cout << Model::get_mdc()->cumulative_mutants_by_location()[location] << "\t";
   }
   std::cout << std::endl;
@@ -126,7 +126,7 @@ void ConsoleReporter::monthly_report() {
 
     auto* pi = Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 
-    for (int location = 0; location < Model::get_instance().number_of_locations(); location++) {
+    for (int location = 0; location < Model::get_config()->number_of_locations(); location++) {
       std::cout << "||\t";
       report_number_by_state(location, pi);
       std::cout << Model::get_mdc()->blood_slide_prevalence_by_location()[location] * 100 << "\t";

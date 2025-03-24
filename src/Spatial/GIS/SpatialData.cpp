@@ -27,7 +27,7 @@ bool SpatialData::parse(const YAML::Node &node) {
   // Load and validate raster files
   load_files(node);
 
-  if (Model::get_instance().number_of_locations() != 0) {
+  if (Model::get_config()->number_of_locations() != 0) {
     throw std::runtime_error("Location database is not empty");
   }
 
@@ -48,8 +48,10 @@ bool SpatialData::parse(const YAML::Node &node) {
   load_location_data(node);
   load_treatment_data(node);
 
-  // Finalize setup, populate location_to_district, district_to_locations, and reset rasters
-  populate_dependent_data();
+  // Finalize setup, populate location_to_district, district_to_locations
+  initialize_admin_boundaries();
+
+  // Reset rasters
   parse_complete();
   return true;
 }
@@ -149,7 +151,7 @@ bool SpatialData::check_catalog(std::string &errors) {
 
 
 void SpatialData::generate_distances() const {
-  auto &db = Model::get_instance().location_db();
+  auto &db = Model::get_config()->location_db();
   auto &distances = Model::get_config()->get_spatial_settings().get_spatial_distance_matrix();
 
   auto locations = db.size();
@@ -183,7 +185,7 @@ void SpatialData::generate_locations(AscFile* reference) {
     throw std::runtime_error("Raster Information is not initialized");
   }
   // Pre-allocate the location database
-  auto &db = Model::get_instance().location_db();
+  auto &db = Model::get_config()->location_db();
   db.clear();
 
   // Calculate maximum possible size (all cells valid)
@@ -208,10 +210,10 @@ void SpatialData::generate_locations(AscFile* reference) {
   // Update the configured count
   Model::get_config()->get_spatial_settings().set_number_of_locations(
     static_cast<int>(db.size()));
-  if (Model::get_instance().number_of_locations() == 0) {
+  if (Model::get_config()->number_of_locations() == 0) {
     // This error should be redundant since the ASC loader should catch it
     spdlog::error("Zero locations loaded while parsing ASC file.");
-  } const auto location_count = Model::get_instance().number_of_locations();
+  } const auto location_count = Model::get_config()->number_of_locations();
 
   if (location_count == 0) {
     throw std::runtime_error(
@@ -223,107 +225,107 @@ void SpatialData::generate_locations(AscFile* reference) {
 }
 
 
-int SpatialData::get_district_from_raster(int location) {
-  // Check if location is within bounds
-  if (location < 0 || location >= Model::get_instance().number_of_locations()) {
-    throw std::out_of_range(fmt::format("{} called with invalid location: {}",
-                                        __FUNCTION__, location));
-  }
+// int SpatialData::get_district_from_raster(int location) {
+//   // Check if location is within bounds
+//   if (location < 0 || location >= Model::get_config()->number_of_locations()) {
+//     throw std::out_of_range(fmt::format("{} called with invalid location: {}",
+//                                         __FUNCTION__, location));
+//   }
+//
+//   // Throw an error if there are no districts
+//   if (data_[SpatialFileType::Districts] == nullptr) {
+//     throw std::runtime_error(
+//         fmt::format("{} called without district data loaded", __FUNCTION__));
+//   }
+//
+//   // Get the coordinate of the location
+//   auto &coordinate = Model::get_config()->location_db()[location].coordinate;
+//
+//   // Check if coordinate is valid
+//   if (coordinate == nullptr) {
+//     throw std::runtime_error(
+//         fmt::format("{} called with location {} having null coordinate",
+//                     __FUNCTION__, location));
+//   }
+//
+//   // Check if coordinates are within raster bounds
+//   auto* districts = data_[SpatialFileType::Districts].get();  // Use .get()
+//   if (coordinate->latitude < 0 || coordinate->latitude >= districts->NROWS
+//       || coordinate->longitude < 0
+//       || coordinate->longitude >= districts->NCOLS) {
+//     throw std::out_of_range(fmt::format(
+//         "{} called with location {} having out of bounds coordinates ({}, {})",
+//         __FUNCTION__, location, coordinate->latitude, coordinate->longitude));
+//       }
+//
+//   // Use the x, y to get the district id
+//   auto district =
+//       static_cast<int>(data_[SpatialFileType::Districts]->data[static_cast<int>(
+//           coordinate->latitude)][static_cast<int>(coordinate->longitude)]);
+//
+//   return district;
+// }
 
-  // Throw an error if there are no districts
-  if (data_[SpatialFileType::Districts] == nullptr) {
-    throw std::runtime_error(
-        fmt::format("{} called without district data loaded", __FUNCTION__));
-  }
+// // NOTE: this function return distrct_id in NON_ZERO based index given a
+// // location
+// int SpatialData::get_raster_district(int location) {
+//   // Throw an error if there are no districts
+//   if (data_[SpatialFileType::Districts] == nullptr) {
+//     throw std::runtime_error(
+//         fmt::format("{} called without district data loaded", __FUNCTION__));
+//   }
+//
+//   // Get the coordinate of the location
+//   auto &coordinate = Model::get_config()->location_db()[location].coordinate;
+//
+//   // Use the x, y to get the district id
+//   auto district =
+//       (int)data_[SpatialFileType::Districts]
+//           ->data[static_cast<int>(coordinate->latitude)][static_cast<int>(coordinate->longitude)];
+//   return district;
+// }
 
-  // Get the coordinate of the location
-  auto &coordinate = Model::get_instance().location_db()[location].coordinate;
+// int SpatialData::get_district(int location) {
+//   if (location < 0 || location >= Model::get_config()->number_of_locations()) {
+//     throw std::out_of_range(fmt::format("{} called with invalid location: {}",
+//                                         __FUNCTION__, location));
+//   }
+//   if (location_to_district_.empty()) {
+//     throw std::runtime_error("location_to_district not initialized");
+//   }
+//   return location_to_district_[location];
+// }
 
-  // Check if coordinate is valid
-  if (coordinate == nullptr) {
-    throw std::runtime_error(
-        fmt::format("{} called with location {} having null coordinate",
-                    __FUNCTION__, location));
-  }
+// std::vector<int> SpatialData::get_district_locations(int district) {
+//   // Throw an error if there are no districts
+//   if (data_[SpatialFileType::Districts] == nullptr) {
+//     throw std::runtime_error(
+//         fmt::format("{} called without district data loaded", __FUNCTION__));
+//   }
+//
+//   // Prepare our data
+//   std::vector<int> locations;
+//   AscFile* reference = data_[SpatialFileType::Districts].get();
+//
+//   // Scan the district raster and use it to generate the location ids, the logic
+//   // here is the same as the generation of the location ids in
+//   // generate_locations
+//   auto id = -1;
+//   for (auto ndx = 0; ndx < reference->NROWS; ndx++) {
+//     for (auto ndy = 0; ndy < reference->NCOLS; ndy++) {
+//       if (reference->data[ndx][ndy] == reference->NODATA_VALUE) { continue; }
+//       id++;
+//       if ((int)reference->data[ndx][ndy] == district) {
+//         locations.emplace_back(id);
+//       }
+//     }
+//   }
+//
+//   // Return the results
+//   return locations;
+// }
 
-  // Check if coordinates are within raster bounds
-  auto* districts = data_[SpatialFileType::Districts].get();  // Use .get()
-  if (coordinate->latitude < 0 || coordinate->latitude >= districts->NROWS
-      || coordinate->longitude < 0
-      || coordinate->longitude >= districts->NCOLS) {
-    throw std::out_of_range(fmt::format(
-        "{} called with location {} having out of bounds coordinates ({}, {})",
-        __FUNCTION__, location, coordinate->latitude, coordinate->longitude));
-      }
-
-  // Use the x, y to get the district id
-  auto district =
-      static_cast<int>(data_[SpatialFileType::Districts]->data[static_cast<int>(
-          coordinate->latitude)][static_cast<int>(coordinate->longitude)]);
-
-  return district;
-}
-
-// NOTE: this function return distrct_id in NON_ZERO based index given a
-// location
-int SpatialData::get_raster_district(int location) {
-  // Throw an error if there are no districts
-  if (data_[SpatialFileType::Districts] == nullptr) {
-    throw std::runtime_error(
-        fmt::format("{} called without district data loaded", __FUNCTION__));
-  }
-
-  // Get the coordinate of the location
-  auto &coordinate = Model::get_instance().location_db()[location].coordinate;
-
-  // Use the x, y to get the district id
-  auto district =
-      (int)data_[SpatialFileType::Districts]
-          ->data[static_cast<int>(coordinate->latitude)][static_cast<int>(coordinate->longitude)];
-  return district;
-}
-
-int SpatialData::get_district(int location) {
-  if (location < 0 || location >= Model::get_instance().number_of_locations()) {
-    throw std::out_of_range(fmt::format("{} called with invalid location: {}",
-                                        __FUNCTION__, location));
-  }
-  if (location_to_district_.empty()) {
-    throw std::runtime_error("location_to_district not initialized");
-  }
-  return location_to_district_[location];
-}
-
-std::vector<int> SpatialData::get_district_locations(int district) {
-  // Throw an error if there are no districts
-  if (data_[SpatialFileType::Districts] == nullptr) {
-    throw std::runtime_error(
-        fmt::format("{} called without district data loaded", __FUNCTION__));
-  }
-
-  // Prepare our data
-  std::vector<int> locations;
-  AscFile* reference = data_[SpatialFileType::Districts].get();
-
-  // Scan the district raster and use it to generate the location ids, the logic
-  // here is the same as the generation of the location ids in
-  // generate_locations
-  auto id = -1;
-  for (auto ndx = 0; ndx < reference->NROWS; ndx++) {
-    for (auto ndy = 0; ndy < reference->NCOLS; ndy++) {
-      if (reference->data[ndx][ndy] == reference->NODATA_VALUE) { continue; }
-      id++;
-      if ((int)reference->data[ndx][ndy] == district) {
-        locations.emplace_back(id);
-      }
-    }
-  }
-
-  // Return the results
-  return locations;
-}
-
-int SpatialData::get_first_district() { return first_district; }
+// int SpatialData::get_first_district() { return first_district; }
 
 SpatialData::RasterInformation SpatialData::get_raster_header() {
   return raster_info;
@@ -347,8 +349,8 @@ void SpatialData::copy_raster_to_location_db(SpatialFileType type) {
   AscFile* raster = data_[type].get();
 
   // Get a reference to the location database
-  auto &db = Model::get_instance().location_db();
-  auto count = Model::get_instance().number_of_locations();
+  auto &db = Model::get_config()->location_db();
+  auto count = Model::get_config()->number_of_locations();
 
   // Scan the data and update the values
   auto id = -1;
@@ -402,11 +404,6 @@ void SpatialData::load_files(const YAML::Node &node) {
          SpatialData::SpatialFileType::Population);
     using_raster = true;
   }
-  if (node[DISTRICT_RASTER]) {
-    load(node[DISTRICT_RASTER].as<std::string>(),
-         SpatialData::SpatialFileType::Districts);
-    using_raster = true;
-  }
   if (node[TRAVEL_RASTER]) {
     load(node[TRAVEL_RASTER].as<std::string>(),
          SpatialData::SpatialFileType::Travel);
@@ -427,6 +424,16 @@ void SpatialData::load_files(const YAML::Node &node) {
          SpatialData::SpatialFileType::PrTreatmentOver5);
     using_raster = true;
   }
+  if (node[DISTRICT_RASTER]) {
+    load(node[DISTRICT_RASTER].as<std::string>(),
+         SpatialData::SpatialFileType::Districts);
+    using_raster = true;
+  }
+
+  // Add support for the new administrative_boundaries section
+  if (node[ADMIN_BOUNDARIES]) {
+    load_admin_boundaries(node);
+  }
   // Check to make sure our data is OK
   std::string errors;
   if (check_catalog(errors)) {
@@ -434,14 +441,37 @@ void SpatialData::load_files(const YAML::Node &node) {
   }
 }
 
+void SpatialData::load_admin_boundaries(const YAML::Node &node) {
+  if (!node[ADMIN_BOUNDARIES].IsSequence()) {
+    throw std::runtime_error("administrative_boundaries must be a sequence");
+  }
+
+  admin_rasters.clear();
+
+  // Process each administrative boundary
+  for (const auto& admin_level : node[ADMIN_BOUNDARIES]) {
+    if (!admin_level["name"] || !admin_level["raster"]) {
+      throw std::runtime_error("Each administrative level must have a name and raster path");
+    }
+
+    std::string level_name = admin_level["name"].as<std::string>();
+    std::string raster_path = admin_level["raster"].as<std::string>();
+
+    // Store for processing later
+    admin_rasters[level_name] = raster_path;
+    spdlog::info("Found admin level: {} with raster: {}", level_name, raster_path);
+  }
+
+  using_raster = true;
+}
 
 void SpatialData::load_age_distribution(const YAML::Node &node) {
   if (!node["age_distribution_by_location"]) {
     throw std::runtime_error("Missing required age distribution data");
   }
 
-  auto &location_db = Model::get_instance().location_db();
-  auto number_of_locations = Model::get_instance().number_of_locations();
+  auto &location_db = Model::get_config()->location_db();
+  auto number_of_locations = Model::get_config()->number_of_locations();
 
   for (auto loc = 0ul; loc < number_of_locations; loc++) {
     auto input_loc =
@@ -461,8 +491,8 @@ void SpatialData::load_age_distribution(const YAML::Node &node) {
 }
 
 void SpatialData::load_treatment_data(const YAML::Node &node) {
-  auto &location_db = Model::get_instance().location_db();
-  auto number_of_locations = Model::get_instance().number_of_locations();
+  auto &location_db = Model::get_config()->location_db();
+  auto number_of_locations = Model::get_config()->number_of_locations();
 
   // Only load from YAML if raster not provided
   if (data_[SpatialFileType::PrTreatmentUnder5] != nullptr) {
@@ -501,8 +531,8 @@ void SpatialData::load_treatment_data(const YAML::Node &node) {
 }
 
 void SpatialData::load_location_data(const YAML::Node &node) {
-  auto &location_db = Model::get_instance().location_db();
-  auto number_of_locations = Model::get_instance().number_of_locations();
+  auto &location_db = Model::get_config()->location_db();
+  auto number_of_locations = Model::get_config()->number_of_locations();
 
   if (data_[SpatialFileType::Beta] != nullptr) {
     copy_raster_to_location_db(SpatialFileType::Beta);
@@ -533,74 +563,112 @@ void SpatialData::load_location_data(const YAML::Node &node) {
   }
 }
 
-void SpatialData::populate_dependent_data() {
-  // populate the location_to_district and district_to_locations
-  if (!data_[SpatialFileType::Districts]) {
-    location_to_district_.clear();
-    district_to_locations_.clear();
-    district_count = -1;
-    min_district_id = -1;
-    max_district_id = -1;
+// void SpatialData::populate_dependent_data() {
+//   // populate the location_to_district and district_to_locations
+//   if (!data_[SpatialFileType::Districts]) {
+//     location_to_district_.clear();
+//     district_to_locations_.clear();
+//     district_count = -1;
+//     min_district_id = -1;
+//     max_district_id = -1;
+//     return;
+//   }
+//   // Get a reference to the districts raster for cleaner code
+//   AscFile* districts_raster = data_[SpatialFileType::Districts].get();
+//
+//   min_district_id = std::numeric_limits<int>::max();
+//   max_district_id = std::numeric_limits<int>::min();
+//   // Perform a consistency check on the districts
+//   std::set<int> unique_districts;  // Use a set to count unique districts
+//   for (auto ndx = 0; ndx < districts_raster->NROWS; ndx++) {
+//     for (auto ndy = 0; ndy < districts_raster->NCOLS; ndy++) {
+//       auto value = districts_raster->data[ndx][ndy];
+//       if (value == districts_raster->NODATA_VALUE) { continue; }
+//       auto district_id = static_cast<int>(value);
+//       unique_districts.insert(district_id);
+//       min_district_id = std::min(min_district_id, district_id);
+//       max_district_id = std::max(max_district_id, district_id);
+//     }
+//   }
+//
+//   // Set district count to number of unique districts
+//   district_count = unique_districts.size();
+//   spdlog::info("Districts loaded with {} cells", district_count);
+//
+//   // Determine if we're using 0-based or 1-based indexing
+//   if (min_district_id == 0) {
+//     spdlog::info("File suggests zero-based district numbering.");
+//   } else if (min_district_id == 1) {
+//     spdlog::info( "File suggests one-based district numbering.");
+//   } else {
+//     spdlog::error("Index of first district must be zero or one, found {}", min_district_id);
+//     throw std::invalid_argument(
+//         "District raster must be zero-based or one-based.");
+//   }
+//   // Log information about the districts
+//   spdlog::info(
+//       "Districts loaded with {} districts (IDs from {} to {})", district_count,
+//       min_district_id, max_district_id);
+//
+//   // Update location_to_district and prepare district_to_locations
+//   location_to_district_.clear();
+//   district_to_locations_.clear();
+//
+//   if (data_[SpatialFileType::Districts]) {
+//     // Size the vectors appropriately
+//     district_to_locations_.resize(max_district_id + 1);
+//     location_to_district_.reserve(Model::get_config()->number_of_locations());
+//
+//     // Single pass through locations to populate both mappings
+//     for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+//       auto district = get_district_from_raster(loc);
+//       location_to_district_.push_back(district);
+//       district_to_locations_[district].push_back(loc);
+//     }
+//
+//     spdlog::info("location_to_district loaded with {} pixels",
+//                             location_to_district_.size());
+//    spdlog::info("district_to_locations created with size of {} for {}-based districts",
+//                             district_to_locations_.size(), min_district_id);
+//   }
+// }
+
+void SpatialData::initialize_admin_boundaries() {
+  // Create a new AdminLevelManager
+  admin_manager_.reset(new AdminLevelManager());
+
+  if (!using_raster) {
     return;
   }
-  // Get a reference to the districts raster for cleaner code
-  AscFile* districts_raster = data_[SpatialFileType::Districts].get();
+  if (admin_rasters.empty()) {
+    // there will be cases where we don't need to have any admin levels
+    return;
+  }
 
-  min_district_id = std::numeric_limits<int>::max();
-  max_district_id = std::numeric_limits<int>::min();
-  // Perform a consistency check on the districts
-  std::set<int> unique_districts;  // Use a set to count unique districts
-  for (auto ndx = 0; ndx < districts_raster->NROWS; ndx++) {
-    for (auto ndy = 0; ndy < districts_raster->NCOLS; ndy++) {
-      auto value = districts_raster->data[ndx][ndy];
-      if (value == districts_raster->NODATA_VALUE) { continue; }
-      auto district_id = static_cast<int>(value);
-      unique_districts.insert(district_id);
-      min_district_id = std::min(min_district_id, district_id);
-      max_district_id = std::max(max_district_id, district_id);
+  // Now process all other admin levels
+  for (const auto& [level_name, raster_path] : admin_rasters) {
+    try {
+      admin_manager_->register_level(level_name);
+
+      // Load the raster
+      auto raster = std::unique_ptr<AscFile>(AscFileManager::read(raster_path));
+      admin_manager_->setup_boundary(level_name, raster.get());
+
+      spdlog::info("Initialized admin level: {}", level_name);
+    } catch (const std::exception& e) {
+      spdlog::error("Failed to initialize admin level {}: {}", level_name, e.what());
+      throw;
     }
   }
 
-  // Set district count to number of unique districts
-  district_count = unique_districts.size();
-  spdlog::info("Districts loaded with {} cells", district_count);
-
-  // Determine if we're using 0-based or 1-based indexing
-  if (min_district_id == 0) {
-    spdlog::info("File suggests zero-based district numbering.");
-  } else if (min_district_id == 1) {
-    spdlog::info( "File suggests one-based district numbering.");
-  } else {
-    spdlog::error("Index of first district must be zero or one, found {}", min_district_id);
-    throw std::invalid_argument(
-        "District raster must be zero-based or one-based.");
+  // Validate the configuration
+  try {
+    admin_manager_->validate();
+  } catch (const std::exception& e) {
+    spdlog::error("AdminLevelManager validation failed: {}", e.what());
+    throw std::runtime_error(e.what());
   }
-  // Log information about the districts
-  spdlog::info(
-      "Districts loaded with {} districts (IDs from {} to {})", district_count,
-      min_district_id, max_district_id);
-
-  // Update location_to_district and prepare district_to_locations
-  location_to_district_.clear();
-  district_to_locations_.clear();
-
-  if (data_[SpatialFileType::Districts]) {
-    // Size the vectors appropriately
-    district_to_locations_.resize(max_district_id + 1);
-    location_to_district_.reserve(Model::get_instance().number_of_locations());
-
-    // Single pass through locations to populate both mappings
-    for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
-      auto district = get_district_from_raster(loc);
-      location_to_district_.push_back(district);
-      district_to_locations_[district].push_back(loc);
-    }
-
-    spdlog::info("location_to_district loaded with {} pixels",
-                            location_to_district_.size());
-   spdlog::info("district_to_locations created with size of {} for {}-based districts",
-                            district_to_locations_.size(), min_district_id);
-  }
+  spdlog::info("Administrative boundaries initialized successfully");
 }
 
 void SpatialData::parse_complete() {
@@ -615,17 +683,23 @@ void SpatialData::parse_complete() {
   data_[SpatialFileType::Population].reset();
   data_[SpatialFileType::PrTreatmentUnder5].reset();
   data_[SpatialFileType::PrTreatmentOver5].reset();
+
+  // Note: We don't reset Districts raster as ownership might have been transferred
+  // Similarly, we don't need to reset any admin rasters as they are stored in custom objects
+
+  // Clean up the temporary admin rasters map as it's no longer needed
+  admin_rasters.clear();
 }
 
-const std::vector<int>& SpatialData::get_district_locations(int district) const {
-  if (district_to_locations_.empty()) {
-    throw std::runtime_error("District to locations mapping not initialized");
-  }
-
-  // Direct indexing without adjustment
-  if (district >= district_to_locations_.size()) {
-    throw std::out_of_range(fmt::format("Invalid district ID: {}", district));
-  }
-
-  return district_to_locations_[district];
-}
+// const std::vector<int>& SpatialData::get_district_locations(int district) const {
+//   if (district_to_locations_.empty()) {
+//     throw std::runtime_error("District to locations mapping not initialized");
+//   }
+//
+//   // Direct indexing without adjustment
+//   if (district >= district_to_locations_.size()) {
+//     throw std::out_of_range(fmt::format("Invalid district ID: {}", district));
+//   }
+//
+//   return district_to_locations_[district];
+// }

@@ -96,11 +96,6 @@ public:
   ImmunityClearanceUpdateFunction* clinical_update_function() {
     return clinical_update_function_;
   }
-  int number_of_locations() const;
-  int number_of_age_classes() const;
-  int get_number_of_tracking_days() const;
-  std::vector<Spatial::Location>& location_db();
-  std::vector<IStrategy *>& strategy_db();
 
   void set_treatment_coverage(ITreatmentCoverageModel* tcm);
   void set_treatment_strategy(const int &strategy_id);

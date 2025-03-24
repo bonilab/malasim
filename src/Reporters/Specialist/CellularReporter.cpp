@@ -20,7 +20,7 @@
 
 void CellularReporter::initialize(int job_number, const std::string &path) {
   // Check the number of cells in the model, if it exceeds one, throw an error
-  if (Model::get_instance().location_db().size() > 1) {
+  if (Model::get_config()->location_db().size() > 1) {
     throw std::runtime_error(
         "CellularReporter can only be used with one location configuration.");
   }
@@ -105,7 +105,7 @@ void CellularReporter::monthly_report() {
 
   auto clinical_all = Model::get_mdc()->monthly_number_of_clinical_episode_by_location()[0];
   auto clinical_u5 = 0;
-  for (auto ndx = 0; ndx < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ndx++) {
+  for (auto ndx = 0; ndx < Model::get_config()->number_of_age_classes(); ndx++) {
     if (Model::get_config()->get_population_demographic().get_age_structure()[ndx] < 5) break;
     clinical_u5 += Model::get_mdc()->monthly_number_of_clinical_episode_by_location_age_class()[0][ndx];
   }

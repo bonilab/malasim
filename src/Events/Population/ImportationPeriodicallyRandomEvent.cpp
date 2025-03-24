@@ -77,7 +77,7 @@ void ImportationPeriodicallyRandomEvent::execute() {
 // selection)
 std::size_t ImportationPeriodicallyRandomEvent::get_location() {
   // Note the common values
-  auto locations = Model::get_instance().number_of_locations();
+  auto locations = Model::get_config()->number_of_locations();
   auto* pi =
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
   auto age_classes = pi->vPerson()[0][Person::HostStates::SUSCEPTIBLE].size();

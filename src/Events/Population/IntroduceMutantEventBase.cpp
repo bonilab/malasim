@@ -21,7 +21,7 @@ double IntroduceMutantEventBase::calculate(std::vector<int> &locations) const {
   // Calculate the frequency of the mutant type across the whole district
   for (auto location : locations) {
     for (auto hs : {Person::ASYMPTOMATIC, Person::CLINICAL}) {
-      for (auto ac = 0; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
+      for (auto ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
         for (auto &person : pi->vPerson()[location][hs][ac]) {
           parasite_population_count +=
               person->get_all_clonal_parasite_populations()->size();
@@ -56,7 +56,7 @@ int IntroduceMutantEventBase::mutate(std::vector<int> &locations,
 
   auto mutations_count = 0;
   for (auto location : locations) {
-    for (auto ac = 0; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
+    for (auto ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
       // Note the infected individuals in the location
       auto infections = pi->vPerson()[location][Person::ASYMPTOMATIC][ac].size()
                         + pi->vPerson()[location][Person::CLINICAL][ac].size();

@@ -25,7 +25,7 @@ protected:
             
             // Set up minimal location database
             Model::get_config()->get_spatial_settings().set_number_of_locations(9);  // 3x3 grid
-            auto& db = Model::get_instance().location_db();
+            auto& db = Model::get_config()->location_db();
             db.clear();
             
             // Create locations with proper initialization

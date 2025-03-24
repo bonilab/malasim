@@ -37,6 +37,9 @@ public:
   [[nodiscard]] bool get_record_genome_db() const { return record_genome_db_; }
   void set_record_genome_db(bool value) { record_genome_db_ = value; }
 
+  bool get_cell_level_reporting() const { return cell_level_reporting_; }
+  void set_cell_level_reporting(bool value) { cell_level_reporting_ = value; }
+
   void process_config() override {
     spdlog::info("Processing ModelSettings");
   }
@@ -45,6 +48,7 @@ private:
   int days_between_stdout_output_;
   long initial_seed_number_;
   bool record_genome_db_;
+  bool cell_level_reporting_;
 };
 
 namespace YAML {
@@ -55,6 +59,7 @@ struct convert<ModelSettings> {
     node["days_between_stdout_output"] = rhs.get_days_between_stdout_output();
     node["initial_seed_number"] = rhs.get_initial_seed_number();
     node["record_genome_db"] = rhs.get_record_genome_db();
+    node["cell_level_reporting"] = rhs.get_cell_level_reporting();
     return node;
   }
 
@@ -68,11 +73,15 @@ struct convert<ModelSettings> {
     if (!node["record_genome_db"]) {
       throw std::runtime_error("Missing 'record_genome_db' field.");
     }
+    if (!node["cell_level_reporting"]) {
+      throw std::runtime_error("Missing 'cell_level_reporting' field.");
+    }
 
     rhs.set_days_between_stdout_output(
         node["days_between_stdout_output"].as<int>());
     rhs.set_initial_seed_number(node["initial_seed_number"].as<long>());
     rhs.set_record_genome_db(node["record_genome_db"].as<bool>());
+    rhs.set_cell_level_reporting(node["cell_level_reporting"].as<bool>());
     return true;
   }
 };

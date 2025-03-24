@@ -10,7 +10,14 @@
 
 #include <vector>
 #include <sqlite3.h>
+
+#include <sstream>
+
 #include "Reporters/Reporter.h"
+
+namespace spdlog {
+class logger;
+}
 
 class AgeBandReporter : public Reporter {
 public:
@@ -22,19 +29,32 @@ public:
 
 private:
   // When to start logging the data
+
   int start_recording = -1;
 
-  // SQLite database connection
-  sqlite3* db;
+  // String streams to use when working with the loggers
+  std::stringstream pfpr;
+  std::stringstream cases;
+
+  // Mapping of the locations to their districts
+  std::vector<int> district_lookup;
+
+  std::shared_ptr<spdlog::logger> pfpr_logger;
+  std::shared_ptr<spdlog::logger> cases_logger;
 
 public:
   AgeBandReporter() = default;
-  ~AgeBandReporter() override;
+
+  ~AgeBandReporter() override = default;
 
   void before_run() override {}
+
   void begin_time_step() override {}
+
   void initialize(int job_number, const std::string &path) override;
-  void after_run() override;
+
+  void after_run() override {}
+
   void monthly_report() override;
 };
 

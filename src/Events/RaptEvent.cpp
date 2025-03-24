@@ -42,9 +42,9 @@ void RaptEvent::execute() {
     // we are following the Malaria Indicator Survey convention of under-5 being
     // 0 - 59 months.
     auto pr_treatment = person->get_age() < 5
-                            ? Model::get_instance().location_db()[person->get_location()]
+                            ? Model::get_config()->location_db()[person->get_location()]
                                   .p_treatment_under_5
-                            : Model::get_instance().location_db()[person->get_location()]
+                            : Model::get_config()->location_db()[person->get_location()]
                                   .p_treatment_over_5;
 
     // Adjust the probability based upon the configured compliance rate with

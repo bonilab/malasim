@@ -136,7 +136,7 @@ void Person::set_age(const int& value) {
     if (Model::get_instance().get_model() != nullptr) {
       auto ac = age_class_ == -1 ? 0 : age_class_;
 
-      while (ac < (Model::get_config()->get_population_demographic().get_number_of_age_classes() - 1)
+      while (ac < (Model::get_config()->number_of_age_classes() - 1)
         && age_ >= Model::get_config()->get_population_demographic().get_age_structure()[ac]) {
         ac++;
       }
