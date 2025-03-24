@@ -19,9 +19,9 @@ ITreatmentCoverageModel *ITreatmentCoverageModel::build_steady_tcm(const YAML::N
   result->starting_time = (date::sys_days{starting_date} - date::sys_days{config->get_simulation_timeframe().get_starting_date()}).count();
 
   read_p_treatment(node["p_treatment_under_5_by_location"], result->p_treatment_under_5,
-                   config->get_spatial_settings().get_number_of_locations());
+                   config->number_of_locations());
   read_p_treatment(node["p_treatment_over_5_by_location"], result->p_treatment_over_5,
-                   config->get_spatial_settings().get_number_of_locations());
+                   config->number_of_locations());
   result->type = node["type"].as<std::string>();
 
   return result;
@@ -46,9 +46,9 @@ ITreatmentCoverageModel *ITreatmentCoverageModel::build_inflated_tcm(const YAML:
   result->monthly_inflation_rate = annual_inflation_rate/12;
 
   read_p_treatment(node["p_treatment_under_5_by_location"], result->p_treatment_under_5,
-                   config->get_spatial_settings().get_number_of_locations());
+                   config->number_of_locations());
   read_p_treatment(node["p_treatment_over_5_by_location"], result->p_treatment_over_5,
-                   config->get_spatial_settings().get_number_of_locations());
+                   config->number_of_locations());
   result->type = node["type"].as<std::string>();
 
   return result;
@@ -62,14 +62,14 @@ ITreatmentCoverageModel *ITreatmentCoverageModel::build_linear_tcm(const YAML::N
   result->end_time = (date::sys_days{to_date} - date::sys_days{config->get_simulation_timeframe().get_starting_date()}).count();
 
   read_p_treatment(node["p_treatment_under_5_by_location_from"], result->p_treatment_under_5,
-                   config->get_spatial_settings().get_number_of_locations());
+                   config->number_of_locations());
   read_p_treatment(node["p_treatment_under_5_by_location_to"], result->p_treatment_under_5_to,
-  config->get_spatial_settings().get_number_of_locations());
+  config->number_of_locations());
 
   read_p_treatment(node["p_treatment_over_5_by_location_from"], result->p_treatment_over_5,
-                   config->get_spatial_settings().get_number_of_locations());
+                   config->number_of_locations());
   read_p_treatment(node["p_treatment_over_5_by_location_to"], result->p_treatment_over_5_to,
-                   config->get_spatial_settings().get_number_of_locations());
+                   config->number_of_locations());
   result->type = node["type"].as<std::string>();
 
   return result;

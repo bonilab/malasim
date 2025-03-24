@@ -105,7 +105,7 @@ std::size_t Population::size(const int& location, const int& age_class) {
   std::size_t temp = 0;
   if (age_class == -1) {
     for (auto state = 0; state < Person::NUMBER_OF_STATE - 1; state++) {
-      for (auto ac = 0; ac < model_->number_of_age_classes(); ac++) {
+      for (auto ac = 0; ac < model_->get_config()->number_of_age_classes(); ac++) {
         temp += pi_lsa->vPerson()[location][state][ac].size();
       }
     }
@@ -138,7 +138,7 @@ std::size_t Population::size_residents_only(const int& location) {
   }
   auto temp = 0ul;
   for (auto state = 0; state < Person::NUMBER_OF_STATE - 1; state++) {
-    for (auto ac = 0; ac < model_->number_of_age_classes(); ac++) {
+    for (auto ac = 0; ac < model_->get_config()->number_of_age_classes(); ac++) {
       for (auto i = 0; i < pi_lsa->vPerson()[location][state][ac].size(); i++) {
         if (pi_lsa->vPerson()[location][state][ac][i]->get_residence_location() == location) {
           temp++;
@@ -161,8 +161,8 @@ void Population::perform_infection_event() {
 
   PersonPtrVector today_infections;
   auto tracking_index = model_->get_scheduler()->current_time()
-                        % model_->get_config()->get_epidemiological_parameters().get_number_of_tracking_days();
-  for (auto loc = 0; loc < model_->number_of_locations(); loc++) {
+                        % model_->get_config()->number_of_tracking_days();
+  for (auto loc = 0; loc < model_->get_config()->number_of_locations(); loc++) {
     const auto force_of_infection = force_of_infection_for_N_days_by_location[tracking_index][loc];
     if (force_of_infection <= DBL_EPSILON) continue;
 
@@ -252,7 +252,7 @@ void Population::perform_infection_event() {
 void Population::initialize() {
   if (model_ != nullptr) {
     // those vector will be used in the initial infection
-    const auto number_of_locations = model_->number_of_locations();
+    const auto number_of_locations = model_->get_config()->number_of_locations();
 
     // Prepare the population size vector
     popsize_by_location_ = IntVector(number_of_locations, 0);
@@ -271,7 +271,7 @@ void Population::initialize() {
     current_force_of_infection_by_location = std::vector<double>(number_of_locations, 0);
 
     force_of_infection_for_N_days_by_location = std::vector<std::vector<double>>(
-        model_->get_config()->get_epidemiological_parameters().get_number_of_tracking_days(),
+        model_->get_config()->number_of_tracking_days(),
         std::vector<double>(number_of_locations, 0));
 
     // initalize other person index
@@ -389,9 +389,9 @@ void Population::generate_individual(int location, int age_class) {
 }
 
 void Population::initialize_person_indices() {
-  const int number_of_location = model_->number_of_locations();
+  const int number_of_location = model_->get_config()->number_of_locations();
   const int number_of_host_states = Person::NUMBER_OF_STATE;
-  const int number_of_age_classes = model_->number_of_age_classes();
+  const int number_of_age_classes = model_->get_config()->number_of_age_classes();
 
   auto p_index_by_l_s_a =
       new PersonIndexByLocationStateAgeClass(number_of_location, number_of_host_states, number_of_age_classes);
@@ -420,8 +420,8 @@ void Population::introduce_initial_cases() {
     update_current_foi();
 
     // update force of infection for N days
-    for (auto d = 0; d < Model::get_config()->get_epidemiological_parameters().get_number_of_tracking_days(); d++) {
-      for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
+    for (auto d = 0; d < Model::get_config()->number_of_tracking_days(); d++) {
+      for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
         force_of_infection_for_N_days_by_location[d][loc] = current_force_of_infection_by_location[loc];
       }
       Model::get_mosquito()->infect_new_cohort_in_PRMC(Model::get_config(), Model::get_random(), this, d);
@@ -475,7 +475,7 @@ void Population::initial_infection(Person* person, Genotype* parasite_type) cons
 
 void Population::perform_birth_event() {
   //    std::cout << "Birth Event" << std::endl;
-  for (auto loc = 0; loc < model_->number_of_locations(); loc++) {
+  for (auto loc = 0; loc < model_->get_config()->number_of_locations(); loc++) {
     auto poisson_means = size(loc) * model_->get_config()->get_population_demographic().get_birth_rate()
     / static_cast<double>(Constants::DAYS_IN_YEAR);
     const auto number_of_births = model_->get_random()->random_poisson(poisson_means);
@@ -533,15 +533,15 @@ void Population::perform_death_event() {
   auto pi = get_person_index<PersonIndexByLocationStateAgeClass>();
   if (pi == nullptr) return;
 
-  for (auto loc = 0; loc < model_->number_of_locations(); loc++) {
+  for (auto loc = 0; loc < model_->get_config()->number_of_locations(); loc++) {
     for (auto hs = 0; hs < Person::NUMBER_OF_STATE - 1; hs++) {
       if (hs == Person::DEAD) continue;
-      for (auto ac = 0; ac < model_->number_of_age_classes(); ac++) {
+      for (auto ac = 0; ac < model_->get_config()->number_of_age_classes(); ac++) {
         const int size = pi->vPerson()[loc][hs][ac].size();
         if (size == 0) continue;
         auto poisson_means = size * model_->get_config()->get_population_demographic().get_death_rate_by_age_class()[ac] / static_cast<double>(Constants::DAYS_IN_YEAR);
 
-        assert(model_->get_config()->get_population_demographic().get_death_rate_by_age_class().size() == model_->number_of_age_classes());
+        assert(model_->get_config()->get_population_demographic().get_death_rate_by_age_class().size() == model_->get_config()->number_of_age_classes());
         const auto number_of_deaths = model_->get_random()->random_poisson(poisson_means);
         if (number_of_deaths == 0) continue;
 
@@ -566,8 +566,8 @@ void Population::clear_all_dead_state_individual() {
   auto pi = get_person_index<PersonIndexByLocationStateAgeClass>();
   PersonPtrVector removePersons;
 
-  for (int loc = 0; loc < model_->number_of_locations(); loc++) {
-    for (int ac = 0; ac < model_->number_of_age_classes(); ac++) {
+  for (int loc = 0; loc < model_->get_config()->number_of_locations(); loc++) {
+    for (int ac = 0; ac < model_->get_config()->number_of_age_classes(); ac++) {
       for (auto *person : pi->vPerson()[loc][Person::DEAD][ac]) {
         removePersons.push_back(person);
       }
@@ -586,33 +586,33 @@ void Population::perform_circulation_event() {
   //  for each number in that list select an individual, and schedule a movement event on next day
   PersonPtrVector today_circulations;
 
-  std::vector<int> v_number_of_residents_by_location(model_->number_of_locations(), 0);
+  std::vector<int> v_number_of_residents_by_location(model_->get_config()->number_of_locations(), 0);
 
-  for (auto location = 0; location < model_->number_of_locations(); location++) {
+  for (auto location = 0; location < model_->get_config()->number_of_locations(); location++) {
     //        v_number_of_residents_by_location[target_location] = (size(target_location));
     v_number_of_residents_by_location[location] = model_->get_mdc()->popsize_residence_by_location()[location];
     //        std::cout << v_original_pop_size_by_location[target_location] << std::endl;
   }
 
-  for (int from_location = 0; from_location < model_->number_of_locations(); from_location++) {
+  for (int from_location = 0; from_location < model_->get_config()->number_of_locations(); from_location++) {
     auto poisson_means = size(from_location) * model_->get_config()->get_movement_settings().get_circulation_info().get_circulation_percent();
     if (poisson_means == 0) continue;
     const auto number_of_circulating_from_this_location = model_->get_random()->random_poisson(poisson_means);
     if (number_of_circulating_from_this_location == 0) continue;
 
-    DoubleVector v_relative_outmovement_to_destination(model_->number_of_locations(), 0);
+    DoubleVector v_relative_outmovement_to_destination(model_->get_config()->number_of_locations(), 0);
     v_relative_outmovement_to_destination = model_->get_config()->get_movement_settings().get_spatial_model()->get_v_relative_out_movement_to_destination(
-        from_location, model_->number_of_locations(), model_->get_config()->get_spatial_settings().get_spatial_distance_matrix()[from_location],
+        from_location, model_->get_config()->number_of_locations(), model_->get_config()->get_spatial_settings().get_spatial_distance_matrix()[from_location],
         v_number_of_residents_by_location);
 
     std::vector<unsigned int> v_num_leavers_to_destination(
-        static_cast<unsigned long long int>(model_->number_of_locations()));
+        static_cast<unsigned long long int>(model_->get_config()->number_of_locations()));
 
     model_->get_random()->random_multinomial(static_cast<int>(v_relative_outmovement_to_destination.size()),
                                       static_cast<unsigned int>(number_of_circulating_from_this_location),
                                       v_relative_outmovement_to_destination, v_num_leavers_to_destination);
 
-    for (int target_location = 0; target_location < model_->number_of_locations(); target_location++) {
+    for (int target_location = 0; target_location < model_->get_config()->number_of_locations(); target_location++) {
       // spdlog::info("target_location individual_relative_moving_by_location[{}] size: {} sum: {}",target_location,
       //              individual_relative_moving_by_location[target_location].size(),
       //              sum_relative_moving_by_location[target_location]);
@@ -654,9 +654,9 @@ void Population::perform_circulation_for_1_location(const int& from_location, co
 
 bool Population::has_0_case() {
   auto pi = get_person_index<PersonIndexByLocationStateAgeClass>();
-  for (int loc = 0; loc < model_->number_of_locations(); loc++) {
+  for (int loc = 0; loc < model_->get_config()->number_of_locations(); loc++) {
     for (int hs = Person::EXPOSED; hs <= Person::CLINICAL; hs++) {
-      for (int ac = 0; ac < model_->number_of_age_classes(); ac++) {
+      for (int ac = 0; ac < model_->get_config()->number_of_age_classes(); ac++) {
         if (!pi->vPerson()[loc][hs][ac].empty()) {
           return false;
         }
@@ -669,9 +669,9 @@ bool Population::has_0_case() {
 void Population::update_all_individuals() {
   // update all individuals
   auto pi = get_person_index<PersonIndexByLocationStateAgeClass>();
-  for (int loc = 0; loc < model_->number_of_locations(); loc++) {
+  for (int loc = 0; loc < model_->get_config()->number_of_locations(); loc++) {
     for (int hs = 0; hs < Person::DEAD; hs++) {
-      for (int ac = 0; ac < model_->number_of_age_classes(); ac++) {
+      for (int ac = 0; ac < model_->get_config()->number_of_age_classes(); ac++) {
         for (auto* person : pi->vPerson()[loc][hs][ac]) {
           person->update();
         }
@@ -688,16 +688,16 @@ void Population::update_all_individual_events() {
 }
 
 void Population::persist_current_force_of_infection_to_use_N_days_later() {
-  for (auto loc = 0; loc < model_->number_of_locations(); loc++) {
+  for (auto loc = 0; loc < model_->get_config()->number_of_locations(); loc++) {
     force_of_infection_for_N_days_by_location[model_->get_scheduler()->current_time()
-                                              % model_->get_config()->get_epidemiological_parameters().get_number_of_tracking_days()][loc] =
+                                              % model_->get_config()->number_of_tracking_days()][loc] =
         current_force_of_infection_by_location[loc];
   }
 }
 
 void Population::update_current_foi() {
   auto pi = get_person_index<PersonIndexByLocationStateAgeClass>();
-  for (int location = 0; location < model_->number_of_locations(); location++) {
+  for (int location = 0; location < model_->get_config()->number_of_locations(); location++) {
     // spdlog::info("location {} pop {}", location, size(location));
     // reset force of infection for each location
     current_force_of_infection_by_location[location] = 0.0;
@@ -711,7 +711,7 @@ void Population::update_current_foi() {
     all_alive_persons_by_location[location].clear();
 
     for (int hs = 0; hs < Person::DEAD; hs++) {
-      for (int ac = 0; ac < model_->number_of_age_classes(); ac++) {
+      for (int ac = 0; ac < model_->get_config()->number_of_age_classes(); ac++) {
         // spdlog::info("There are {} individuals in location {} with host state {} and age class {}", pi->vPerson()[location][hs][ac].size(), location, hs, ac);
         // for (std::size_t i = 0; i < pi->vPerson()[location][hs][ac].size(); i++) {
           // Person* person = pi->vPerson()[location][hs][ac][i];

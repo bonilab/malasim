@@ -17,20 +17,17 @@ public:
     // Class for GridBased settings
     class GridBased {
         public:
+            class AdministativeBoundaries {
+            public:
+              std::string name;
+              std::string raster;
+            };
             // Getters and Setters for population_raster
             [[nodiscard]] const std::string &get_population_raster() const {
                 return population_raster_;
             }
             void set_population_raster(const std::string &value) {
                 population_raster_ = value;
-            }
-
-            // Getters and Setters for district_raster
-            [[nodiscard]] const std::string &get_district_raster() const {
-                return district_raster_;
-            }
-            void set_district_raster(const std::string &value) {
-                district_raster_ = value;
             }
 
             // Getters and Setters for p_treatment_under_5_raster
@@ -99,10 +96,18 @@ public:
                 ecoclimatic_raster_ = value;
             }
 
+            [[nodiscard]] std::vector<AdministativeBoundaries>
+            get_administrative_boundaries() const {
+                return administrative_boundaries_;
+            }
+            void set_administrative_boundaries(const std::vector<AdministativeBoundaries> &value) {
+                administrative_boundaries_ = value;
+            }
+
         private:
             std::vector<Spatial::Location> locations_;
             std::string population_raster_;
-            std::string district_raster_;
+            std::vector<AdministativeBoundaries> administrative_boundaries_;
             std::string p_treatment_under_5_raster_;
             std::string p_treatment_over_5_raster_;
             std::string beta_raster_;
@@ -285,25 +290,27 @@ struct convert<SpatialSettings::GridBased> {
     static Node encode(const SpatialSettings::GridBased &rhs) {
         Node node;
         node["population_raster"] = rhs.get_population_raster();
-        node["district_raster"] = rhs.get_district_raster();
         node["p_treatment_under_5_raster"] = rhs.get_p_treatment_under_5_raster();
         node["p_treatment_over_5_raster"] = rhs.get_p_treatment_over_5_raster();
         node["beta_raster"] = rhs.get_beta_raster();
         node["ecoclimatic_raster"] = rhs.get_ecoclimatic_raster();
         node["cell_size"] = rhs.get_cell_size();
         node["age_distribution_by_location"] = rhs.get_age_distribution_by_location();
+        for (int i = 0; i < rhs.get_administrative_boundaries().size(); i++) {
+            node["administrative_boundaries"][i]["name"] = rhs.get_administrative_boundaries()[i].name;
+            node["administrative_boundaries"][i]["raster"] = rhs.get_administrative_boundaries()[i].raster;
+        }
         return node;
     }
 
     static bool decode(const Node &node, SpatialSettings::GridBased &rhs) {
-        if (!node["population_raster"] || !node["district_raster"] || !node["p_treatment_under_5_raster"] ||
+        if (!node["population_raster"] || !node["administrative_boundaries"] || !node["p_treatment_under_5_raster"] ||
             !node["p_treatment_over_5_raster"] || !node["beta_raster"] || !node["cell_size"] ||
             !node["age_distribution_by_location"]) {
             throw std::runtime_error("Missing required fields in grid-based settings.");
         }
 
         rhs.set_population_raster(node["population_raster"].as<std::string>());
-        rhs.set_district_raster(node["district_raster"].as<std::string>());
         rhs.set_p_treatment_under_5_raster(node["p_treatment_under_5_raster"].as<std::string>());
         rhs.set_p_treatment_over_5_raster(node["p_treatment_over_5_raster"].as<std::string>());
         rhs.set_beta_raster(node["beta_raster"].as<std::string>());
@@ -311,7 +318,14 @@ struct convert<SpatialSettings::GridBased> {
         if(node["ecoclimatic_raster"]) {
             rhs.set_ecoclimatic_raster(node["ecoclimatic_raster"].as<std::string>());
         }
-
+        std::vector<SpatialSettings::GridBased::AdministativeBoundaries> admin_boundaries;
+        for (auto i = 0; i < node["administrative_boundaries"].size(); i++) {
+            SpatialSettings::GridBased::AdministativeBoundaries admin_boundary;
+            admin_boundary.name = node["administrative_boundaries"][i]["name"].as<std::string>();
+            admin_boundary.raster = node["administrative_boundaries"][i]["raster"].as<std::string>();
+            admin_boundaries.push_back(admin_boundary);
+        }
+        rhs.set_administrative_boundaries(admin_boundaries);
         /* use one age distribution for all locations */
         rhs.set_age_distribution_by_location(node["age_distribution_by_location"].as<std::vector<std::vector<double>>>());
         return true;

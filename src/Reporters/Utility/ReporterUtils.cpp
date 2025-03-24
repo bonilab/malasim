@@ -47,12 +47,12 @@ void ReporterUtils::output_genotype_frequency1(std::stringstream& ss, const int&
           std::map<int, int> individual_genotype_map;
 
           for (auto* parasite_population : *(person->get_all_clonal_parasite_populations()->parasites())) {
-            const auto g_id = parasite_population->genotype()->genotype_id;
+            const auto g_id = parasite_population->genotype()->genotype_id();
             // result2[g_id] += 1;
             if (individual_genotype_map.find(g_id) == individual_genotype_map.end()) {
-              individual_genotype_map[parasite_population->genotype()->genotype_id] = 1;
+              individual_genotype_map[parasite_population->genotype()->genotype_id()] = 1;
             } else {
-              individual_genotype_map[parasite_population->genotype()->genotype_id] += 1;
+              individual_genotype_map[parasite_population->genotype()->genotype_id()] += 1;
             }
           }
 
@@ -98,7 +98,7 @@ void ReporterUtils::output_genotype_frequency2(std::stringstream& ss, const int&
           std::map<int, int> individual_genotype_map;
 
           for (auto* parasite_population : *(person->get_all_clonal_parasite_populations()->parasites())) {
-            const auto g_id = parasite_population->genotype()->genotype_id;
+            const auto g_id = parasite_population->genotype()->genotype_id();
             result2[g_id] += 1;
             result2_all[g_id] += 1;
           }
@@ -146,13 +146,13 @@ void ReporterUtils::output_genotype_frequency3(std::stringstream& ss, const int&
           std::map<int, int> individual_genotype_map;
 
           for (auto* parasite_population : *(person->get_all_clonal_parasite_populations()->parasites())) {
-            const auto g_id = parasite_population->genotype()->genotype_id;
+            const auto g_id = parasite_population->genotype()->genotype_id();
             if (individual_genotype_map.find(g_id) == individual_genotype_map.end()) {
-              individual_genotype_map[parasite_population->genotype()->genotype_id] = 1;
+              individual_genotype_map[parasite_population->genotype()->genotype_id()] = 1;
             } else {
-              individual_genotype_map[parasite_population->genotype()->genotype_id] += 1;
+              individual_genotype_map[parasite_population->genotype()->genotype_id()] += 1;
             }
-//            individual_genotype_cr[parasite_population->genotype()->genotype_id] = parasite_population->genotype()->daily_fitness_multiple_infection;
+//            individual_genotype_cr[parasite_population->genotype()->genotype_id()] = parasite_population->genotype()->daily_fitness_multiple_infection;
           }
 
           for (const auto genotype : individual_genotype_map) {
@@ -206,13 +206,13 @@ void ReporterUtils::output_genotype_frequency4(std::stringstream& ss, std::strin
           std::map<int, int> individual_genotype_map;
 
           for (auto* parasite_population : *(person->get_all_clonal_parasite_populations()->parasites())) {
-            const auto g_id = parasite_population->genotype()->genotype_id;
+            const auto g_id = parasite_population->genotype()->genotype_id();
             if (individual_genotype_map.find(g_id) == individual_genotype_map.end()) {
-              individual_genotype_map[parasite_population->genotype()->genotype_id] = 1;
+              individual_genotype_map[parasite_population->genotype()->genotype_id()] = 1;
             } else {
-              individual_genotype_map[parasite_population->genotype()->genotype_id] += 1;
+              individual_genotype_map[parasite_population->genotype()->genotype_id()] += 1;
             }
-//            individual_genotype_cr[parasite_population->genotype()->genotype_id] = parasite_population->genotype()->daily_fitness_multiple_infection;
+//            individual_genotype_cr[parasite_population->genotype()->genotype_id()] = parasite_population->genotype()->daily_fitness_multiple_infection;
           }
 
           for (const auto genotype : individual_genotype_map) {
@@ -233,7 +233,7 @@ void ReporterUtils::output_genotype_frequency4(std::stringstream& ss, std::strin
 //    }
 
     std::map<int, int> prmc_genotype_map;
-    auto tracking_day = Model::get_scheduler()->current_time() % Model::get_config()->get_epidemiological_parameters().get_number_of_tracking_days();
+    auto tracking_day = Model::get_scheduler()->current_time() % Model::get_config()->number_of_tracking_days();
     int sum_nullptr = 0;
     for(auto* prmc_genotypes : Model::get_mosquito()->genotypes_table[tracking_day][loc]) {
         if (prmc_genotypes == nullptr) {
@@ -243,12 +243,12 @@ void ReporterUtils::output_genotype_frequency4(std::stringstream& ss, std::strin
     }
     if (sum_nullptr == 0){
         for(auto* prmc_genotypes : Model::get_mosquito()->genotypes_table[tracking_day][loc]) {
-          const auto g_id = prmc_genotypes->genotype_id;
+          const auto g_id = prmc_genotypes->genotype_id();
           if (prmc_genotype_map.find(g_id) == prmc_genotype_map.end()) {
-              prmc_genotype_map[prmc_genotypes->genotype_id] = 1;
+              prmc_genotype_map[prmc_genotypes->genotype_id()] = 1;
           }
           else{
-              prmc_genotype_map[prmc_genotypes->genotype_id] += 1;
+              prmc_genotype_map[prmc_genotypes->genotype_id()] += 1;
           }
         }
         for (const auto genotype : prmc_genotype_map) {
@@ -308,13 +308,13 @@ void ReporterUtils::output_3_genotype_frequency(std::stringstream& ss, const int
 
           for (auto* parasite_population : *(person->get_all_clonal_parasite_populations()->parasites())) {
             std::cout << "hello" << std::endl;
-            const auto g_id = parasite_population->genotype()->genotype_id;
+            const auto g_id = parasite_population->genotype()->genotype_id();
             result2[g_id] += 1;
             result2_all[g_id] += 1;
             if (individual_genotype_map.find(g_id) == individual_genotype_map.end()) {
-              individual_genotype_map[parasite_population->genotype()->genotype_id] = 1;
+              individual_genotype_map[parasite_population->genotype()->genotype_id()] = 1;
             } else {
-              individual_genotype_map[parasite_population->genotype()->genotype_id] += 1;
+              individual_genotype_map[parasite_population->genotype()->genotype_id()] += 1;
             }
           }
 
@@ -451,13 +451,13 @@ void ReporterUtils::initialize_moi_file_logger() {
 //
 //
 // void MonthlyReporter::print_monthly_incidence_by_location() {
-//  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); ++loc) {
+//  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); ++loc) {
 //    ss << Model::get_mdc()->monthly_number_of_treatment_by_location()[loc] << sep;
 //  }
 //
 //  ss << group_sep;
 //
-//  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); ++loc) {
+//  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); ++loc) {
 //    ss << Model::get_mdc()->monthly_number_of_clinical_episode_by_location()[loc] << sep;
 //  }
 //}

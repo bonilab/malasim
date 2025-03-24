@@ -73,7 +73,7 @@ bool Model::initialize() {
       spdlog::info("Model initialized with seed: " + std::to_string(random_->get_seed()));
       // add reporter here
       if (utils::Cli::get_instance().get_reporter().empty()) {
-        add_reporter(Reporter::MakeReport(Reporter::MONTHLY_REPORTER));
+        add_reporter(Reporter::MakeReport(Reporter::SQLITE_MONTHLY_REPORTER));
       } else {
         if (Reporter::ReportTypeMap.find(utils::Cli::get_instance().get_reporter()) != Reporter::ReportTypeMap.end()) {
           add_reporter(Reporter::MakeReport(Reporter::ReportTypeMap[utils::Cli::get_instance().get_reporter()]));
@@ -196,7 +196,7 @@ void Model::daily_update() {
   // infect new mosquito cohort in prmc must be run after population perform infection event and update current foi
   // because the prmc at the tracking index will be overridden with new cohort to use N days later and
   // infection event used the prmc at the tracking index for the today infection
-  auto tracking_index = scheduler_->current_time() % config_->get_epidemiological_parameters().get_number_of_tracking_days();
+  auto tracking_index = scheduler_->current_time() % config_->number_of_tracking_days();
   mosquito_->infect_new_cohort_in_PRMC(config_, random_, population_, tracking_index);
 
   // this function must be called after mosquito infect new cohort in prmc
@@ -295,26 +295,6 @@ IStrategy* Model::get_treatment_strategy() {
 
 ITreatmentCoverageModel* Model::get_treatment_coverage() {
   return get_instance().treatment_coverage_;
-}
-
-int Model::number_of_locations() const {
-  return config_->get_spatial_settings().get_number_of_locations();
-}
-
-int Model::number_of_age_classes() const {
-  return config_->get_population_demographic().get_number_of_age_classes();
-}
-
-int Model::get_number_of_tracking_days() const {
-  return config_->get_epidemiological_parameters().get_number_of_tracking_days();
-}
-
-std::vector<Spatial::Location>& Model::location_db() {
-  return config_->get_spatial_settings().location_db;
-}
-
-std::vector<IStrategy *>& Model::strategy_db() {
-  return config_->get_strategy_parameters().strategy_db;
 }
 
 

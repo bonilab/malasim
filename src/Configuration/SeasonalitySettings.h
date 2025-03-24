@@ -84,7 +84,7 @@ public:
 
   void process_config() override {};
 
-  void process_config_using_number_of_locations(int number_of_locations) {
+  void process_config_using_number_of_locations(SpatialData *spatial_data,int number_of_locations) {
     spdlog::info("Processing SeasonalitySettings");
     if(enable_) {
       spdlog::info("Seasonality enabled");
@@ -101,7 +101,7 @@ public:
       else if(mode_== "pattern") {
         spdlog::info("Pattern based");
         // process rainfall based
-        seasonal_pattern_->build();
+        seasonal_pattern_->build(spatial_data);
       }
       else {
         throw std::runtime_error("Unknown mode in 'seasonality_settings'.");
@@ -184,11 +184,12 @@ struct convert<SeasonalPattern*> {
     Node node;
     node["filename"] = rhs->get_filename();
     node["period"] = rhs->get_period();
+    node["admin_level"] = rhs->get_admin_level();
     return node;
   }
 
   static bool decode(const Node &node, SeasonalPattern* rhs) {
-    if (!node["filename"] || !node["period"]) {
+    if (!node["filename"] || !node["period"] || !node["admin_level"]) {
       throw std::runtime_error("Missing fields in SeasonalPattern");
     }
     rhs->set_filename(node["filename"].as<std::string>());
@@ -197,6 +198,7 @@ struct convert<SeasonalPattern*> {
       throw std::invalid_argument(
           "Period must be either 12 (monthly) or 365 (daily)");
     }
+    rhs->set_admin_level(node["admin_level"].as<std::string>());
     rhs->set_is_monthly(rhs->get_period() == 12);
     return true;
   }

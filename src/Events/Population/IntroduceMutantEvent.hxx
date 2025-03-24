@@ -24,13 +24,14 @@ public:
   IntroduceMutantEvent(const IntroduceMutantEvent &) = delete;
   IntroduceMutantEvent(IntroduceMutantEvent &&) = delete;
 private:
-  int district_;
+  int admin_level_id_;
+  int unit_id_;
 
   void execute() override {
     // Calculate the target fraction of the district infections and perform them
     // as needed
     auto locations =
-        SpatialData::get_instance().get_district_locations(district_);
+        SpatialData::get_instance().get_locations_in_unit(admin_level_id_, unit_id_);
     double target_fraction = calculate(locations);
     auto count = (target_fraction > 0) ? mutate(locations, target_fraction) : 0;
 
@@ -44,11 +45,13 @@ private:
 public:
   inline static const std::string EventName = "introduce_mutant_event";
 
-  explicit IntroduceMutantEvent(const int &time, const int &district,
+  explicit IntroduceMutantEvent(const int &time, const int &unit_id,
+                                const int &admin_level_id,
                                 const double &fraction,
                                 const std::vector<std::tuple<int,int,char>> &alleles)
-      : IntroduceMutantEventBase(fraction, alleles),
-        district_(district) {
+  : IntroduceMutantEventBase(fraction, alleles),
+    unit_id_(unit_id),
+    admin_level_id_(admin_level_id) {
     this->time = time;
   }
 

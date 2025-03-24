@@ -51,8 +51,9 @@ TEST_F(BoundaryValidationTest, InvalidIndexingValues) {
     }
     auto district_raster = SpatialData::get_instance().get_raster(SpatialData::Districts);
     SpatialData::get_instance().generate_locations(district_raster);
-    EXPECT_THROW(SpatialData::get_instance().populate_dependent_data(), std::invalid_argument);
     SpatialData::get_instance().using_raster = false;
+    auto raster = std::make_unique<AscFile>(*district_raster);
+    EXPECT_THROW(manager.setup_boundary("district", raster.get()), std::runtime_error);
     SpatialData::get_instance().parse_complete();
 }
 
@@ -104,7 +105,7 @@ TEST_F(BoundaryValidationTest, SameDimensionsAreAccepted) {
     SpatialData::get_instance().parse_complete();
     auto raster = std::make_unique<AscFile>(*district_raster);
     EXPECT_NO_THROW(manager.register_level("district"));
-    EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster)));
+    EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster).get()));
 
     SpatialData::get_instance().load("test_district.asc",SpatialData::Districts);
     SpatialData::get_instance().using_raster = true;
@@ -116,7 +117,7 @@ TEST_F(BoundaryValidationTest, SameDimensionsAreAccepted) {
     SpatialData::get_instance().parse_complete();
     raster = std::make_unique<AscFile>(*province_raster);
     EXPECT_NO_THROW(manager.register_level("province"));
-    EXPECT_NO_THROW(manager.setup_boundary("province",std::move(raster)));
+    EXPECT_NO_THROW(manager.setup_boundary("province",std::move(raster).get()));
     raster.reset();
 }
 
@@ -140,7 +141,7 @@ TEST_F(BoundaryValidationTest, DifferentDimensionsAreRejected) {
     SpatialData::get_instance().parse_complete();
     auto raster = std::make_unique<AscFile>(*district_raster);
     EXPECT_NO_THROW(manager.register_level("district"));
-    EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster)));
+    EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster).get()));
     raster.reset();
 
     // Create province raster with different dimensions (4x4)
@@ -182,7 +183,7 @@ TEST_F(BoundaryValidationTest, ValidConfigurationWithDistrict) {
     SpatialData::get_instance().parse_complete();
     auto raster = std::make_unique<AscFile>(*district_raster);
     EXPECT_NO_THROW(manager.register_level("district"));
-    EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster)));
+    EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster).get()));
     EXPECT_NO_THROW(manager.validate());
     raster.reset();
 }

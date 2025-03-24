@@ -26,7 +26,7 @@ void IntroduceAmodiaquineMutantEvent::execute() {
   auto* pi =
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 
-  for (std::size_t j = 0; j < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ++j) {
+  for (std::size_t j = 0; j < Model::get_config()->number_of_age_classes(); ++j) {
     const auto number_infected_individual_in_ac =
         pi->vPerson()[0][Person::ASYMPTOMATIC][j].size()
         + pi->vPerson()[0][Person::CLINICAL][j].size();

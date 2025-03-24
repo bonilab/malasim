@@ -19,6 +19,8 @@ model_settings:
   # Record the genomic data (set to true for a real run)
   record_genome_db: true
 
+  cell_level_reporting: false
+
 # ---------------------------------------------------------------
 # 2. Simulation Timeframe
 # ---------------------------------------------------------------
@@ -89,7 +91,12 @@ spatial_settings:
 
     # Raster files defining the country districts
 #    district_raster: "../../sample_inputs/kag_district.asc"
-    district_raster: "../../sample_inputs/dev_district.asc"
+#    district_raster: "../../sample_inputs/dev_district.asc"
+
+    administrative_boundaries:
+     - name: "district"    # First admin level
+#       raster: "../../sample_inputs/kag_district.asc"
+       raster: "../../sample_inputs/dev_district.asc"
 
     # Raster files defining treatment probabilities (comment these out for beta calibration)
 #    p_treatment_under_5_raster: "../../sample_inputs/kag_treatment.asc"
@@ -141,6 +148,7 @@ seasonality_settings:
   enable: true
   mode: "pattern"
   pattern:
+    admin_level: "district"
     filename: "../../sample_inputs/dev_seasonality_pattern.csv"
     period: 365
   rainfall:

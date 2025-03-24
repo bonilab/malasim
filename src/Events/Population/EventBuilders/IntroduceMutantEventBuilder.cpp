@@ -22,7 +22,7 @@ std::vector<int> get_locations_from_raster(const std::string &filename) {
   auto* file = AscFileManager::read(filename);
 
   // Note the number of locations so that we can provide some error checking
-  auto count = Model::get_instance().number_of_locations();
+  auto count = Model::get_config()->number_of_locations();
 
   // Iterate through the raster and note the valid locations
   std::vector<int> locations;
@@ -68,16 +68,16 @@ std::vector<int> get_locations_from_raster(const std::string &filename) {
 }
 
 std::vector<Event*> PopulationEventBuilder::build_introduce_mutant_event(
-    const YAML::Node &node, Config* config) {
+    const YAML::Node &node, Config* config, const std::string& admin_level_name)  {
   try {
     std::vector<Event*> events;
     for (const auto &entry : node) {
       // Load the values
-      auto start_date = entry["date"].as<date::year_month_day>();
+      auto start_date = entry["day"].as<date::year_month_day>();
       auto time =
           (date::sys_days{start_date} - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
               .count();
-      auto district = entry["district"].as<int>();
+      auto unit_id = entry["unit_id"].as<int>();
       auto fraction = entry["fraction"].as<double>();
       std::vector<std::tuple<int,int,char>> alleles;
       for (const auto &allele_node : entry["alleles"]) {
@@ -93,37 +93,34 @@ std::vector<Event*> PopulationEventBuilder::build_introduce_mutant_event(
         spdlog::info("Mutation at {}:{} {}",std::get<0>(allele),std::get<1>(allele),std::get<2>(allele));
       }
 
-      // Make sure the district GIS data is loaded and the district id makes
+      auto admin_level_id = SpatialData::get_instance().get_admin_level_id(admin_level_name);
+      // Make sure the GIS data is loaded and the unit id makes
       // sense
-      if (district < 0) {
-        spdlog::error("The target district must be greater than or equal to zero.");
-        throw std::invalid_argument(
-            "Target district must be greater than or equal to zero");
-      }
-      if (district > SpatialData::get_instance().district_count) {
-        spdlog::error("Target district is greater than the district count.");
-        throw std::invalid_argument(
-            "Target district greater than district count.");
+      if (unit_id < 0) {
+        spdlog::error("The target unit id must be greater than or equal to zero.");
+        throw std::invalid_argument("Target unit id must be greater than or equal to zero");
       }
 
-      // Make sure the fraction makes sense
-      if (fraction <= 0) {
-        spdlog::error("The fraction of the mutants must be greater than zero.");
-        throw std::invalid_argument(
-            "Mutant fraction must be greater than zero");
+      if (SpatialData::get_instance().get_admin_levels().empty()) {
+        spdlog::error("No admin levels found.");
+        throw std::invalid_argument("No admin levels found.");
+      }
+
+      if (unit_id > SpatialData::get_instance().get_unit_count(admin_level_id)) {
+        spdlog::error("Target unit id is greater than the unit count.");
+        throw std::invalid_argument("Target unit id greater than unit count.");
       }
 
       // Log and add the event to the queue
-      auto* event = new IntroduceMutantEvent(time, district, fraction,alleles);
-      spdlog::debug(
-          "Adding event {} start date: {} district: {} fraction: {}",
-          event->name(), StringHelpers::date_as_string(start_date), district, fraction);
+      auto* event = new IntroduceMutantEvent(time, unit_id, admin_level_id, fraction, alleles);
+      for (auto & allele : alleles) {
+        spdlog::info("Mutation at {}:{} {}",std::get<0>(allele),std::get<1>(allele),std::get<2>(allele));
+      }
       events.push_back(event);
     }
     return events;
   } catch (YAML::BadConversion &error) {
-    spdlog::error("Unrecoverable error parsing YAML value in {}"
-                  " node: {}",
+    spdlog::error("Unrecoverable error parsing YAML value in {} node: {}",
                   IntroduceMutantEvent::EventName, error.msg);
     exit(1);
   }

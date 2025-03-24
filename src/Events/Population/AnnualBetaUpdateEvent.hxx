@@ -23,10 +23,10 @@ private:
   // Execute the annual beta update event
   void execute() override {
     // Grab a reference to the location_db to work with
-    auto &location_db = Model::get_instance().location_db();
+    auto &location_db = Model::get_config()->location_db();
 
     // Iterate through and adjust the betas
-    auto count = Model::get_instance().number_of_locations();
+    auto count = Model::get_config()->number_of_locations();
     for (auto ndx = 0; ndx < count; ndx++) {
       location_db[ndx].beta = adjust(location_db[ndx].beta, rate_);
     }

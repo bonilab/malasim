@@ -36,44 +36,43 @@ protected:
         SpatialData::get_instance().parse_complete();
         auto raster = std::make_unique<AscFile>(*district_raster);
         EXPECT_NO_THROW(manager.register_level("district"));
-        EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster)));
+        EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster).get()));
         raster.reset();
     }
 };
 
 TEST_F(LookupOperationsTest, GetAdminUnitForLocation) {
     // Test various locations based on the known raster pattern
-    EXPECT_EQ(manager.get_admin_unit(0, "district"), 1);  // First district
-    EXPECT_EQ(manager.get_admin_unit(4, "district"), 1);  // Second district
-    EXPECT_EQ(manager.get_admin_unit(2, "district"), 2);  // Second district
-    EXPECT_EQ(manager.get_admin_unit(8, "district"), 3);  // Third district
+    EXPECT_EQ(manager.get_admin_unit("district",0), 1);  // First district
+    EXPECT_EQ(manager.get_admin_unit("district",4), 1);  // Second district
+    EXPECT_EQ(manager.get_admin_unit("district",2), 2);  // Second district
+    EXPECT_EQ(manager.get_admin_unit("district",8), 3);  // Third district
 }
 
 TEST_F(LookupOperationsTest, InvalidLocationHandling) {
-    EXPECT_THROW(manager.get_admin_unit(-1, "district"), std::out_of_range);
-    EXPECT_THROW(manager.get_admin_unit(999, "district"), std::out_of_range);
+    EXPECT_THROW(manager.get_admin_unit("district",-1), std::out_of_range);
+    EXPECT_THROW(manager.get_admin_unit("district",999), std::out_of_range);
 }
 
 TEST_F(LookupOperationsTest, GetLocationsInAdminUnit) {
-    auto locations_d1 = manager.get_locations_in_unit(1, "district");
+    auto locations_d1 = manager.get_locations_in_unit("district",1);
     EXPECT_EQ(locations_d1.size(), 4);  // District 1 has 4 cells
 
-    auto locations_d2 = manager.get_locations_in_unit(2, "district");
+    auto locations_d2 = manager.get_locations_in_unit("district",2);
     EXPECT_EQ(locations_d2.size(), 2);  // District 2 has 2 cells
 
-    auto locations_d3 = manager.get_locations_in_unit(3, "district");
+    auto locations_d3 = manager.get_locations_in_unit("district",3);
     EXPECT_EQ(locations_d3.size(), 3);  // District 3 has 3 cells
 }
 
 TEST_F(LookupOperationsTest, InvalidAdminUnitHandling) {
-    auto locations = manager.get_locations_in_unit(999, "district");
-    EXPECT_TRUE(locations.empty());
+    EXPECT_THROW(manager.get_locations_in_unit("district",999),std::out_of_range);
 }
 
 TEST_F(LookupOperationsTest, GetBoundaryData) {
     const auto* boundary = manager.get_boundary("district");
     ASSERT_NE(boundary, nullptr);
-    EXPECT_EQ(boundary->count, 3);  // Three unique districts
+    EXPECT_EQ(boundary->unit_count, 3);  // Three unique districts
 }
 
 TEST_F(LookupOperationsTest, GetUnitCount) {

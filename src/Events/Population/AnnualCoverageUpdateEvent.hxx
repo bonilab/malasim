@@ -26,7 +26,7 @@ private:
     auto tcm_db = Model::get_treatment_coverage();
 
     // Iterate though and adjust the rates
-    auto count = Model::get_instance().number_of_locations();
+    auto count = Model::get_config()->number_of_locations();
     for (auto ndx = 0; ndx < count; ndx++) {
       tcm_db->p_treatment_under_5[ndx] =
           adjust(tcm_db->p_treatment_under_5[ndx], rate_);

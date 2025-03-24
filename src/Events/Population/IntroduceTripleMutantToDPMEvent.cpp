@@ -22,7 +22,7 @@ void IntroduceTrippleMutantToDPMEvent::execute() {
   auto* pi = Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 
 
-  for (int j = 0; j < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ++j) {
+  for (int j = 0; j < Model::get_config()->number_of_age_classes(); ++j) {
     const auto number_infected_individual_in_ac =
         pi->vPerson()[0][Person::ASYMPTOMATIC][j].size() + pi->vPerson()[0][Person::CLINICAL][j].size();
     const auto number_of_importation_cases = Model::get_random()->random_poisson(
