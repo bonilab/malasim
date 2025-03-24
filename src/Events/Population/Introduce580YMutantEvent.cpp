@@ -32,7 +32,7 @@ void Introduce580YMutantEvent::execute() {
 
   double current_580Y_fraction = 0.0;
   double total_population_count = 0;
-  for (int j = 0; j < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ++j) {
+  for (int j = 0; j < Model::get_config()->number_of_age_classes(); ++j) {
     for (Person* p :  pi->vPerson()[0][Person::ASYMPTOMATIC][j]) {
       total_population_count += p->get_all_clonal_parasite_populations()->size();
       for (ClonalParasitePopulation* pp : *p->get_all_clonal_parasite_populations()->parasites()) {
@@ -53,7 +53,7 @@ void Introduce580YMutantEvent::execute() {
   }
 //  std::cout << target_fraction << std::endl;
 
-  for (int j = 0; j < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ++j) {
+  for (int j = 0; j < Model::get_config()->number_of_age_classes(); ++j) {
     const auto number_infected_individual_in_ac =
       pi->vPerson()[0][Person::ASYMPTOMATIC][j].size() + pi->vPerson()[0][Person::CLINICAL][j].size();
     const auto number_of_importation_cases = Model::get_random()->random_poisson(

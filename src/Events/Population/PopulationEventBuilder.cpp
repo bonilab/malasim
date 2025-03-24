@@ -53,10 +53,10 @@ std::vector<Event*> PopulationEventBuilder::build_introduce_parasite_events(
   std::vector<Event*> events;
   for (const auto &entry : node) {
     auto location = entry["location"].as<int>();
-    if (static_cast<std::size_t>(location) < config->get_spatial_settings().get_number_of_locations()) {
+    if (static_cast<std::size_t>(location) < config->number_of_locations()) {
       for (std::size_t j = 0; j < entry["parasite_info"].size(); j++) {
         auto genotype_aa_sequence = entry["parasite_info"][j]["genotype_aa_sequence"].as<std::string>();
-        auto genotype_id = config->get_genotype_parameters().genotype_db->get_genotype(genotype_aa_sequence)->genotype_id;
+        auto genotype_id = config->get_genotype_parameters().genotype_db->get_genotype(genotype_aa_sequence)->genotype_id();
         auto num = entry["parasite_info"][j]["number_of_cases"].as<int>();
 
         const auto starting_date =
@@ -82,14 +82,14 @@ PopulationEventBuilder::build_introduce_parasites_periodically_events(
     const auto location = entry["location"].as<unsigned long>();
     const unsigned long location_from = location;
     const auto location_to = std::min(location + 1,
-        static_cast<unsigned long>(config->get_spatial_settings().get_number_of_locations()));
+        static_cast<unsigned long>(config->number_of_locations()));
 
     for (auto loc = location_from; loc < location_to; ++loc) {
       for (std::size_t j = 0; j < entry["parasite_info"].size(); j++) {
         //            InitialParasiteInfo ipi;
         //            ipi.location = location;
         auto genotype_aa_sequence = entry["parasite_info"][j]["genotype_aa_sequence"].as<std::string>();
-        auto genotype_id = config->get_genotype_parameters().genotype_db->get_genotype(genotype_aa_sequence)->genotype_id;
+        auto genotype_id = config->get_genotype_parameters().genotype_db->get_genotype(genotype_aa_sequence)->genotype_id();
         // TODO: implement new importation parasite genotype based on allele
         // distribution
 
@@ -118,8 +118,8 @@ std::vector<Event*> PopulationEventBuilder::build_introduce_parasites_periodical
     const auto location = event_node["location"].as<unsigned long>();
     const auto location_from = location == -1 ? 0 : location;
     const auto location_to =
-        location == -1 ? config->get_spatial_settings().get_number_of_locations()
-    : std::min(location + 1, static_cast<unsigned long>(config->get_spatial_settings().get_number_of_locations()));
+        location == -1 ? config->number_of_locations()
+    : std::min(location + 1, static_cast<unsigned long>(config->number_of_locations()));
 
     for (auto loc = location_from; loc < location_to; ++loc) {
       for (auto j = 0; j < event_node["parasite_info"].size(); j++) {
@@ -213,9 +213,9 @@ std::vector<Event*> PopulationEventBuilder::build_single_round_mda_event(
                  - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                     .count();
     auto* e = new SingleRoundMDAEvent(time);
-    for (std::size_t loc = 0; loc < config->get_spatial_settings().get_number_of_locations(); loc++) {
+    for (std::size_t loc = 0; loc < config->number_of_locations(); loc++) {
       auto input_loc = entry["fraction_population_targeted"].size()
-                               < config->get_spatial_settings().get_number_of_locations()
+                               < config->number_of_locations()
                            ? 0
                            : loc;
       e->fraction_population_targeted.push_back(
@@ -254,7 +254,7 @@ PopulationEventBuilder::build_introduce_plas2_parasite_events(
   std::vector<Event*> events;
   for (const auto &entry : node) {
     int location = entry["location"].as<int>();
-    if (static_cast<std::size_t>(location) < config->get_spatial_settings().get_number_of_locations()) {
+    if (static_cast<std::size_t>(location) < config->number_of_locations()) {
       auto fraction = entry["fraction"].as<double>();
 
       const auto starting_date = entry["date"].as<date::year_month_day>();
@@ -302,7 +302,7 @@ std::vector<Event*> PopulationEventBuilder::build_change_interrupted_feeding_rat
   std::vector<Event*> events;
   for (const auto& event_node : node) {
     auto location = event_node["location"].as<int>();
-    if (location < config->get_spatial_settings().get_number_of_locations()) {
+    if (location < config->number_of_locations()) {
       const auto starting_date = event_node["date"].as<date::year_month_day>();
       auto time = (date::sys_days { starting_date } - date::sys_days { config->get_simulation_timeframe().get_starting_date() }).count();
       auto ifr = event_node["interrupted_feeding_rate"].as<double>();
@@ -347,7 +347,7 @@ PopulationEventBuilder::build_introduce_amodiaquine_mutant_parasite_events(
   std::vector<Event*> events;
   for (const auto &entry : node) {
     auto location = entry["location"].as<int>();
-    if (static_cast<std::size_t>(location) < config->get_spatial_settings().get_number_of_locations()) {
+    if (static_cast<std::size_t>(location) < config->number_of_locations()) {
       auto fraction = entry["fraction"].as<double>();
 
       const auto starting_date = entry["date"].as<date::year_month_day>();
@@ -380,7 +380,7 @@ PopulationEventBuilder::build_introduce_lumefantrine_mutant_parasite_events(
   std::vector<Event*> events;
   for (const auto &entry : node) {
     int location = entry["location"].as<int>();
-    if (static_cast<std::size_t>(location) < config->get_spatial_settings().get_number_of_locations()) {
+    if (static_cast<std::size_t>(location) < config->number_of_locations()) {
       auto fraction = entry["fraction"].as<double>();
 
       const auto starting_date = entry["date"].as<date::year_month_day>();
@@ -413,7 +413,7 @@ std::vector<Event*> PopulationEventBuilder::build_introduce_580Y_mutant_events(c
   std::vector<Event*> events;
   for (const auto& event_node : node) {
     auto location = event_node["location"].as<int>();
-    if (location <config->get_spatial_settings().get_number_of_locations()) {
+    if (location <config->number_of_locations()) {
       auto fraction = event_node["fraction"].as<double>();
 
       const auto starting_date = event_node["date"].as<date::year_month_day>();
@@ -444,7 +444,7 @@ std::vector<Event*> PopulationEventBuilder::build_introduce_triple_mutant_to_dpm
   std::vector<Event*> events;
   for (const auto& event_node : node) {
     auto location = event_node["location"].as<int>();
-    if (location < config->get_spatial_settings().get_number_of_locations()) {
+    if (location < config->number_of_locations()) {
       auto fraction = event_node["fraction"].as<double>();
 
       const auto starting_date = event_node["date"].as<date::year_month_day>();
@@ -879,7 +879,8 @@ std::vector<Event*> PopulationEventBuilder::build(const YAML::Node &node) {
     events = build_importation_periodically_random_event(node["info"], config);
   }
   if (name == IntroduceMutantEvent::EventName) {
-    events = build_introduce_mutant_event(node["info"], config);
+    auto admin_level_name = node["admin_level"].as<std::string>();
+    events = build_introduce_mutant_event(node["info"], config, admin_level_name);
   }
   if (name == IntroduceMutantRasterEvent::EventName) {
     events = build_introduce_mutant_raster_event(node["info"], config);

@@ -18,13 +18,13 @@ void Mosquito::initialize(Config *config) {
   genotypes_table.clear();
 
   genotypes_table = std::vector<std::vector<std::vector<Genotype *>>>(
-      config->get_epidemiological_parameters().get_number_of_tracking_days(),
-      std::vector<std::vector<Genotype *>>(config->get_spatial_settings().get_number_of_locations(),
+      config->number_of_tracking_days(),
+      std::vector<std::vector<Genotype *>>(config->number_of_locations(),
                                            std::vector<Genotype *>(100, nullptr)));
 
   for(auto loc_index = 0; loc_index < config->get_spatial_settings().location_db.size(); ++loc_index) {
     if (Model::get_population()->all_alive_persons_by_location[loc_index].empty()) continue;
-    for(auto day = 0; day < config->get_epidemiological_parameters().get_number_of_tracking_days(); ++day) {
+    for(auto day = 0; day < config->number_of_tracking_days(); ++day) {
       genotypes_table[day][loc_index] = std::vector<Genotype *>(
           config->get_spatial_settings().location_db[loc_index].mosquito_size, nullptr);
     }
@@ -35,7 +35,7 @@ void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, 
                                          const int &tracking_index) {
   auto &location_db = config->get_spatial_settings().location_db;
   // for each location fill prmc at tracking_index row with sampling genotypes
-  for (int loc = 0; loc < config->get_spatial_settings().get_number_of_locations(); loc++) {
+  for (int loc = 0; loc < config->number_of_locations(); loc++) {
     if (!Model::get_population()->all_alive_persons_by_location[loc].empty()) {
       // spdlog::info("tracking_index {} Location {} has {} alive persons", tracking_index,loc,
       //   Model::get_population()->all_alive_persons_by_location[loc].size());
@@ -192,7 +192,7 @@ void Mosquito::infect_new_cohort_in_PRMC(Config *config, utils::Random *random, 
              * Print our recombination for counting later
              * */
             auto resistant_tracker_info = std::make_tuple(Model::get_scheduler()->current_time(),
-              parent_genotypes[0]->genotype_id, parent_genotypes[1]->genotype_id, sampled_genotype->genotype_id);
+              parent_genotypes[0]->genotype_id(), parent_genotypes[1]->genotype_id(), sampled_genotype->genotype_id());
 //            if (std::find(Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].begin(),
 //                          Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].end(), resistant_tracker_info)
 //                == Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].end()){
@@ -232,7 +232,7 @@ int Mosquito::random_genotype(int location, int tracking_index) {
   auto genotype_index = Model::get_random()->random_uniform<int>(
     0,
     max_genotype_numbers);
-  return genotypes_table[tracking_index][location][genotype_index]->genotype_id;
+  return genotypes_table[tracking_index][location][genotype_index]->genotype_id();
 }
 
 void Mosquito::get_genotypes_profile_from_person(Person *person, std::vector<Genotype *> &sampling_genotypes,

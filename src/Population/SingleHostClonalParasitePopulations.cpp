@@ -159,16 +159,16 @@ void SingleHostClonalParasitePopulations::update_by_drugs(DrugsInBlood* drugs_in
           Model::get_mdc()->record_1_mutation(person_->get_location(), blood_parasite->genotype(), new_genotype);
           Model::get_mdc()->record_1_mutation_by_drug(person_->get_location(), blood_parasite->genotype(), new_genotype, drug_id);
 
-          //          LOG(TRACE) << Model::get_scheduler()->current_time() << "\t" << blood_parasite->genotype()->genotype_id
+          //          LOG(TRACE) << Model::get_scheduler()->current_time() << "\t" << blood_parasite->genotype()->genotype_id()
           //          << "\t"
-          //                     << new_genotype->genotype_id << "\t"
+          //                     << new_genotype->genotype_id() << "\t"
           //                     << blood_parasite->genotype()->get_EC50_power_n(drug->drug_type()) << "\t"
           //                     << new_genotype->get_EC50_power_n(drug->drug_type());
           blood_parasite->set_genotype(new_genotype);
         }
 
 
-      const auto p_temp = drug->get_parasite_killing_rate(blood_parasite->genotype()->genotype_id);
+      const auto p_temp = drug->get_parasite_killing_rate(blood_parasite->genotype()->genotype_id());
       percent_parasite_remove = percent_parasite_remove + p_temp - percent_parasite_remove * p_temp;
     }
     if (percent_parasite_remove > 0) {

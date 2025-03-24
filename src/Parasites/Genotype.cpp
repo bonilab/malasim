@@ -79,7 +79,7 @@ double Genotype::get_EC50_power_n(DrugType *dt) {
 }
 
 std::ostream &operator<<(std::ostream &os, Genotype &e) {
-  os << e.genotype_id << "\t";
+  os << e.genotype_id_ << "\t";
   os << e.get_aa_sequence();
   return os;
 }

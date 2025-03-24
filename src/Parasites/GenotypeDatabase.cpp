@@ -15,11 +15,11 @@ GenotypeDatabase::~GenotypeDatabase() {
 }
 
 void GenotypeDatabase::add(Genotype *genotype) {
-  if (this->find(genotype->genotype_id) != this->end()) {
-    delete (*this)[genotype->genotype_id];
+  if (this->find(genotype->genotype_id()) != this->end()) {
+    delete (*this)[genotype->genotype_id()];
   }
-  (*this)[genotype->genotype_id] = genotype;
-  // spdlog::info("GenotypeDatabase Added genotype id: {} aa_sequence: {}", genotype->genotype_id, genotype->get_aa_sequence());
+  (*this)[genotype->genotype_id()] = genotype;
+  // spdlog::info("GenotypeDatabase Added genotype id: {} aa_sequence: {}", genotype->genotype_id(), genotype->get_aa_sequence());
 }
 
 Genotype *GenotypeDatabase::get_genotype_from_alleles_structure(const IntVector &alleles) {
@@ -31,7 +31,7 @@ Genotype *GenotypeDatabase::get_genotype_from_alleles_structure(const IntVector 
 }
 
 unsigned int GenotypeDatabase::get_id(const std::string &aa_sequence) {
-  return get_genotype(aa_sequence)->genotype_id;
+  return get_genotype(aa_sequence)->genotype_id();
 }
 
 Genotype *GenotypeDatabase::get_genotype(const std::string &aa_sequence) {
@@ -39,7 +39,7 @@ Genotype *GenotypeDatabase::get_genotype(const std::string &aa_sequence) {
     // not yet exist then initialize new genotype
     auto new_id = auto_id;
     auto new_genotype = new Genotype(aa_sequence);
-    new_genotype->genotype_id = new_id;
+    new_genotype->set_genotype_id(new_id);
     new_genotype->resistant_recombinations_in_mosquito = std::vector<MosquitoRecombinedGenotypeInfo>();
 
     // check if aa_sequence is valid

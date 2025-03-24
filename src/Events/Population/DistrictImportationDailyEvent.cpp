@@ -40,7 +40,7 @@ void DistrictImportationDailyEvent::execute() {
 
   if (number_of_importation_cases == 0) { return; }
 
-  std::vector<int> locations;
+  const auto &locations = SpatialData::get_instance().get_locations_in_unit("district", district_);
 
   auto* pi =
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
@@ -50,7 +50,7 @@ void DistrictImportationDailyEvent::execute() {
   for (auto i = 0; i < locations.size(); i++) {
     auto location = locations[i];
 
-    for (auto ac = 0; ac < Model::get_config()->get_population_demographic().get_number_of_age_classes(); ac++) {
+    for (auto ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
       // only select state clinical or asymptomatic
       infected_cases_by_location[i] +=
           pi->vPerson()[location][Person::ASYMPTOMATIC][ac].size()
@@ -71,14 +71,14 @@ void DistrictImportationDailyEvent::execute() {
 
     for (auto i = 0; i < number_of_importation_cases; i++) {
       auto ac =
-          Model::get_random()->random_uniform(Model::get_config()->get_population_demographic().get_number_of_age_classes());
+          Model::get_random()->random_uniform(Model::get_config()->number_of_age_classes());
       auto hs = Model::get_random()->random_uniform(2) + Person::ASYMPTOMATIC;
 
       auto max_retry = 10;
       while (pi->vPerson()[location][hs][ac].empty() && max_retry > 0) {
         // redraw if the selected state and age class is empty
         ac = Model::get_random()->random_uniform(
-            Model::get_config()->get_population_demographic().get_number_of_age_classes());
+            Model::get_config()->number_of_age_classes());
 
         hs = Model::get_random()->random_uniform(2) + Person::ASYMPTOMATIC;
         max_retry--;

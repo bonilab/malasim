@@ -116,7 +116,7 @@ IStrategy* StrategyBuilder::buildNestedSwitchingStrategy(const YAML::Node &ns, c
 
   for (int i = 0; i < ns["strategy_ids"].size(); i++) {
     result->add_strategy(
-        Model::get_instance().strategy_db()[ns["strategy_ids"][i].as<int>()]);
+        Model::get_config()->strategy_db()[ns["strategy_ids"][i].as<int>()]);
   }
 
   return result;
@@ -146,25 +146,25 @@ StrategyBuilder::buildMFTMultiLocationStrategy(const YAML::Node &ns, const int &
   result->name = ns["name"].as<std::string>();
 
   result->distribution.clear();
-  result->distribution.resize(static_cast<unsigned long long int>(Model::get_instance().number_of_locations()));
+  result->distribution.resize(static_cast<unsigned long long int>(Model::get_config()->number_of_locations()));
 
   result->start_distribution.clear();
-  result->start_distribution.resize(static_cast<unsigned long long int>(Model::get_instance().number_of_locations()));
+  result->start_distribution.resize(static_cast<unsigned long long int>(Model::get_config()->number_of_locations()));
 
   result->peak_distribution.clear();
-  result->peak_distribution.resize(static_cast<unsigned long long int>(Model::get_instance().number_of_locations()));
+  result->peak_distribution.resize(static_cast<unsigned long long int>(Model::get_config()->number_of_locations()));
 
-  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
-    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_instance().number_of_locations() ? 0 : loc;
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_config()->number_of_locations() ? 0 : loc;
     add_distributions(ns["start_distribution_by_location"][input_loc], result->distribution[loc]);
   }
-  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
-    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_instance().number_of_locations() ? 0 : loc;
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_config()->number_of_locations() ? 0 : loc;
     add_distributions(ns["start_distribution_by_location"][input_loc], result->start_distribution[loc]);
   }
 
-  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
-    auto input_loc = ns["peak_distribution_by_location"].size() < Model::get_instance().number_of_locations() ? 0 : loc;
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    auto input_loc = ns["peak_distribution_by_location"].size() < Model::get_config()->number_of_locations() ? 0 : loc;
     add_distributions(ns["peak_distribution_by_location"][input_loc], result->peak_distribution[loc]);
   }
 
@@ -180,30 +180,30 @@ IStrategy* StrategyBuilder::buildNestedMFTDifferentDistributionByLocationStrateg
   result->name = ns["name"].as<std::string>();
 
   result->distribution.clear();
-  result->distribution.resize(static_cast<unsigned long long int>(Model::get_instance().number_of_locations()));
+  result->distribution.resize(static_cast<unsigned long long int>(Model::get_config()->number_of_locations()));
 
   result->start_distribution.clear();
-  result->start_distribution.resize(static_cast<unsigned long long int>(Model::get_instance().number_of_locations()));
+  result->start_distribution.resize(static_cast<unsigned long long int>(Model::get_config()->number_of_locations()));
 
   result->peak_distribution.clear();
-  result->peak_distribution.resize(static_cast<unsigned long long int>(Model::get_instance().number_of_locations()));
+  result->peak_distribution.resize(static_cast<unsigned long long int>(Model::get_config()->number_of_locations()));
 
-  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
-    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_instance().number_of_locations() ? 0 : loc;
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_config()->number_of_locations() ? 0 : loc;
     add_distributions(ns["start_distribution_by_location"][input_loc], result->distribution[loc]);
   }
-  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
-    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_instance().number_of_locations() ? 0 : loc;
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    auto input_loc = ns["start_distribution_by_location"].size() < Model::get_config()->number_of_locations() ? 0 : loc;
     add_distributions(ns["start_distribution_by_location"][input_loc], result->start_distribution[loc]);
   }
 
-  for (auto loc = 0; loc < Model::get_instance().number_of_locations(); loc++) {
-    auto input_loc = ns["peak_distribution_by_location"].size() < Model::get_instance().number_of_locations() ? 0 : loc;
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    auto input_loc = ns["peak_distribution_by_location"].size() < Model::get_config()->number_of_locations() ? 0 : loc;
     add_distributions(ns["peak_distribution_by_location"][input_loc], result->peak_distribution[loc]);
   }
 
   for (auto i = 0; i < ns["strategy_ids"].size(); i++) {
-    result->add_strategy(Model::get_instance().strategy_db()[ns["strategy_ids"][i].as<int>()]);
+    result->add_strategy(Model::get_config()->strategy_db()[ns["strategy_ids"][i].as<int>()]);
   }
 
   result->peak_after = ns["peak_after"].as<int>();
@@ -226,7 +226,7 @@ StrategyBuilder::buildNovelDrugIntroductionStrategy(const YAML::Node &ns, const 
 
   for (int i = 0; i < ns["strategy_ids"].size(); i++) {
     result->add_strategy(
-        Model::get_instance().strategy_db()[ns["strategy_ids"][i].as<int>()]);
+        Model::get_config()->strategy_db()[ns["strategy_ids"][i].as<int>()]);
   }
 
   result->newly_introduced_strategy_id = ns["newly_introduced_strategy_id"].as<int>();
@@ -252,9 +252,9 @@ IStrategy* StrategyBuilder::buildDistrictMftStrategy(const YAML::Node &node,
 
   // Get district ID range from SpatialData
   const auto& spatial_data = SpatialData::get_instance();
-  const auto min_district_id = spatial_data.min_district_id;
-  const auto max_district_id = spatial_data.max_district_id;
-  const auto expected_district_count = spatial_data.district_count;
+  const auto min_district_id = spatial_data.get_boundary("district")->min_unit_id;
+  const auto max_district_id = spatial_data.get_boundary("district")->max_unit_id;
+  const auto expected_district_count = spatial_data.get_boundary("district")->unit_count;
 
   // Read each of the definitions
   for (auto ndx = 0; ndx < node["definitions"].size(); ndx++) {

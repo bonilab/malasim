@@ -70,7 +70,7 @@ public:
       const YAML::Node& node, Config* config
   );
 
-  static std::vector<Event*> build_introduce_mutant_event(const YAML::Node &node, Config* config);
+  static std::vector<Event*> build_introduce_mutant_event(const YAML::Node &node, Config* config, const std::string& admin_level_name) ;
 
   static std::vector<Event*> build_introduce_mutant_raster_event(const YAML::Node &node, Config* config);
 

@@ -25,8 +25,8 @@ private:
     AscFile* raster = AscFileManager::read(filename_);
 
     // Grab a reference to the location_db to work with, note the location count
-    auto &location_db = Model::get_instance().location_db();
-    auto count = Model::get_instance().number_of_locations();
+    auto &location_db = Model::get_config()->location_db();
+    auto count = Model::get_config()->number_of_locations();
 
     // Iterate though and update the betas
     auto id = 0;

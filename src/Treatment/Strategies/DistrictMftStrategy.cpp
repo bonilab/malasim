@@ -18,9 +18,10 @@
 // TODO : fix for 0-1 based indexing
 DistrictMftStrategy::DistrictMftStrategy()
     : IStrategy("DistrictMFT", StrategyType::DistrictMft) {
+
   // Size the map to accommodate either 0-based or 1-based district IDs
   // Pre-populate map with nullptr entries for all possible district IDs
-  auto vectorSize = SpatialData::get_instance().max_district_id + 1;
+  auto vectorSize = SpatialData::get_instance().get_boundary("district")->max_unit_id + 1;
   for (int i = 0; i < vectorSize; i++) {
     district_strategies[i] = nullptr;
   }
@@ -50,7 +51,7 @@ void DistrictMftStrategy::set_district_strategy(int district, std::unique_ptr<Mf
 
 Therapy* DistrictMftStrategy::get_therapy(Person* person) {
   // Resolve the MFT for this district
-  auto district = SpatialData::get_instance().get_district(person->get_location());
+  auto district = SpatialData::get_instance().get_admin_unit("district", person->get_location());
   auto mft = district_strategies[district].get();
 
   // Select the therapy to give the individual

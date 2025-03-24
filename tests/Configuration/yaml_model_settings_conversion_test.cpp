@@ -24,7 +24,9 @@ TEST_F(ModelSettingsTest, EncodeModelSettings) {
   EXPECT_EQ(node["initial_seed_number"].as<int>(),
             default_settings.get_initial_seed_number());
   EXPECT_EQ(node["record_genome_db"].as<bool>(),
-            default_settings.get_record_genome_db());
+  default_settings.get_record_genome_db());
+  EXPECT_EQ(node["cell_level_reporting"].as<bool>(),
+            default_settings.get_cell_level_reporting());
 }
 
 // Test decoding functionality
@@ -33,6 +35,7 @@ TEST_F(ModelSettingsTest, DecodeModelSettings) {
   node["days_between_stdout_output"] = 10;
   node["initial_seed_number"] = 123;
   node["record_genome_db"] = true;
+  node["cell_level_reporting"] = true;
 
   ModelSettings decoded_settings;
   EXPECT_NO_THROW(YAML::convert<ModelSettings>::decode(node, decoded_settings));
@@ -40,6 +43,7 @@ TEST_F(ModelSettingsTest, DecodeModelSettings) {
   EXPECT_EQ(decoded_settings.get_days_between_stdout_output(), 10);
   EXPECT_EQ(decoded_settings.get_initial_seed_number(), 123);
   EXPECT_EQ(decoded_settings.get_record_genome_db(), true);
+  EXPECT_EQ(decoded_settings.get_cell_level_reporting(), true);
 }
 
 // Test missing fields during decoding

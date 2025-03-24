@@ -28,12 +28,14 @@ TEST_F(ConfigurationTest, ZeroBasedIndexing) {
   SpatialData::get_instance().parse_complete();
   auto raster = std::make_unique<AscFile>(*district_raster);
   EXPECT_NO_THROW(manager.register_level("district"));
-  EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster)));
+  EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster).get()));
   raster.reset();
 
   const auto* boundary = manager.get_boundary("district");
   ASSERT_NE(boundary, nullptr);
-  EXPECT_EQ(boundary->first_index, 0);
+  EXPECT_EQ(boundary->min_unit_id, 0);
+  EXPECT_EQ(boundary->max_unit_id, 2);
+  EXPECT_EQ(boundary->unit_count, 3);
 }
 
 TEST_F(ConfigurationTest, OneBasedIndexing) {
@@ -50,12 +52,12 @@ TEST_F(ConfigurationTest, OneBasedIndexing) {
   SpatialData::get_instance().parse_complete();
   auto raster = std::make_unique<AscFile>(*district_raster);
   EXPECT_NO_THROW(manager.register_level("district"));
-  EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster)));
+  EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster).get()));
   raster.reset();
 
   const auto* boundary = manager.get_boundary("district");
   ASSERT_NE(boundary, nullptr);
-  EXPECT_EQ(boundary->first_index, 1);
+  EXPECT_EQ(boundary->min_unit_id, 1);
 }
 
 TEST_F(ConfigurationTest, DifferentRasterDimensions) {
@@ -73,18 +75,12 @@ TEST_F(ConfigurationTest, DifferentRasterDimensions) {
   SpatialData::get_instance().parse_complete();
   auto raster = std::make_unique<AscFile>(*district_raster);
   EXPECT_NO_THROW(manager.register_level("district"));
-  EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster)));
+  EXPECT_NO_THROW(manager.setup_boundary("district",std::move(raster).get()));
   raster.reset();
 
   const auto* boundary = manager.get_boundary("district");
   ASSERT_NE(boundary, nullptr);
-  EXPECT_EQ(boundary->raster->NROWS, 5);
-  EXPECT_EQ(boundary->raster->NCOLS, 4);
-}
-
-TEST_F(ConfigurationTest, OptionalDescriptions) {
-  EXPECT_NO_THROW(manager.register_level("district", "Health Districts"));
-  const auto* boundary = manager.get_boundary("district");
-  ASSERT_NE(boundary, nullptr);
-  EXPECT_EQ(boundary->description, "Health Districts");
+  EXPECT_EQ(boundary->min_unit_id, 0);
+  EXPECT_EQ(boundary->max_unit_id, 2);
+  EXPECT_EQ(boundary->unit_count, 3);
 }

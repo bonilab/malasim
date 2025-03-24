@@ -36,7 +36,7 @@ void NovelDrugIntroductionStrategy::monthly_update() {
 
       // switch to novel drugs
 
-      auto novel_SFT_strategy = Model::get_instance().strategy_db()[newly_introduced_strategy_id];
+      auto novel_SFT_strategy = Model::get_config()->strategy_db()[newly_introduced_strategy_id];
 
       auto* new_public_stategy = new NestedMFTStrategy();
 
@@ -58,7 +58,7 @@ void NovelDrugIntroductionStrategy::monthly_update() {
       new_public_stategy->id = static_cast<int>(Model::get_config()->
           get_strategy_parameters().strategy_db.size());
 
-      Model::get_instance().strategy_db().push_back(new_public_stategy);
+      Model::get_config()->strategy_db().push_back(new_public_stategy);
 
       //reset the time point to collect ntf
       Model::get_config()->get_simulation_timeframe().set_start_of_comparison_period(Model::get_scheduler()->current_time());

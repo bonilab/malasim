@@ -33,7 +33,7 @@ class Genotype {
   void operator=(const Genotype&) = delete;
 
 public:
-  int genotype_id { -1 };
+  int genotype_id_ { -1 };
   PfGenotypeStr pf_genotype_str = std::vector<ChromosomalGenotypeStr>(14);
   std::string aa_sequence;
   double daily_fitness_multiple_infection { 1 };
@@ -44,6 +44,9 @@ public:
   explicit Genotype(const std::string& aa_sequence);
 
   virtual ~Genotype();
+
+  int genotype_id() const { return genotype_id_; }
+  void set_genotype_id(int genotype_id){ genotype_id_ = genotype_id; }
 
   double get_EC50_power_n(DrugType* dt);
 

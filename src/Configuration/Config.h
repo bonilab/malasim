@@ -53,8 +53,8 @@ public:
   [[nodiscard]] const TransmissionSettings &get_transmission_settings() const {
     return transmission_settings_;
   }
-  [[nodiscard]] const PopulationDemographic &get_population_demographic()
-      const {
+  [[nodiscard]] PopulationDemographic &get_population_demographic()
+      {
     return population_demographic_;
   }
   [[nodiscard]] SpatialSettings &get_spatial_settings() {
@@ -106,9 +106,14 @@ public:
     return rapt_settings_;
   }
 
-  int get_number_of_locations() const {
-    return spatial_settings_.get_number_of_locations();
-  }
+  int number_of_locations() const;
+  int number_of_age_classes() const;
+  int number_of_parasite_types() const;
+  int number_of_tracking_days() const;
+  std::vector<int> age_structure();
+  std::vector<Spatial::Location>& location_db();
+  std::vector<IStrategy *>& strategy_db();
+  GenotypeDatabase* genotype_db();
 
 private:
   // Template method for getting a field

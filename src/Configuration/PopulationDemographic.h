@@ -22,7 +22,7 @@ public:
     number_of_age_classes_ = value;
   }
 
-  [[nodiscard]] const std::vector<int> &get_age_structure() const {
+  [[nodiscard]] std::vector<int> &get_age_structure() {
     return age_structure_;
   }
   void set_age_structure(const std::vector<int> &value) {
@@ -103,7 +103,7 @@ private:
 namespace YAML {
 template <>
 struct convert<PopulationDemographic> {
-  static Node encode(const PopulationDemographic &rhs) {
+  static Node encode(PopulationDemographic &rhs) {
     Node node;
     node["number_of_age_classes"] = rhs.get_number_of_age_classes();
     node["age_structure"] = rhs.get_age_structure();

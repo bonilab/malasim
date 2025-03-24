@@ -27,7 +27,7 @@ add_dependencies(runTests MalaSimCore)
 
 # Link the core library and GTest to the test executable
 target_link_libraries(runTests PRIVATE
-  GTest::gtest_main
+  GTest::gtest_main GTest::gmock
   MalaSimCore
 )
 
