@@ -11,7 +11,6 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <memory>
 
 void AgeBandReporter::initialize(int job_number, const std::string &path) {
   // Setup spdlog multi-sink loggers
@@ -69,7 +68,7 @@ void AgeBandReporter::monthly_report() {
   std::vector<std::vector<double>> prevalence(districts, std::vector<double>(age_classes));
 
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    auto district = district_lookup[loc];
+    auto district = district_lookup[loc] - 1;
     for (auto ac = 0; ac < age_classes; ac++) {
       population[district][ac] += Model::get_mdc()->popsize_by_location_age_class()[loc][ac];
       prevalence[district][ac] += Model::get_mdc()->blood_slide_number_by_location_age_group()[loc][ac];

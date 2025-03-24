@@ -9,8 +9,7 @@
 #define AGEBANDREPORTER_H
 
 #include <vector>
-#include <sqlite3.h>
-
+#include <memory>
 #include <sstream>
 
 #include "Reporters/Reporter.h"
