@@ -13,7 +13,7 @@ public:
   }
 
   // Setter for transmission_parameter with validation
-  void set_transmission_parameter(double value) {
+  void set_transmission_parameter(const double value) {
     if (value <= 0)
       throw std::invalid_argument(
           "transmission_parameter must be greater than 0");
@@ -26,7 +26,7 @@ public:
   }
 
   // Setter for p_infection_from_an_infectious_bite with validation
-  void set_p_infection_from_an_infectious_bite(double value) {
+  void set_p_infection_from_an_infectious_bite(const double value) {
     if (value < 0 || value > 1)
       throw std::invalid_argument(
           "p_infection_from_an_infectious_bite must be between 0 and 1");
@@ -41,14 +41,12 @@ public:
   }
 
 private:
-  double transmission_parameter_;
-  double p_infection_from_an_infectious_bite_;
+  double transmission_parameter_ = 0.55;
+  double p_infection_from_an_infectious_bite_ = 0.1;
 };
 
-namespace YAML {
-
 template <>
-struct convert<TransmissionSettings> {
+struct YAML::convert<TransmissionSettings> {
   static Node encode(const TransmissionSettings &rhs) {
     Node node;
     node["transmission_parameter"] = rhs.get_transmission_parameter();
@@ -71,9 +69,7 @@ struct convert<TransmissionSettings> {
         node["p_infection_from_an_infectious_bite"].as<double>());
     return true;
   }
-};
-
-}  // namespace YAML
+};  // namespace YAML
 
 #endif  // TRANSMISSION_SETTINGS_H
 

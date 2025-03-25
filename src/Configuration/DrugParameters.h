@@ -22,13 +22,13 @@ public:
         void set_name(const std::string& value) { name_ = value; }
 
         [[nodiscard]] double get_half_life() const { return half_life_; }
-        void set_half_life(double value) { half_life_ = value; }
+        void set_half_life(const double value) { half_life_ = value; }
 
         [[nodiscard]] double get_maximum_parasite_killing_rate() const { return maximum_parasite_killing_rate_; }
-        void set_maximum_parasite_killing_rate(double value) { maximum_parasite_killing_rate_ = value; }
+        void set_maximum_parasite_killing_rate(const double value) { maximum_parasite_killing_rate_ = value; }
 
         [[nodiscard]] int get_n() const { return n_; }
-        void set_n(int value) { n_ = value; }
+        void set_n(const int value) { n_ = value; }
 
         [[nodiscard]] const std::vector<double>& get_age_specific_drug_concentration_sd() const { return age_specific_drug_concentration_sd_; }
         void set_age_specific_drug_concentration_sd(const std::vector<double>& value) { age_specific_drug_concentration_sd_ = value; }
@@ -37,18 +37,18 @@ public:
         void set_age_specific_drug_absorption(const std::vector<double>& value) { age_specific_drug_absorption_ = value; }
 
         [[nodiscard]] int get_k() const { return k_; }
-        void set_k(int value) { k_ = value; }
+        void set_k(const int value) { k_ = value; }
 
         [[nodiscard]] double get_base_EC50() const { return base_EC50_; }
-        void set_base_EC50(double value) { base_EC50_ = value; }
+        void set_base_EC50(const double value) { base_EC50_ = value; }
 
     private:
         std::string name_;
         double half_life_ = -1;
         double maximum_parasite_killing_rate_ = -1;
         int n_ = -1;
-        std::vector<double> age_specific_drug_concentration_sd_{};
-        std::vector<double> age_specific_drug_absorption_{};
+        std::vector<double> age_specific_drug_concentration_sd_;
+        std::vector<double> age_specific_drug_absorption_;
         int k_ = -1;
         double base_EC50_ = -1;
     };
@@ -75,15 +75,14 @@ public:
 
         //    std::cout <<dt->drug_half_life() << "-" << dt->maximum_parasite_killing_rate() << "-" << dt->n() << "-" <<
         //    dt->EC50() << std::endl;
-        for (std::size_t i = 0; i < dt_node.get_age_specific_drug_concentration_sd().size(); i++) {
-          dt->age_group_specific_drug_concentration_sd().push_back(
-              dt_node.get_age_specific_drug_concentration_sd()[i]);
+        for (double value : dt_node.get_age_specific_drug_concentration_sd()) {
+          dt->age_group_specific_drug_concentration_sd().push_back(value);
           dt->age_specific_drug_absorption().push_back(1.0);
         }
         //    assert(dt->age_group_specific_drug_concentration_sd().size() == 15);
 
         if (!dt_node.get_age_specific_drug_absorption().empty()) {
-          dt->set_age_specific_drug_absorption(std::vector<double>(dt_node.get_age_specific_drug_absorption()));
+          dt->set_age_specific_drug_absorption(dt_node.get_age_specific_drug_absorption());
         }
 
         dt->set_k(dt_node.get_k());
@@ -94,7 +93,7 @@ public:
 
         drug_db->add(dt);
       }
-    };
+    }
 
 private:
     std::map<int, DrugInfo> drug_infos_;

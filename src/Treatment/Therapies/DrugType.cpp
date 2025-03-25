@@ -50,7 +50,7 @@ void DrugType::populate_resistant_aa_locations() {
       auto &gene_info = chromosome_info.get_genes()[gene_id];
 
       auto aa_pos_in_sequence = Model::get_config()->get_genotype_parameters().get_pf_genotype_info().calculate_aa_pos(
-          chromosome_info.get_chromosome_id() - 1, gene_id, static_cast<int>(gene_info.get_aa_positions().size()), 0);
+          chromosome_info.get_chromosome_id() - 1, gene_id, 0);
 
       for (int aa_id = 0; aa_id < gene_info.get_aa_positions().size(); ++aa_id) {
         for(auto const& multiple_ec50 : gene_info.get_aa_positions()[aa_id].get_multiplicative_effect_on_EC50()) {

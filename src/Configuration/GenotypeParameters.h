@@ -1,10 +1,10 @@
 #ifndef GENOTYPEPARAMETERS_H
 #define GENOTYPEPARAMETERS_H
+
 #include <string>
 #include <vector>
 #include <yaml-cpp/yaml.h>
 #include <spdlog/spdlog.h>
-#include <iostream>
 #include <stdexcept>
 
 #include "IConfigData.h"
@@ -19,14 +19,14 @@ public:
   public:
     // Getters and Setters
     [[nodiscard]] int get_drug_id() const { return drug_id_; }
-    void set_drug_id(int value) { drug_id_ = value; }
+    void set_drug_id(const int value) { drug_id_ = value; }
 
     [[nodiscard]] const double& get_factor() const { return factor_; }
     void set_factor(const double& value) { factor_ = value; }
 
   private:
-    int drug_id_;
-    double factor_;
+    int drug_id_ = -1;
+    double factor_ = 1.0;
   };
 
   // Inner class: MultiplicativeEffectOnEC50
@@ -34,12 +34,12 @@ public:
   public:
     // Getters and Setters
     [[nodiscard]] int get_drug_id() const { return drug_id_; }
-    void set_drug_id(int value) { drug_id_ = value; }
+    void set_drug_id(const int value) { drug_id_ = value; }
 
     [[nodiscard]] const std::vector<double>& get_factors() const { return factors_; }
     void set_factors(const std::vector<double>& value) { factors_ = value; }
 
-    std::string to_string() {
+    [[nodiscard]] std::string to_string() const {
       std::string result = std::to_string(drug_id_) + ": ";
       for (const auto& factor : factors_) {
         result += std::to_string(factor) + " ";
@@ -48,7 +48,7 @@ public:
     }
 
   private:
-    int drug_id_;
+    int drug_id_ = -1;
     std::vector<double> factors_;
   };
 
@@ -57,7 +57,7 @@ public:
   public:
     // Getters and Setters
     [[nodiscard]] int get_position() const { return position_; }
-    void set_position(int value) { position_ = value; }
+    void set_position(const int value) { position_ = value; }
 
     [[nodiscard]] const std::vector<std::string>& get_amino_acids() const {
       return amino_acids_;
@@ -70,7 +70,7 @@ public:
     [[nodiscard]] const std::vector<MultiplicativeEffectOnEC50>& get_multiplicative_effect_on_EC50() const { return multiplicative_effect_on_EC50_; }
     void set_multiplicative_effect_on_EC50(const std::vector<MultiplicativeEffectOnEC50>& value) { multiplicative_effect_on_EC50_ = value; }
 
-    std::string get_amino_acids_string() const {
+    [[nodiscard]] std::string get_amino_acids_string() const {
         std::string result;
         for (const auto& aa : amino_acids_) {
             result += aa + " ";
@@ -78,7 +78,7 @@ public:
         return result;
     }
 
-    std::string get_daily_crs_string() const {
+    [[nodiscard]] std::string get_daily_crs_string() const {
       std::string result;
       for (const auto& crs : daily_crs_) {
         result += std::to_string(crs) + " ";
@@ -86,15 +86,15 @@ public:
       return result;
     }
 
-    std::string get_multiplicative_effect_on_EC50_string() const {
+    [[nodiscard]] std::string get_multiplicative_effect_on_EC50_string() const {
       std::string result;
-      for (auto effect : multiplicative_effect_on_EC50_) {
+      for (const auto &effect : multiplicative_effect_on_EC50_) {
         result += effect.to_string() + " ";
       }
       return result;
     }
 
-    std::string to_string() const {
+    [[nodiscard]] std::string to_string() const {
       std::string result = std::to_string(position_) + ": ";
       if (!amino_acids_.empty()) {
         for (const auto& aa : amino_acids_) {
@@ -108,7 +108,7 @@ public:
       return result;
     }
   private:
-    int position_;
+    int position_ = -1;
     std::vector<std::string> amino_acids_;
     std::vector<double> daily_crs_;
     std::vector<MultiplicativeEffectOnEC50> multiplicative_effect_on_EC50_;
@@ -122,7 +122,7 @@ public:
     void set_name(const std::string& value) { name_ = value; }
 
     [[nodiscard]] int get_max_copies() const { return max_copies_; }
-    void set_max_copies(int value) { max_copies_ = value; }
+    void set_max_copies(const int value) { max_copies_ = value; }
 
     [[nodiscard]] const std::vector<double>& get_cnv_daily_crs() const { return cnv_daily_crs_; }
     void set_cnv_daily_crs(const std::vector<double>& value) { cnv_daily_crs_ = value; }
@@ -137,12 +137,12 @@ public:
     void set_multiplicative_effect_on_ec50_for_2_or_more_mutations(const std::vector<MultiplicativeEffectOnEC50For2OrMoreMutations>& value) { multiplicative_effect_on_ec50_for_2_or_more_mutations_ = value; }
 
     [[nodiscard]] double get_average_daily_crs() const { return average_daily_crs_; }
-    void set_average_daily_crs(double value) { average_daily_crs_ = value; }
+    void set_average_daily_crs(const double value) { average_daily_crs_ = value; }
 
     [[nodiscard]] int get_chromosome_id() const { return chromosome_id_; }
-    void set_chromosome_id(int value) { chromosome_id_ = value; }
+    void set_chromosome_id(const int value) { chromosome_id_ = value; }
 
-    std::string to_string() const {
+    [[nodiscard]] std::string to_string() const {
       std::string result = std::to_string(chromosome_id_) + ": " + name_ + " ";
       for (const auto& aa_pos : aa_positions_) {
         result += aa_pos.to_string() + " ";
@@ -167,19 +167,19 @@ public:
   public:
     // Getters and Setters
     [[nodiscard]] int get_chromosome_id() const { return chromosome_id_; }
-    void set_chromosome_id(int value) {
+    void set_chromosome_id(const int value) {
       chromosome_id_ = value;
     }
 
     [[nodiscard]] const std::vector<GeneInfo>& get_genes() const { return genes_; }
     void set_genes(const std::vector<GeneInfo>& value) {
       genes_ = value;
-      for (int i = 0; i < genes_.size(); ++i) {
-        genes_[i].set_chromosome_id(chromosome_id_);
+      for (auto & gene : genes_) {
+        gene.set_chromosome_id(chromosome_id_);
       }
     }
 
-    std::string to_string() const {
+    [[nodiscard]] std::string to_string() const {
       std::string result = std::to_string(chromosome_id_) + ": ";
       for (const auto& gene : genes_) {
         result += gene.to_string() + " ";
@@ -195,12 +195,13 @@ public:
   class PfGenotypeInfo {
   public:
     std::vector<ChromosomeInfo> chromosome_infos = std::vector<ChromosomeInfo>(14);
-    int calculate_aa_pos(int chromosome_id, int gene_id, int aa_pos_id, int aa_id) {
+    [[nodiscard]] int calculate_aa_pos(const int chromosome_id,const  int gene_id, const  int aa_id) const {
       auto result = 0;
       for (int ii = 0; ii < chromosome_id; ++ii) {
-        result += chromosome_infos[ii].get_genes().size() > 1 ? chromosome_infos[ii].get_genes().size() - 1 : 0;  // for ','
-        for (auto &gene_info : chromosome_infos[ii].get_genes()) {
-          result += gene_info.get_aa_positions().size();
+        const int size = static_cast<int>(chromosome_infos[ii].get_genes().size());
+        result += size > 1 ? size - 1 : 0;  // for ','
+        for (const auto &gene_info : chromosome_infos[ii].get_genes()) {
+          result += static_cast<int>(gene_info.get_aa_positions().size());
           result += gene_info.get_max_copies() > 1 ? 1 : 0;  // for copy number
         }
       }
@@ -208,7 +209,7 @@ public:
 
       // final chromosome
       for (int ii = 0; ii < gene_id; ++ii) {
-        result += chromosome_infos[chromosome_id].get_genes()[ii].get_aa_positions().size();
+        result += static_cast<int>(chromosome_infos[chromosome_id].get_genes()[ii].get_aa_positions().size());
         result += chromosome_infos[chromosome_id].get_genes()[ii].get_max_copies() > 1 ? 1 : 0;  // for copy number
         result += 1;                                                                      // for ","
       }
@@ -218,7 +219,7 @@ public:
       return result;
     }
 
-    std::string to_string() const {
+    [[nodiscard]] std::string to_string() const {
       std::string result;
       for (const auto& chromosome : chromosome_infos) {
         result += chromosome.to_string() + "\n";
@@ -235,15 +236,15 @@ public:
     void set_pattern(const std::string& value) { pattern_ = value; }
 
     [[nodiscard]] int get_drug_id() const { return drug_id_; }
-    void set_drug_id(int value) { drug_id_ = value; }
+    void set_drug_id(const int value) { drug_id_ = value; }
 
     [[nodiscard]] double get_ec50() const { return ec50_; }
-    void set_ec50(double value) { ec50_ = value; }
+    void set_ec50(const double value) { ec50_ = value; }
 
   private:
     std::string pattern_;
-    int drug_id_;
-    double ec50_;
+    int drug_id_ = -1;
+    double ec50_ = 0.0;
   };
 
   // Inner class: GenotypeInfo
@@ -254,11 +255,11 @@ public:
     void set_aa_sequence(const std::string& value) { aa_sequence_ = value; }
 
     [[nodiscard]] double get_prevalence() const { return prevalence_; }
-    void set_prevalence(double value) { prevalence_ = value; }
+    void set_prevalence(const double value) { prevalence_ = value; }
 
   private:
     std::string aa_sequence_;
-    double prevalence_;
+    double prevalence_ = 0.0;
   };
 
   // Inner class: InitialParasiteInfo
@@ -266,13 +267,13 @@ public:
   public:
     // Getters and Setters
     [[nodiscard]] int get_location_id() const { return location_id_; }
-    void set_location_id(int value) { location_id_ = value; }
+    void set_location_id(const int value) { location_id_ = value; }
 
     [[nodiscard]] const std::vector<ParasiteInfo>& get_parasite_info() const { return parasite_info_; }
     void set_parasite_info(const std::vector<ParasiteInfo>& value) { parasite_info_ = value; }
 
   private:
-    int location_id_;
+    int location_id_ = -1;
     std::vector<ParasiteInfo> parasite_info_;
   };
 
@@ -281,10 +282,10 @@ public:
     int parasite_type_id;
     double prevalence;
 
-    InitialParasiteInfo() : location(-1), parasite_type_id(-1), prevalence(-1.0) {};
+    InitialParasiteInfo() : location(-1), parasite_type_id(-1), prevalence(-1.0) {}
 
     InitialParasiteInfo(const int loc, const int p_type, const double pre)
-        : location(loc), parasite_type_id(p_type), prevalence(pre) {};
+        : location(loc), parasite_type_id(p_type), prevalence(pre) {}
   };
 
   // Getters and Setters for GenotypeParameters
@@ -292,7 +293,7 @@ public:
   void set_mutation_mask(const std::string& value) { mutation_mask_ = value; }
 
   [[nodiscard]] double get_mutation_probability_per_locus() const { return mutation_probability_per_locus_; }
-  void set_mutation_probability_per_locus(double value) { mutation_probability_per_locus_ = value; }
+  void set_mutation_probability_per_locus(const double value) { mutation_probability_per_locus_ = value; }
 
   [[nodiscard]] const std::vector<OverrideEC50Pattern>& get_override_ec50_patterns() const { return override_ec50_patterns_; }
   void set_override_ec50_patterns(const std::vector<OverrideEC50Pattern>& value) { override_ec50_patterns_ = value; }
@@ -306,11 +307,11 @@ public:
   [[nodiscard]] PfGenotypeInfo get_pf_genotype_info() const { return pf_genotype_info_; }
   void set_pf_genotype_info(const PfGenotypeInfo& value) { pf_genotype_info_ = value; }
 
-  void process_config() override {};
+  void process_config() override {}
 
-  void process_config_with_number_of_locations(int number_of_locations) {
+  void process_config_with_number_of_locations(const int number_of_locations) {
     spdlog::info("Processing GenotypeParameters");
-    for (auto &initial_genotype_info_raw : get_initial_parasite_info_raw()) {
+    for (const auto &initial_genotype_info_raw : get_initial_parasite_info_raw()) {
       const auto location = initial_genotype_info_raw.get_location_id();
       const auto location_from = location == -1 ? 0 : location;
       const auto location_to =
@@ -319,7 +320,7 @@ public:
       // apply for all location
       for (auto loc = location_from; loc < location_to; ++loc) {
         for (const auto &parasite_node : initial_genotype_info_raw.get_parasite_info()) {
-          auto aa_sequence = parasite_node.get_aa_sequence();
+          const auto& aa_sequence = parasite_node.get_aa_sequence();
           auto parasite_type_id = genotype_db->get_id(aa_sequence);
           auto prevalence = parasite_node.get_prevalence();
           initial_parasite_info_.emplace_back(loc, parasite_type_id, prevalence);
@@ -335,7 +336,7 @@ public:
 
 private:
   std::string mutation_mask_;
-  double mutation_probability_per_locus_;
+  double mutation_probability_per_locus_ = 0.001;
   PfGenotypeInfo pf_genotype_info_;
   std::vector<OverrideEC50Pattern> override_ec50_patterns_;
   std::vector<InitialParasiteInfo> initial_parasite_info_;
@@ -410,7 +411,7 @@ struct convert<GenotypeParameters::AminoAcidPosition> {
     }
 };
 template<typename T>
-void optional_decode(const YAML::Node& node, const std::string& key, T& value) {
+void optional_decode(const Node& node, const std::string& key, T& value) {
     if (node[key]) {
         value = node[key].as<T>();
     }

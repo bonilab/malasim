@@ -1,4 +1,7 @@
 #include "MFTRebalancingStrategy.h"
+
+#include <iostream>
+
 #include "Simulation/Model.h"
 #include "Configuration/Config.h"
 #include "MDC/ModelDataCollector.h"

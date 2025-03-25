@@ -1,7 +1,7 @@
+#pragma once
 #include <yaml-cpp/yaml.h>
 #include <string>
 #include <vector>
-#include <iostream>
 #include "date/date.h"
 #include "Utils/YamlFile.hxx"
 #include <stdexcept>
@@ -18,7 +18,7 @@ public:
         [[nodiscard]] const date::year_month_day& get_date() const { return date_; }
         void set_date(const date::year_month_day& value) { date_ = value; }
     private:
-        date::year_month_day date_;
+        date::year_month_day date_ = date::year_month_day(date::year(2000), date::month(1), date::day(1));
     };
 
     // Inner class: PopulationEvent
@@ -99,7 +99,7 @@ struct convert<PopulationEvents> {
         }
         return node;
     }
-    static bool decode(const YAML::Node& node, PopulationEvents& rhs) {
+    static bool decode(const Node& node, PopulationEvents& rhs) {
         spdlog::info("Decoding PopulationEvents");
         std::vector<PopulationEvents::PopulationEvent> events_raw;
         std::vector<Event*> events;

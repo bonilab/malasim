@@ -7,7 +7,6 @@
 #include <map>
 #include <spdlog/spdlog.h>
 #include "IConfigData.h"
-#include "Treatment/Therapies/MACTherapy.h"
 #include "Treatment/Therapies/SCTherapy.h"
 #include "Treatment/Therapies/TherapyBuilder.h"
 #include "Utils/Helpers/NumberHelpers.hxx"
@@ -43,10 +42,10 @@ public:
 
   // Getters and Setters for TherapyParameters
   [[nodiscard]] int get_tf_testing_day() const { return tf_testing_day_; }
-  void set_tf_testing_day(int value) { tf_testing_day_ = value; }
+  void set_tf_testing_day(const int value) { tf_testing_day_ = value; }
 
   [[nodiscard]] double get_tf_rate() const { return tf_rate_; }
-  void set_tf_rate(double value) { tf_rate_ = value; }
+  void set_tf_rate(const double value) { tf_rate_ = value; }
 
   [[nodiscard]] const std::map<int, TherapyInfo>& get_therapy_db_raw() const { return therapy_db_raw_; }
   void set_therapy_db_raw(const std::map<int, TherapyInfo>& value) { therapy_db_raw_ = value; }
@@ -64,15 +63,15 @@ public:
     spdlog::info("Processing TherapyParameters");
 
     for (std::size_t i = 0; i < node_.size(); i++) {
-      auto *t = read_therapy(node_, (int)i);
+      auto *t = read_therapy(node_, static_cast<int>(i));
       therapy_db.push_back(t);
     }
   }
 
   std::vector<Therapy*> therapy_db;
 private:
-  int tf_testing_day_;
-  double tf_rate_;
+  int tf_testing_day_ = 28;
+  double tf_rate_ = 0.1;
   std::map<int, TherapyInfo> therapy_db_raw_;  // Changed from vector to map
   YAML::Node node_;
 };

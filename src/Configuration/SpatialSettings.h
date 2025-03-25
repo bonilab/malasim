@@ -58,7 +58,7 @@ public:
             [[nodiscard]] double get_cell_size() const {
                 return cell_size_;
             }
-            void set_cell_size(double value) {
+            void set_cell_size(const double value) {
                 if (value <= 0)
                     throw std::invalid_argument("cell_size must be greater than 0");
                 cell_size_ = value;
@@ -72,7 +72,7 @@ public:
                 age_distribution_by_location_ = value;
             }
 
-            void set_number_of_location(int value) {
+            void set_number_of_location(const int value) {
                 number_of_location_ = value;
             }
 
@@ -168,7 +168,7 @@ public:
             population_size_by_location_ = value;
         }
 
-        void set_number_of_locations(int value) {
+        void set_number_of_locations(const int value) {
             number_of_locations_ = value;
         }
 
@@ -226,7 +226,7 @@ public:
       return spatial_distance_matrix_;
     }
 
-    void set_number_of_locations(int value) {
+    void set_number_of_locations(const int value) {
       number_of_location_ = value;
     }
 
@@ -270,7 +270,6 @@ public:
         }
     }
 
-public:
   std::vector<Spatial::Location> location_db = {};
 
 private:
