@@ -68,7 +68,8 @@ void AgeBandReporter::monthly_report() {
   std::vector<std::vector<double>> prevalence(districts, std::vector<double>(age_classes));
 
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    auto district = district_lookup[loc] - 1;
+    auto district = SpatialData::get_instance().get_boundary("district")->min_unit_id == 0
+    ? district_lookup[loc] : district_lookup[loc] - 1;
     for (auto ac = 0; ac < age_classes; ac++) {
       population[district][ac] += Model::get_mdc()->popsize_by_location_age_class()[loc][ac];
       prevalence[district][ac] += Model::get_mdc()->blood_slide_number_by_location_age_group()[loc][ac];

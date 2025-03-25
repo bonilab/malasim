@@ -1,4 +1,4 @@
-# Core Config
+# Configuration
 
 The Configuration module is responsible for loading, validating, and managing the configuration settings for the simulation. It reads configuration data from a YAML file and provides access to various configuration parameters through getter methods.
 

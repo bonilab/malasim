@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include <string>
 #include <spdlog/spdlog.h>
-
 #include "IConfigData.h"
 
 class EpidemiologicalParameters: public IConfigData {
@@ -14,26 +13,26 @@ public:
     public:
         // Getters and Setters
         [[nodiscard]] double get_mean() const { return mean_; }
-        void set_mean(double value) { mean_ = value; }
+        void set_mean(const double value) { mean_ = value; }
 
         [[nodiscard]] double get_sd() const { return sd_; }
-        void set_sd(double value) { sd_ = value; }
+        void set_sd(const double value) { sd_ = value; }
 
     private:
-        double mean_;
-        double sd_;
+        double mean_ = 5;
+        double sd_ = 10;
     };
 
     class BitingLevelDistributionExponential {
     public:
         // Getters and Setters
         [[nodiscard]] double get_scale() const { return scale_; }
-        void set_scale(double value) { scale_ = value; }
+        void set_scale(const double value) { scale_ = value; }
 
     private:
-        double scale_;
-        double mean_;
-        double sd_;
+        double scale_ = 0.17;
+        double mean_ = 0.0;
+        double sd_ = 0.0;
     };
 
     class BitingLevelDistribution {
@@ -58,33 +57,33 @@ public:
     public:
         // Getters and Setters
         [[nodiscard]] int get_max_relative_biting_value() const { return max_relative_biting_value_; }
-        void set_max_relative_biting_value(int value) { max_relative_biting_value_ = value; }
+        void set_max_relative_biting_value(const int value) { max_relative_biting_value_ = value; }
 
         [[nodiscard]] double get_min_relative_biting_value() const { return min_relative_biting_value_; }
-        void set_min_relative_biting_value(double value) { min_relative_biting_value_ = value; }
+        void set_min_relative_biting_value(const double value) { min_relative_biting_value_ = value; }
 
         [[nodiscard]] int get_number_of_biting_levels() const { return number_of_biting_levels_; }
-        void set_number_of_biting_levels(int value) { number_of_biting_levels_ = value; }
+        void set_number_of_biting_levels(const int value) { number_of_biting_levels_ = value; }
 
         [[nodiscard]] const BitingLevelDistribution& get_biting_level_distribution() const { return biting_level_distribution_; }
         void set_biting_level_distribution(const BitingLevelDistribution& value) { biting_level_distribution_ = value; }
 
         [[nodiscard]] double get_scale() const { return scale_; }
-        void set_scale(double value) { scale_ = value; }
+        void set_scale(const double value) { scale_ = value; }
 
         [[nodiscard]] double get_mean() const { return mean_; }
-        void set_mean(double value) { mean_ = value; }
+        void set_mean(const double value) { mean_ = value; }
 
         [[nodiscard]] double get_sd() const { return sd_; }
-        void set_sd(double value) { sd_ = value; }
+        void set_sd(const double value) { sd_ = value; }
 
     private:
-        int max_relative_biting_value_;
-        double min_relative_biting_value_;
-        int number_of_biting_levels_;
-        double scale_;
-        double mean_;
-        double sd_;
+        int max_relative_biting_value_ = 35;
+        double min_relative_biting_value_ = 1.0;
+        int number_of_biting_levels_ = 100;
+        double scale_ = 0.0;
+        double mean_ = 0.0;
+        double sd_ = 0.0;
 
         BitingLevelDistribution biting_level_distribution_;
     };
@@ -93,41 +92,40 @@ public:
     public:
         // Getters and Setters
         [[nodiscard]] double get_sigma() const { return sigma_; }
-        void set_sigma(double value) { sigma_ = value; }
+        void set_sigma(const double value) { sigma_ = value; }
 
         [[nodiscard]] double get_ro_star() const { return ro_star_; }
-        void set_ro_star(double value) { ro_star_ = value; }
+        void set_ro_star(const double value) { ro_star_ = value; }
 
         [[nodiscard]] double get_blood_meal_volume() const { return blood_meal_volume_; }
-        void set_blood_meal_volume(double value) { blood_meal_volume_ = value; }
+        void set_blood_meal_volume(const double value) { blood_meal_volume_ = value; }
 
     private:
-        double sigma_;
-        double ro_star_;
-        double blood_meal_volume_;
+        double sigma_ = 3.91;
+        double ro_star_ = 0.00031;
+        double blood_meal_volume_ = 3.0;
     };
-public:
     // Getters and Setters
     [[nodiscard]] int get_number_of_tracking_days() const { return number_of_tracking_days_; }
-    void set_number_of_tracking_days(int value) { number_of_tracking_days_ = value; }
+    void set_number_of_tracking_days(const int value) { number_of_tracking_days_ = value; }
 
     [[nodiscard]] int get_days_to_clinical_under_five() const { return days_to_clinical_under_five_; }
-    void set_days_to_clinical_under_five(int value) { days_to_clinical_under_five_ = value; }
+    void set_days_to_clinical_under_five(const int value) { days_to_clinical_under_five_ = value; }
 
     [[nodiscard]] int get_days_to_clinical_over_five() const { return days_to_clinical_over_five_; }
-    void set_days_to_clinical_over_five(int value) { days_to_clinical_over_five_ = value; }
+    void set_days_to_clinical_over_five(const int value) { days_to_clinical_over_five_ = value; }
 
     [[nodiscard]] int get_days_mature_gametocyte_under_five() const { return days_mature_gametocyte_under_five_; }
-    void set_days_mature_gametocyte_under_five(int value) { days_mature_gametocyte_under_five_ = value; }
+    void set_days_mature_gametocyte_under_five(const int value) { days_mature_gametocyte_under_five_ = value; }
 
     [[nodiscard]] int get_days_mature_gametocyte_over_five() const { return days_mature_gametocyte_over_five_; }
-    void set_days_mature_gametocyte_over_five(int value) { days_mature_gametocyte_over_five_ = value; }
+    void set_days_mature_gametocyte_over_five(const int value) { days_mature_gametocyte_over_five_ = value; }
 
     [[nodiscard]] double get_p_compliance() const { return p_compliance_; }
-    void set_p_compliance(double value) { p_compliance_ = value; }
+    void set_p_compliance(const double value) { p_compliance_ = value; }
 
     [[nodiscard]] int get_min_dosing_days() const { return min_dosing_days_; }
-    void set_min_dosing_days(int value) { min_dosing_days_ = value; }
+    void set_min_dosing_days(const int value) { min_dosing_days_ = value; }
 
     [[nodiscard]] const RelativeBitingInfo& get_relative_biting_info() const { return relative_biting_info_; }
     void set_relative_biting_info(const RelativeBitingInfo& value) {
@@ -135,45 +133,45 @@ public:
     }
 
     [[nodiscard]] double get_gametocyte_level_under_artemisinin_action() const { return gametocyte_level_under_artemisinin_action_; }
-    void set_gametocyte_level_under_artemisinin_action(double value) { gametocyte_level_under_artemisinin_action_ = value; }
+    void set_gametocyte_level_under_artemisinin_action(const double value) { gametocyte_level_under_artemisinin_action_ = value; }
 
     [[nodiscard]] double get_gametocyte_level_full() const { return gametocyte_level_full_; }
-    void set_gametocyte_level_full(double value) { gametocyte_level_full_ = value; }
+    void set_gametocyte_level_full(const double value) { gametocyte_level_full_ = value; }
 
     [[nodiscard]] const RelativeInfectivity& get_relative_infectivity() const { return relative_infectivity_; }
     void set_relative_infectivity(const RelativeInfectivity& value) { relative_infectivity_ = value; }
 
     [[nodiscard]] double get_p_relapse() const { return p_relapse_; }
-    void set_p_relapse(double value) { p_relapse_ = value; }
+    void set_p_relapse(const double value) { p_relapse_ = value; }
 
     [[nodiscard]] int get_relapse_duration() const { return relapse_duration_; }
-    void set_relapse_duration(int value) { relapse_duration_ = value; }
+    void set_relapse_duration(const int value) { relapse_duration_ = value; }
 
     [[nodiscard]] double get_relapse_rate() const { return relapse_rate_; }
-    void set_relapse_rate(double value) { relapse_rate_ = value; }
+    void set_relapse_rate(const double value) { relapse_rate_ = value; }
 
     [[nodiscard]] int get_update_frequency() const { return update_frequency_; }
-    void set_update_frequency(int value) { update_frequency_ = value; }
+    void set_update_frequency(const int value) { update_frequency_ = value; }
 
     [[nodiscard]] bool get_allow_new_coinfection_to_cause_symptoms() const { return allow_new_coinfection_to_cause_symptoms_; }
-    void set_allow_new_coinfection_to_cause_symptoms(bool value) { allow_new_coinfection_to_cause_symptoms_ = value; }
+    void set_allow_new_coinfection_to_cause_symptoms(const bool value) { allow_new_coinfection_to_cause_symptoms_ = value; }
 
     [[nodiscard]] int get_tf_window_size() const { return tf_window_size_; }
-    void set_tf_window_size(int value) { tf_window_size_ = value; }
+    void set_tf_window_size(const int value) { tf_window_size_ = value; }
 
     [[nodiscard]] double get_fraction_mosquitoes_interrupted_feeding() const { return fraction_mosquitoes_interrupted_feeding_; }
-    void set_fraction_mosquitoes_interrupted_feeding(double value) { fraction_mosquitoes_interrupted_feeding_ = value; }
+    void set_fraction_mosquitoes_interrupted_feeding(const double value) { fraction_mosquitoes_interrupted_feeding_ = value; }
 
     [[nodiscard]] double get_inflation_factor() const { return inflation_factor_; }
-    void set_inflation_factor(double value) { inflation_factor_ = value; }
+    void set_inflation_factor(const double value) { inflation_factor_ = value; }
 
     [[nodiscard]] bool get_using_age_dependent_biting_level() const { return using_age_dependent_biting_level_; }
-    void set_using_age_dependent_biting_level(bool value) { using_age_dependent_biting_level_ = value; }
+    void set_using_age_dependent_biting_level(const bool value) { using_age_dependent_biting_level_ = value; }
 
     [[nodiscard]] bool get_using_variable_probability_infectious_bites_cause_infection() const {
         return using_variable_probability_infectious_bites_cause_infection_;
     }
-    void set_using_variable_probability_infectious_bites_cause_infection(bool value) {
+    void set_using_variable_probability_infectious_bites_cause_infection(const bool value) {
         using_variable_probability_infectious_bites_cause_infection_ = value;
     }
 
@@ -184,33 +182,33 @@ public:
       * get_relative_biting_info().get_biting_level_distribution().get_gamma().get_sd();
       gamma_b = var / get_relative_biting_info().get_biting_level_distribution().get_gamma().get_mean();
       gamma_a = get_relative_biting_info().get_biting_level_distribution().get_gamma().get_mean() / gamma_b;
-    };
+    }
 
 private:
-    int number_of_tracking_days_;
-    int days_to_clinical_under_five_;
-    int days_to_clinical_over_five_;
-    int days_mature_gametocyte_under_five_;
-    int days_mature_gametocyte_over_five_;
-    double p_compliance_;
-    int min_dosing_days_;
-    RelativeBitingInfo relative_biting_info_;
-    double gametocyte_level_under_artemisinin_action_;
-    double gametocyte_level_full_;
-    RelativeInfectivity relative_infectivity_;
-    double p_relapse_;
-    int relapse_duration_;
-    double relapse_rate_;
-    int update_frequency_;
-    bool allow_new_coinfection_to_cause_symptoms_;
-    int tf_window_size_;
-    double fraction_mosquitoes_interrupted_feeding_;
-    double inflation_factor_;
-    bool using_age_dependent_biting_level_;
-    bool using_variable_probability_infectious_bites_cause_infection_;
+    int number_of_tracking_days_ = 11;
+    int days_to_clinical_under_five_ = 4;
+    int days_to_clinical_over_five_ = 6;
+    int days_mature_gametocyte_under_five_ = 4;
+    int days_mature_gametocyte_over_five_ = 6;
+    double p_compliance_ = 1.0;
+    int min_dosing_days_ = 1;
+    RelativeBitingInfo relative_biting_info_{};
+    double gametocyte_level_under_artemisinin_action_ = 1.0;
+    double gametocyte_level_full_ = 1.0;
+    RelativeInfectivity relative_infectivity_{};
+    double p_relapse_ = 0.01;
+    int relapse_duration_ = 30;
+    double relapse_rate_ = 4.4721;
+    int update_frequency_ = 7;
+    bool allow_new_coinfection_to_cause_symptoms_ = true;
+    int tf_window_size_ = 60;
+    double fraction_mosquitoes_interrupted_feeding_ = 0.0;
+    double inflation_factor_ = 0.01;
+    bool using_age_dependent_biting_level_ = false;
+    bool using_variable_probability_infectious_bites_cause_infection_ = false;
 public:
-    double gamma_a;
-    double gamma_b;
+    double gamma_a = 0.0;
+    double gamma_b = 0.0;
 };
 
 namespace YAML {
@@ -351,7 +349,7 @@ struct convert<EpidemiologicalParameters> {
         return node;
     }
 
-    static bool decode(const YAML::Node& node, EpidemiologicalParameters& rhs) {
+    static bool decode(const Node& node, EpidemiologicalParameters& rhs) {
         if (!node["number_of_tracking_days"] || !node["days_to_clinical_under_five"] || !node["days_to_clinical_over_five"]
             || !node["days_mature_gametocyte_under_five"] || !node["days_mature_gametocyte_over_five"]
             || !node["p_compliance"] || !node["min_dosing_days"] || !node["relative_biting_info"]

@@ -35,7 +35,7 @@ public:
     return start_of_comparison_period_;
   }
 
-  void set_start_of_comparison_period(int value) {
+  void set_start_of_comparison_period(const int value) {
     start_of_comparison_period_ = value;
   }
 
@@ -56,14 +56,14 @@ public:
     return start_collect_data_day_;
   }
 
-  void set_start_collect_data_day(int value) {
+  void set_start_collect_data_day(const int value) {
     if (value < 0) {
       throw std::invalid_argument("start_collect_data_day must be non-negative");
     }
     start_collect_data_day_ = value;
   }
 
-  void set_total_time(int total_time) {
+  void set_total_time(const int total_time) {
     total_time_ = total_time;
   }
 
@@ -78,23 +78,22 @@ public:
   }
 
 private:
-  date::year_month_day starting_date_;
-  date::year_month_day start_of_comparison_period_date_;
-  int start_of_comparison_period_;
-  date::year_month_day ending_date_;
-  int start_collect_data_day_;
-  int total_time_;
+  date::year_month_day starting_date_ = date::year_month_day(date::year(2000), date::month(1), date::day(1));
+  date::year_month_day start_of_comparison_period_date_ = date::year_month_day(date::year(2000), date::month(1), date::day(1));
+  int start_of_comparison_period_ = 0;
+  date::year_month_day ending_date_ = date::year_month_day(date::year(2000), date::month(1), date::day(1));
+  int start_collect_data_day_ = 0;
+  int total_time_ = 0;
 };
 
 // Specialization of convert for the SimulationTimeframe class
-namespace YAML {
 template <>
-struct convert<SimulationTimeframe> {
+struct YAML::convert<SimulationTimeframe> {
   static Node encode(const SimulationTimeframe &rhs) {
     Node node;
-    node["starting_date"] = date::format("%Y/%m/%d", rhs.get_starting_date());
-    node["start_of_comparison_period"] = date::format("%Y/%m/%d", rhs.get_start_of_comparison_period_date());
-    node["ending_date"] = date::format("%Y/%m/%d", rhs.get_ending_date());
+    node["starting_date"] = format("%Y/%m/%d", rhs.get_starting_date());
+    node["start_of_comparison_period"] = format("%Y/%m/%d", rhs.get_start_of_comparison_period_date());
+    node["ending_date"] = format("%Y/%m/%d", rhs.get_ending_date());
     node["start_collect_data_day"] = rhs.get_start_collect_data_day();
     return node;
   }
@@ -123,4 +122,3 @@ struct convert<SimulationTimeframe> {
     return true;
   }
 };
-}
