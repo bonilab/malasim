@@ -73,7 +73,7 @@ public:
     [[nodiscard]] bool get_within_host_induced_free_recombination() const { return within_host_induced_free_recombination_; }
     void set_within_host_induced_free_recombination(bool value) { within_host_induced_free_recombination_ = value; }
 
-    void process_config() override {};
+    void process_config() override {}
     void process_config_using_locations(std::vector<Spatial::Location> locations) {
       spdlog::info("Processing MosquitoParameters");
       if(get_mosquito_config().get_mode()=="grid_based") {

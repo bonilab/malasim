@@ -20,107 +20,107 @@ public:
     public:
         // Getters and Setters
         [[nodiscard]] double get_r_g_0() const { return r_g_0_; }
-        void set_r_g_0(double value) { r_g_0_ = value; }
+        void set_r_g_0(const double value) { r_g_0_ = value; }
 
         [[nodiscard]] double get_beta_r() const { return beta_r_; }
-        void set_beta_r(double value) { beta_r_ = value; }
+        void set_beta_r(const double value) { beta_r_ = value; }
 
         [[nodiscard]] int get_kappa() const { return kappa_; }
-        void set_kappa(int value) {
+        void set_kappa(const int value) {
             if (value <= 0) throw std::invalid_argument("kappa must be positive");
             kappa_ = value;
         }
 
     private:
-        double r_g_0_;
-        double beta_r_;
-        int kappa_;
+        double r_g_0_ = 5.8;
+        double beta_r_ = 1.65;
+        int kappa_ = 350;
     };
 
     class WesolowskiSM{
     public:
         // Getters and Setters
         [[nodiscard]] double get_kappa() const { return kappa_; }
-        void set_kappa(double value) { kappa_ = value; }
+        void set_kappa(const double value) { kappa_ = value; }
 
         [[nodiscard]] double get_alpha() const { return alpha_; }
-        void set_alpha(double value) { alpha_ = value; }
+        void set_alpha(const double value) { alpha_ = value; }
 
         [[nodiscard]] double get_beta() const { return beta_; }
-        void set_beta(double value) { beta_ = value; }
+        void set_beta(const double value) { beta_ = value; }
 
         [[nodiscard]] double get_gamma() const { return gamma_; }
-        void set_gamma(double value) { gamma_ = value; }
+        void set_gamma(const double value) { gamma_ = value; }
 
     private:
-        double kappa_;
-        double alpha_;
-        double beta_;
-        double gamma_;
+      double kappa_ = 0.01093251;
+      double alpha_ = 0.22268982;
+      double beta_ = 0.14319618;
+      double gamma_ = 0.83741484;
     };
 
     class WesolowskiSurfaceSM{
     public:
       // Getters and Setters
       [[nodiscard]] double get_kappa() const { return kappa_; }
-      void set_kappa(double value) { kappa_ = value; }
+      void set_kappa(const double value) { kappa_ = value; }
 
       [[nodiscard]] double get_alpha() const { return alpha_; }
-      void set_alpha(double value) { alpha_ = value; }
+      void set_alpha(const double value) { alpha_ = value; }
 
       [[nodiscard]] double get_beta() const { return beta_; }
-      void set_beta(double value) { beta_ = value; }
+      void set_beta(const double value) { beta_ = value; }
 
       [[nodiscard]] double get_gamma() const { return gamma_; }
-      void set_gamma(double value) { gamma_ = value; }
+      void set_gamma(const double value) { gamma_ = value; }
 
     private:
-      double kappa_;
-      double alpha_;
-      double beta_;
-      double gamma_;
+      double kappa_ = 0.01093251;
+      double alpha_ = 0.22268982;
+      double beta_ = 0.14319618;
+      double gamma_ = 0.83741484;
     };
 
     class MarshallSM {
     public:
       [[nodiscard]] double get_tau() const { return tau_; }
-      void set_tau(double value) { tau_ = value; }
+      void set_tau(const double value) { tau_ = value; }
 
       [[nodiscard]] double get_alpha() const { return alpha_; }
-      void set_alpha(double value) { alpha_ = value; }
+      void set_alpha(const double value) { alpha_ = value; }
 
       [[nodiscard]] double get_log_rho() const { return log_rho_; }
-      void set_log_rho(double value) { log_rho_ = value; }
+      void set_log_rho(const double value) { log_rho_ = value; }
 
     private:
-      double tau_;
-      double alpha_;
-      double log_rho_;
+      double tau_ = 1.342;
+      double alpha_ = 1.27;
+      double log_rho_ = 0.54;
     };
 
     class BurkinaFasoSM {
     public:
       [[nodiscard]] double get_tau() const { return tau_; }
-      void set_tau(double value) { tau_ = value; }
+      void set_tau(const double value) { tau_ = value; }
 
       [[nodiscard]] double get_alpha() const { return alpha_; }
-      void set_alpha(double value) { alpha_ = value; }
+      void set_alpha(const double value) { alpha_ = value; }
 
       [[nodiscard]] double get_log_rho() const { return log_rho_; }
-      void set_log_rho(double value) { log_rho_ = value; }
+      void set_log_rho(const double value) { log_rho_ = value; }
 
       [[nodiscard]] double get_capital() const { return capital_; }
-      void set_capital(double value) { capital_ = value; }
+      void set_capital(const double value) { capital_ = value; }
 
       [[nodiscard]] double get_penalty() const { return penalty_; }
-      void set_penalty(double value) { penalty_ = value; }
+      void set_penalty(const double value) { penalty_ = value; }
 
     private:
-      double tau_;
-      double alpha_;
-      double log_rho_;
-      double capital_;
-      double penalty_;
+      double tau_ = 1.342;
+      double alpha_ = 1.27;
+      double log_rho_ = 0.25;
+      double capital_ = 14;
+      double penalty_ = 12;
     };
 
   class SpatialModelSettings {
@@ -157,46 +157,46 @@ public:
     public:
         // Getters and Setters
         [[nodiscard]] double get_mean() const { return mean_; }
-        void set_mean(double value) { mean_ = value; }
+        void set_mean(const double value) { mean_ = value; }
 
         [[nodiscard]] double get_sd() const { return sd_; }
-        void set_sd(double value) { sd_ = value; }
+        void set_sd(const double value) { sd_ = value; }
 
         [[nodiscard]] double get_scale() const { return scale_; }
-        void set_scale(double value) { scale_ = value; }
+        void set_scale(const double value) { scale_ = value; }
 
     private:
-        double scale_;
-        double mean_;
-        double sd_;
+        double scale_ = 0.17;
+        double mean_ = 0.0;
+        double sd_ = 0.0;
     };
 
     class LengthOfStay {
     public:
       // Getters and Setters
       [[nodiscard]] double get_mean() const { return mean_; }
-      void set_mean(double value) { mean_ = value; }
+      void set_mean(const double value) { mean_ = value; }
 
       [[nodiscard]] double get_sd() const { return sd_; }
-      void set_sd(double value) { sd_ = value; }
+      void set_sd(const double value) { sd_ = value; }
 
     private:
-      double mean_;
-      double sd_;
+      double mean_ = 5;
+      double sd_ = 10;
     };
 
     class MovingLevelDistributionGamma {
     public:
         // Getters and Setters
         [[nodiscard]] double get_mean() const { return mean_; }
-        void set_mean(double value) { mean_ = value; }
+        void set_mean(const double value) { mean_ = value; }
 
         [[nodiscard]] double get_sd() const { return sd_; }
-        void set_sd(double value) { sd_ = value; }
+        void set_sd(const double value) { sd_ = value; }
 
     private:
-        double mean_;
-        double sd_;
+        double mean_ = 5;
+        double sd_ = 10;
     };
 
     class MovingLevelDistribution {
@@ -221,13 +221,13 @@ public:
     public:
         // Getters and Setters
         [[nodiscard]] int get_max_relative_moving_value() const { return max_relative_moving_value_; }
-        void set_max_relative_moving_value(int value) {
+        void set_max_relative_moving_value(const int value) {
             if (value < 0) throw std::invalid_argument("max_relative_moving_value must be non-negative");
             max_relative_moving_value_ = value;
         }
 
         [[nodiscard]] int get_number_of_moving_levels() const { return number_of_moving_levels_; }
-        void set_number_of_moving_levels(int value) {
+        void set_number_of_moving_levels(const int value) {
             if (value <= 0) throw std::invalid_argument("number_of_moving_levels must be positive");
             number_of_moving_levels_ = value;
         }
@@ -236,7 +236,7 @@ public:
         void set_moving_level_distribution(const MovingLevelDistribution& value) { moving_level_distribution_ = value; }
 
         [[nodiscard]] double get_circulation_percent() const { return circulation_percent_; }
-        void set_circulation_percent(double value) {
+        void set_circulation_percent(const double value) {
             if (value < 0 || value > 100) throw std::invalid_argument("circulation_percent must be between 0 and 100");
             circulation_percent_ = value;
         }
@@ -248,7 +248,7 @@ public:
           return relative_probability_that_child_travels_compared_to_adult_;
         }
 
-        void set_relative_probability_that_child_travels_compared_to_adult(double value) {
+        void set_relative_probability_that_child_travels_compared_to_adult(const double value) {
           relative_probability_that_child_travels_compared_to_adult_ = value;
         }
 
@@ -256,7 +256,7 @@ public:
           return relative_probability_for_clinical_to_travel_;
         }
 
-        void set_relative_probability_for_clinical_to_travel(double value) {
+        void set_relative_probability_for_clinical_to_travel(const double value) {
           relative_probability_for_clinical_to_travel_ = value;
         }
 
@@ -265,9 +265,9 @@ public:
         MovingLevelDistributionGamma moving_level_distribution_gamma_;
         LengthOfStay length_of_stay_;
 
-        double max_relative_moving_value_;
-        int number_of_moving_levels_;
-        double circulation_percent_;
+        int max_relative_moving_value_ = 35;
+        int number_of_moving_levels_ = 100;
+        double circulation_percent_ = 0.00336;
 
         double relative_probability_that_child_travels_compared_to_adult_ = 1.0;
         double relative_probability_for_clinical_to_travel_ = 1.0;
@@ -290,10 +290,10 @@ public:
     void set_v_moving_level_value(const std::vector<double>& value) { v_moving_level_value = value; }
 
     [[nodiscard]] double get_length_of_stay_theta() const { return length_of_stay_theta; }
-    void set_length_of_stay_theta(double value) { length_of_stay_theta = value; }
+    void set_length_of_stay_theta(const double value) { length_of_stay_theta = value; }
 
     [[nodiscard]] double get_length_of_stay_k() const { return length_of_stay_k; }
-    void set_length_of_stay_k(double value) { length_of_stay_k = value; }
+    void set_length_of_stay_k(const double value) { length_of_stay_k = value; }
 
     [[nodiscard]] MultinomialDistributionGenerator get_moving_level_generator() const {
       return moving_level_generator_;
@@ -302,7 +302,7 @@ public:
   void process_config() override {}
 
   void process_config_using_spatial_settings(
-    std::vector<std::vector<double>> spatial_distance_matrix,int number_of_locations) {
+    const std::vector<std::vector<double>>& spatial_distance_matrix,const int number_of_locations) {
     spdlog::info("Processing MovementSettings");
     if(spatial_model_settings_.get_name() == "Barabasi") {
       spdlog::info("Processing BarabasiSM");
@@ -361,7 +361,7 @@ public:
       for (double i = 0; i <= max + 0.0001; i += step) {
         const auto p = gsl_cdf_gamma_P(i + step, a, b);
         double value = 0;
-        value = (j == 0) ? p : p - old_p;
+        value = j == 0 ? p : p - old_p;
         v_moving_level_density.push_back(value);
         old_p = p;
         v_moving_level_value.push_back(i + 1);
@@ -372,14 +372,14 @@ public:
       // normalized
       double t = 0;
       for (auto &i : v_moving_level_density) {
-        i = i + (1 - sum) / v_moving_level_density.size();
+        i = i + (1 - sum) / static_cast<double>(v_moving_level_density.size());
         t += i;
       }
 
-      assert((unsigned)get_circulation_info().get_number_of_moving_levels()
-             == v_moving_level_density.size());
-      assert((unsigned)get_circulation_info().get_number_of_moving_levels()
-             == v_moving_level_value.size());
+      assert(static_cast<unsigned>(get_circulation_info().get_number_of_moving_levels())
+        == v_moving_level_density.size());
+      assert(static_cast<unsigned>(get_circulation_info().get_number_of_moving_levels())
+        == v_moving_level_value.size());
       assert(fabs(t - 1) < 0.0001);
 
       const auto stay_variance = get_circulation_info().get_length_of_stay().get_sd()
@@ -395,16 +395,16 @@ public:
 
 private:
     SpatialModelSettings spatial_model_settings_;
-    Spatial::SpatialModel* spatial_model_;
+    Spatial::SpatialModel* spatial_model_{};
     CirculationInfo circulation_info_;
     DoubleVector v_moving_level_value;
     DoubleVector v_moving_level_density;
     MultinomialDistributionGenerator moving_level_generator_{};
-    double length_of_stay;
-    double length_of_stay_mean;
-    double length_of_stay_sd;
-    double length_of_stay_theta;
-    double length_of_stay_k;
+    double length_of_stay = 0.0;
+    double length_of_stay_mean = 0.0;
+    double length_of_stay_sd = 0.0;
+    double length_of_stay_theta = 0.0;
+    double length_of_stay_k = 0.0;
 };
 
 namespace YAML {

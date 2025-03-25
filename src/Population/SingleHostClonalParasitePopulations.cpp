@@ -1,6 +1,7 @@
 #include "SingleHostClonalParasitePopulations.h"
 
 #include <cmath>
+#include <iostream>
 
 #include "ClonalParasitePopulation.h"
 #include "Configuration/Config.h"

@@ -1,4 +1,7 @@
 #include "NovelDrugIntroductionStrategy.h"
+
+#include <iostream>
+
 #include "Simulation/Model.h"
 #include "Utils/Random.h"
 #include "Treatment/Therapies/Therapy.h"

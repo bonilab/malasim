@@ -1,5 +1,8 @@
 #include "ITreatmentCoverageModel.h"
 #include <yaml-cpp/yaml.h>
+
+#include <iostream>
+
 #include "SteadyTCM.h"
 #include "Configuration/Config.h"
 #include "LinearTCM.h"

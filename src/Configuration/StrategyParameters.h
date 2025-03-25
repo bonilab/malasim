@@ -32,19 +32,19 @@ public:
         void set_distribution(const std::vector<double>& value) { distribution_ = value; }
 
         [[nodiscard]] int get_cycling_time() const { return cycling_time_; }
-        void set_cycling_time(int value) { cycling_time_ = value; }
+        void set_cycling_time(const int value) { cycling_time_ = value; }
 
         [[nodiscard]] double get_trigger_value() const { return trigger_value_; }
-        void set_trigger_value(double value) { trigger_value_ = value; }
+        void set_trigger_value(const double value) { trigger_value_ = value; }
 
         [[nodiscard]] int get_delay_until_actual_trigger() const { return delay_until_actual_trigger_; }
-        void set_delay_until_actual_trigger(int value) { delay_until_actual_trigger_ = value; }
+        void set_delay_until_actual_trigger(const int value) { delay_until_actual_trigger_ = value; }
 
         [[nodiscard]] int get_turn_off_days() const { return turn_off_days_; }
-        void set_turn_off_days(int value) { turn_off_days_ = value; }
+        void set_turn_off_days(const int value) { turn_off_days_ = value; }
 
         [[nodiscard]] int get_update_duration_after_rebalancing() const { return update_duration_after_rebalancing_; }
-        void set_update_duration_after_rebalancing(int value) { update_duration_after_rebalancing_ = value; }
+        void set_update_duration_after_rebalancing(const int value) { update_duration_after_rebalancing_ = value; }
 
         [[nodiscard]] const std::vector<int>& get_strategy_ids() const { return strategy_ids_; }
         void set_strategy_ids(const std::vector<int>& value) { strategy_ids_ = value; }
@@ -62,7 +62,7 @@ public:
         void set_peak_distribution_by_location(const std::vector<std::vector<double>>& value) { peak_distribution_by_location_ = value; }
 
         [[nodiscard]] int get_peak_after() const { return peak_after_; }
-        void set_peak_after(int value) { peak_after_ = value; }
+        void set_peak_after(const int value) { peak_after_ = value; }
 
     private:
         std::string name_;
@@ -91,10 +91,10 @@ public:
         };
         // Getters and Setters
         [[nodiscard]] bool get_enable() const { return enable_; }
-        void set_enable(bool value) { enable_ = value; }
+        void set_enable(const bool value) { enable_ = value; }
 
         [[nodiscard]] int get_mda_therapy_id() const { return mda_therapy_id_; }
-        void set_mda_therapy_id(int value) { mda_therapy_id_ = value; }
+        void set_mda_therapy_id(const int value) { mda_therapy_id_ = value; }
 
         [[nodiscard]] const std::vector<int>& get_age_bracket_prob_individual_present_at_mda() const { return age_bracket_prob_individual_present_at_mda_; }
         void set_age_bracket_prob_individual_present_at_mda(const std::vector<int>& value) { age_bracket_prob_individual_present_at_mda_ = value; }
@@ -109,8 +109,8 @@ public:
         void set_prob_individual_present_at_mda_distribution(const std::vector<beta_distribution_params>& value) { prob_individual_present_at_mda_distribution_ = value; }
 
     private:
-        bool enable_;
-        int mda_therapy_id_;
+        bool enable_ = false;
+        int mda_therapy_id_ = -1;
         std::vector<int> age_bracket_prob_individual_present_at_mda_;
         std::vector<double> mean_prob_individual_present_at_mda_;
         std::vector<double> sd_prob_individual_present_at_mda_;
@@ -122,10 +122,10 @@ public:
     void set_strategy_db_raw(const std::map<int, StrategyInfo>& value) { strategy_db_raw_ = value; }
 
     [[nodiscard]] int get_initial_strategy_id() const { return initial_strategy_id_; }
-    void set_initial_strategy_id(int value) { initial_strategy_id_ = value; }
+    void set_initial_strategy_id(const int value) { initial_strategy_id_ = value; }
 
     [[nodiscard]] int get_recurrent_therapy_id() const { return recurrent_therapy_id_; }
-    void set_recurrent_therapy_id(int value) { recurrent_therapy_id_ = value; }
+    void set_recurrent_therapy_id(const int value) { recurrent_therapy_id_ = value; }
 
     [[nodiscard]] MassDrugAdministration get_mda() const { return mass_drug_administration_; }
     void set_mass_drug_administration(const MassDrugAdministration& value) { mass_drug_administration_ = value; }
@@ -150,7 +150,7 @@ public:
        * and this will make implementation more flexible.
        */
       for (std::size_t i = 0; i < node_.size(); i++) {
-        auto *s = read_strategy(node_, (int)i);
+        auto *s = read_strategy(node_, static_cast<int>(i));
         strategy_db.push_back(s);
       }
       std::vector<MassDrugAdministration::beta_distribution_params> prob_individual_present_at_mda_distribution_;
@@ -175,14 +175,13 @@ public:
       //   std::cout << "alpha: " << mda_prob.alpha << " beta: " << mda_prob.beta << std::endl;
       // }
       mass_drug_administration_.set_prob_individual_present_at_mda_distribution(prob_individual_present_at_mda_distribution_);
-    };
+    }
 
-public:
     std::vector<IStrategy *> strategy_db = std::vector<IStrategy *>();
 private:
     std::map<int, StrategyInfo> strategy_db_raw_;  // Changed from vector to map
-    int initial_strategy_id_;
-    int recurrent_therapy_id_;
+    int initial_strategy_id_ = -1;
+    int recurrent_therapy_id_ = -1;
     MassDrugAdministration mass_drug_administration_;
     YAML::Node node_;
 };

@@ -82,7 +82,6 @@ int AdminLevelManager::get_admin_unit(const std::string& level_name, int locatio
     if (it == name_to_id.end()) {
         throw std::runtime_error("get_admin_unit: Administrative level '" + level_name + "' not found");
     }
-
     return get_admin_unit(it->second, location);
 }
 

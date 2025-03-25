@@ -16,7 +16,7 @@ public:
     return days_between_stdout_output_;
   }
   // Setters with validation
-  void set_days_between_stdout_output(int value) {
+  void set_days_between_stdout_output(const int value) {
     if (value <= 0)
       throw std::invalid_argument(
           "days_between_stdout_output must be greater than 0");
@@ -25,7 +25,7 @@ public:
   [[nodiscard]] long get_initial_seed_number() const {
     return initial_seed_number_;
   }
-  void set_initial_seed_number(long value) {
+  void set_initial_seed_number(const long value) {
     if (value < 0) {
       spdlog::info("Using random seed number");
     }
@@ -35,25 +35,24 @@ public:
     }
   }
   [[nodiscard]] bool get_record_genome_db() const { return record_genome_db_; }
-  void set_record_genome_db(bool value) { record_genome_db_ = value; }
+  void set_record_genome_db(const bool value) { record_genome_db_ = value; }
 
   bool get_cell_level_reporting() const { return cell_level_reporting_; }
-  void set_cell_level_reporting(bool value) { cell_level_reporting_ = value; }
+  void set_cell_level_reporting(const bool value) { cell_level_reporting_ = value; }
 
   void process_config() override {
     spdlog::info("Processing ModelSettings");
   }
 
 private:
-  int days_between_stdout_output_;
-  long initial_seed_number_;
-  bool record_genome_db_;
-  bool cell_level_reporting_;
+  int days_between_stdout_output_ = 30;
+  long initial_seed_number_ = 0;
+  bool record_genome_db_ = true;
+  bool cell_level_reporting_ = true;
 };
 
-namespace YAML {
 template <>
-struct convert<ModelSettings> {
+struct YAML::convert<ModelSettings> {
   static Node encode(const ModelSettings &rhs) {
     Node node;
     node["days_between_stdout_output"] = rhs.get_days_between_stdout_output();
@@ -84,8 +83,7 @@ struct convert<ModelSettings> {
     rhs.set_cell_level_reporting(node["cell_level_reporting"].as<bool>());
     return true;
   }
-};
-}  // namespace YAML
+};  // namespace YAML
 
 #endif  // MODEL_SETTINGS_H
 

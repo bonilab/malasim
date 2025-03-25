@@ -27,6 +27,7 @@
 #include "Population/Population.h"
 #include "Population/ImmuneSystem/ImmuneSystem.h"
 #include "Treatment/Therapies/Drug.h"
+#include "Treatment/Therapies/MACTherapy.h"
 
 Person::Person() : age_(0),
                    age_class_(0),
