@@ -21,7 +21,7 @@ class DrugsInBlood {
 
  private:
  Person *person_;
- DrugPtrMap *drugs_;
+ std::unique_ptr<DrugPtrMap> drugs_;
 
  public:
  Person *person() const {
@@ -32,10 +32,7 @@ class DrugsInBlood {
  }
 
  DrugPtrMap *drugs() const {
-   return drugs_;
- }
- void set_drugs(DrugPtrMap *value) {
-   drugs_ = value;
+   return drugs_.get();
  }
 
  public:

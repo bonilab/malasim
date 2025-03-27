@@ -15,7 +15,6 @@ Scheduler::~Scheduler() {
 void Scheduler::extend_total_time(int new_total_time) {
   if (total_available_time_ < new_total_time) {
     for (auto i = total_available_time_; i <= new_total_time; i++) {
-      // individual_events_list_.push_back(EventPtrVector());
       population_events_list_.push_back(EventPtrVector());
     }
   }
@@ -23,7 +22,6 @@ void Scheduler::extend_total_time(int new_total_time) {
 }
 
 void Scheduler::clear_all_events() {
-  // clear_all_events(individual_events_list_);
   clear_all_events(population_events_list_);
 }
 
@@ -32,7 +30,6 @@ void Scheduler::set_total_available_time(const int& value) {
     clear_all_events();
   }
   total_available_time_ = value;
-  // individual_events_list_.assign(total_available_time_, EventPtrVector());
   population_events_list_.assign(total_available_time_, EventPtrVector());
 }
 
@@ -158,9 +155,8 @@ void Scheduler::schedule_event(EventPtrVector& time_events, Event* event) {
 void Scheduler::clear_all_events(EventPtrVector2& events_list) {
   for (auto& timestep_events : events_list) {
     for (auto* event : timestep_events) {
-      if (event->dispatcher != nullptr) {
-        event->dispatcher->remove_dispatcher(event);
-      }
+      // TODO: consider using dispatcher to manage events
+      // maybe population events will be removed
       ObjectHelpers::delete_pointer<Event>(event);
     }
     timestep_events.clear();

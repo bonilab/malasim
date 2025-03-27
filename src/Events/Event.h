@@ -29,13 +29,8 @@ public:
     void perform_execute();
     virtual std::string name() = 0;
     int time{-1};
-    void set_id(uuids::uuid id) { id_ = id; }
-    [[nodiscard]] uuids::uuid get_id_raw() const { return id_; }
-    [[nodiscard]] std::string get_id() const { return to_string(id_).substr(to_string(id_).length()-8, 8); }
-
 private:
     virtual void execute() = 0;
-    uuids::uuid id_;
 };
 
 #endif // EVENT_H

@@ -8,28 +8,16 @@
 #include "Simulation/Model.h"
 #include "Utils/Random.h"
 
-Event::Event() {
-  id_ = Model::get_random()->uuid();
-}
+Event::Event() {}
 
-Event::~Event(){
-  if (dispatcher!=nullptr) {
-    dispatcher->remove_dispatcher(this);
-  }
+Event::~Event() {
   dispatcher = nullptr;
   scheduler = nullptr;
 }
 
 void Event::perform_execute() {
   if (executable) {
-    if (dispatcher!=nullptr) {
-      dispatcher->update_dispatcher();
-    }
     execute();
-    if (dispatcher!=nullptr) {
-      dispatcher->remove_dispatcher(this);
-      dispatcher = nullptr;
-    }
     executable = false;
   }
 }

@@ -13,13 +13,12 @@
 DrugsInBlood::DrugsInBlood(Person *person) : person_(person), drugs_(nullptr) {}
 
 void DrugsInBlood::init() {
-  drugs_ = new DrugPtrMap();
+  drugs_ = std::make_unique<DrugPtrMap>();
 }
 
 DrugsInBlood::~DrugsInBlood() {
   if (drugs_!=nullptr) {
     clear();
-    ObjectHelpers::delete_pointer<DrugPtrMap>(drugs_);
   }
 }
 

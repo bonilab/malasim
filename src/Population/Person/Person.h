@@ -56,23 +56,16 @@ public:
   };
 
   enum HostStates { SUSCEPTIBLE = 0, EXPOSED = 1, ASYMPTOMATIC = 2, CLINICAL = 3, DEAD = 4, NUMBER_OF_STATE = 5 };
-  // Comparison function for priority queue
-  struct EventComparator {
-    bool operator()(Event* lhs, Event* rhs) const {
-      return lhs->time > rhs->time;
-    }
-  };
 
-  // Priority queue of Event
-  std::priority_queue<Event*, std::vector<Event*>, EventComparator> event_queue;
+  // sorted by time
+  std::multimap<int, std::unique_ptr<Event>> event_queue;
 
   Person();
 
   ~Person();
 private:
   int age_;
-  uuids::uuid id_;
-  Population* population_{};
+  Population* population_{nullptr};
   int location_{};
   int residence_location_{};
   HostStates host_state_;
@@ -80,8 +73,8 @@ private:
   int birthday_{};
   int latest_update_time_{};
   int moving_level_{};
-  std::vector<int> *today_infections_{};
-  std::vector<int> *today_target_locations_{};
+  std::vector<int> today_infections_;
+  std::vector<int> today_target_locations_;
   std::vector<double> prob_present_at_mda_by_age_;
   int number_of_times_bitten_{};
   int number_of_trips_taken_{};
@@ -89,10 +82,10 @@ private:
   std::map<int, double> starting_drug_values_for_MAC_;
   double innate_relative_biting_rate_;
   double current_relative_biting_rate_;
-  ImmuneSystem *immune_system_{};
-  SingleHostClonalParasitePopulations *all_clonal_parasite_populations_{};
-  DrugsInBlood *drugs_in_blood_{};
-  Genotype *liver_parasite_type_{};
+  std::unique_ptr<ImmuneSystem> immune_system_{nullptr};
+  std::unique_ptr<SingleHostClonalParasitePopulations> all_clonal_parasite_populations_{nullptr};
+  std::unique_ptr<DrugsInBlood> drugs_in_blood_{nullptr};
+  Genotype* liver_parasite_type_{nullptr};
   int latest_time_received_public_treatment_{-1};
   RecurrenceStatus recurrence_status_{RecurrenceStatus::NONE};
 #ifdef ENABLE_TRAVEL_TRACKING
@@ -112,13 +105,10 @@ public:
     // Method to add an event
     void add_event(Event* event);
 
-    // Method to remove an event
-    void remove_event(Event* event);
+    // // Method to remove an event
+    // void remove_event(Event* event);
 
     void increase_age_by_1_year();
-
-    [[nodiscard]] uuids::uuid get_id_raw() const { return id_; }
-    [[nodiscard]] std::string get_id() const { return to_string(id_).substr(to_string(id_).length()-8, 8); }
 
     void update();
     void update_events(int time);
@@ -131,17 +121,15 @@ public:
     void set_moving_level(const int& value);
 
     ImmuneSystem* get_immune_system() {
-        return immune_system_;
+        return immune_system_.get();
     }
+    
+    // set and take ownership of immune system
+    void set_immune_system(ImmuneSystem* value);
 
     SingleHostClonalParasitePopulations* get_all_clonal_parasite_populations() {
-      return all_clonal_parasite_populations_;
+      return all_clonal_parasite_populations_.get();
     }
-    void set_all_clonal_parasite_populations(SingleHostClonalParasitePopulations* all_clonal_parasite_populations) {
-      all_clonal_parasite_populations_ = all_clonal_parasite_populations;
-    }
-
-    void set_immune_system(ImmuneSystem* value);
 
     int get_location() const { return location_; }
 
@@ -166,11 +154,9 @@ public:
 
     int get_moving_level() const { return moving_level_; }
 
-    std::vector<int>* get_today_infections() const { return today_infections_; }
-    void set_today_infections(std::vector<int>* today_infections) { today_infections_ = today_infections; }
+    std::vector<int>& get_today_infections() { return today_infections_; }
 
-    std::vector<int>* get_today_target_locations() const { return today_target_locations_; }
-    void set_today_target_locations(std::vector<int>* today_target_locations) { today_target_locations_ = today_target_locations; }
+    std::vector<int>& get_today_target_locations() { return today_target_locations_; }
 
     std::vector<double> get_prob_present_at_mda_by_age() const { return prob_present_at_mda_by_age_; }
     void set_prob_present_at_mda_by_age(const std::vector<double>& prob_present_at_mda_by_age) { prob_present_at_mda_by_age_ = prob_present_at_mda_by_age; }
@@ -206,9 +192,8 @@ public:
     void set_location(const int& value);
 
     DrugsInBlood *drugs_in_blood() {
-      return drugs_in_blood_;
+      return drugs_in_blood_.get();
     }
-    void set_drugs_in_blood(DrugsInBlood *drugs_in_blood);
 
     Genotype* liver_parasite_type() {
       return liver_parasite_type_;
@@ -282,8 +267,6 @@ public:
 
   void increase_number_of_times_bitten();
 
-  void move_to_population(Population *target_population);
-
   bool has_birthday_event() const;
 
   bool has_update_by_having_drug_event() const;
@@ -320,11 +303,10 @@ public:
   // Check to see if the indicated event has been defined for the individual.
   template <typename T>
   bool has_event() const {
-    for (auto event_pair : *events()) {
-      if (dynamic_cast<T*>(event_pair.second) != nullptr && event_pair.second->executable
-          && event_pair.second->dispatcher != nullptr) {
+    for (auto& [time, event] : event_queue) {
+      if (dynamic_cast<T*>(event.get()) != nullptr) {
         return true;
-          }
+      }
     }
     return false;
   }

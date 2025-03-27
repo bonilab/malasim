@@ -213,7 +213,7 @@ void Population::perform_infection_event() {
           if (theta < 0.2) { pr_inf = pr; }
           if (draw <= pr_inf) {
             if (person->get_host_state() != Person::EXPOSED && person->liver_parasite_type() == nullptr) {
-              person->get_today_infections()->push_back(genotype_id);
+              person->get_today_infections().push_back(genotype_id);
               today_infections.push_back(person);
             }
           }
@@ -221,14 +221,14 @@ void Population::perform_infection_event() {
         else {
           if (draw <= person->p_infection_from_an_infectious_bite()) {
             if (person->get_host_state() != Person::EXPOSED && person->liver_parasite_type() == nullptr) {
-              person->get_today_infections()->push_back(genotype_id);
+              person->get_today_infections().push_back(genotype_id);
               today_infections.push_back(person);
             }
           }
         }
       } else if (draw <= model_->get_config()->get_transmission_settings().get_p_infection_from_an_infectious_bite()) {
         if (person->get_host_state() != Person::EXPOSED && person->liver_parasite_type() == nullptr) {
-          person->get_today_infections()->push_back(genotype_id);
+          person->get_today_infections().push_back(genotype_id);
           today_infections.push_back(person);
         }
       }
@@ -239,7 +239,7 @@ void Population::perform_infection_event() {
   if (today_infections.empty()) return;
 
   for (auto* p : today_infections) {
-    if (!p->get_today_infections()->empty()) {
+    if (!p->get_today_infections().empty()) {
       model_->get_mdc()->monthly_number_of_new_infections_by_location()[p->get_location()] += 1;
       model_->get_mdc()->record_1_infection(p->get_location());
     }
@@ -646,7 +646,7 @@ void Population::perform_circulation_for_1_location(const int& from_location, co
   for (auto* person : persons_moving_today) {
     assert(person->get_host_state() != Person::DEAD);
 
-    person->get_today_target_locations()->push_back(target_location);
+    person->get_today_target_locations().push_back(target_location);
     today_circulations.push_back(person);
   }
 

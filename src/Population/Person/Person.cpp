@@ -38,51 +38,38 @@ Person::Person() : age_(0),
                    number_of_times_bitten_(0),
                    number_of_trips_taken_(0),
                    last_therapy_id_(0),
-                   population_(nullptr),
-                   today_infections_(nullptr),
-                   today_target_locations_(nullptr),
+                   immune_system_(nullptr),
+                   all_clonal_parasite_populations_(nullptr),
+                   drugs_in_blood_(nullptr),
+                   today_infections_(std::vector<int>()),
+                   today_target_locations_(std::vector<int>()),
+                   starting_drug_values_for_MAC_(std::map<int, double>()),
+                   innate_relative_biting_rate_(0),
+                   current_relative_biting_rate_(0),
                    liver_parasite_type_(nullptr),
                    latest_update_time_(-1),
                    recurrence_status_(RecurrenceStatus::NONE),
                    latest_time_received_public_treatment_(-30){
-  id_ = Model::get_random()->uuid();
-  population_ = nullptr;
-  immune_system_ = nullptr;
-  all_clonal_parasite_populations_ = nullptr;
-  drugs_in_blood_ = nullptr;
-
-  today_infections_ = nullptr;
-  today_target_locations_ = nullptr;
-  latest_update_time_ = -1;
 }
 
 Person::~Person() {
-  while (!event_queue.empty()) {
-    delete event_queue.top();
-    event_queue.pop();
-  }
-  Dispatcher::clear_dispatcher_events();
-  ObjectHelpers::delete_pointer<ImmuneSystem>(immune_system_);
-  ObjectHelpers::delete_pointer<SingleHostClonalParasitePopulations>(all_clonal_parasite_populations_);
-  ObjectHelpers::delete_pointer<DrugsInBlood>(drugs_in_blood_);
-  ObjectHelpers::delete_pointer<IntVector>(today_infections_);
-  ObjectHelpers::delete_pointer<IntVector>(today_target_locations_);
+  // as we use unique_ptr, we don't need to delete events
 }
 
 void Person::initialize() {
   Dispatcher::initialize();
-  event_queue = std::priority_queue<Event*, std::vector<Event*>, EventComparator>();
+  event_queue = std::multimap<int, std::unique_ptr<Event>>();
 
-  immune_system_ = new ImmuneSystem(this);
+  immune_system_ = std::make_unique<ImmuneSystem>(this);
 
-  all_clonal_parasite_populations_ = new SingleHostClonalParasitePopulations(this);
+  all_clonal_parasite_populations_ = std::make_unique<SingleHostClonalParasitePopulations>(this);
   all_clonal_parasite_populations_->init();
 
-  drugs_in_blood_ = new DrugsInBlood(this);
+  drugs_in_blood_ = std::make_unique<DrugsInBlood>(this);
   drugs_in_blood_->init();
 
-  today_infections_ = new std::vector<int>();
-  today_target_locations_ = new std::vector<int>();
+  today_infections_ = std::vector<int>();
+  today_target_locations_ = std::vector<int>();
 
   starting_drug_values_for_MAC_ = std::map<int, double>();
   innate_relative_biting_rate_ = 0;
@@ -117,7 +104,7 @@ void Person::set_host_state(const HostStates& value) {
     if (value == DEAD) {
       // clear also remove all infection forces
       all_clonal_parasite_populations_->clear();
-      clear_dispatcher_events();
+      // TODO: remove all events
       Model::get_mdc()->record_1_death(location_, birthday_, number_of_times_bitten_, age_class_, age_);
     }
 
@@ -161,11 +148,9 @@ void Person::set_moving_level(const int& value) {
   }
 }
 
+
 void Person::set_immune_system(ImmuneSystem* value) {
-  if (immune_system_ != value) {
-    delete immune_system_;
-    immune_system_ = value;
-  }
+  immune_system_ = std::unique_ptr<ImmuneSystem>(value);
 }
 
 ClonalParasitePopulation* Person::add_new_parasite_to_blood(Genotype* parasite_type) const {
@@ -194,20 +179,20 @@ double Person::get_probability_progress_to_clinical() {
   return immune_system_->get_clinical_progression_probability();
 }
 
-void Person::cancel_all_other_progress_to_clinical_events_except(Event* event) const {
-  for (auto event_pair : *events()) {
-    if (event_pair.second != event && dynamic_cast<ProgressToClinicalEvent*>(event_pair.second) != nullptr) {
+void Person::cancel_all_other_progress_to_clinical_events_except(Event* inEvent) const {
+  for (auto& [time, event] : event_queue) {
+    if (event.get() != inEvent && dynamic_cast<ProgressToClinicalEvent*>(event.get()) != nullptr) {
       //            std::cout << "Hello"<< std::endl;
-      event_pair.second->executable = false;
+      event->executable = false;
     }
   }
 }
 
-void Person::cancel_all_events_except(Event* event) const {
-  for (auto event_pair : *events()) {
-    if (event_pair.second != event) {
+void Person::cancel_all_events_except(Event* inEvent) const {
+  for (auto& [time, event] : event_queue) {
+    if (event.get() != inEvent) {
       //            e->set_dispatcher(nullptr);
-      event_pair.second->executable = false;
+      event->executable = false;
     }
   }
 }
@@ -496,11 +481,11 @@ void Person::determine_symptomatic_recrudescence(ClonalParasitePopulation* clini
 
     this->recurrence_status_ = Person::RecurrenceStatus::WITH_SYMPTOM;
     // mark the test treatment failure event as a failure
-    for (auto event_pair : *events()) {
-      auto* tf_event = dynamic_cast<TestTreatmentFailureEvent*>(event_pair.second);
+    for (auto& [time, event] : event_queue) {
+      auto* tf_event = dynamic_cast<TestTreatmentFailureEvent*>(event.get());
       if (tf_event != nullptr
           && tf_event->clinical_caused_parasite() == clinical_caused_parasite) {
-        event_pair.second->executable = false;
+        event->executable = false;
         Model::get_mdc()->record_1_treatment_failure_by_therapy(
             location_, age_class_, tf_event->therapyId());
       }
@@ -566,7 +551,7 @@ void Person::update() {
   drugs_in_blood_->update();
 
   // update drug activity on parasite
-  all_clonal_parasite_populations_->update_by_drugs(drugs_in_blood_);
+  all_clonal_parasite_populations_->update_by_drugs(drugs_in_blood_.get());
 
   immune_system_->update();
 
@@ -602,18 +587,18 @@ void Person::update_current_state() {
 }
 
 void Person::randomly_choose_parasite() {
-  if (today_infections_->empty()) {
+  if (today_infections_.empty()) {
     // already chose
     return;
   }
-  if (today_infections_->size() == 1) {
-    infected_by(today_infections_->at(0));
+  if (today_infections_.size() == 1) {
+    infected_by(today_infections_.at(0));
   } else {
-    const std::size_t index_random_parasite = Model::get_random()->random_uniform(today_infections_->size());
-    infected_by(today_infections_->at(index_random_parasite));
+    const std::size_t index_random_parasite = Model::get_random()->random_uniform(today_infections_.size());
+    infected_by(today_infections_.at(index_random_parasite));
   }
 
-  today_infections_->clear();
+  today_infections_.clear();
 }
 
 void Person::infected_by(const int& parasite_type_id) {
@@ -664,22 +649,22 @@ void Person::schedule_clinical_recurrence_event(
 
 
 void Person::randomly_choose_target_location() {
-  if (today_target_locations_->empty()) {
+  if (today_target_locations_.empty()) {
     // already chose
     return;
   }
 
   auto target_location { -1 };
-  if (today_target_locations_->size() == 1) {
-    target_location = today_target_locations_->at(0);
+  if (today_target_locations_.size() == 1) {
+    target_location = today_target_locations_.at(0);
   } else {
-    const int index_random_location = Model::get_random()->random_uniform(today_target_locations_->size());
-    target_location = today_target_locations_->at(index_random_location);
+    const int index_random_location = Model::get_random()->random_uniform(today_target_locations_.size());
+    target_location = today_target_locations_.at(index_random_location);
   }
 
   schedule_move_to_target_location_next_day_event(target_location);
 
-  today_target_locations_->clear();
+  today_target_locations_.clear();
 
 #ifdef ENABLE_TRAVEL_TRACKING
   // Update the day of the last initiated trip to the next day from current
@@ -714,8 +699,8 @@ void Person::schedule_move_to_target_location_next_day_event(const int& location
 }
 
 bool Person::has_return_to_residence_event() const {
-  for (auto event_pair : *events()) {
-    if (dynamic_cast<ReturnToResidenceEvent*>(event_pair.second) != nullptr) {
+  for (auto& [time, event] : event_queue) {
+    if (dynamic_cast<ReturnToResidenceEvent*>(event.get()) != nullptr) {
       return true;
     }
   }
@@ -723,9 +708,9 @@ bool Person::has_return_to_residence_event() const {
 }
 
 void Person::cancel_all_return_to_residence_events() const {
-  for (auto event_pair : *events()) {
-    if (dynamic_cast<ReturnToResidenceEvent*>(event_pair.second) != nullptr) {
-      event_pair.second->executable = false;
+  for (auto& [time, event] : event_queue) {
+    if (dynamic_cast<ReturnToResidenceEvent*>(event.get()) != nullptr) {
+      event->executable = false;
     }
   }
 }
@@ -800,16 +785,9 @@ bool Person::has_effective_drug_in_blood() const {
   return false;
 }
 
-void Person::move_to_population(Population* target_population) {
-  assert(population_ != target_population);
-
-  population_->remove_person(this);
-  target_population->add_person(this);
-}
-
 bool Person::has_birthday_event() const {
-  for (auto event_pair : *events()) {
-    if (dynamic_cast<BirthdayEvent*>(event_pair.second) != nullptr) {
+  for (auto& [time, event] : event_queue) {
+    if (dynamic_cast<BirthdayEvent*>(event.get()) != nullptr) {
       return true;
     }
   }
@@ -817,8 +795,8 @@ bool Person::has_birthday_event() const {
 }
 
 bool Person::has_update_by_having_drug_event() const {
-  for (auto event_pair : *events()) {
-    if (dynamic_cast<UpdateWhenDrugIsPresentEvent*>(event_pair.second) != nullptr) {
+  for (auto& [time, event] : event_queue) {
+    if (dynamic_cast<UpdateWhenDrugIsPresentEvent*>(event.get()) != nullptr) {
       return true;
     }
   }
@@ -864,21 +842,22 @@ void Person::update_events(int time) {
 
 void Person::execute_events(int time) {
   if(event_queue.empty()) return;
-  while (!event_queue.empty() && event_queue.top()->time <= time) {
-    auto *event = event_queue.top();
+
+  auto it = event_queue.begin();
+  while (it != event_queue.end() && it->first <= time) {
+    auto *event = it->second.get();
+
     try {
       if (event->executable) {
-        // if (Model::get_random()->random_uniform<double>(0,1) < 0.0001) {
-        //   spdlog::debug("Running event {} time {} of person {} {}", event->name(), time, get_id(), event->get_id());
-        // }
         event->perform_execute();
       }
     }
     catch (const std::exception& ex) {
-      spdlog::error("Error in event {} time {} of person {} {}", event->name(), time, get_id(), event->get_id());
+      spdlog::error("Error in event {} at time {}", event->name(), time);
       spdlog::error("Error: {}", ex.what());
     }
-    event_queue.pop();
+    // Erase and advance in one step (safe pattern)
+    it = event_queue.erase(it);
   }
 }
 
@@ -892,23 +871,17 @@ void Person::add_event(Event* event) {
     }
     ObjectHelpers::delete_pointer<Event>(event);
   } else {
-    event_queue.push(event);
-    add_dispatcher(event);
+    event_queue.insert(std::make_pair(event->time, std::unique_ptr<Event>(event)));
     event->scheduler = Model::get_scheduler();
     event->executable = true;
   }
 }
 
-void Person::remove_event(Event* event) {
-  std::vector<Event*> temp_events;
-  while (!event_queue.empty()) {
-    auto top_event = event_queue.top();
-    event_queue.pop();
-    if (top_event != event) {
-      temp_events.push_back(top_event);
-    }
-  }
-  for (const auto& e : temp_events) {
-    event_queue.push(e);
-  }
-}
+// void Person::remove_event(Event* event) {
+//   for (auto it = event_queue.begin(); it != event_queue.end(); ++it) {
+//     if (it->second.get() == event) {
+//       event_queue.erase(it);
+//       break;
+//     }
+//   }
+// }

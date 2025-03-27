@@ -17,11 +17,7 @@ public:
 
 private:
  // std::vector<Event*> *events_;
- std::map<uuids::uuid, Event*> *events_;
 public:
-  std::map<uuids::uuid, Event*> *events() const { return events_; }
-  void set_events(std::map<uuids::uuid, Event*> *value) { events_ = value; }
-
  public:
   Dispatcher();
 
@@ -30,13 +26,6 @@ public:
 
   virtual void initialize();
 
-  virtual void add_dispatcher(Event* event);
-
-  virtual void remove_dispatcher(Event* event);
-
-  virtual void clear_dispatcher_events();
-
-  virtual void update_dispatcher();
 
 };
 
