@@ -11,6 +11,8 @@ class Scheduler;
 
 class ClonalParasitePopulation;
 
+class Therapy;
+
 class ProgressToClinicalEvent : public Event {
 public:
   //disallow copy, assign and move
@@ -26,15 +28,24 @@ public:
   ClonalParasitePopulation* clinical_caused_parasite() { return clinical_caused_parasite_; }
   void set_clinical_caused_parasite(ClonalParasitePopulation* value) { clinical_caused_parasite_ = value; }
 
- public:
   ProgressToClinicalEvent();
 
   virtual ~ProgressToClinicalEvent();
 
-  static void schedule_event(Scheduler *scheduler, Person *p, ClonalParasitePopulation *clinical_caused_parasite,
+  static void schedule_event(Scheduler *scheduler, Person *person, ClonalParasitePopulation *clinical_caused_parasite,
                              const int &time);
 
-  static void receive_no_treatment_routine(Person *p);
+  // static void receive_no_treatment_routine(Person *p);
+
+  static bool should_receive_treatment(Person *person);
+
+  static void handle_no_treatment(Person *person);
+
+  static std::pair<Therapy *, bool> determine_therapy(Person *person, bool is_recurrence=false);
+
+  void transition_to_clinical_state(Person *person);
+  
+  void apply_therapy(Person *person, Therapy *therapy, bool is_public_sector = true);
 
   std::string name() override {
     return "ProgressToClinicalEvent";

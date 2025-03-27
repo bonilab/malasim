@@ -714,6 +714,8 @@ therapy_parameters:
       therapy_ids: [0,0]
       regimen: [1,7]
 
+recurrence_therapy_id: 7
+
 # ---------------------------------------------------------------
 # 13. Treatment Strategy Parameters
 # ---------------------------------------------------------------

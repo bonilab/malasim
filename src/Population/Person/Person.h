@@ -38,6 +38,13 @@ class Person :  public PersonIndexAllHandler,
   Person& operator=(Person&&) = delete;
 
 public:
+  enum RecurrenceStatus {
+    NONE = 0,
+    WITHOUT_SYMPTOM = 1,
+    WITH_SYMPTOM = 2
+  };
+
+
   enum Property {
     LOCATION = 0,
     HOST_STATE,
@@ -86,6 +93,8 @@ private:
   SingleHostClonalParasitePopulations *all_clonal_parasite_populations_{};
   DrugsInBlood *drugs_in_blood_{};
   Genotype *liver_parasite_type_{};
+  int latest_time_received_public_treatment_{-1};
+  RecurrenceStatus recurrence_status_{RecurrenceStatus::NONE};
 #ifdef ENABLE_TRAVEL_TRACKING
   int day_that_last_trip_was_initiated_{-1};
   int day_that_last_trip_outside_district_was_initiated_{-1};
@@ -184,6 +193,12 @@ public:
     double get_current_relative_biting_rate() const { return current_relative_biting_rate_; }
     void set_current_relative_biting_rate(double current_relative_biting_rate) { current_relative_biting_rate_ = current_relative_biting_rate; }
 
+    int get_latest_time_received_public_treatment() const { return latest_time_received_public_treatment_; }
+    void set_latest_time_received_public_treatment(int latest_time_received_public_treatment) { latest_time_received_public_treatment_ = latest_time_received_public_treatment; }
+
+    RecurrenceStatus get_recurrence_status() const { return recurrence_status_; }
+    void set_recurrence_status(RecurrenceStatus recurrence_status) { recurrence_status_ = recurrence_status; }
+
     void update_relative_bitting_rate();
 
     void NotifyChange(const Property &property, const void *oldValue, const void *newValue);
@@ -222,7 +237,7 @@ public:
   int complied_dosing_days(const int &dosing_day) const;
 
   void receive_therapy(Therapy *therapy, ClonalParasitePopulation *clinical_caused_parasite,
-                       bool is_part_of_MAC_therapy = false);
+                       bool is_part_of_MAC_therapy = false, bool is_public_sector = true);
 
   void add_drug_to_blood(DrugType *dt, const int &dosing_days, bool is_part_of_MAC_therapy = false);
 
@@ -235,9 +250,7 @@ public:
 
   void schedule_end_clinical_event(ClonalParasitePopulation *clinical_caused_parasite);
 
-  void schedule_end_clinical_by_no_treatment_event(ClonalParasitePopulation *clinical_caused_parasite);
-
-  void schedule_relapse_event(ClonalParasitePopulation *clinical_caused_parasite, const int &time_until_relapse);
+  void schedule_clinical_recurrence_event(ClonalParasitePopulation *clinical_caused_parasite);
 
   // void schedule_move_parasite_to_blood(Genotype *genotype, const int &time);
   //
@@ -245,9 +258,11 @@ public:
 
   void change_state_when_no_parasite_in_blood();
 
-  void determine_relapse_or_not(ClonalParasitePopulation *clinical_caused_parasite);
+  void determine_symptomatic_recrudescence(
+      ClonalParasitePopulation* clinical_caused_parasite);
 
-  void determine_clinical_or_not(ClonalParasitePopulation *clinical_caused_parasite);
+  void determine_clinical_or_not(
+      ClonalParasitePopulation* clinical_caused_parasite);
 
   void update_current_state();
 

@@ -680,6 +680,12 @@ public:
     void set_monthly_number_of_new_infections_by_location(const IntVector& value) { monthly_number_of_new_infections_by_location_ = value; }
 
 private:
+    IntVector monthly_number_of_recrudescence_treatment_by_location_;
+public:
+    IntVector& monthly_number_of_recrudescence_treatment_by_location() { return monthly_number_of_recrudescence_treatment_by_location_; }
+    void set_monthly_number_of_recrudescence_treatment_by_location(const IntVector& value) { monthly_number_of_recrudescence_treatment_by_location_ = value; }
+
+private:
     IntVector monthly_number_of_clinical_episode_by_location_;
 public:
     IntVector& monthly_number_of_clinical_episode_by_location() { return monthly_number_of_clinical_episode_by_location_; }
@@ -848,6 +854,13 @@ public:
   void record_1_TF(const int& location, const bool& by_drug);
 
   void record_1_treatment(const int& location, const int& age, const int& age_class, const int& therapy_id);
+
+  // Record that one treatment has been given
+  void record_1_recrudescence_treatment(const int &location,
+                                        const int &age,
+                                        const int &age_class,
+                                        const int &therapy_id);
+
 
   void record_1_non_treated_case(const int& location,  const int& age, const int& age_class);
 

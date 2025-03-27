@@ -14,16 +14,15 @@ UpdateWhenDrugIsPresentEvent::UpdateWhenDrugIsPresentEvent() : clinical_caused_p
 
 UpdateWhenDrugIsPresentEvent::~UpdateWhenDrugIsPresentEvent() = default;
 
-void UpdateWhenDrugIsPresentEvent::schedule_event(Scheduler *scheduler, Person *p,
+void UpdateWhenDrugIsPresentEvent::schedule_event(Scheduler *scheduler, Person *person,
                                                   ClonalParasitePopulation *clinical_caused_parasite, const int &time) {
   if (scheduler!=nullptr) {
 
-    auto *e = new UpdateWhenDrugIsPresentEvent();
-    e->dispatcher = p;
-    e->set_clinical_caused_parasite(clinical_caused_parasite);
-    e->time = time;
-    p->add_event(e);
-    //scheduler->schedule_individual_event(e);
+    auto *event = new UpdateWhenDrugIsPresentEvent();
+    event->dispatcher = person;
+    event->set_clinical_caused_parasite(clinical_caused_parasite);
+    event->time = time;
+    person->add_event(event);
   }
 }
 
@@ -40,15 +39,9 @@ void UpdateWhenDrugIsPresentEvent::execute() {
     }
     person->schedule_update_by_drug_event(clinical_caused_parasite_);
   } else {
-    //        no drug in blood, reset the status of drug Update parasite
-    // the drug update parasite is inserted into blood when  there is still drug in blood and also the clinical cause parasite
-
     for (auto i = 0; i < person->get_all_clonal_parasite_populations()->size(); i++) {
       const auto blood_parasite = person->get_all_clonal_parasite_populations()->parasites()->at(i);
       if (blood_parasite->update_function()==Model::get_instance().having_drug_update_function()) {
-        //Prevent parasite density fall back to asymptomatic level early when day for parasite cleared by mono drug less than day of clinical ended.
-        //This makes parasite density fall back to asymptomatic level after clinical ended.
-//        person->determine_relapse_or_not(blood_parasite);
         blood_parasite->set_update_function(Model::get_instance().immunity_clearance_update_function());
       }
     }

@@ -268,6 +268,7 @@ void ModelDataCollector::initialize() {
     today_number_of_treatments_by_therapy_ = IntVector(Model::get_config()->get_therapy_parameters().therapy_db.size(), 0);
 
     monthly_number_of_treatment_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
+    monthly_number_of_recrudescence_treatment_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
     monthly_number_of_TF_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
     monthly_number_of_new_infections_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
     monthly_number_of_clinical_episode_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
@@ -739,6 +740,14 @@ void ModelDataCollector::record_1_treatment(const int& location, const int& age,
   monthly_number_of_treatment_by_location_therapy_[location][therapy_id] += 1;
 }
 
+void ModelDataCollector::record_1_recrudescence_treatment(const int &location,
+                                                          const int &age,
+                                                          const int &age_class,
+                                                          const int &therapy_id) {
+  if (!recording) { return; }
+  monthly_number_of_recrudescence_treatment_by_location_[location] += 1;
+}
+
 void ModelDataCollector::record_1_mutation(const int& location, Genotype* from, Genotype* to) {
   if (Model::get_scheduler()->current_time() >= Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) {
     cumulative_mutants_by_location_[location] += 1;
@@ -987,6 +996,7 @@ void ModelDataCollector::monthly_update() {
 
   if (Model::get_scheduler()->current_time() > Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) {
     zero_fill(monthly_number_of_treatment_by_location_);
+    zero_fill(monthly_number_of_recrudescence_treatment_by_location_);
     zero_fill(monthly_number_of_new_infections_by_location_);
     zero_fill(monthly_number_of_clinical_episode_by_location_);
     zero_fill(monthly_nontreatment_by_location_);
