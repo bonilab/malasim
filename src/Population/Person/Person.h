@@ -57,9 +57,6 @@ public:
 
   enum HostStates { SUSCEPTIBLE = 0, EXPOSED = 1, ASYMPTOMATIC = 2, CLINICAL = 3, DEAD = 4, NUMBER_OF_STATE = 5 };
 
-  // sorted by time
-  std::multimap<int, std::unique_ptr<Event>> event_queue;
-
   Person();
 
   ~Person();
@@ -99,8 +96,6 @@ public:
 public:
     void initialize();
 
-    // // Method to run events before a certain time
-    void execute_events(int time);
 
     // Method to add an event
     void add_event(Event* event);
@@ -111,6 +106,9 @@ public:
     void increase_age_by_1_year();
 
     void update();
+    // Method to run events before a certain time
+    // void execute_events(int time);
+    // TODO: consider to rename this method to "execute_events_at_time"
     void update_events(int time);
     
     Population* get_population() const { return population_; }
@@ -214,8 +212,6 @@ public:
 
   void cancel_all_other_progress_to_clinical_events_except(Event *event) const;
 
-  void cancel_all_events_except(Event *event) const;
-
   void change_all_parasite_update_function(ParasiteDensityUpdateFunction *from,
                                            ParasiteDensityUpdateFunction *to) const;
 
@@ -300,16 +296,6 @@ public:
   double age_in_floating() const;
 
   void schedule_update_every_K_days_event(const int &time);
-  // Check to see if the indicated event has been defined for the individual.
-  template <typename T>
-  bool has_event() const {
-    for (auto& [time, event] : event_queue) {
-      if (dynamic_cast<T*>(event.get()) != nullptr) {
-        return true;
-      }
-    }
-    return false;
-  }
 
 };
 

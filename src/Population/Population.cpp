@@ -680,6 +680,7 @@ void Population::update_all_individuals() {
   }
 }
 
+// TODO: it should be called "execute_all_individual_events" for an input time
 void Population::update_all_individual_events() {
   auto all_persons_index = get_person_index<PersonIndexAll>();
   for (auto* person : all_persons_index->vPerson()) {

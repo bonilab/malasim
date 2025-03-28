@@ -24,6 +24,7 @@ public:
     Event();
     virtual ~Event();
 
+    // TODO: consider to remove these two pointers
     Scheduler* scheduler;
     Dispatcher* dispatcher{nullptr};
     void perform_execute();

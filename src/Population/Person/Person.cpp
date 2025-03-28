@@ -58,8 +58,7 @@ Person::~Person() {
 
 void Person::initialize() {
   Dispatcher::initialize();
-  event_queue = std::multimap<int, std::unique_ptr<Event>>();
-
+  
   immune_system_ = std::make_unique<ImmuneSystem>(this);
 
   all_clonal_parasite_populations_ = std::make_unique<SingleHostClonalParasitePopulations>(this);
@@ -180,21 +179,7 @@ double Person::get_probability_progress_to_clinical() {
 }
 
 void Person::cancel_all_other_progress_to_clinical_events_except(Event* inEvent) const {
-  for (auto& [time, event] : event_queue) {
-    if (event.get() != inEvent && dynamic_cast<ProgressToClinicalEvent*>(event.get()) != nullptr) {
-      //            std::cout << "Hello"<< std::endl;
-      event->executable = false;
-    }
-  }
-}
-
-void Person::cancel_all_events_except(Event* inEvent) const {
-  for (auto& [time, event] : event_queue) {
-    if (event.get() != inEvent) {
-      //            e->set_dispatcher(nullptr);
-      event->executable = false;
-    }
-  }
+  cancel_all_events_except<ProgressToClinicalEvent>(inEvent);
 }
 
 void Person::change_all_parasite_update_function(ParasiteDensityUpdateFunction* from,
@@ -481,7 +466,7 @@ void Person::determine_symptomatic_recrudescence(ClonalParasitePopulation* clini
 
     this->recurrence_status_ = Person::RecurrenceStatus::WITH_SYMPTOM;
     // mark the test treatment failure event as a failure
-    for (auto& [time, event] : event_queue) {
+    for (auto& [time, event] : get_events()) {
       auto* tf_event = dynamic_cast<TestTreatmentFailureEvent*>(event.get());
       if (tf_event != nullptr
           && tf_event->clinical_caused_parasite() == clinical_caused_parasite) {
@@ -699,20 +684,11 @@ void Person::schedule_move_to_target_location_next_day_event(const int& location
 }
 
 bool Person::has_return_to_residence_event() const {
-  for (auto& [time, event] : event_queue) {
-    if (dynamic_cast<ReturnToResidenceEvent*>(event.get()) != nullptr) {
-      return true;
-    }
-  }
-  return false;
+  return has_event<ReturnToResidenceEvent>();
 }
 
 void Person::cancel_all_return_to_residence_events() const {
-  for (auto& [time, event] : event_queue) {
-    if (dynamic_cast<ReturnToResidenceEvent*>(event.get()) != nullptr) {
-      event->executable = false;
-    }
-  }
+  cancel_all_events<ReturnToResidenceEvent>();
 }
 
 bool Person::has_detectable_parasite() const {
@@ -786,21 +762,11 @@ bool Person::has_effective_drug_in_blood() const {
 }
 
 bool Person::has_birthday_event() const {
-  for (auto& [time, event] : event_queue) {
-    if (dynamic_cast<BirthdayEvent*>(event.get()) != nullptr) {
-      return true;
-    }
-  }
-  return false;
+  return has_event<BirthdayEvent>();
 }
 
 bool Person::has_update_by_having_drug_event() const {
-  for (auto& [time, event] : event_queue) {
-    if (dynamic_cast<UpdateWhenDrugIsPresentEvent*>(event.get()) != nullptr) {
-      return true;
-    }
-  }
-  return false;
+  return has_event<UpdateWhenDrugIsPresentEvent>();
 }
 
 double Person::p_infection_from_an_infectious_bite() const {
@@ -836,30 +802,10 @@ void Person::increase_age_by_1_year() {
 }
 
 void Person::update_events(int time) {
-  //Update all person attributes before execute events
+  // call execute_events of dispatcher
   execute_events(time);
 }
 
-void Person::execute_events(int time) {
-  if(event_queue.empty()) return;
-
-  auto it = event_queue.begin();
-  while (it != event_queue.end() && it->first <= time) {
-    auto *event = it->second.get();
-
-    try {
-      if (event->executable) {
-        event->perform_execute();
-      }
-    }
-    catch (const std::exception& ex) {
-      spdlog::error("Error in event {} at time {}", event->name(), time);
-      spdlog::error("Error: {}", ex.what());
-    }
-    // Erase and advance in one step (safe pattern)
-    it = event_queue.erase(it);
-  }
-}
 
 void Person::add_event(Event* event) {
   if (event->time > Model::get_config()->get_simulation_timeframe().get_total_time() || event->time < Model::get_scheduler()->current_time_) {
@@ -871,9 +817,9 @@ void Person::add_event(Event* event) {
     }
     ObjectHelpers::delete_pointer<Event>(event);
   } else {
-    event_queue.insert(std::make_pair(event->time, std::unique_ptr<Event>(event)));
-    event->scheduler = Model::get_scheduler();
-    event->executable = true;
+
+    // schedule and transfer ownership of the event to the dispatcher
+    schedule_event(event);
   }
 }
 
