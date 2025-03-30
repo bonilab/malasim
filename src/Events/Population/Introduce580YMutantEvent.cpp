@@ -35,7 +35,7 @@ void Introduce580YMutantEvent::execute() {
   for (int j = 0; j < Model::get_config()->number_of_age_classes(); ++j) {
     for (Person* p :  pi->vPerson()[0][Person::ASYMPTOMATIC][j]) {
       total_population_count += p->get_all_clonal_parasite_populations()->size();
-      for (ClonalParasitePopulation* pp : *p->get_all_clonal_parasite_populations()->parasites()) {
+      for (auto& pp : p->get_all_clonal_parasite_populations()->parasites()) {
 //        if (pp->genotype()->aa_structure()[2] == 1) {
 //          current_580Y_fraction++;
 //        }
@@ -72,7 +72,7 @@ void Introduce580YMutantEvent::execute() {
       }
 
       //mutate all clonal populations
-      for (auto* pp : *(p->get_all_clonal_parasite_populations()->parasites())) {
+      for (auto& pp : p->get_all_clonal_parasite_populations()->parasites()) {
         auto* old_genotype = pp->genotype();
         auto* new_genotype = old_genotype->modify_genotype_allele(alleles_,Model::get_config());
         pp->set_genotype(new_genotype);

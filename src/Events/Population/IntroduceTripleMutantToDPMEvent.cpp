@@ -44,7 +44,7 @@ void IntroduceTrippleMutantToDPMEvent::execute() {
 
       // get random parasite population
       //mutate all
-      for (auto* pp : *(p->get_all_clonal_parasite_populations()->parasites())) {
+      for (auto& pp : p->get_all_clonal_parasite_populations()->parasites()) {
         // TODO: rework on this
         auto* old_genotype = pp->genotype();
         auto* new_genotype = old_genotype->modify_genotype_allele(alleles_,Model::get_config());

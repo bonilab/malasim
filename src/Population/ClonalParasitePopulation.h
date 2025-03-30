@@ -26,7 +26,7 @@ private:
   ParasiteDensityUpdateFunction *update_function_;
 
  public:
-  static const double LOG_ZERO_PARASITE_DENSITY;
+  static constexpr double LOG_ZERO_PARASITE_DENSITY = -1000;
 
   [[nodiscard]] double last_update_log10_parasite_density() const;
   void set_last_update_log10_parasite_density(const double &value);

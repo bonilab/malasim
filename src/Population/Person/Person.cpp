@@ -521,12 +521,15 @@ void Person::determine_clinical_or_not(ClonalParasitePopulation* clinical_caused
 }
 
 void Person::update() {
-  // std::cout << "Person Update " << get_id() << std::endl;
-  // already update
-  assert(host_state_ != DEAD);
+  if (host_state_ == DEAD) {
+    // throw an error
+    spdlog::error("Person::update: Person is dead");
+    throw std::runtime_error("Person is dead");
+  }
 
   if (latest_update_time_ == Model::get_scheduler()->current_time()) return;
 
+  // update parasites by immune system
   //    std::cout << "ppu"<< std::endl;
   // update the density of each blood parasite in parasite population
   // parasite will be killed by immune system

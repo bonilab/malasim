@@ -919,7 +919,7 @@ void ModelDataCollector::record_AMU_AFU(
             auto found_amu = false;
             auto found_afu = false;
             for (auto j = 0ul; j < parasite_population_size; j++) {
-              ClonalParasitePopulation* bp = person->get_all_clonal_parasite_populations()->parasites()->at(j);
+              ClonalParasitePopulation* bp = person->get_all_clonal_parasite_populations()->parasites()[j].get();
               if (bp->resist_to(drug_id) && !bp->resist_to(art_id)) {
                 found_amu = true;
                 AMU_per_parasite_pop_ +=

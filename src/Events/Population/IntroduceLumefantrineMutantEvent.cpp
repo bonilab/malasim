@@ -45,7 +45,7 @@ void IntroduceLumefantrineMutantEvent::execute() {
                           - pi->vPerson()[0][Person::ASYMPTOMATIC][j].size()];
       }
 
-      for (auto* pp : *(p->get_all_clonal_parasite_populations()->parasites())) {
+      for (auto& pp : p->get_all_clonal_parasite_populations()->parasites()) {
         auto* old_genotype = pp->genotype();
         auto* new_genotype = old_genotype->modify_genotype_allele(alleles_,Model::get_config());
         pp->set_genotype(new_genotype);

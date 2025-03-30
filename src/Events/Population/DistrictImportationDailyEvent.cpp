@@ -91,8 +91,7 @@ void DistrictImportationDailyEvent::execute() {
       auto* person = pi->vPerson()[location][hs][ac][index];
 
       // Mutate all the clonal populations the individual is carrying
-      for (auto* pp :
-           *(person->get_all_clonal_parasite_populations()->parasites())) {
+      for (auto& pp : person->get_all_clonal_parasite_populations()->parasites()) {
         auto* old_genotype = pp->genotype();
         auto* new_genotype =
             old_genotype->modify_genotype_allele(alleles_, Model::get_config());

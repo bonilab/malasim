@@ -2,6 +2,7 @@
 #define SINGLEHOSTCLONALPARASITEPOPULATIONS_H
 
 #include <vector>
+#include <memory>
 
 #include "Utils/TypeDef.hxx"
 #include "Population/ClonalParasitePopulation.h"
@@ -23,45 +24,46 @@ class SingleHostClonalParasitePopulations {
   void operator=(const SingleHostClonalParasitePopulations &) = delete;
 
 private:
-  Person* person_;
-  std::vector<ClonalParasitePopulation*>* parasites_;
+  Person* person_{nullptr};
+  std::vector<std::unique_ptr<ClonalParasitePopulation>> parasites_;
 
 public:
-  // this value will be automatically updated daily in the function clear_cured_parasites
-  // in order to have accurate sum of all density
-  double log10_total_infectious_denstiy{ClonalParasitePopulation::LOG_ZERO_PARASITE_DENSITY};
+  // Use constexpr for compile-time constant
+  static constexpr double DEFAULT_LOG_DENSITY = ClonalParasitePopulation::LOG_ZERO_PARASITE_DENSITY;
+  double log10_total_infectious_denstiy{DEFAULT_LOG_DENSITY};
 
-  [[nodiscard]] double log10_total_infectious_density() const {
+  // Use [[nodiscard]] consistently and reference member functions that don't modify state as const
+  [[nodiscard]] double log10_total_infectious_density() const noexcept {
     return log10_total_infectious_denstiy;
   }
-  void set_log10_total_infectious_density(const double &value) {
+
+  void set_log10_total_infectious_density(double value) noexcept {  // Pass by value for primitives
     log10_total_infectious_denstiy = value;
   }
 
-  [[nodiscard]] Person* person() const {
+  [[nodiscard]] Person* person() const noexcept {
     return person_;
   }
-  void set_person(Person* value) {
+
+  void set_person(Person* value) noexcept {
     person_ = value;
   }
 
-  [[nodiscard]] std::vector<ClonalParasitePopulation*>* parasites() const {
+  [[nodiscard]] const std::vector<std::unique_ptr<ClonalParasitePopulation>>& parasites() const {
     return parasites_;
   }
 
-  void set_parasites(std::vector<ClonalParasitePopulation*>* value) {
-    parasites_ = value;
-  }
-
 public:
-  SingleHostClonalParasitePopulations(Person *person = nullptr);
-
-  //    ParasitePopulation(const ParasitePopulation& orig);
+  // Use explicit for single-parameter constructors
+  explicit SingleHostClonalParasitePopulations(Person* person = nullptr);
+  
+  // Mark destructor as default if it doesn't need special handling
   virtual ~SingleHostClonalParasitePopulations();
 
-  void init();
+  // Mark virtual functions that are meant to be overridden with override in derived classes
+  [[nodiscard]] virtual int size() const noexcept;  // Add const if not modifying state
 
-  virtual int size();
+  void init();
 
   virtual void add(ClonalParasitePopulation *blood_parasite);
 

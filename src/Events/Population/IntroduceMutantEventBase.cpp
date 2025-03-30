@@ -25,8 +25,7 @@ double IntroduceMutantEventBase::calculate(std::vector<int> &locations) const {
         for (auto &person : pi->vPerson()[location][hs][ac]) {
           parasite_population_count +=
               person->get_all_clonal_parasite_populations()->size();
-          for (auto &pp :
-               *person->get_all_clonal_parasite_populations()->parasites()) {
+          for (auto &pp : person->get_all_clonal_parasite_populations()->parasites()) {
               auto chromosome_strings = StringHelpers::split<char>(pp->genotype()->get_aa_sequence(),'|',false);
               // spdlog::info(StringHelpers::join(chromosome_strings,"#"));
             for (auto &allele_info : alleles_) {
@@ -94,8 +93,7 @@ int IntroduceMutantEventBase::mutate(std::vector<int> &locations,
         }
 
         // Mutate all the clonal populations the individual is carrying
-        for (auto* pp :
-             *(person->get_all_clonal_parasite_populations()->parasites())) {
+        for (auto& pp : person->get_all_clonal_parasite_populations()->parasites()) {
           auto* old_genotype = pp->genotype();
           auto* new_genotype =
               old_genotype->modify_genotype_allele(alleles_, Model::get_config());

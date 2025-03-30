@@ -79,24 +79,24 @@ void CellularReporter::monthly_report() {
     for (std::size_t ac = 0; ac < index->vPerson()[0][0].size(); ac++) {
       auto age_class = index->vPerson()[0][hs][ac];
       for (auto& person : age_class) {
-        auto parasites = person->get_all_clonal_parasite_populations()->parasites();
+        auto& parasites = person->get_all_clonal_parasite_populations()->parasites();
         population++;
 
-        if (parasites->size() == 0) continue;
+        if (parasites.size() == 0) continue;
 
         infectedIndividuals++;
 
-        for (auto& parasite_population : *parasites) {
+        for (auto& parasite_population : parasites) {
           parasiteClones++;
 
           if (parasite_population->genotype()->get_aa_sequence()[2] == 1) {
             _580yCount++;
-            _580yWeighted += (1.0 / static_cast<double>(parasites->size()));
+            _580yWeighted += (1.0 / static_cast<double>(parasites.size()));
           }
 
           if (parasite_population->genotype()->get_aa_sequence()[3] == 1) {
             plasmepsinDoubleCopy++;
-            plasmepsinDoubleCopyWeighted += (1.0 / static_cast<double>(parasites->size()));
+            plasmepsinDoubleCopyWeighted += (1.0 / static_cast<double>(parasites.size()));
           }
         }
       }
