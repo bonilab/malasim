@@ -20,37 +20,33 @@ class DrugsInBlood {
   DrugsInBlood& operator=(const DrugsInBlood&&) = delete;
 
  private:
- Person *person_{nullptr};
- DrugUniquePtrMap drugs_{};
+  Person *person_{nullptr};
+  DrugUniquePtrMap drugs_{};
 
  public:
- Person *person() const {
-   return person_;
- }
- void set_person(Person *value) {
-   person_ = value;
- }
+  // Iterator type definitions for proxy access
+  using iterator = DrugUniquePtrMap::iterator;
+  using const_iterator = DrugUniquePtrMap::const_iterator;
 
- // Getter for drugs map
- const DrugUniquePtrMap& get_drugs() const {
-   return drugs_;
- }
+  // Iterator proxy methods
+  iterator begin() { return drugs_.begin(); }
+  iterator end() { return drugs_.end(); }
+  const_iterator begin() const { return drugs_.begin(); }
+  const_iterator end() const { return drugs_.end(); }
+  const_iterator cbegin() const { return drugs_.cbegin(); }
+  const_iterator cend() const { return drugs_.cend(); }
 
-//  // Add a single drug to the map
-//  void add_drug_to_map(int drug_id, Drug* drug) {
-//    drugs_[drug_id] = std::unique_ptr<Drug>(drug);
-//  }
+  // Map-like proxy methods
+  Drug* at(const int& key) const { return drugs_.at(key).get(); }
+  bool contains(const int& key) const { return drugs_.find(key) != drugs_.end(); }
+  
+  Person *person() const {
+    return person_;
+  }
+  void set_person(Person *value) {
+    person_ = value;
+  }
 
-//  // Remove a single drug from the map
-//  void remove_drug_from_map(int drug_id) {
-//    drugs_.erase(drug_id);
-//  }
-
-//  // Get a specific drug by ID
-//  Drug* get_drug_from_map(int drug_id) const {
-//    auto it = drugs_.find(drug_id);
-//    return it != drugs_.end() ? it->second.get() : nullptr;
-//  }
 
  public:
   explicit DrugsInBlood(Person *person = nullptr);
@@ -62,23 +58,13 @@ class DrugsInBlood {
 
   Drug *add_drug(Drug *drug);
 
-  bool is_drug_in_blood(DrugType *drug_type) const;
-
-  bool is_drug_in_blood(int drug_type_id) const;
-
-  void remove_drug(Drug *drug);
-
-  void remove_drug(const int &drug_type_id);
-
-  Drug *get_drug(const int &type_id) const;
-
   std::size_t size() const;
 
   void clear();
 
   void update();
 
-  void clear_cut_off_drugs_by_event(Event *event);
+  void clear_cut_off_drugs();
 
 };
 

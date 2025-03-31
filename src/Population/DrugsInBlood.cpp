@@ -24,51 +24,23 @@ DrugsInBlood::~DrugsInBlood() {
 
 Drug *DrugsInBlood::add_drug(Drug *drug) {
   int typeID = drug->drug_type()->id();
-  if (!is_drug_in_blood(typeID)) {
+  if (!contains(typeID)) {
     drug->set_person_drugs(this);
-    drugs_.insert(std::pair<int, Drug *>(typeID, drug));
-
+    drugs_.insert(std::pair<int, std::unique_ptr<Drug>>(typeID, std::unique_ptr<Drug>(drug)));
   } else {
     //already have it
-    drugs_.at(typeID)->set_starting_value(drug->starting_value());
-    drugs_.at(typeID)->set_dosing_days(drug->dosing_days());
-    drugs_.at(typeID)->set_last_update_value(drug->last_update_value());
-    drugs_.at(typeID)->set_last_update_time(drug->last_update_time());
-    drugs_.at(typeID)->set_start_time(drug->start_time());
-    drugs_.at(typeID)->set_end_time(drug->end_time());
+    Drug* existing_drug = at(typeID);
+    existing_drug->set_starting_value(drug->starting_value());
+    existing_drug->set_dosing_days(drug->dosing_days());
+    existing_drug->set_last_update_value(drug->last_update_value());
+    existing_drug->set_last_update_time(drug->last_update_time());
+    existing_drug->set_start_time(drug->start_time());
+    existing_drug->set_end_time(drug->end_time());
 
     delete drug;
   }
 
-  return drugs_.at(typeID).get();
-
-}
-
-bool DrugsInBlood::is_drug_in_blood(DrugType *drug_type) const {
-  return is_drug_in_blood(drug_type->id());
-}
-
-bool DrugsInBlood::is_drug_in_blood(const int drugTypeID) const {
-  return drugs_.find(drugTypeID)!=drugs_.end();
-}
-
-void DrugsInBlood::remove_drug(Drug *drug) {
-  remove_drug(drug->drug_type()->id());
-}
-
-void DrugsInBlood::remove_drug(const int &drug_type_id) {
-  auto it = drugs_.find(drug_type_id);
-  if (it==drugs_.end()) {
-    throw std::invalid_argument("Cannot remove drug, drug not found");
-  }
-  drugs_.erase(it);
-}
-
-Drug *DrugsInBlood::get_drug(const int &type_id) const {
-  if (!is_drug_in_blood(type_id))
-    return nullptr;
-
-  return drugs_.at(type_id).get();
+  return at(typeID);
 }
 
 std::size_t DrugsInBlood::size() const {
@@ -77,21 +49,18 @@ std::size_t DrugsInBlood::size() const {
 
 void DrugsInBlood::clear() {
   if (drugs_.empty()) return;
-  // simply clear the map, the unique_ptr will be deleted automatically
   drugs_.clear();
 }
 
 void DrugsInBlood::update() {
-  for (auto &drug : drugs_) {
+  for (auto& drug : *this) {
     drug.second->update();
   }
 }
 
-void DrugsInBlood::clear_cut_off_drugs_by_event(Event *event) {
+void DrugsInBlood::clear_cut_off_drugs() {
   if (!drugs_.empty()) {
-    for (auto pos = drugs_.begin(); pos!=drugs_.end();) {
-      //if (pos->second->lastUpdateValue <= 0.1) {
-      //Cut off at 10%
+    for (auto pos = drugs_.begin(); pos != drugs_.end();) {
       if (pos->second->last_update_value() <= DRUG_CUT_OFF_VALUE) {
         drugs_.erase(pos++);
       } else {

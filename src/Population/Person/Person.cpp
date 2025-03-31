@@ -335,9 +335,9 @@ void Person::add_drug_to_blood(DrugType* dt, const int& dosing_days, bool is_par
   // If this is going to be part of a complex therapy regime then we need to
   // note this initial drug level
   if (is_part_of_MAC_therapy) {
-    if (drugs_in_blood_->get_drugs().find(dt->id()) != drugs_in_blood_->get_drugs().end()) {
+    if (drugs_in_blood_->contains(dt->id())) {
       // Long half-life drugs are already present in the blood
-      drug_level = drugs_in_blood_->get_drug(dt->id())->starting_value();
+      drug_level = drugs_in_blood_->at(dt->id())->starting_value();
     } else if (starting_drug_values_for_MAC_.find(dt->id()) != starting_drug_values_for_MAC_.end()) {
       // Short half-life drugs that were taken, but cleared the blood already
       drug_level = starting_drug_values_for_MAC_[dt->id()];
@@ -349,8 +349,8 @@ void Person::add_drug_to_blood(DrugType* dt, const int& dosing_days, bool is_par
   // Set the starting level for this course of treatment
   drug->set_starting_value(drug_level);
 
-  if (drugs_in_blood_->is_drug_in_blood(dt)) {
-    drug->set_last_update_value(drugs_in_blood_->get_drug(dt->id())->last_update_value());
+  if (drugs_in_blood_->contains(dt->id())) {
+    drug->set_last_update_value(drugs_in_blood_->at(dt->id())->last_update_value());
   } else {
     drug->set_last_update_value(0.0);
   }
@@ -563,7 +563,7 @@ void Person::update_relative_biting_rate() {
 
 void Person::update_current_state() {
   // clear drugs <=0.1
-  drugs_in_blood_->clear_cut_off_drugs_by_event(nullptr);
+  drugs_in_blood_->clear_cut_off_drugs();
   // clear cured parasite
   all_clonal_parasite_populations_->clear_cured_parasites(Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured());
 
@@ -759,7 +759,7 @@ double Person::prob_present_at_mda() {
 }
 
 bool Person::has_effective_drug_in_blood() const {
-  for (const auto& kv_drug : drugs_in_blood_->get_drugs()) {
+  for (const auto& kv_drug : *drugs_in_blood_) {
     if (kv_drug.second->last_update_value() > 0.5) return true;
   }
   return false;

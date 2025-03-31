@@ -120,7 +120,7 @@ void SingleHostClonalParasitePopulations::update_by_drugs(DrugsInBlood* drugs_in
     auto* new_genotype = blood_parasite->genotype();
 
     double percent_parasite_remove = 0;
-    for (auto& [drug_id, drug] : drugs_in_blood->get_drugs()) {
+    for (auto& [drug_id, drug] : *drugs_in_blood) {
       // select all locus
       // remember to use mask to turn on and off mutation location
       // for a specific time
