@@ -17,9 +17,7 @@
 #include "Mosquito/Mosquito.h"
 
 SingleHostClonalParasitePopulations::SingleHostClonalParasitePopulations(Person* person)
-    : person_(person),
-      parasites_(std::vector<std::unique_ptr<ClonalParasitePopulation>>()),
-      log10_total_infectious_denstiy(ClonalParasitePopulation::LOG_ZERO_PARASITE_DENSITY) {}
+    : person_(person) {}
 
 void SingleHostClonalParasitePopulations::init() {
   parasites_.clear();

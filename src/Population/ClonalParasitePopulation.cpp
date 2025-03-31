@@ -11,12 +11,7 @@
 
 
 ClonalParasitePopulation::ClonalParasitePopulation(Genotype *genotype)
-    : last_update_log10_parasite_density_(LOG_ZERO_PARASITE_DENSITY),
-      gametocyte_level_(0.0),
-      first_date_in_blood_(-1),
-      parasite_population_(nullptr),
-      genotype_(genotype),
-      update_function_(nullptr) {}
+    : genotype_(genotype) {}
 
 ClonalParasitePopulation::~ClonalParasitePopulation() = default;
 
@@ -27,7 +22,6 @@ double ClonalParasitePopulation::get_current_parasite_density(const int &current
   }
 
   if (update_function_ == nullptr) {
-    //        std::cout << "hello" << std::endl;
     return last_update_log10_parasite_density_;
   }
 
@@ -40,34 +34,6 @@ double ClonalParasitePopulation::get_log10_infectious_density() const {
     return LOG_ZERO_PARASITE_DENSITY;
 
   return last_update_log10_parasite_density_ + log10(gametocyte_level_);
-}
-
-double ClonalParasitePopulation::last_update_log10_parasite_density() const {
-  return last_update_log10_parasite_density_;
-}
-
-void ClonalParasitePopulation::set_last_update_log10_parasite_density(const double &value) {
-  last_update_log10_parasite_density_ = value;
-}
-
-double ClonalParasitePopulation::gametocyte_level() const {
-  return gametocyte_level_;
-}
-
-void ClonalParasitePopulation::set_gametocyte_level(const double &value) {
-  if (NumberHelpers::is_enot_qual(gametocyte_level_, value)) {
-    gametocyte_level_ = value;
-  }
-}
-
-Genotype *ClonalParasitePopulation::genotype() const {
-  return genotype_;
-}
-
-void ClonalParasitePopulation::set_genotype(Genotype *value) {
-  if (genotype_ != value) {
-    genotype_ = value;
-  }
 }
 
 bool ClonalParasitePopulation::resist_to(const int &drug_id) const {
