@@ -335,9 +335,9 @@ void Person::add_drug_to_blood(DrugType* dt, const int& dosing_days, bool is_par
   // If this is going to be part of a complex therapy regime then we need to
   // note this initial drug level
   if (is_part_of_MAC_therapy) {
-    if (drugs_in_blood()->drugs()->find(dt->id()) != drugs_in_blood()->drugs()->end()) {
+    if (drugs_in_blood_->get_drugs().find(dt->id()) != drugs_in_blood_->get_drugs().end()) {
       // Long half-life drugs are already present in the blood
-      drug_level = drugs_in_blood()->get_drug(dt->id())->starting_value();
+      drug_level = drugs_in_blood_->get_drug(dt->id())->starting_value();
     } else if (starting_drug_values_for_MAC_.find(dt->id()) != starting_drug_values_for_MAC_.end()) {
       // Short half-life drugs that were taken, but cleared the blood already
       drug_level = starting_drug_values_for_MAC_[dt->id()];
@@ -565,7 +565,7 @@ void Person::update_current_state() {
   // clear drugs <=0.1
   drugs_in_blood_->clear_cut_off_drugs_by_event(nullptr);
   // clear cured parasite
-  all_clonal_parasite_populations_->clear_cured_parasites();
+  all_clonal_parasite_populations_->clear_cured_parasites(Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured());
 
   if (all_clonal_parasite_populations_->size() == 0) {
     change_state_when_no_parasite_in_blood();
@@ -695,7 +695,8 @@ void Person::cancel_all_return_to_residence_events() const {
 }
 
 bool Person::has_detectable_parasite() const {
-  return all_clonal_parasite_populations_->has_detectable_parasite();
+  auto detectable_threshold = Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_detectable_pfpr();
+  return all_clonal_parasite_populations_->has_detectable_parasite(detectable_threshold);
 }
 
 void Person::increase_number_of_times_bitten() {
@@ -758,7 +759,7 @@ double Person::prob_present_at_mda() {
 }
 
 bool Person::has_effective_drug_in_blood() const {
-  for (const auto& kv_drug : *drugs_in_blood_->drugs()) {
+  for (const auto& kv_drug : drugs_in_blood_->get_drugs()) {
     if (kv_drug.second->last_update_value() > 0.5) return true;
   }
   return false;

@@ -57,7 +57,7 @@ typedef std::vector<Reporter *> ReporterPtrVector;
 
 typedef std::list<PersonIndex *> PersonIndexPtrList;
 
-typedef std::map<int, Drug *> DrugPtrMap;
+typedef std::map<int, std::unique_ptr<Drug>> DrugUniquePtrMap;
 
 typedef std::vector<Therapy *> TherapyPtrVector;
 typedef std::vector<IStrategy *> StrategyPtrVector;

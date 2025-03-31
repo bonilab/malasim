@@ -147,8 +147,8 @@ public:
     int get_birthday() const { return birthday_; }
     void set_birthday(int birthday) { birthday_ = birthday; }
 
-    int get_latest_update_time() const { return latest_update_time_; }
-    void set_latest_update_time(int lastest_update_time) { latest_update_time_ = lastest_update_time; }
+    virtual int get_latest_update_time() const { return latest_update_time_; }
+    virtual void set_latest_update_time(int lastest_update_time) { latest_update_time_ = lastest_update_time; }
 
     int get_moving_level() const { return moving_level_; }
 

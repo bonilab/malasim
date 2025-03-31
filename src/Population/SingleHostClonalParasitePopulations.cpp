@@ -35,10 +35,9 @@ void SingleHostClonalParasitePopulations::clear() {
 // transfer ownership of the parasite to the SingleHostClonalParasitePopulations
 void SingleHostClonalParasitePopulations::add(ClonalParasitePopulation* blood_parasite) {
   blood_parasite->set_parasite_population(this);
-
+  // move the parasite to the vector
   parasites_.push_back(std::unique_ptr<ClonalParasitePopulation>(blood_parasite));
-  blood_parasite->set_index(parasites_.size() - 1);
-  assert(parasites_.at(blood_parasite->get_index()) == blood_parasite);
+  parasites_.back()->set_index(parasites_.size() - 1);
 }
 
 void SingleHostClonalParasitePopulations::remove(ClonalParasitePopulation* blood_parasite) {
@@ -47,6 +46,9 @@ void SingleHostClonalParasitePopulations::remove(ClonalParasitePopulation* blood
 
 // TODO: test this
 void SingleHostClonalParasitePopulations::remove(const int& index) {
+  if (index < 0 || index >= parasites_.size()) {
+    throw std::out_of_range("Index out of range");
+  }
   ClonalParasitePopulation* bp = parasites_[index].get();
   //    std::cout << parasites_.size() << std::endl;
   if (bp->get_index() != index) {
@@ -92,12 +94,12 @@ void SingleHostClonalParasitePopulations::update() {
   }
 }
 
-void SingleHostClonalParasitePopulations::clear_cured_parasites() {
+void SingleHostClonalParasitePopulations::clear_cured_parasites(double cured_threshold) {
   log10_total_infectious_denstiy = ClonalParasitePopulation::LOG_ZERO_PARASITE_DENSITY;
   //    std::vector<int> cured_parasites_index;
   for (int i = parasites_.size() - 1; i >= 0; i--) {
     if (parasites_[i]->last_update_log10_parasite_density()
-        <= Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured() + 0.00001) {
+        <= cured_threshold + 0.00001) {
       remove(i);
     } else {
       if (log10_total_infectious_denstiy == ClonalParasitePopulation::LOG_ZERO_PARASITE_DENSITY) {
@@ -111,11 +113,14 @@ void SingleHostClonalParasitePopulations::clear_cured_parasites() {
 }
 
 void SingleHostClonalParasitePopulations::update_by_drugs(DrugsInBlood* drugs_in_blood) const {
+  if (drugs_in_blood == nullptr) {
+    throw std::invalid_argument("Drugs in blood is nullptr");
+  }
   for (auto& blood_parasite : parasites_) {
     auto* new_genotype = blood_parasite->genotype();
 
     double percent_parasite_remove = 0;
-    for (auto& [drug_id, drug] : *drugs_in_blood->drugs()) {
+    for (auto& [drug_id, drug] : drugs_in_blood->get_drugs()) {
       // select all locus
       // remember to use mask to turn on and off mutation location
       // for a specific time
@@ -160,10 +165,10 @@ void SingleHostClonalParasitePopulations::update_by_drugs(DrugsInBlood* drugs_in
   }
 }
 
-bool SingleHostClonalParasitePopulations::has_detectable_parasite() const {
+bool SingleHostClonalParasitePopulations::has_detectable_parasite(double detectable_threshold) const {
   for (auto& parasite : parasites_) {
     if (parasite->last_update_log10_parasite_density()
-        >= Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_detectable_pfpr()) {
+        >= detectable_threshold) {
       return true;
     }
   }

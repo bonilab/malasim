@@ -20,8 +20,8 @@ class DrugsInBlood {
   DrugsInBlood& operator=(const DrugsInBlood&&) = delete;
 
  private:
- Person *person_;
- std::unique_ptr<DrugPtrMap> drugs_;
+ Person *person_{nullptr};
+ DrugUniquePtrMap drugs_{};
 
  public:
  Person *person() const {
@@ -31,9 +31,26 @@ class DrugsInBlood {
    person_ = value;
  }
 
- DrugPtrMap *drugs() const {
-   return drugs_.get();
+ // Getter for drugs map
+ const DrugUniquePtrMap& get_drugs() const {
+   return drugs_;
  }
+
+//  // Add a single drug to the map
+//  void add_drug_to_map(int drug_id, Drug* drug) {
+//    drugs_[drug_id] = std::unique_ptr<Drug>(drug);
+//  }
+
+//  // Remove a single drug from the map
+//  void remove_drug_from_map(int drug_id) {
+//    drugs_.erase(drug_id);
+//  }
+
+//  // Get a specific drug by ID
+//  Drug* get_drug_from_map(int drug_id) const {
+//    auto it = drugs_.find(drug_id);
+//    return it != drugs_.end() ? it->second.get() : nullptr;
+//  }
 
  public:
   explicit DrugsInBlood(Person *person = nullptr);
@@ -49,19 +66,19 @@ class DrugsInBlood {
 
   bool is_drug_in_blood(int drug_type_id) const;
 
-  void remove_drug(Drug *drug) const;
+  void remove_drug(Drug *drug);
 
-  void remove_drug(const int &drug_type_id) const;
+  void remove_drug(const int &drug_type_id);
 
   Drug *get_drug(const int &type_id) const;
 
   std::size_t size() const;
 
-  void clear() const;
+  void clear();
 
-  void update() const;
+  void update();
 
-  void clear_cut_off_drugs_by_event(Event *event) const;
+  void clear_cut_off_drugs_by_event(Event *event);
 
 };
 

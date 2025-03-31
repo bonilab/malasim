@@ -102,13 +102,13 @@ public:
 
   void update();
 
-  void clear_cured_parasites();
+  void clear_cured_parasites(double cured_threshold);
 
   void clear();
 
   void update_by_drugs(DrugsInBlood *drugs_in_blood) const;
 
-  bool has_detectable_parasite() const;
+  bool has_detectable_parasite(double detectable_threshold) const;
 
   bool is_gametocytaemic() const;
 };
