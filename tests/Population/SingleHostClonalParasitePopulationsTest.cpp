@@ -5,6 +5,9 @@
 #include "Parasites/Genotype.h"
 #include "Population/Person/Person.h"
 #include "Population/DrugsInBlood.h"
+#include "Configuration/Config.h"
+#include <memory>
+#include <set>
 
 // Mock Person class
 class MockPerson : public Person {
@@ -19,6 +22,7 @@ protected:
         person = new MockPerson();
         populations = new SingleHostClonalParasitePopulations(person);
         genotype = new Genotype("abcdef");
+        destroyed_parasites_.clear();
     }
 
     void TearDown() override {
@@ -30,7 +34,37 @@ protected:
     MockPerson* person;
     SingleHostClonalParasitePopulations* populations;
     Genotype* genotype;
+    static std::set<int> destroyed_parasites_;
+
+    // Helper class to track parasite destruction
+    class TrackedParasite : public ClonalParasitePopulation {
+    public:
+        TrackedParasite(int tracking_id) : tracking_id_(tracking_id) {}
+        
+        ~TrackedParasite() override {
+            destroyed_parasites_.insert(tracking_id_);
+        }
+        
+        int tracking_id() const { return tracking_id_; }
+        
+    private:
+        int tracking_id_;
+    };
+
+    // Helper method to create a trackable parasite
+    TrackedParasite* create_tracked_parasite(int tracking_id) {
+        auto* parasite = new TrackedParasite(tracking_id);
+        // Set any necessary default values
+        parasite->set_last_update_log10_parasite_density(2.0); // Above cured threshold
+        return parasite;
+    }
+
+    static bool is_destroyed(int tracking_id) {
+        return destroyed_parasites_.find(tracking_id) != destroyed_parasites_.end();
+    }
 };
+
+std::set<int> SingleHostClonalParasitePopulationsTest::destroyed_parasites_;
 
 TEST_F(SingleHostClonalParasitePopulationsTest, Initialization) {
     EXPECT_EQ(populations->size(), 0);
@@ -329,4 +363,131 @@ TEST_F(SingleHostClonalParasitePopulationsTest, RemoveByParasitePtr) {
     // No need to delete parasite2 as unique_ptr will handle it
     // will get segfault if delete parasite2 even though the pointer is still point to the object
     // delete parasite2;
+} 
+
+TEST_F(SingleHostClonalParasitePopulationsTest, MemoryManagementAdd) {
+    const int tracking_id = 100;
+    {
+        TrackedParasite* parasite = create_tracked_parasite(tracking_id);
+        populations->add(parasite);
+        EXPECT_FALSE(is_destroyed(tracking_id));
+    }
+    // Parasite should still exist in populations
+    EXPECT_FALSE(is_destroyed(tracking_id));
+    EXPECT_EQ(populations->size(), 1);
+    
+    // Clear should destroy the parasite
+    populations->clear();
+    EXPECT_TRUE(is_destroyed(tracking_id));
+    EXPECT_EQ(populations->size(), 0);
+}
+
+TEST_F(SingleHostClonalParasitePopulationsTest, MemoryManagementRemove) {
+    const int tracking_id1 = 101;
+    const int tracking_id2 = 102;
+    
+    TrackedParasite* parasite1 = create_tracked_parasite(tracking_id1);
+    TrackedParasite* parasite2 = create_tracked_parasite(tracking_id2);
+    
+    populations->add(parasite1);
+    populations->add(parasite2);
+    EXPECT_EQ(populations->size(), 2);
+    
+    // Remove first parasite
+    populations->remove(0);
+    EXPECT_TRUE(is_destroyed(tracking_id1));
+    EXPECT_FALSE(is_destroyed(tracking_id2));
+    EXPECT_EQ(populations->size(), 1);
+}
+
+TEST_F(SingleHostClonalParasitePopulationsTest, MemoryManagementDestructor) {
+    const int tracking_id1 = 103;
+    const int tracking_id2 = 104;
+    
+    {
+        auto* local_populations = new SingleHostClonalParasitePopulations(person);
+        local_populations->add(create_tracked_parasite(tracking_id1));
+        local_populations->add(create_tracked_parasite(tracking_id2));
+        
+        EXPECT_FALSE(is_destroyed(tracking_id1));
+        EXPECT_FALSE(is_destroyed(tracking_id2));
+        
+        delete local_populations;
+        
+        // Both parasites should be destroyed when populations is destroyed
+        EXPECT_TRUE(is_destroyed(tracking_id1));
+        EXPECT_TRUE(is_destroyed(tracking_id2));
+    }
+}
+
+TEST_F(SingleHostClonalParasitePopulationsTest, MemoryManagementClearCuredParasites) {
+    const int staying_id = 105;
+    const int cleared_id = 106;
+    
+    TrackedParasite* staying_parasite = create_tracked_parasite(staying_id);
+    TrackedParasite* cleared_parasite = create_tracked_parasite(cleared_id);
+    
+    staying_parasite->set_last_update_log10_parasite_density(2.0); // Above threshold
+    cleared_parasite->set_last_update_log10_parasite_density(-4.0); // Below threshold
+    
+    populations->add(staying_parasite);
+    populations->add(cleared_parasite);
+    
+    populations->clear_cured_parasites(-2.0); // Set threshold between the two parasites
+    
+    // Cleared parasite should be destroyed, staying parasite should remain
+    EXPECT_FALSE(is_destroyed(staying_id));
+    EXPECT_TRUE(is_destroyed(cleared_id));
+    EXPECT_EQ(populations->size(), 1);
+}
+
+TEST_F(SingleHostClonalParasitePopulationsTest, MemoryManagementVectorReallocation) {
+    std::vector<int> tracking_ids;
+    const int num_parasites = 10;
+    
+    // Add enough parasites to force vector reallocation
+    for (int i = 0; i < num_parasites; i++) {
+        tracking_ids.push_back(i);
+        populations->add(create_tracked_parasite(tracking_ids.back()));
+        EXPECT_FALSE(is_destroyed(tracking_ids.back()));
+    }
+    
+    EXPECT_EQ(populations->size(), num_parasites);
+    
+    // When removing index 3 repeatedly:
+    // 1. parasite[3] is replaced by parasite[9], parasite[3] is destroyed
+    // 2. parasite[3] (which was parasite[9]) is replaced by parasite[8], parasite[9] is destroyed
+    // 3. parasite[3] (which was parasite[8]) is replaced by parasite[7], parasite[8] is destroyed
+    // 4. parasite[3] (which was parasite[7]) is replaced by parasite[6], parasite[7] is destroyed
+
+    std::vector<int> expected_destroyed_parasites{3, 9, 8, 7};
+    for (int i = 0; i < 4; i++) {
+        populations->remove(3);
+        
+        EXPECT_EQ(populations->size(), num_parasites - i - 1);
+
+        // destroyed_parasites_ should contain 3, 9, 8, 7 iteratively
+        for (int j =0; j < std::min(i,4); j++) {
+            EXPECT_TRUE(is_destroyed(expected_destroyed_parasites[j]));
+        }
+    }
+    
+    EXPECT_EQ(populations->size(), num_parasites - 4);
+    
+    // Final state verification:
+    // - First 3 parasites (0,1,2) should be alive
+    for (int i = 0; i < 3; i++) {
+        EXPECT_FALSE(is_destroyed(i));
+    }
+
+    // parasites 3, 7,8,9 should be destroyed
+    EXPECT_TRUE(is_destroyed(3));
+    EXPECT_TRUE(is_destroyed(7));
+    EXPECT_TRUE(is_destroyed(8));
+    EXPECT_TRUE(is_destroyed(9));
+
+    // parasites 4,5,6 should be alive
+    EXPECT_FALSE(is_destroyed(4));
+    EXPECT_FALSE(is_destroyed(5));
+    EXPECT_FALSE(is_destroyed(6));
 } 
