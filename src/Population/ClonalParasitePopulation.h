@@ -83,7 +83,7 @@ private:
 
   void update();
 
-  void perform_drug_action(const double &percent_parasite_remove);
+  void perform_drug_action(double percent_parasite_remove, double log10_parasite_density_cured);
 
 };
 

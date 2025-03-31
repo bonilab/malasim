@@ -21,7 +21,10 @@ build b:
 	cmake --build build --config $(BUILD_TYPE) -j 6
 
 test t: build
-	cd build && GTEST_COLOR=1 ctest -V
+	cd build && GTEST_COLOR=1 ctest -V $(ARGS)
+
+gtest: build
+	./build/bin/malasim_test --gtest_filter=$(filter)
 
 run r: build 
 	./$(APP_EXECUTABLE)

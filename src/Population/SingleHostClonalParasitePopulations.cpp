@@ -155,7 +155,7 @@ void SingleHostClonalParasitePopulations::update_by_drugs(DrugsInBlood* drugs_in
       percent_parasite_remove = percent_parasite_remove + p_temp - percent_parasite_remove * p_temp;
     }
     if (percent_parasite_remove > 0) {
-      blood_parasite->perform_drug_action(percent_parasite_remove);
+      blood_parasite->perform_drug_action(percent_parasite_remove, Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured());
     }
   }
 }

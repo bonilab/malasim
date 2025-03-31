@@ -15,23 +15,24 @@ file(GLOB_RECURSE MALASIM_TEST_SOURCES
   "GIS/SpatialDataTest/*.cpp"
   "GIS/AdminLevelManagerTest/*.cpp"
   "GIS/SpatialDataTest/*.cpp"
+  "Population/*.cpp"
 )
 
 
 # Add test executable
-add_executable(runTests
+add_executable(malasim_test
   ${MALASIM_TEST_SOURCES}
 )
 
-add_dependencies(runTests MalaSimCore)
+add_dependencies( malasim_test MalaSimCore)
 
 # Link the core library and GTest to the test executable
-target_link_libraries(runTests PRIVATE
+target_link_libraries(malasim_test PRIVATE
   GTest::gtest_main GTest::gmock
   MalaSimCore
 )
 
-set_property(TARGET runTests PROPERTY CXX_STANDARD 20)
+set_property(TARGET malasim_test PROPERTY CXX_STANDARD 20)
 
 # Add tests
-add_test(NAME malasim_test COMMAND ${CMAKE_BINARY_DIR}/bin/runTests)
+add_test(NAME malasim_test COMMAND ${CMAKE_BINARY_DIR}/bin/malasim_test)

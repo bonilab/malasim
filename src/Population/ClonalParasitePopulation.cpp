@@ -16,13 +16,20 @@ ClonalParasitePopulation::ClonalParasitePopulation(Genotype *genotype)
 ClonalParasitePopulation::~ClonalParasitePopulation() = default;
 
 double ClonalParasitePopulation::get_current_parasite_density(const int &current_time) {
+  if (update_function_ == nullptr) {
+    return last_update_log10_parasite_density_;
+  }
+
   const auto duration = current_time - parasite_population()->latest_update_time();
   if (duration == 0) {
     return last_update_log10_parasite_density_;
   }
 
-  if (update_function_ == nullptr) {
-    return last_update_log10_parasite_density_;
+  if (duration < 0) {
+    // duration is negative which is some error in the system
+    // we do not allow thing happens in future
+    spdlog::error("Duration is negative: {}", duration);
+    throw std::invalid_argument("Duration is negative");
   }
 
   return update_function_->get_current_parasite_density(this, duration);
@@ -44,22 +51,22 @@ void ClonalParasitePopulation::update() {
   set_last_update_log10_parasite_density(get_current_parasite_density(Model::get_scheduler()->current_time()));
 }
 
-void ClonalParasitePopulation::perform_drug_action(const double &percent_parasite_remove) {
+void ClonalParasitePopulation::perform_drug_action(double percent_parasite_remove, double log10_parasite_density_cured) {
+
+  if (percent_parasite_remove < 0) {
+    throw std::invalid_argument("Percent parasite remove is less than 0");
+  }
+
   double newSize = last_update_log10_parasite_density_;
-  if (percent_parasite_remove > 1) {
-    newSize = Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured();
+  if (percent_parasite_remove >= 1) {
+    newSize = log10_parasite_density_cured;
   } else {
-//    std::cout << "Day: " << Model::get_scheduler()->current_time() << "\tDrug: old density: "
-//    << newSize << "\tremoved by drug: " << log10(1 - percent_parasite_remove);
     newSize += log10(1 - percent_parasite_remove);
-//    std::cout << "\tnew density: " << newSize << std::endl;
   }
 
-  if (newSize < Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured()) {
-    newSize = Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured();
+  if (newSize < log10_parasite_density_cured) {
+    newSize = log10_parasite_density_cured;
   }
 
-//      std::cout << Model::get_scheduler()->current_time() << "\t" <<parasite_population()->person()->last_therapy_id() << "\t"  <<
-//      percent_parasite_remove << "\t"<<last_update_log10_parasite_density_ << "\t" <<newSize << std::endl;
   set_last_update_log10_parasite_density(newSize);
 }
