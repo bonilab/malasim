@@ -79,10 +79,10 @@ void CellularReporter::monthly_report() {
     for (std::size_t ac = 0; ac < index->vPerson()[0][0].size(); ac++) {
       auto age_class = index->vPerson()[0][hs][ac];
       for (auto& person : age_class) {
-        auto& parasites = person->get_all_clonal_parasite_populations()->parasites();
+        auto& parasites = *person->get_all_clonal_parasite_populations();
         population++;
 
-        if (parasites.size() == 0) continue;
+        if (parasites.empty()) continue;
 
         infectedIndividuals++;
 

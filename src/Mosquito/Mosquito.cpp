@@ -237,7 +237,7 @@ int Mosquito::random_genotype(int location, int tracking_index) {
 
 void Mosquito::get_genotypes_profile_from_person(Person *person, std::vector<Genotype *> &sampling_genotypes,
                                                  std::vector<double> &relative_infectivity_each_pp) {
-  for (auto& pp : person->get_all_clonal_parasite_populations()->parasites()) {
+  for (auto& pp : *person->get_all_clonal_parasite_populations()) {
     //Select parasites based on gametocyte density
     auto clonal_foi = pp->gametocyte_level() * Person::relative_infectivity(pp->last_update_log10_parasite_density());
     if (clonal_foi > 0) {

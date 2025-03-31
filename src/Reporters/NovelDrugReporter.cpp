@@ -148,14 +148,14 @@ void NovelDrugReporter::output_genotype_frequency_3(const int& number_of_genotyp
         for (auto i = 0ull; i < size; i++) {
           auto* person = pi->vPerson()[loc][hs][ac][i];
 
-          if (!person->get_all_clonal_parasite_populations()->parasites().empty()) {
+          if (!person->get_all_clonal_parasite_populations()->empty()) {
             sum1 += 1;
             sum1_all += 1;
           }
 
           std::map<int, int> individual_genotype_map;
 
-          for (auto& parasite_population : person->get_all_clonal_parasite_populations()->parasites()) {
+          for (auto& parasite_population : *person->get_all_clonal_parasite_populations()) {
             const auto g_id = parasite_population->genotype()->genotype_id();
             if (individual_genotype_map.find(g_id) == individual_genotype_map.end()) {
               individual_genotype_map[parasite_population->genotype()->genotype_id()] = 1;
@@ -166,9 +166,9 @@ void NovelDrugReporter::output_genotype_frequency_3(const int& number_of_genotyp
 
           for (const auto genotype : individual_genotype_map) {
             result3[genotype.first] +=
-                genotype.second / static_cast<double>(person->get_all_clonal_parasite_populations()->parasites().size());
+                genotype.second / static_cast<double>(person->get_all_clonal_parasite_populations()->size());
             result3_all[genotype.first] +=
-                genotype.second / static_cast<double>(person->get_all_clonal_parasite_populations()->parasites().size());
+                genotype.second / static_cast<double>(person->get_all_clonal_parasite_populations()->size());
           }
         }
       }

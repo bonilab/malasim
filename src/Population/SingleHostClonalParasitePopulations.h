@@ -49,8 +49,32 @@ public:
     person_ = value;
   }
 
-  [[nodiscard]] const std::vector<std::unique_ptr<ClonalParasitePopulation>>& parasites() const {
-    return parasites_;
+  // Iterator type definitions for STL compatibility
+  using iterator = std::vector<std::unique_ptr<ClonalParasitePopulation>>::iterator;
+  using const_iterator = std::vector<std::unique_ptr<ClonalParasitePopulation>>::const_iterator;
+
+  // Iterator methods
+  [[nodiscard]] const_iterator begin() const noexcept { return parasites_.begin(); }
+  [[nodiscard]] const_iterator end() const noexcept { return parasites_.end(); }
+  [[nodiscard]] iterator begin() noexcept { return parasites_.begin(); }
+  [[nodiscard]] iterator end() noexcept { return parasites_.end(); }
+
+  // Access methods
+  [[nodiscard]] ClonalParasitePopulation* at(size_t index) const {
+    return parasites_.at(index).get();
+  }
+
+  [[nodiscard]] ClonalParasitePopulation* operator[](size_t index) const {
+    return parasites_[index].get();
+  }
+
+  // Mark virtual functions that are meant to be overridden with override in derived classes
+  [[nodiscard]] virtual int size() const noexcept {
+    return parasites_.size();
+  }
+
+  [[nodiscard]] bool empty() const noexcept {
+    return parasites_.empty();
   }
 
 public:
@@ -60,8 +84,6 @@ public:
   // Mark destructor as default if it doesn't need special handling
   virtual ~SingleHostClonalParasitePopulations();
 
-  // Mark virtual functions that are meant to be overridden with override in derived classes
-  [[nodiscard]] virtual int size() const noexcept;  // Add const if not modifying state
 
   void init();
 

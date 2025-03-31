@@ -47,7 +47,7 @@ void SQLiteMonthlyReporter::count_infections_for_location(int level_id, int loca
     for (unsigned int ac = 0; ac < ageClasses.size(); ac++) {
       for (auto &person : index->vPerson()[location_id][hs][ac]) {
         // Is the individual infected by at least one parasite?
-        if (person->get_all_clonal_parasite_populations()->parasites().empty()) {
+        if (person->get_all_clonal_parasite_populations()->empty()) {
           continue;
         }
 
@@ -302,7 +302,7 @@ void SQLiteMonthlyReporter::collect_genome_data_for_a_person(Person* person,
   const auto numGenotypes = Model::get_config()->number_of_parasite_types();
   auto individual = std::vector<int>(numGenotypes, 0);
   // Get the person, press on if they are not infected
-  auto& parasites = person->get_all_clonal_parasite_populations()->parasites();
+  auto& parasites = *person->get_all_clonal_parasite_populations();
   auto numClones = parasites.size();
   if (numClones == 0) { return; }
 
@@ -313,7 +313,7 @@ void SQLiteMonthlyReporter::collect_genome_data_for_a_person(Person* person,
 
   // Count the genotypes present in the individual
   for (unsigned int ndx = 0; ndx < numClones; ndx++) {
-    auto& parasitePopulation = parasites[ndx];
+    auto* parasitePopulation = parasites[ndx];
     auto genotypeId = parasitePopulation->genotype()->genotype_id();
     monthly_genome_data_by_level[level_id].occurrences[unit_id][genotypeId]++;
     monthly_genome_data_by_level[level_id].occurrences_0_5[unit_id][genotypeId] += (age <= 5) ? 1 : 0;

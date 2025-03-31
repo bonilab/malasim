@@ -42,7 +42,7 @@ void IntroducePlas2CopyParasiteEvent::execute() {
                           - pi->vPerson()[0][Person::ASYMPTOMATIC][j].size()];
       }
       // mutate all
-      for (auto& pp : p->get_all_clonal_parasite_populations()->parasites()) {
+      for (auto& pp : *p->get_all_clonal_parasite_populations()) {
         auto* old_genotype = pp->genotype();
         auto* new_genotype = old_genotype->modify_genotype_allele({std::tuple(14,1,'2')},
           Model::get_config());

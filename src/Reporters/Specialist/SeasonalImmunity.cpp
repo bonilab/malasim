@@ -97,14 +97,14 @@ void SeasonalImmunity::monthly_report() {
           auto theta = person->get_immune_system()->get_current_value();
           mean_theta[zone] += theta;
           median_theta[zone].push(theta);
-          auto& parasites = person->get_all_clonal_parasite_populations()->parasites();
+          auto& parasites = *person->get_all_clonal_parasite_populations();
           if (parasites.empty()) { continue; }
           auto size = static_cast<int>(parasites.size());
           infected_individuals[zone]++;
           if (size > 1) { multiclonal[zone]++; }
           parasite_clones[zone] += size;
           for (auto ndx = 0; ndx < size; ndx++) {
-            auto parasite = parasites[ndx].get();
+            auto* parasite = parasites[ndx];
             if (parasite->genotype()->get_aa_sequence()[2] == 1) {
               unweighted_580y[zone]++;
               weighted_580y[zone] += (1 / static_cast<double>(size));

@@ -68,9 +68,6 @@ int SingleHostClonalParasitePopulations::latest_update_time() const {
   return person_->get_latest_update_time();
 }
 
-int SingleHostClonalParasitePopulations::size() const noexcept {
-  return parasites_.size();
-}
 
 bool SingleHostClonalParasitePopulations::contain(ClonalParasitePopulation* blood_parasite) {
   for (auto& parasite : parasites_) {

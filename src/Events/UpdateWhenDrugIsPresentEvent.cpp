@@ -40,7 +40,7 @@ void UpdateWhenDrugIsPresentEvent::execute() {
     person->schedule_update_by_drug_event(clinical_caused_parasite_);
   } else {
     for (auto i = 0; i < person->get_all_clonal_parasite_populations()->size(); i++) {
-      auto& blood_parasite = person->get_all_clonal_parasite_populations()->parasites()[i];
+      auto* blood_parasite = person->get_all_clonal_parasite_populations()->at(i);
       if (blood_parasite->update_function()==Model::get_instance().having_drug_update_function()) {
         blood_parasite->set_update_function(Model::get_instance().immunity_clearance_update_function());
       }
