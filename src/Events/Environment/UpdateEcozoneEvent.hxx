@@ -38,7 +38,7 @@ public:
   inline static const std::string EventName = "update_ecozone_event";
 
   UpdateEcozoneEvent(int from, int to, int start) : from_(from), to_(to) {
-    time = start;
+    set_time(start);
   }
 
   ~UpdateEcozoneEvent() override = default;

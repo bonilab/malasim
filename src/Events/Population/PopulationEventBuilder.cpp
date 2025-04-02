@@ -785,7 +785,6 @@ PopulationEventBuilder::build_import_district_mutant_daily_events(
             .count();
     auto* event = new DistrictImportationDailyEvent(
         district, daily_rate, start_day, alleles);
-    event->event_manager = nullptr;
     events.push_back(event);
   }
   return events;

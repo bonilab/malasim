@@ -26,8 +26,7 @@ class ImmuneSystem;
 
 class Person :  public PersonIndexAllHandler,
                 public PersonIndexByLocationStateAgeClassHandler,
-                public PersonIndexByLocationMovingLevelHandler,
-                public EventManager {
+                public PersonIndexByLocationMovingLevelHandler {
   // OBJECTPOOL(Person)
 
   // Disable copy and assignment
@@ -92,23 +91,38 @@ public:
   int get_day_that_last_trip_outside_district_was_initiated() const { return day_that_last_trip_outside_district_was_initiated_; }
 #endif
 
+private:
+  EventManager event_manager_;
+
 public:
     void initialize();
 
+    // Delegate event management methods to event_manager_
+    void add_event(PersonEvent* event);
+    void update_events(int time) { event_manager_.execute_events(time); }
+    
+    template <typename T>
+    bool has_event() const { return event_manager_.has_event<T>(); }
+    
+    template <typename T>
+    void cancel_all_events() const { event_manager_.cancel_all_events<T>(); }
+    
+    void cancel_all_events_except(Event* event) const { 
+        event_manager_.cancel_all_events_except(event); 
+    }
+    
+    template <typename T>
+    void cancel_all_events_except(Event* event) const {
+        event_manager_.cancel_all_events_except<T>(event);
+    }
 
-    // Method to add an event
-    void add_event(Event* event);
-
-    // // Method to remove an event
-    // void remove_event(Event* event);
+    std::multimap<int, std::unique_ptr<Event>>& get_events() {
+      return event_manager_.get_events();
+    }
 
     void increase_age_by_1_year();
 
     void update();
-    // Method to run events before a certain time
-    // void execute_events(int time);
-    // TODO: consider to rename this method to "execute_events_at_time"
-    void update_events(int time);
     
     Population* get_population() const { return population_; }
     void set_population(Population* population) { population_ = population; }
@@ -276,7 +290,7 @@ public:
 
   template<typename T>
   void schedule_basic_event(T* event) {
-    event->event_manager = this;
+    event->set_person(this);
     add_event(event);
   }
 
@@ -291,6 +305,8 @@ public:
   void schedule_rapt_event(int days_delay);
   void schedule_receive_mda_therapy_event(Therapy* therapy, int days_delay);
   void schedule_receive_therapy_event(ClonalParasitePopulation* parasite, Therapy* therapy, int days_delay, bool is_part_of_MAC_therapy = false);
+  void schedule_switch_immune_component_event(int days_delay);
+
   // Group 2: Parasite Event Scheduling  
   void schedule_move_parasite_to_blood(Genotype* genotype, int days_delay);
   void schedule_mature_gametocyte_event(ClonalParasitePopulation* parasite);

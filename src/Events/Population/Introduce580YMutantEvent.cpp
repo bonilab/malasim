@@ -16,7 +16,7 @@ Introduce580YMutantEvent::Introduce580YMutantEvent(const int &location, const in
                                                    const std::vector<std::tuple<int,int,char>> &alleles) :
 location_(location),fraction_(fraction), alleles_(alleles)
                                                                              {
-  time = execute_at;
+  set_time(execute_at);
 }
 
 Introduce580YMutantEvent::~Introduce580YMutantEvent() = default;

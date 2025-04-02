@@ -18,7 +18,7 @@ ImportationEvent::ImportationEvent(const int &location, const int &execute_at,
     : location_(location),
       genotype_id_(genotype_id),
       number_of_cases_(number_of_cases) {
-  time = execute_at;
+  set_time(execute_at);
 }
 
 ImportationEvent::~ImportationEvent() = default;
@@ -30,8 +30,7 @@ void ImportationEvent::schedule_event(Scheduler* scheduler, const int &location,
   if (scheduler != nullptr) {
     auto* e = new ImportationEvent(location, execute_at, genotype_id,
                                    number_of_cases);
-    e->event_manager = nullptr;
-    e->time = execute_at;
+    e->set_time(execute_at);
     scheduler->schedule_population_event(e);
   }
 }

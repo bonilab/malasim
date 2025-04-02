@@ -35,7 +35,7 @@ public:
   ImportationPeriodicallyRandomEvent(int genotypeId, int start, int count,
                                      double log_parasite_density)
       : genotypeId_(genotypeId), count_(count) {
-    time = start;
+    set_time(start);
     log_parasite_density_ = log_parasite_density;
   }
   ~ImportationPeriodicallyRandomEvent() override = default;

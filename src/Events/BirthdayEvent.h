@@ -8,7 +8,7 @@
 
 class Person;
 
-class BirthdayEvent : public Event {
+class BirthdayEvent : public PersonEvent {
 public:
   //disallow copy and assignment
   BirthdayEvent(const BirthdayEvent& other) = delete;
@@ -21,10 +21,10 @@ public:
   // DELETE_COPY_AND_MOVE(BirthdayEvent)
 
 public:
-  BirthdayEvent();
+  BirthdayEvent(Person* person) : PersonEvent(person) {}
 
   //    BirthdayEvent(const BirthdayEvent& orig);
-  virtual ~BirthdayEvent();
+  virtual ~BirthdayEvent() = default;
 
   const std::string name() const override { return "Birthday Event"; }
 

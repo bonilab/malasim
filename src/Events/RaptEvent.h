@@ -4,13 +4,15 @@
 
 class Person;
 
-class RaptEvent : public Event {
+class RaptEvent : public PersonEvent {
 public:
   RaptEvent(const RaptEvent &) = delete;
   RaptEvent &operator=(const RaptEvent &) = delete;
+  RaptEvent(RaptEvent &&) = delete;
+  RaptEvent &operator=(RaptEvent &&) = delete;
 
 public:
-  RaptEvent() = default;
+  RaptEvent(Person* person) : PersonEvent(person) {}
   ~RaptEvent() override = default;
 
   const std::string name() const override { return "RAPT Event"; }

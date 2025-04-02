@@ -10,12 +10,11 @@
 
 //OBJECTPOOL_IMPL(UpdateWhenDrugIsPresentEvent)
 
-UpdateWhenDrugIsPresentEvent::UpdateWhenDrugIsPresentEvent() : clinical_caused_parasite_(nullptr) {}
-
-UpdateWhenDrugIsPresentEvent::~UpdateWhenDrugIsPresentEvent() = default;
-
 void UpdateWhenDrugIsPresentEvent::do_execute() {
-  auto *person = dynamic_cast<Person *>(event_manager);
+  auto *person = get_person();
+  if (person == nullptr) {
+    throw std::runtime_error("Person is nullptr");
+  }
   if (person->drugs_in_blood()->size() > 0) {
     if (person->get_all_clonal_parasite_populations()->contain(clinical_caused_parasite_) && person->get_host_state()==
         Person::CLINICAL) {

@@ -57,7 +57,7 @@ private:
 public:
   inline static const std::string EventName = "annual_beta_update_event";
 
-  AnnualBetaUpdateEvent(float rate, int start) : rate_(rate) { time = start; }
+  AnnualBetaUpdateEvent(float rate, int start) : rate_(rate) { set_time(start); }
   ~AnnualBetaUpdateEvent() = default;
 
   // Return the name of this event

@@ -6,7 +6,7 @@
 #include "Utils/Helpers/StringHelpers.h"
 
 TurnOffMutationEvent::TurnOffMutationEvent(const int &at_time) {
-  time = at_time;
+  set_time(at_time);
 }
 
 void TurnOffMutationEvent::do_execute() {

@@ -57,7 +57,7 @@ public:
 
   UpdateBetaRasterEvent(std::string filename, int start)
       : filename_(std::move(filename)) {
-    time = start;
+    set_time(start);
   }
 
   ~UpdateBetaRasterEvent() override = default;

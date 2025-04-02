@@ -20,7 +20,7 @@ IntroduceParasitesPeriodicallyEventV2::IntroduceParasitesPeriodicallyEventV2(
       location_(location), duration_(duration), number_of_cases_(number_of_cases),
       start_day(start_day_in), end_day(end_day_in) {
 
-  time = start_day;
+  set_time(start_day);
 
   if (end_day_in == -1){
     end_day = Model::get_config()->get_simulation_timeframe().get_total_time();
@@ -38,8 +38,7 @@ void IntroduceParasitesPeriodicallyEventV2::schedule_event(
         old_event->location(), old_event->duration(),
         old_event->number_of_cases(), old_event->start_day, old_event->end_day
     );
-    e->event_manager = nullptr;
-    e->time = scheduler->current_time() + 1;
+    e->set_time(scheduler->current_time() + 1);
     scheduler->schedule_population_event(e);
   }
 }

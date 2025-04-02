@@ -12,7 +12,7 @@ DistrictImportationDailyEvent::DistrictImportationDailyEvent(
     int district, double dailyRate, int startDay, const std::vector<std::tuple<int,int,char>> &alleles)
     : district_(district),
       daily_rate_(dailyRate), alleles_(alleles){
-  time = startDay;
+  set_time(startDay);
 }
 
 void DistrictImportationDailyEvent::schedule_event(Scheduler* scheduler,
@@ -23,8 +23,7 @@ void DistrictImportationDailyEvent::schedule_event(Scheduler* scheduler,
   if (scheduler != nullptr) {
     auto* event = new DistrictImportationDailyEvent(
         district, dailyRate, startDay,alleles);
-    event->event_manager = nullptr;
-    event->time = startDay;
+    event->set_time(startDay);
     scheduler->schedule_population_event(event);
   }
 }

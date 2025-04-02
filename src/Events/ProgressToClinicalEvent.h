@@ -13,7 +13,7 @@ class ClonalParasitePopulation;
 
 class Therapy;
 
-class ProgressToClinicalEvent : public Event {
+class ProgressToClinicalEvent : public PersonEvent {
 public:
   //disallow copy, assign and move
   ProgressToClinicalEvent(const ProgressToClinicalEvent&) = delete;
@@ -28,9 +28,10 @@ public:
   ClonalParasitePopulation* clinical_caused_parasite() { return clinical_caused_parasite_; }
   void set_clinical_caused_parasite(ClonalParasitePopulation* value) { clinical_caused_parasite_ = value; }
 
-  ProgressToClinicalEvent();
+public:
+  ProgressToClinicalEvent(Person* person) : PersonEvent(person), clinical_caused_parasite_(nullptr) {}
 
-  virtual ~ProgressToClinicalEvent();
+  virtual ~ProgressToClinicalEvent() = default;
 
   static bool should_receive_treatment(Person *person);
 

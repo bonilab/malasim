@@ -14,8 +14,6 @@ public:
  EventManager& operator=(EventManager&&) = delete;
 
 private:
- // std::vector<Event*> *events_;
- // sorted by time
   std::multimap<int, std::unique_ptr<Event>> events_;
 
   // Helper method to erase all events at a specific time point
@@ -27,19 +25,21 @@ public:
   std::multimap<int, std::unique_ptr<Event>>& get_events() {
     return events_;
   }
-public:
+
   EventManager();
-
-  //    EventManager(const EventManager& orig);
   virtual ~EventManager();
-
   virtual void initialize();
 
   // this will execute all events up to and including time
   virtual void execute_events(int time);
 
-  // this will transfer ownership of the event to the event manager
-  void schedule_event(Event* event);
+  // Schedule an event and transfer ownership
+  void schedule_event(Event* event) {
+    if (event) {
+      event->set_executable(true);
+      events_.emplace(event->get_time(), std::unique_ptr<Event>(event));
+    }
+  }
 
   // Convenience method to check if any event exists
   bool has_event() const {
@@ -65,7 +65,7 @@ public:
   void cancel_all_events() const {
     for (auto& [time, event] : events_) {
       if (dynamic_cast<T*>(event.get()) != nullptr) {
-        event->executable = false;
+        event->set_executable(false);
       }
     }
   }
@@ -73,7 +73,7 @@ public:
   void cancel_all_events_except(Event* inEvent) const {
     for (auto& [time, event] : events_) {
       if (event.get() != inEvent) {
-        event->executable = false;
+        event->set_executable(false);
       }
     }
   }
@@ -82,7 +82,7 @@ public:
   void cancel_all_events_except(Event* inEvent) const {
     for (auto& [time, event] : events_) {
       if (event.get() != inEvent && dynamic_cast<T*>(event.get()) != nullptr) {
-        event->executable = false;
+        event->set_executable(false);
       }
     }
   }

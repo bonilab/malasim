@@ -52,7 +52,7 @@ public:
   : IntroduceMutantEventBase(fraction, alleles),
     unit_id_(unit_id),
     admin_level_id_(admin_level_id) {
-    this->time = time;
+    this->set_time(time);
   }
 
   ~IntroduceMutantEvent() override = default;

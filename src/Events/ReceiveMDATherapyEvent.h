@@ -12,7 +12,7 @@ class Person;
 
 class Therapy;
 
-class ReceiveMDATherapyEvent : public Event {
+class ReceiveMDATherapyEvent : public PersonEvent {
 public:
   //disable copy and move
   ReceiveMDATherapyEvent(const ReceiveMDATherapyEvent&) = delete;
@@ -21,16 +21,16 @@ public:
 
 //  POINTER_PROPERTY(Therapy, received_therapy)
 private:
-  Therapy* received_therapy_;
+  Therapy* received_therapy_{nullptr};
 public:
   Therapy* received_therapy() { return received_therapy_; }
   void set_received_therapy(Therapy* value) { received_therapy_ = value; }
 
 public:
-  ReceiveMDATherapyEvent();
+  ReceiveMDATherapyEvent(Person* person) : PersonEvent(person), received_therapy_(nullptr) {}
 
   //    ReceiveMDADrugEvent(const ReceiveMDADrugEvent& orig);
-  virtual ~ReceiveMDATherapyEvent();
+  virtual ~ReceiveMDATherapyEvent() = default;
 
   const std::string name() const override { return "ReceiveMDADrugEvent"; }
 

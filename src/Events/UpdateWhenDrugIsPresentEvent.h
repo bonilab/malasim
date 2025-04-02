@@ -12,11 +12,13 @@ class Scheduler;
 
 class Person;
 
-class UpdateWhenDrugIsPresentEvent : public Event {
+class UpdateWhenDrugIsPresentEvent : public PersonEvent {
 public:
   //disallow copy and assign
   UpdateWhenDrugIsPresentEvent(const UpdateWhenDrugIsPresentEvent &) = delete;
   void operator=(const UpdateWhenDrugIsPresentEvent &) = delete;
+  UpdateWhenDrugIsPresentEvent(UpdateWhenDrugIsPresentEvent &&) = delete;
+  void operator=(UpdateWhenDrugIsPresentEvent &&) = delete;
 
 // OBJECTPOOL(UpdateWhenDrugIsPresentEvent)
 
@@ -27,10 +29,10 @@ public:
     void set_clinical_caused_parasite(ClonalParasitePopulation *value) { clinical_caused_parasite_ = value; }
 
  public:
-  UpdateWhenDrugIsPresentEvent();
+  UpdateWhenDrugIsPresentEvent(Person* person) : PersonEvent(person), clinical_caused_parasite_(nullptr) {}
 
   //    UpdateByHavingDrugEvent(const UpdateByHavingDrugEvent& orig);
-  virtual ~UpdateWhenDrugIsPresentEvent();
+  virtual ~UpdateWhenDrugIsPresentEvent() = default;
 
   const std::string name() const override {
     return "UpdateByHavingDrugEvent";

@@ -9,13 +9,9 @@
 
 // OBJECTPOOL_IMPL(BirthdayEvent)
 
-BirthdayEvent::BirthdayEvent() = default;
-
-BirthdayEvent::~BirthdayEvent() = default;
-
 void BirthdayEvent::do_execute() {
-  assert(event_manager != nullptr);
-  auto* person = dynamic_cast<Person*>(event_manager);
+  auto* person = get_person();
+  assert(person != nullptr);
   person->increase_age_by_1_year();
 
   const auto days_to_next_birthday =

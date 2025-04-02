@@ -63,7 +63,7 @@ public:
   inline static const std::string EventName = "annual_coverage_update_event";
 
   AnnualCoverageUpdateEvent(float rate, int start) : rate_(rate) {
-    time = start;
+    set_time(start);
   }
   ~AnnualCoverageUpdateEvent() = default;
 

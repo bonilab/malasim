@@ -11,7 +11,7 @@ class Scheduler;
 
 class Person;
 
-class MatureGametocyteEvent : public Event {
+class MatureGametocyteEvent : public PersonEvent {
 public:
   //disallow copy, assign and move
   MatureGametocyteEvent(const MatureGametocyteEvent&) = delete;
@@ -27,10 +27,10 @@ public:
   void set_blood_parasite(ClonalParasitePopulation* value) { blood_parasite_ = value; }
 
 public:
-  MatureGametocyteEvent();
+  MatureGametocyteEvent(Person* person) : PersonEvent(person) {}
 
   //    MatureGametocyteEvent(const MatureGametocyteEvent& orig);
-  virtual ~MatureGametocyteEvent();
+  virtual ~MatureGametocyteEvent() = default;
 
   const std::string name() const override { return "MatureGametocyteEvent"; }
 

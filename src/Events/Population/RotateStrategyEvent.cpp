@@ -17,7 +17,7 @@ RotateStrategyEvent::RotateStrategyEvent(int at_time, int years,
     : years_(years),
       new_strategy_id_(new_strategy_id),
       next_strategy_id_(next_strategy_id) {
-  time = at_time;
+  set_time(at_time);
 }
 
 void RotateStrategyEvent::do_execute() {

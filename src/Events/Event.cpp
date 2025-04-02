@@ -8,19 +8,13 @@
 #include "Simulation/Model.h"
 #include "Utils/Random.h"
 
-Event::Event() {}
-
-Event::~Event() {
-  event_manager = nullptr;
-}
-
 void Event::execute() {
-  if (executable) {
+  if (executable_) {
     try {
       do_execute();
     } catch (const std::exception& e) {
       spdlog::error("Error executing event {}: {}", name(), e.what());
     }
-    executable = false;
+    executable_ = false;
   }
 }

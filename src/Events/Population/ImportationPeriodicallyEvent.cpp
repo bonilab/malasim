@@ -15,7 +15,7 @@ ImportationPeriodicallyEvent::ImportationPeriodicallyEvent(const int& location, 
                                                            const int& number_of_cases, const int& start_day)
     : location_(location), duration_(duration), genotype_id_(genotype_id), number_of_cases_(number_of_cases) {
   // TODO: remove start_day_
-  time = start_day;
+  set_time(start_day);
 }
 
 ImportationPeriodicallyEvent::~ImportationPeriodicallyEvent() = default;
@@ -25,8 +25,7 @@ void ImportationPeriodicallyEvent::schedule_event(Scheduler* scheduler, const in
                                                   const int& start_day) {
   if (scheduler != nullptr) {
     auto* e = new ImportationPeriodicallyEvent(location, duration, genotype_id, number_of_cases, start_day);
-    e->event_manager = nullptr;
-    e->time = start_day;
+    e->set_time(start_day);
     scheduler->schedule_population_event(e);
   }
 }

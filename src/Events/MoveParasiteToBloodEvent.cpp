@@ -13,13 +13,12 @@
 
 //OBJECTPOOL_IMPL(MoveParasiteToBloodEvent)
 
-MoveParasiteToBloodEvent::MoveParasiteToBloodEvent()
-    : infection_genotype_(nullptr) {}
-
-MoveParasiteToBloodEvent::~MoveParasiteToBloodEvent() {}
-
 void MoveParasiteToBloodEvent::do_execute() {
-  auto* person = dynamic_cast<Person*>(event_manager);
+  auto* person = get_person();
+  if (person == nullptr) {
+    throw std::runtime_error("Person is nullptr");
+  }
+  
   auto* parasite_type = person->liver_parasite_type();
   person->set_liver_parasite_type(nullptr);
 

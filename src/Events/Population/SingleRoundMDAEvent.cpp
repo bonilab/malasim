@@ -12,7 +12,7 @@
 #include "Utils/Helpers/StringHelpers.h"
 
 SingleRoundMDAEvent::SingleRoundMDAEvent(const int &execute_at) {
-  time = execute_at;
+  set_time(execute_at);
 }
 
 void SingleRoundMDAEvent::do_execute() {

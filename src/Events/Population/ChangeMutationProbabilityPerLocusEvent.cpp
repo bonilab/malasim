@@ -10,7 +10,7 @@
 ChangeMutationProbabilityPerLocusEvent::ChangeMutationProbabilityPerLocusEvent(const double& value,
                                                                                const int& at_time)
         : value { value } {
-    time = at_time;
+    set_time(at_time);
 }
 void ChangeMutationProbabilityPerLocusEvent::do_execute() {
     Model::get_config()->get_genotype_parameters().set_mutation_probability_per_locus(value);

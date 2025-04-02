@@ -9,12 +9,11 @@
 #include "Population/ImmuneSystem/ImmunityClearanceUpdateFunction.h"
 #include "Treatment/ITreatmentCoverageModel.h"
 
-ReceiveMDATherapyEvent::ReceiveMDATherapyEvent() : received_therapy_(nullptr){};
-
-ReceiveMDATherapyEvent::~ReceiveMDATherapyEvent() = default;
-
 void ReceiveMDATherapyEvent::do_execute() {
-  auto* person = dynamic_cast<Person*>(event_manager);
+  auto* person = get_person();
+  if (person == nullptr) {
+    throw std::runtime_error("Person is nullptr");
+  }
   //    if (person->is_in_external_population()) {
   //        return;
   //    }

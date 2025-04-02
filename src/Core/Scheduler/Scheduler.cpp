@@ -125,29 +125,29 @@ bool Scheduler::is_today_last_day_of_month() {
 }
 
 // void Scheduler::schedule_individual_event(Event* event) {
-  // schedule_event(individual_events_list_[event->time], event);
+  // schedule_event(individual_events_list_[event->get_time()], event);
 // }
 
 void Scheduler::schedule_population_event(Event* event) {
-  if (event->time < population_events_list_.size()) {
-    schedule_event(population_events_list_[event->time], event);
+  if (event->get_time() < population_events_list_.size()) {
+    schedule_event(population_events_list_[event->get_time()], event);
   }
 }
 
 void Scheduler::schedule_event(EventPtrVector& time_events, Event* event) {
   // Schedule event in the future
   // Event time cannot exceed total time or less than current time
-  if (event->time > Model::get_config()->get_simulation_timeframe().get_total_time() || event->time < current_time_) {
-    if (event->time < current_time()) {
+  if (event->get_time() > Model::get_config()->get_simulation_timeframe().get_total_time() || event->get_time() < current_time_) {
+    if (event->get_time() < current_time()) {
       spdlog::error("Error when schedule event {} at {}. Current_time: {} - total time: {}",
-      event->name(), event->time, current_time_, total_available_time_);
+      event->name(), event->get_time(), current_time_, total_available_time_);
       spdlog::error("Cannot schedule event {} at {}. Current_time: {} - total time: {}",
-        event->name(), event->time, current_time_, total_available_time_);
+        event->name(), event->get_time(), current_time_, total_available_time_);
     }
     ObjectHelpers::delete_pointer<Event>(event);
   } else {
     time_events.push_back(event);
-    event->executable = true;
+    event->set_executable(true);
   }
 }
 
@@ -164,7 +164,7 @@ void Scheduler::clear_all_events(EventPtrVector2& events_list) {
 }
 
 void Scheduler::cancel(Event* event) {
-  event->executable = false;
+  event->set_executable(false);
 }
 
 void Scheduler::execute_events_list(EventPtrVector& events_list) {

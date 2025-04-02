@@ -7,7 +7,7 @@
 class Person;
 class Scheduler;
 
-class ReturnToResidenceEvent : public Event {
+class ReturnToResidenceEvent : public PersonEvent {
 public:
   //disallow copy and move
   ReturnToResidenceEvent(const ReturnToResidenceEvent&) = delete;
@@ -18,7 +18,7 @@ public:
 //  OBJECTPOOL(ReturnToResidenceEvent)
 
 public:
-  ReturnToResidenceEvent() = default;
+  ReturnToResidenceEvent(Person* person) : PersonEvent(person) {}
   virtual ~ReturnToResidenceEvent() = default;
 
   const std::string name() const override { return "ReturnToResidenceEvent"; }

@@ -15,7 +15,7 @@ class Person;
 
 class Genotype;
 
-class MoveParasiteToBloodEvent : public Event {
+class MoveParasiteToBloodEvent : public PersonEvent {
 public:
   //disallow copy and assign and move
   MoveParasiteToBloodEvent(const MoveParasiteToBloodEvent &orig) = delete;
@@ -25,7 +25,7 @@ public:
 
 //  OBJECTPOOL(MoveParasiteToBloodEvent)
 private:
-  Genotype* infection_genotype_;
+  Genotype* infection_genotype_{nullptr};
 public:
   Genotype* infection_genotype(){return infection_genotype_;}
   void set_infection_genotype(Genotype* infection_genotype) {
@@ -33,10 +33,8 @@ public:
   }
 
 public:
-  MoveParasiteToBloodEvent();
-
-  //    MoveParasiteToBloodEvent(const MoveParasiteToBloodEvent& orig);
-  virtual ~MoveParasiteToBloodEvent();
+  MoveParasiteToBloodEvent(Person* person) : PersonEvent(person) {}
+  virtual ~MoveParasiteToBloodEvent() = default;
 
   const std::string name() const override { return "MoveParasiteToBloodEvent"; }
 

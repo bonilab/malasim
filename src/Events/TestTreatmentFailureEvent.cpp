@@ -9,12 +9,12 @@
 
 //OBJECTPOOL_IMPL(TestTreatmentFailureEvent)
 
-TestTreatmentFailureEvent::TestTreatmentFailureEvent()
-    : clinical_caused_parasite_(nullptr), therapy_id_(0) {}
-
 
 void TestTreatmentFailureEvent::do_execute() {
-  auto* person = dynamic_cast<Person*>(event_manager);
+  auto* person = get_person();
+  if (person == nullptr) {
+    throw std::runtime_error("Person is nullptr");
+  }
 
   // If the parasite is still present at a detectable level, then it's a
   // treatment failure

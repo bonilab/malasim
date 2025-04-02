@@ -345,9 +345,7 @@ void Population::generate_individual(int location, int age_class) {
     }
     p->get_immune_system()->set_immune_component(new InfantImmuneComponent());
     // schedule for switch
-    SwitchImmuneComponentEvent::schedule_for_switch_immune_component_event(
-        model_->get_scheduler(), p,
-        simulation_time_birthday + (Constants::DAYS_IN_YEAR / 2));
+    p->schedule_switch_immune_component_event(simulation_time_birthday + (Constants::DAYS_IN_YEAR / 2));
   } else {
     // LOG(INFO) << "Adult: " << p->age() << " - " << simulation_time_birthday;
     p->get_immune_system()->
@@ -514,8 +512,7 @@ void Population::give_1_birth(const int& location) {
   p->schedule_birthday_event(number_of_days_to_next_birthday);
 
   // schedule for switch
-  SwitchImmuneComponentEvent::schedule_for_switch_immune_component_event(
-      model_->get_scheduler(), p, model_->get_scheduler()->current_time() + (Constants::DAYS_IN_YEAR / 2));
+  p->schedule_switch_immune_component_event( Constants::DAYS_IN_YEAR / 2);
 
   //    p->startLivingTime = (Global::startTreatmentDay > Global::scheduler->currentTime) ? Global::startTreatmentDay :
   //    Global::scheduler->currentTime;

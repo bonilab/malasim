@@ -12,7 +12,7 @@ class Therapy;
 
 class ClonalParasitePopulation;
 
-class ReceiveTherapyEvent : public Event {
+class ReceiveTherapyEvent : public PersonEvent {
 public:
   //disallow copy and assign and move
   ReceiveTherapyEvent(const ReceiveTherapyEvent &) = delete;
@@ -33,10 +33,10 @@ public:
   bool is_part_of_MAC_therapy { false };
 
 public:
-  ReceiveTherapyEvent();
+  ReceiveTherapyEvent(Person* person) : PersonEvent(person) {}
 
   //    ReceiveTherapyEvent(const ReceiveTherapyEvent& orig);
-  virtual ~ReceiveTherapyEvent();
+  virtual ~ReceiveTherapyEvent() = default;
 
   const std::string name() const override {
     return "ReceiveTherapyEvent";

@@ -13,7 +13,7 @@ IntroduceTrippleMutantToDPMEvent::IntroduceTrippleMutantToDPMEvent(
                                                const double &fraction,
                                                const std::vector<std::tuple<int,int,char>> &alleles) :
 location_(location),fraction_(fraction), alleles_(alleles){
-  time = execute_at;
+  set_time(execute_at);
 }
 
 IntroduceTrippleMutantToDPMEvent::~IntroduceTrippleMutantToDPMEvent() = default;

@@ -7,7 +7,7 @@
 
 TurnOnMutationEvent::TurnOnMutationEvent(const int &at_time, const double &mutation_probability) :
   mutation_probability{mutation_probability} {
-  time = at_time;
+  set_time(at_time);
 }
 
 void TurnOnMutationEvent::do_execute() {

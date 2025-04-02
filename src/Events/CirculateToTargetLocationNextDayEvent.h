@@ -12,7 +12,7 @@
 class Person;
 class Scheduler;
 
-class CirculateToTargetLocationNextDayEvent : public Event {
+class CirculateToTargetLocationNextDayEvent : public PersonEvent {
 public:
    //disallow copy and move
   CirculateToTargetLocationNextDayEvent(const CirculateToTargetLocationNextDayEvent&) = delete;
@@ -28,7 +28,7 @@ public:
   void set_target_location(int value) { target_location_ = value; }
 
 public:
-  CirculateToTargetLocationNextDayEvent() : target_location_(0) {}
+  CirculateToTargetLocationNextDayEvent(Person* person) : PersonEvent(person), target_location_(0) {}
   ~CirculateToTargetLocationNextDayEvent() override = default;
 
   const std::string name() const override { return "CirculateToTargetLocationNextDayEvent"; }

@@ -15,7 +15,7 @@ class EventManagerTest;  // Forward declaration
 class MockEvent : public Event {
 public:
     explicit MockEvent(const int time) {
-        this->time = time;
+        this->set_time(time);
     }
 
     MOCK_METHOD(const std::string, name, (), (const, override));
@@ -38,7 +38,7 @@ protected:
 // public:
 //     explicit DestructionTrackingEvent(const int time, bool* destroyed) 
 //         : destroyed_(destroyed) {
-//         this->time = time;
+//         this->set_time(time);
 //     }
     
 //     ~DestructionTrackingEvent() override {
@@ -156,9 +156,9 @@ TEST_F(EventManagerTest, CancelAllEventsExcept) {
     // Verify cancelled events are marked non-executable
     for (auto& [time, event] : event_manager.get_events()) {
         if (event.get() != event2) {
-            EXPECT_FALSE(event->executable);
+            EXPECT_FALSE(event->is_executable());
         } else {
-            EXPECT_TRUE(event->executable);
+            EXPECT_TRUE(event->is_executable());
         }
     }
     
@@ -349,7 +349,7 @@ TEST_F(EventManagerTest, RescheduleEventDuringExecution) {
         // event1 will try to reschedule event2 to an earlier time
         EXPECT_CALL(*event1, do_execute())
             .WillOnce(::testing::Invoke([event2]() {
-                event2->time = 15;  // This shouldn't affect the already scheduled event
+                event2->set_time(15);  // This shouldn't affect the already scheduled event
             }));
         EXPECT_CALL(*event1, die()).Times(1);
         

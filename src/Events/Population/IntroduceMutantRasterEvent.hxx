@@ -47,7 +47,7 @@ public:
                             const  std::vector<std::tuple<int,int,char>> &alleles)
       : IntroduceMutantEventBase(fraction, alleles),
         locations_(std::move(locations)) {
-    this->time = time;
+    this->set_time(time);
   }
 
   ~IntroduceMutantRasterEvent() override = default;

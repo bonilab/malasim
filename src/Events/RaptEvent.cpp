@@ -18,7 +18,11 @@
 #include "Events/TestTreatmentFailureEvent.h"
 
 void RaptEvent::do_execute() {
-  auto* person = dynamic_cast<Person*>(event_manager);
+  auto* person = get_person();
+  if (person == nullptr) {
+    throw std::runtime_error("Person is nullptr");
+  }
+  
   const auto raptConfig = Model::get_config()->get_rapt_settings();
 
   // Check to see if we should receive a therapy: RAPT is currently active, the

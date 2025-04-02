@@ -24,10 +24,6 @@
 
 // OBJECTPOOL_IMPL(ProgressToClinicalEvent)
 
-ProgressToClinicalEvent::ProgressToClinicalEvent() : clinical_caused_parasite_(nullptr) {}
-
-ProgressToClinicalEvent::~ProgressToClinicalEvent() = default;
-
 bool ProgressToClinicalEvent::should_receive_treatment(Person *person) {
   return Model::get_random()->random_flat(0.0, 1.0) <= Model::get_treatment_coverage()->get_probability_to_be_treated(
       person->get_location(), person->get_age());
@@ -102,7 +98,11 @@ void ProgressToClinicalEvent::apply_therapy(Person *person, Therapy *therapy, bo
 }
 
 void ProgressToClinicalEvent::do_execute() {
-  auto *person = dynamic_cast<Person *>(event_manager);
+  auto *person = get_person();
+  
+  if (person == nullptr) {
+    throw std::runtime_error("Person is nullptr");
+  }
   if (person->get_all_clonal_parasite_populations()->size()==0) {
     //parasites might be cleaned by immune system or other things else
     return;

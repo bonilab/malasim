@@ -36,7 +36,7 @@ public:
       "change_circulation_percent_event";
 
   ChangeCirculationPercentEvent(float rate, int start) : rate_(rate) {
-    time = start;
+    set_time(start);
   }
   ~ChangeCirculationPercentEvent() override = default;
 

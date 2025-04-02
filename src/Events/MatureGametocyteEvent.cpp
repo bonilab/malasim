@@ -9,13 +9,12 @@
 
 // OBJECTPOOL_IMPL(MatureGametocyteEvent)
 
-MatureGametocyteEvent::MatureGametocyteEvent() : blood_parasite_(nullptr) {}
-
-MatureGametocyteEvent::~MatureGametocyteEvent() = default;
-
 void MatureGametocyteEvent::do_execute() {
   // spdlog::info("Mature gametocyte event executed {}", get_id());
-  auto* person = dynamic_cast<Person*>(event_manager);
+  auto* person = get_person();
+  if (person == nullptr) {
+    throw std::runtime_error("Person is nullptr");
+  }
   if (person->get_all_clonal_parasite_populations()->contain(blood_parasite_)) {
     blood_parasite_->set_gametocyte_level(
         Model::get_config()->get_epidemiological_parameters().get_gametocyte_level_full());

@@ -9,7 +9,7 @@
 ChangeTreatmentStrategyEvent::ChangeTreatmentStrategyEvent(const int &at_time,
                                                            const int &strategy_id)
     : strategy_id(strategy_id) {
-  time = at_time;
+  set_time(at_time);
 }
 
 void ChangeTreatmentStrategyEvent::do_execute() {

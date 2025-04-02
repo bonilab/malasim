@@ -12,12 +12,11 @@
 #include "Simulation/Model.h"
 #include "Population/Person/Person.h"
 
-ReportTreatmentFailureDeathEvent::ReportTreatmentFailureDeathEvent()
-    : age_class_(0), location_id_(0), therapy_id_(0) {}
-
-ReportTreatmentFailureDeathEvent::~ReportTreatmentFailureDeathEvent() = default;
-
 void ReportTreatmentFailureDeathEvent::do_execute() {
+  auto* person = get_person();
+  if (person == nullptr) {
+    throw std::runtime_error("Person is nullptr");
+  }
   Model::get_mdc()->record_1_treatment_failure_by_therapy(
-      location_id(), age_class(), therapy_id());
+      person->get_location(), person->get_age_class(), therapy_id());
 }

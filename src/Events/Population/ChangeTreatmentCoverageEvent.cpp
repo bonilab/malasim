@@ -8,7 +8,7 @@
 
 ChangeTreatmentCoverageEvent::ChangeTreatmentCoverageEvent(
     ITreatmentCoverageModel* tcm) {
-  time = tcm->starting_time;
+  set_time(tcm->starting_time);
   treatment_coverage_model = tcm;
 }
 
@@ -26,5 +26,5 @@ spdlog::info("{}: change treatment coverage model to {}",
     linear_tcm->update_rate_of_change();
   }
   treatment_coverage_model = nullptr;
-  executable = false;
+  set_executable(false);
 }

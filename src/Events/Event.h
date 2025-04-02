@@ -3,8 +3,6 @@
 
 #include <string>
 
-class EventManager;
-
 class Event {
 public:
     // Disable copy and assignment
@@ -13,25 +11,41 @@ public:
     Event(Event&&) = delete;
     Event& operator=(Event&&) = delete;
 
-    Event();
-    virtual ~Event();
+    Event() = default;
+    virtual ~Event() = default;
 
     // Public interface
     void execute();  // Non-virtual public interface (Template Method)
     virtual const std::string name() const = 0;
 
-    bool executable{false};
-    EventManager* event_manager{nullptr};
-    int time{-1};
+    // Public state management
+    bool is_executable() const { return executable_; }
+    void set_executable(bool value) { executable_ = value; }
+    
+    int get_time() const { return time_; }
+    void set_time(int value) { time_ = value; }
 
 protected:
     // Protected interface for derived classes
     virtual void do_execute() = 0;  // Hook method for derived classes
 
 private:
-
-    // Friend declaration to allow EventManager to set executable state
-    friend class EventManager;
+    bool executable_{false};
+    int time_{-1};
 };
+
+class Person;
+
+class PersonEvent : public Event {
+public:
+    PersonEvent(Person* person) : person_(person) {}
+
+    Person* get_person() const { return person_; }
+    void set_person(Person* person) { person_ = person; }
+private:
+    Person* person_;
+};
+
+class WorldEvent : public Event {};
 
 #endif // EVENT_H

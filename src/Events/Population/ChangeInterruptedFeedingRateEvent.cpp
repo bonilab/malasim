@@ -6,7 +6,7 @@
 ChangeInterruptedFeedingRateEvent::ChangeInterruptedFeedingRateEvent(const int &location, const double &ifr, const int &at_time)
     : location{location},
       ifr{ifr} {
-  time = at_time;
+  set_time(at_time);
 }
 
 void ChangeInterruptedFeedingRateEvent::do_execute() {

@@ -31,7 +31,7 @@ void EventManager::execute_events(int time) {
     for (auto it = range.first; it != range.second; ++it) {
       auto* event = it->second.get();
       try {
-        if (event->executable) {
+        if (event->is_executable()) {
           event->execute();
         }
       }
@@ -43,10 +43,4 @@ void EventManager::execute_events(int time) {
     // Erase all events at this time point at once
     erase_events_at_time(current_time);
   }
-}
-
-void EventManager::schedule_event(Event* event) {
-  event->executable = true;
-  event->event_manager = this;
-  events_.insert(std::make_pair(event->time, std::unique_ptr<Event>(event)));
 }

@@ -17,7 +17,7 @@ class Scheduler;
 
 class Person;
 
-class TestTreatmentFailureEvent : public Event {
+class TestTreatmentFailureEvent : public PersonEvent {
 public:
   //disallow copy, assign and move
   TestTreatmentFailureEvent(const TestTreatmentFailureEvent&) = delete;
@@ -36,7 +36,7 @@ public:
     void set_therapy_id(int value) { therapy_id_ = value; }
 
 public:
-  TestTreatmentFailureEvent();
+  TestTreatmentFailureEvent(Person* person) : PersonEvent(person), clinical_caused_parasite_(nullptr), therapy_id_(0) {}
   ~TestTreatmentFailureEvent() override = default;
 
   const std::string name() const override { return "TestTreatmentFailureEvent"; }

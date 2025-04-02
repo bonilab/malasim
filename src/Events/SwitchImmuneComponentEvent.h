@@ -1,5 +1,5 @@
-#ifndef SWITCHIMMUNECOMPONENTEVENT_H
-#define    SWITCHIMMUNECOMPONENTEVENT_H
+#ifndef SWITCH_IMMUNE_COMPONENT_EVENT_H
+#define SWITCH_IMMUNE_COMPONENT_EVENT_H
 
 #include "Event.h"
 //#include "Core/ObjectPool.h"
@@ -8,25 +8,24 @@ class Scheduler;
 
 class Person;
 
-class SwitchImmuneComponentEvent : public Event {
+class SwitchImmuneComponentEvent : public PersonEvent {
 // OBJECTPOOL(SwitchImmuneComponentEvent)
 
  public:
-  SwitchImmuneComponentEvent();
+  SwitchImmuneComponentEvent(Person* person);
 
-  SwitchImmuneComponentEvent(const SwitchImmuneComponentEvent &orig);
+  ~SwitchImmuneComponentEvent() override;
 
-  virtual ~SwitchImmuneComponentEvent();
-
-  static void schedule_for_switch_immune_component_event(Scheduler *scheduler, Person *p, const int &time);
-
-  virtual const std::string name() const {
+  const std::string name() const override {
     return "SwitchImmuneComponentEvent";
   }
 
+ protected:
+  void do_execute() override;
+
  private:
-  virtual void do_execute();
+  Person* person_;  // Store direct reference to person
 };
 
-#endif    /* SWITCHIMMUNECOMPONENTEVENT_H */
+#endif    /* SWITCH_IMMUNE_COMPONENT_EVENT_H */
 

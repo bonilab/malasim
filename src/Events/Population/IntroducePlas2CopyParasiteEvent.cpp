@@ -13,7 +13,7 @@
 IntroducePlas2CopyParasiteEvent::IntroducePlas2CopyParasiteEvent(
     const int &location, const int &execute_at, const double &fraction)
     : location_(location), fraction_(fraction) {
-  time = execute_at;
+  set_time(execute_at);
 }
 
 IntroducePlas2CopyParasiteEvent::~IntroducePlas2CopyParasiteEvent() = default;

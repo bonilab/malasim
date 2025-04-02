@@ -10,7 +10,7 @@ class Scheduler;
 
 class Person;
 
-class EndClinicalEvent : public Event {
+class EndClinicalEvent : public PersonEvent {
 public:
   //disallow copy, assign and move
   EndClinicalEvent(const EndClinicalEvent&) = delete;
@@ -26,10 +26,10 @@ public:
     void set_clinical_caused_parasite(ClonalParasitePopulation* value) { clinical_caused_parasite_ = value; }
 
 public:
-  EndClinicalEvent();
+  EndClinicalEvent(Person* person) : PersonEvent(person) {}
 
   //    EndClinicalEvent(const EndClinicalEvent& orig);
-  virtual ~EndClinicalEvent();
+  virtual ~EndClinicalEvent() = default;
 
   const std::string name() const override { return "EndClinicalEvent"; }
 

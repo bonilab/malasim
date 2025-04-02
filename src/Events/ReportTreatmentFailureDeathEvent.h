@@ -13,7 +13,7 @@
 class Person;
 class Scheduler;
 
-class ReportTreatmentFailureDeathEvent : public Event {
+class ReportTreatmentFailureDeathEvent : public PersonEvent {
 public:
   //disallow copy and move
   ReportTreatmentFailureDeathEvent(const ReportTreatmentFailureDeathEvent&) = delete;
@@ -22,9 +22,9 @@ public:
   // OBJECTPOOL(ReportTreatmentFailureDeathEvent)
 
 private:
-  int age_class_;
-  int location_id_;
-  int therapy_id_;
+  int age_class_{-1};
+  int location_id_{-1};
+  int therapy_id_{-1};
 public:
   int age_class() const { return age_class_; }
   void set_age_class(int value) { age_class_ = value; }
@@ -34,8 +34,8 @@ public:
   void set_therapy_id(int value) { therapy_id_ = value; }
 
 public:
-  ReportTreatmentFailureDeathEvent();
-  ~ReportTreatmentFailureDeathEvent() override;
+  ReportTreatmentFailureDeathEvent(Person* person) : PersonEvent(person), age_class_(0), location_id_(0), therapy_id_(0) {}
+  ~ReportTreatmentFailureDeathEvent() override = default;
 
   const std::string name() const override { return "ReportTreatmentFailureDeathEvent"; }
 

@@ -5,7 +5,7 @@
 
 ChangeMutationMaskEvent::ChangeMutationMaskEvent(const std::string &mask, const int &at_time)
     : mask_{mask}{
-  time = at_time;
+  set_time(at_time);
 }
 
 void ChangeMutationMaskEvent::do_execute() {
