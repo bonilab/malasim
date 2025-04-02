@@ -28,7 +28,7 @@ void RaptEvent::schedule_event(Scheduler* scheduler, Person* p,
   }
 }
 
-void RaptEvent::execute() {
+void RaptEvent::do_execute() {
   auto* person = dynamic_cast<Person*>(dispatcher);
   const auto raptConfig = Model::get_config()->get_rapt_settings();
 

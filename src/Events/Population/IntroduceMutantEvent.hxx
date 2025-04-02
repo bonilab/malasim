@@ -27,7 +27,7 @@ private:
   int admin_level_id_;
   int unit_id_;
 
-  void execute() override {
+  void do_execute() override {
     // Calculate the target fraction of the district infections and perform them
     // as needed
     auto locations =
@@ -58,7 +58,7 @@ public:
   ~IntroduceMutantEvent() override = default;
 
   // Return the name of this event
-  std::string name() override { return EventName; }
+  const std::string name() const override { return EventName; }
 };
 
 #endif

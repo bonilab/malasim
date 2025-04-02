@@ -36,10 +36,10 @@ public:
                              ClonalParasitePopulation* blood_parasite,
                              const int &time);
 
-  std::string name() override { return "MatureGametocyteEvent"; }
+  const std::string name() const override { return "MatureGametocyteEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif /* MATUREGAMETOCYTEEVENT_H */

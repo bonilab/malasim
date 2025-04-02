@@ -35,12 +35,12 @@ public:
   static void schedule_event(Scheduler *scheduler, Person *p, ClonalParasitePopulation *clinical_caused_parasite,
                              const int &time);
 
-  std::string name() override {
+  const std::string name() const override {
     return "UpdateByHavingDrugEvent";
   }
 
  private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif    /* UPDATEWHENDRUGISPRESENTEVENT_H */

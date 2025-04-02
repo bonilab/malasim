@@ -23,12 +23,12 @@ public:
 
   ~ChangeInterruptedFeedingRateEvent() override = default;
 
-  std::string name() override {
+  const std::string name() const override {
     return "ChangeInterruptedFeedingRateEvent";
   }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif  // POMS_CHANGEINTERRUPTEDFEEDINGRATEEVENT_H

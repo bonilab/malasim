@@ -19,19 +19,26 @@ public:
     Event(Event&&) = delete;
     Event& operator=(Event&&) = delete;
 
-    bool executable{false};
-
     Event();
     virtual ~Event();
 
-    // TODO: consider to remove these two pointers
-    Scheduler* scheduler;
+    // Public interface
+    void execute();  // Non-virtual public interface (Template Method)
+    virtual const std::string name() const = 0;
+
+    bool executable{false};
     Dispatcher* dispatcher{nullptr};
-    void perform_execute();
-    virtual std::string name() = 0;
+    Scheduler* scheduler{nullptr};
     int time{-1};
+
+protected:
+    // Protected interface for derived classes
+    virtual void do_execute() = 0;  // Hook method for derived classes
+
 private:
-    virtual void execute() = 0;
+
+    // Friend declaration to allow Dispatcher to set executable state
+    friend class Dispatcher;
 };
 
 #endif // EVENT_H

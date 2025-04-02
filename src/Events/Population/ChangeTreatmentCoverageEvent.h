@@ -12,10 +12,10 @@ public:
 
   virtual ~ChangeTreatmentCoverageEvent();
 
-  std::string name() override { return "ChangeTreatmentCoverageEvent"; }
+  const std::string name() const override { return "ChangeTreatmentCoverageEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif  // CHANGETREATMENTCOVERAGEEVENT_H

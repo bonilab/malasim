@@ -42,12 +42,12 @@ public:
 
   static void schedule_event(Scheduler *scheduler, IntroduceParasitesPeriodicallyEventV2* old_event);
 
-  std::string name() override {
+  const std::string name() const override {
     return "IntroduceParasitesPeriodicallyEventV2";
   }
 
 private:
-  void execute() override;
+  void do_execute() override;
 
 };
 

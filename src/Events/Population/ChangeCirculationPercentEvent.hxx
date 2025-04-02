@@ -16,7 +16,7 @@ private:
   float rate_ = 0.0;
 
   // Execute the event to change the circulation percentage
-  void execute() override {
+  void do_execute() override {
     MovementSettings::CirculationInfo circulation_info =
         Model::get_config()->get_movement_settings().get_circulation_info();
     circulation_info.set_circulation_percent(rate_);
@@ -41,7 +41,7 @@ public:
   ~ChangeCirculationPercentEvent() override = default;
 
   // Return the name of this event
-  std::string name() override { return EventName; }
+  const std::string name() const override { return EventName; }
 };
 
 #endif

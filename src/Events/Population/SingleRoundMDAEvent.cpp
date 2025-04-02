@@ -15,7 +15,7 @@ SingleRoundMDAEvent::SingleRoundMDAEvent(const int &execute_at) {
   time = execute_at;
 }
 
-void SingleRoundMDAEvent::execute() {
+void SingleRoundMDAEvent::do_execute() {
   spdlog::info("{}: executing Single Round MDA",
     StringHelpers::date_as_string(date::year_month_day{scheduler->calendar_date}));
 

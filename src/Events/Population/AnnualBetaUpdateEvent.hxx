@@ -21,7 +21,7 @@ private:
   float rate_ = 0.0;
 
   // Execute the annual beta update event
-  void execute() override {
+  void do_execute() override {
     // Grab a reference to the location_db to work with
     auto &location_db = Model::get_config()->location_db();
 
@@ -61,7 +61,7 @@ public:
   ~AnnualBetaUpdateEvent() = default;
 
   // Return the name of this event
-  std::string name() override { return EventName; }
+  const std::string name() const override { return EventName; }
 };
 
 #endif

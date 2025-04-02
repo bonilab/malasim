@@ -25,7 +25,7 @@ void ReceiveMDATherapyEvent::schedule_event(Scheduler* scheduler, Person* p,
   }
 }
 
-void ReceiveMDATherapyEvent::execute() {
+void ReceiveMDATherapyEvent::do_execute() {
   auto* person = dynamic_cast<Person*>(dispatcher);
   //    if (person->is_in_external_population()) {
   //        return;

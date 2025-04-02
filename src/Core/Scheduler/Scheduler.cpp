@@ -171,7 +171,7 @@ void Scheduler::cancel(Event* event) {
 void Scheduler::execute_events_list(EventPtrVector& events_list) {
   for (auto& event : events_list) {
     // std::cout << "execute_events_list " << event->name() << " id: " << event->get_id() << std::endl;
-    event->perform_execute();
+    event->execute();
     ObjectHelpers::delete_pointer<Event>(event);
   }
   ObjectHelpers::clear_vector_memory<Event>(events_list);

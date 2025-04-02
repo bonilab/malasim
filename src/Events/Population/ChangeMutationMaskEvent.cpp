@@ -8,7 +8,7 @@ ChangeMutationMaskEvent::ChangeMutationMaskEvent(const std::string &mask, const 
   time = at_time;
 }
 
-void ChangeMutationMaskEvent::execute() {
+void ChangeMutationMaskEvent::do_execute() {
   Model::get_config()->get_genotype_parameters().set_mutation_mask(mask_);
   spdlog::info("{}: change mutation mask to {}",
     StringHelpers::date_as_string(date::year_month_day{scheduler->calendar_date}), mask_);

@@ -26,7 +26,7 @@ void UpdateWhenDrugIsPresentEvent::schedule_event(Scheduler *scheduler, Person *
   }
 }
 
-void UpdateWhenDrugIsPresentEvent::execute() {
+void UpdateWhenDrugIsPresentEvent::do_execute() {
   auto *person = dynamic_cast<Person *>(dispatcher);
   if (person->drugs_in_blood()->size() > 0) {
     if (person->get_all_clonal_parasite_populations()->contain(clinical_caused_parasite_) && person->get_host_state()==

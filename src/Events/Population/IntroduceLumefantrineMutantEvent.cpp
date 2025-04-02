@@ -21,7 +21,7 @@ location_(location),fraction_(fraction), alleles_(alleles){
 IntroduceLumefantrineMutantEvent ::~IntroduceLumefantrineMutantEvent() =
     default;
 
-void IntroduceLumefantrineMutantEvent::execute() {
+void IntroduceLumefantrineMutantEvent::do_execute() {
   auto* pi =
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 

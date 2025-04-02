@@ -17,7 +17,7 @@ private:
     int years_;
 
 private:
-  void execute() override;
+  void do_execute() override;
 
 public:
   inline static const std::string EventName = "rotate_treatment_strategy_event";
@@ -26,7 +26,7 @@ public:
                       int next_strategy_id);
   ~RotateStrategyEvent() override = default;
 
-  std::string name() override { return EventName; }
+  const std::string name() const override { return EventName; }
 };
 
 #endif

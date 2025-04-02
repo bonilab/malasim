@@ -29,7 +29,7 @@ void DistrictImportationDailyEvent::schedule_event(Scheduler* scheduler,
   }
 }
 
-void DistrictImportationDailyEvent::execute() {
+void DistrictImportationDailyEvent::do_execute() {
   // std::cout << date::year_month_day{ Model::get_scheduler()->calendar_date } <<
   // ":import periodically event" << std::endl;
   // schedule importation for the next day

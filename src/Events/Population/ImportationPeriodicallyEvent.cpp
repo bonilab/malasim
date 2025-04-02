@@ -31,7 +31,7 @@ void ImportationPeriodicallyEvent::schedule_event(Scheduler* scheduler, const in
   }
 }
 
-void ImportationPeriodicallyEvent::execute() {
+void ImportationPeriodicallyEvent::do_execute() {
   // std::cout << date::year_month_day{ Model::get_scheduler()->calendar_date } << ":import periodically event" << std::endl;
   // schedule importation for the next day
   schedule_event(Model::get_scheduler(), location_, duration_, genotype_id_, number_of_cases_,

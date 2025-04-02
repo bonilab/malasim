@@ -22,12 +22,12 @@ public:
 
     ~ChangeMutationProbabilityPerLocusEvent() override = default;
 
-    std::string name() override {
+    const std::string name() const override {
         return "ChangeMutationProbabilityPerLocusEvent";
     }
 
 private:
-    void execute() override;
+    void do_execute() override;
 };
 
 

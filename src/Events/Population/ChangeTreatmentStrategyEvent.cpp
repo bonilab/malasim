@@ -12,7 +12,7 @@ ChangeTreatmentStrategyEvent::ChangeTreatmentStrategyEvent(const int &at_time,
   time = at_time;
 }
 
-void ChangeTreatmentStrategyEvent::execute() {
+void ChangeTreatmentStrategyEvent::do_execute() {
   Model::get_instance().set_treatment_strategy(strategy_id);
   spdlog::info("Day {}: Change treatment strategy to {}",
                Model::get_scheduler()->current_time(),

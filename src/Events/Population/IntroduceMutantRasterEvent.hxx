@@ -23,7 +23,7 @@ public:
 private:
   std::vector<int> locations_;
 
-  void execute() override {
+  void do_execute() override {
     // Use the locations to calculate the target fraction of mutations and
     // perform them
     auto target_fraction = calculate(locations_);
@@ -53,7 +53,7 @@ public:
   ~IntroduceMutantRasterEvent() override = default;
 
   // Return the name of this event
-  std::string name() override { return EventName; }
+  const std::string name() const override { return EventName; }
 };
 
 #endif

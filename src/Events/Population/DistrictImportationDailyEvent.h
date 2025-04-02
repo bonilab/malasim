@@ -28,10 +28,10 @@ public:
   static void schedule_event(Scheduler* scheduler, int district, double dailyRate, int startDay,
     const std::vector<std::tuple<int,int,char>> &alleles);
 
-  std::string name() override { return "DistrictImportationDailyEvent"; }
+  const std::string name() const override { return "DistrictImportationDailyEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif  // DISTRICTIMPORTATIONDAILYEVENT_H

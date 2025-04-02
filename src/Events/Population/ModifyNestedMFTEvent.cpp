@@ -14,7 +14,7 @@ ModifyNestedMFTEvent::ModifyNestedMFTEvent(const int &at_time,
   time = at_time;
 }
 
-void ModifyNestedMFTEvent::execute() {
+void ModifyNestedMFTEvent::do_execute() {
   IStrategy* new_strategy = nullptr;
   if (Model::get_treatment_strategy()->type == IStrategy::NestedMFTMultiLocation) {
     new_strategy = Model::get_config()->strategy_db()[strategy_id];

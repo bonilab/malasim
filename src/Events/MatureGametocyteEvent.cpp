@@ -27,7 +27,7 @@ void MatureGametocyteEvent::schedule_event(
   }
 }
 
-void MatureGametocyteEvent::execute() {
+void MatureGametocyteEvent::do_execute() {
   // spdlog::info("Mature gametocyte event executed {}", get_id());
   auto* person = dynamic_cast<Person*>(dispatcher);
   if (person->get_all_clonal_parasite_populations()->contain(blood_parasite_)) {

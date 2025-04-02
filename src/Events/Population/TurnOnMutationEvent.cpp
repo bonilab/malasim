@@ -10,7 +10,7 @@ TurnOnMutationEvent::TurnOnMutationEvent(const int &at_time, const double &mutat
   time = at_time;
 }
 
-void TurnOnMutationEvent::execute() {
+void TurnOnMutationEvent::do_execute() {
   Model::get_config()->get_genotype_parameters().set_mutation_probability_per_locus(mutation_probability);
     spdlog::info("{}: turn mutation on with probability {}",
         StringHelpers::date_as_string(date::year_month_day{scheduler->calendar_date}),

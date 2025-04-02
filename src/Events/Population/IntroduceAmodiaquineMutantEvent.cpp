@@ -22,7 +22,7 @@ location_(location),fraction_(fraction), alleles_(alleles){
 
 IntroduceAmodiaquineMutantEvent::~IntroduceAmodiaquineMutantEvent() = default;
 
-void IntroduceAmodiaquineMutantEvent::execute() {
+void IntroduceAmodiaquineMutantEvent::do_execute() {
   auto* pi =
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 

@@ -29,7 +29,7 @@ void Dispatcher::execute_events(int time) {
 
     try {
       if (event->executable) {
-        event->perform_execute();
+        event->execute();
       }
     }
     catch (const std::exception& ex) {

@@ -23,10 +23,10 @@ public:
 
   static void schedule_event(Scheduler* scheduler, Person* p, const int &time);
 
-  std::string name() override { return "ReturnToResidenceEvent"; }
+  const std::string name() const override { return "ReturnToResidenceEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif

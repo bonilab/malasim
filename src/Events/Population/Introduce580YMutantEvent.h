@@ -27,12 +27,12 @@ public:
   //    ImportationEvent(const ImportationEvent& orig);
   ~Introduce580YMutantEvent() override;
 
-  std::string name() override {
+  const std::string name() const override {
     return "580YImportationEvent";
   }
 
 private:
-  void execute() override;
+  void do_execute() override;
 
 };
 

@@ -33,10 +33,10 @@ public:
 
   static void schedule_event(Scheduler* scheduler, Person* p,
                              const int &target_location, const int &time);
-  std::string name() override;
+  const std::string name() const override { return "CirculateToTargetLocationNextDayEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif

@@ -32,11 +32,11 @@ public:
 
   static void schedule_event(Scheduler* schedule, const int &time);
 
-  std::string name() override { return "ClinicalStudy"; }
+  const std::string name() const override { return "ClinicalStudy"; }
 
 private:
   // Triggered by the scheduler
-  void execute() override;
+  void do_execute() override;
 
   // Check persons that have already been enrolled in the study at T+28
   // to determine if they have cleared the parasite or not.

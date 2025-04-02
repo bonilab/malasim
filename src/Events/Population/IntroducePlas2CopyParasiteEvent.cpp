@@ -18,7 +18,7 @@ IntroducePlas2CopyParasiteEvent::IntroducePlas2CopyParasiteEvent(
 
 IntroducePlas2CopyParasiteEvent::~IntroducePlas2CopyParasiteEvent() = default;
 
-void IntroducePlas2CopyParasiteEvent::execute() {
+void IntroducePlas2CopyParasiteEvent::do_execute() {
   auto* pi =
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 

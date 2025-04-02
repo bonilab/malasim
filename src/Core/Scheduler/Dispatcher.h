@@ -32,14 +32,24 @@ public:
   virtual void initialize();
 
   // this will execute all events at the given time
-  void execute_events(int time);
+  virtual void execute_events(int time);
 
   // this will transfer ownership of the event to the dispatcher
   void schedule_event(Event* event);
 
+  // Convenience method to check if any event exists
+  bool has_event() const {
+    return !events_.empty();
+  }
+
   template <typename T>
   bool has_event() const {
     for (auto& [time, event] : events_) {
+      // For Event base class, return true if any event exists
+      if constexpr (std::is_same_v<T, Event>) {
+        return !events_.empty();
+      }
+      // For specific event types, use dynamic_cast to check exact type
       if (dynamic_cast<T*>(event.get()) != nullptr) {
         return true;
       }

@@ -29,12 +29,12 @@ public:
   //    ImportationEvent(const ImportationEvent& orig);
   ~IntroduceTrippleMutantToDPMEvent() override;
 
-  std::string name() override {
+  const std::string name() const override {
     return "IntroduceTrippleMutantToDPMEvent";
   }
 
 private:
-  void execute() override;
+  void do_execute() override;
 
 };
 

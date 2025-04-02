@@ -18,7 +18,7 @@ location_(location),fraction_(fraction), alleles_(alleles){
 
 IntroduceTrippleMutantToDPMEvent::~IntroduceTrippleMutantToDPMEvent() = default;
 
-void IntroduceTrippleMutantToDPMEvent::execute() {
+void IntroduceTrippleMutantToDPMEvent::do_execute() {
   auto* pi = Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 
 

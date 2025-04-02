@@ -30,7 +30,7 @@ void EndClinicalEvent::schedule_event(
   }
 }
 
-void EndClinicalEvent::execute() {
+void EndClinicalEvent::do_execute() {
   auto person = dynamic_cast<Person*>(dispatcher);
 
   if (person->get_all_clonal_parasite_populations()->size() == 0) {

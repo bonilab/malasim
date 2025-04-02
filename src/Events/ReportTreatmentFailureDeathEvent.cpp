@@ -33,7 +33,7 @@ void ReportTreatmentFailureDeathEvent::schedule_event(Scheduler* scheduler,
   //scheduler->schedule_individual_event(event);
 }
 
-void ReportTreatmentFailureDeathEvent::execute() {
+void ReportTreatmentFailureDeathEvent::do_execute() {
   Model::get_mdc()->record_1_treatment_failure_by_therapy(
       location_id(), age_class(), therapy_id());
 }

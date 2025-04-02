@@ -41,12 +41,12 @@ public:
   static void schedule_event(Scheduler *scheduler, Person *p, Therapy *therapy, const int &time,
                              ClonalParasitePopulation *clinical_caused_parasite, bool is_part_of_MAC_therapy = false);
 
-  std::string name() override {
+  const std::string name() const override {
     return "ReceiveTherapyEvent";
   }
 
  private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif    /* RECEIVETHERAPYEVENT_H */

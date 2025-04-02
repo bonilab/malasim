@@ -20,10 +20,10 @@ public:
 
   virtual ~ChangeTreatmentStrategyEvent() = default;
 
-  std::string name() override { return "ChangeStrategyEvent"; }
+  const std::string name() const override { return "ChangeStrategyEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif  // CHANGESTRATEGYEVENT_H

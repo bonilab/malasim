@@ -12,7 +12,7 @@ BirthdayEvent::BirthdayEvent() = default;
 
 BirthdayEvent::~BirthdayEvent() = default;
 
-void BirthdayEvent::execute() {
+void BirthdayEvent::do_execute() {
   assert(dispatcher != nullptr);
   auto* person = dynamic_cast<Person*>(dispatcher);
   person->increase_age_by_1_year();
@@ -30,10 +30,9 @@ void BirthdayEvent::schedule_event(Scheduler* scheduler, Person* p,
     auto* birthday_event = new BirthdayEvent();
     birthday_event->dispatcher = p;
     birthday_event->time = time;
+    birthday_event->scheduler = scheduler;
     p->add_event(birthday_event);
     //scheduler->schedule_individual_event(birthday_event);
     //        std::cout << scheduler->current_time() << " - hello" << std::endl;
   }
 }
-
-std::string BirthdayEvent::name() { return "Birthday Event"; }

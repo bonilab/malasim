@@ -32,7 +32,7 @@ void ClinicalStudy::check_population() {
   // TODO Enroll them in the study
 }
 
-void ClinicalStudy::execute() {
+void ClinicalStudy::do_execute() {
   check_enrollees();
   check_population();
 }

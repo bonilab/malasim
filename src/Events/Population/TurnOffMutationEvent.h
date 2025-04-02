@@ -17,12 +17,12 @@ public:
 
   virtual ~TurnOffMutationEvent() = default;
 
-  std::string name() override {
+  const std::string name() const override {
     return "TurnOffMutationEvent";
   }
 
  private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif // TURNOFFMUTATIONEVENT_H

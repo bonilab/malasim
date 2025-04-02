@@ -19,7 +19,7 @@ private:
   int to_;
 
   // Execute the import event
-  void execute() override {
+  void do_execute() override {
     // Scan all the locations, if they match the old values, then replace them
     // with the new
     spdlog::info("Updating ecozone from {} to {}", from_, to_);
@@ -43,7 +43,7 @@ public:
 
   ~UpdateEcozoneEvent() override = default;
 
-  std::string name() override { return EventName; }
+  const std::string name() const override { return EventName; }
 };
 
 #endif

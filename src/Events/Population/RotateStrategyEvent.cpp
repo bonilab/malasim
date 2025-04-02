@@ -20,7 +20,7 @@ RotateStrategyEvent::RotateStrategyEvent(int at_time, int years,
   time = at_time;
 }
 
-void RotateStrategyEvent::execute() {
+void RotateStrategyEvent::do_execute() {
   // Change to the new treatment strategy
   Model::get_instance().get_model()->set_treatment_strategy(new_strategy_id_);
   spdlog::info(

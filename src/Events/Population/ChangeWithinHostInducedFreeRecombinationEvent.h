@@ -16,12 +16,12 @@ public:
 
   ~ChangeWithinHostInducedFreeRecombinationEvent() override = default;
 
-  std::string name() override {
+  const std::string name() const override {
     return "ChangeWithinHostInducedRecombinationEvent";
   }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif  // POMS_CHANGEWITHINHOSTINDUCEDFREERECOMBINATIONEVENT_H

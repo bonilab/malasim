@@ -54,12 +54,12 @@ public:
   static void schedule_event(Scheduler *scheduler, const int &location, const int &duration, unsigned int genotype_id,
                              const int &number_of_cases, const int &start_day);
 
-  std::string name() override {
+  const std::string name() const override {
     return "ImportationPeriodicallyEvent";
   }
 
  private:
-  void execute() override;
+  void do_execute() override;
 
 };
 

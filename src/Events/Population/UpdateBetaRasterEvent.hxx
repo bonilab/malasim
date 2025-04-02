@@ -20,7 +20,7 @@ private:
   std::string filename_;
 
   // Execute the event to replace all beta values
-  void execute() override {
+  void do_execute() override {
     // Read the raster file
     AscFile* raster = AscFileManager::read(filename_);
 
@@ -62,7 +62,7 @@ public:
 
   ~UpdateBetaRasterEvent() override = default;
 
-  std::string name() override { return EventName; }
+  const std::string name() const override { return EventName; }
 };
 
 #endif

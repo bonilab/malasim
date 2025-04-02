@@ -20,12 +20,12 @@ class SwitchImmuneComponentEvent : public Event {
 
   static void schedule_for_switch_immune_component_event(Scheduler *scheduler, Person *p, const int &time);
 
-  virtual std::string name() {
+  virtual const std::string name() const {
     return "SwitchImmuneComponentEvent";
   }
 
  private:
-  virtual void execute();
+  virtual void do_execute();
 };
 
 #endif    /* SWITCHIMMUNECOMPONENTEVENT_H */

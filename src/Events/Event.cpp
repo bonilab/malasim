@@ -15,9 +15,13 @@ Event::~Event() {
   scheduler = nullptr;
 }
 
-void Event::perform_execute() {
+void Event::execute() {
   if (executable) {
-    execute();
+    try {
+      do_execute();
+    } catch (const std::exception& e) {
+      spdlog::error("Error executing event {}: {}", name(), e.what());
+    }
     executable = false;
   }
 }

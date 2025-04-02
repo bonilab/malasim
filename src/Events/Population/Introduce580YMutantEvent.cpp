@@ -21,7 +21,7 @@ location_(location),fraction_(fraction), alleles_(alleles)
 
 Introduce580YMutantEvent::~Introduce580YMutantEvent() = default;
 
-void Introduce580YMutantEvent::execute() {
+void Introduce580YMutantEvent::do_execute() {
   // TODO: rework on this
 
 

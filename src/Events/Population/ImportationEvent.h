@@ -36,10 +36,10 @@ public:
                              const int &execute_at, const int &genotype_id,
                              const int &number_of_cases);
 
-  std::string name() override { return "ImportationEvent"; }
+  const std::string name() const override { return "ImportationEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif /* IMPORTATIONEVENT_H */

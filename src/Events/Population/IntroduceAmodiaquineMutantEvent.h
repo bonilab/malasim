@@ -28,8 +28,8 @@ public:
   //    ImportationEvent(const ImportationEvent& orig);
   ~IntroduceAmodiaquineMutantEvent() override;
 
-  std::string name() override { return "IntroduceAmodiaquineMutantEvent"; }
+  const std::string name() const override { return "IntroduceAmodiaquineMutantEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };

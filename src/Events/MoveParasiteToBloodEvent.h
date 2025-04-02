@@ -41,10 +41,10 @@ public:
   static void schedule_event(Scheduler* scheduler, Person* p,
                              Genotype* infection_type, const int &time);
 
-  std::string name() override { return "MoveParasiteToBloodEvent"; }
+  const std::string name() const override { return "MoveParasiteToBloodEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif /* MOVEPARASITETOBLOODEVENT_H */

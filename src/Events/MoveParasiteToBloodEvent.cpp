@@ -31,7 +31,7 @@ void MoveParasiteToBloodEvent::schedule_event(Scheduler* scheduler, Person* p,
   }
 }
 
-void MoveParasiteToBloodEvent::execute() {
+void MoveParasiteToBloodEvent::do_execute() {
   auto* person = dynamic_cast<Person*>(dispatcher);
   auto* parasite_type = person->liver_parasite_type();
   person->set_liver_parasite_type(nullptr);

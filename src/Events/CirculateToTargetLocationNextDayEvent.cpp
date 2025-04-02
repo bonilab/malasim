@@ -28,11 +28,7 @@ void CirculateToTargetLocationNextDayEvent::schedule_event(
   }
 }
 
-std::string CirculateToTargetLocationNextDayEvent::name() {
-  return "CirculateToTargetLocationNextDayEvent";
-}
-
-void CirculateToTargetLocationNextDayEvent::execute() {
+void CirculateToTargetLocationNextDayEvent::do_execute() {
   // Get the person and perform the movement
   auto* person = dynamic_cast<Person*>(dispatcher);
   auto source_location = person->get_location();
@@ -59,6 +55,7 @@ void CirculateToTargetLocationNextDayEvent::execute() {
         Model::get_config()->get_movement_settings().get_length_of_stay_theta(),
         Model::get_config()->get_movement_settings().get_length_of_stay_k())));
   }
+  
   ReturnToResidenceEvent::schedule_event(
       Model::get_scheduler(), person,
       Model::get_scheduler()->current_time() + length_of_trip);

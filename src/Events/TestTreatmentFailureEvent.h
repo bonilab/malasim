@@ -43,10 +43,10 @@ public:
                              ClonalParasitePopulation* clinical_caused_parasite,
                              const int &time, const int &t_id = 0);
 
-  std::string name() override { return "TestTreatmentFailureEvent"; }
+  const std::string name() const override { return "TestTreatmentFailureEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif

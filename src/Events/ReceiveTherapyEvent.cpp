@@ -23,7 +23,7 @@ void ReceiveTherapyEvent::schedule_event(Scheduler *scheduler, Person *p, Therap
   }
 }
 
-void ReceiveTherapyEvent::execute() {
+void ReceiveTherapyEvent::do_execute() {
   auto *person = dynamic_cast<Person *>(dispatcher);
   //    if (person->is_in_external_population()) {
   //        return;

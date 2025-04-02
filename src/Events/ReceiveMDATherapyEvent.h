@@ -35,10 +35,10 @@ public:
   static void schedule_event(Scheduler* scheduler, Person* p, Therapy* therapy,
                              const int &time);
 
-  std::string name() override { return "ReceiveMDADrugEvent"; }
+  const std::string name() const override { return "ReceiveMDADrugEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif /* RECEIVEMDADRUGEVENT_H */

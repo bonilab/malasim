@@ -22,7 +22,7 @@ private:
   float rate_ = 0.0;
 
   // Execute the annual coverage update event
-  void execute() override {
+  void do_execute() override {
     auto tcm_db = Model::get_treatment_coverage();
 
     // Iterate though and adjust the rates
@@ -68,7 +68,7 @@ public:
   ~AnnualCoverageUpdateEvent() = default;
 
   // Return the name of this event
-  std::string name() override { return EventName; }
+  const std::string name() const override { return EventName; }
 };
 
 #endif

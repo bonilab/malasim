@@ -28,10 +28,10 @@ public:
   //    ImportationEvent(const ImportationEvent& orig);
   ~IntroducePlas2CopyParasiteEvent() override;
 
-  std::string name() override { return "ImportationEvent"; }
+  const std::string name() const override { return "ImportationEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif  // PCMS_INTRODUCEPLAS2COPYPARASITEEVENT_H

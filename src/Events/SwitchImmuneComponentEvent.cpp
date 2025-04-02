@@ -11,7 +11,7 @@ SwitchImmuneComponentEvent::SwitchImmuneComponentEvent() = default;
 
 SwitchImmuneComponentEvent::~SwitchImmuneComponentEvent() = default;
 
-void SwitchImmuneComponentEvent::execute() {
+void SwitchImmuneComponentEvent::do_execute() {
 
   assert(dispatcher!=nullptr);
   auto *p = dynamic_cast<Person *>(dispatcher);

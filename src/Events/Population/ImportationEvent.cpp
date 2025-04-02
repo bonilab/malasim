@@ -36,7 +36,7 @@ void ImportationEvent::schedule_event(Scheduler* scheduler, const int &location,
   }
 }
 
-void ImportationEvent::execute() {
+void ImportationEvent::do_execute() {
   const auto number_of_importation_cases =
       Model::get_random()->random_poisson(number_of_cases_);
   auto* pi =

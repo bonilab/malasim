@@ -29,7 +29,7 @@ void TestTreatmentFailureEvent::schedule_event(
   //scheduler->schedule_individual_event(e);
 }
 
-void TestTreatmentFailureEvent::execute() {
+void TestTreatmentFailureEvent::do_execute() {
   auto* person = dynamic_cast<Person*>(dispatcher);
 
   // If the parasite is still present at a detectable level, then it's a

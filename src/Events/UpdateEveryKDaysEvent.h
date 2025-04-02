@@ -24,10 +24,10 @@ public:
 
   static void schedule_event(Scheduler* scheduler, Person* p, const int &time);
 
-  std::string name() override { return "UpdateEveryKDaysEvent"; }
+  const std::string name() const override { return "UpdateEveryKDaysEvent"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif /* UPDATEEVERYKDAYSEVENT_H */

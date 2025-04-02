@@ -15,8 +15,8 @@ public:
 
   static void schedule_event(Scheduler* scheduler, Person* p, const int &time);
 
-  std::string name() override { return "RAPT Event"; }
+  const std::string name() const override { return "RAPT Event"; }
 
 private:
-  void execute() override;
+  void do_execute() override;
 };

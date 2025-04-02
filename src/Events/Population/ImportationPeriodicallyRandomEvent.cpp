@@ -17,7 +17,7 @@
 #include "Utils/Index/PersonIndexAll.h"
 #include "Utils/Index/PersonIndexByLocationStateAgeClass.h"
 
-void ImportationPeriodicallyRandomEvent::execute() {
+void ImportationPeriodicallyRandomEvent::do_execute() {
   // Start by finding the number of infections to inflict
   auto date =
       static_cast<date::year_month_day>(Model::get_scheduler()->calendar_date);

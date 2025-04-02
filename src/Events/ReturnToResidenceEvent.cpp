@@ -21,7 +21,7 @@ void ReturnToResidenceEvent::schedule_event(Scheduler* scheduler, Person* p,
   }
 }
 
-void ReturnToResidenceEvent::execute() {
+void ReturnToResidenceEvent::do_execute() {
   auto* person = dynamic_cast<Person*>(dispatcher);
   auto source_location = person->get_location();
   person->set_location(person->get_residence_location());

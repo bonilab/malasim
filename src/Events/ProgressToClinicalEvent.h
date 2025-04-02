@@ -47,12 +47,12 @@ public:
   
   void apply_therapy(Person *person, Therapy *therapy, bool is_public_sector = true);
 
-  std::string name() override {
+  const std::string name() const override {
     return "ProgressToClinicalEvent";
   }
 
  private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif    /* PROGRESSTOCLINICALEVENT_H */

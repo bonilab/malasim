@@ -19,7 +19,7 @@ private:
   double log_parasite_density_ = 0.0;
 
   // Execute the import event
-  void execute() override;
+  void do_execute() override;
 
   // Get a random index to perform the importation event at, the population
   // is used to weight the random pull
@@ -41,7 +41,7 @@ public:
   ~ImportationPeriodicallyRandomEvent() override = default;
 
   // Return the name of this event
-  std::string name() override { return EventName; }
+  const std::string name() const override { return EventName; }
 };
 
 #endif

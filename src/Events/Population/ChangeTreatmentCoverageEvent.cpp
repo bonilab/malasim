@@ -16,7 +16,7 @@ ChangeTreatmentCoverageEvent::~ChangeTreatmentCoverageEvent() {
   ObjectHelpers::delete_pointer(treatment_coverage_model);
 }
 
-void ChangeTreatmentCoverageEvent::execute() {
+void ChangeTreatmentCoverageEvent::do_execute() {
 spdlog::info("{}: change treatment coverage model to {}",
              StringHelpers::date_as_string(date::year_month_day{scheduler->calendar_date}),
              treatment_coverage_model->type);

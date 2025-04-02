@@ -20,12 +20,12 @@ public:
 
   virtual ~SingleRoundMDAEvent() = default;
 
-  std::string name() override {
+  const std::string name() const override {
     return "SingleRoundMDAEvent";
   }
 
  private:
-  void execute() override;
+  void do_execute() override;
 };
 
 #endif // SINGLEROUNDMDAEVENT_H
