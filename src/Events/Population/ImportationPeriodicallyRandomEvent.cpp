@@ -70,7 +70,7 @@ void ImportationPeriodicallyRandomEvent::do_execute() {
   // Generate and schedule the event
   auto* event = new ImportationPeriodicallyRandomEvent(
       genotypeId_, time, count_, log_parasite_density_);
-  scheduler->schedule_population_event(event);
+  Model::get_scheduler()->schedule_population_event(event);
 }
 
 // The following is based upon a fitness proportionate selection (roulette wheel

@@ -80,6 +80,6 @@ void RaptEvent::do_execute() {
       Model::get_random()->random_uniform<int>(from, to + 1);
 
   // Schedule the event
-  schedule_event(scheduler, person,
-                 scheduler->current_time() + (int)days_to_next_event);
+  schedule_event(Model::get_scheduler(), person,
+                 Model::get_scheduler()->current_time() + (int)days_to_next_event);
 }

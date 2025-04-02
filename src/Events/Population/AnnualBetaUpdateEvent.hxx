@@ -33,10 +33,10 @@ private:
 
     // Schedule for one year from now
     auto time =
-        scheduler->current_time()
-        + TimeHelpers::number_of_days_to_next_year(scheduler->calendar_date);
+        Model::get_scheduler()->current_time()
+        + TimeHelpers::number_of_days_to_next_year(Model::get_scheduler()->calendar_date);
     AnnualBetaUpdateEvent* event = new AnnualBetaUpdateEvent(rate_, time);
-    scheduler->schedule_population_event(event);
+    Model::get_scheduler()->schedule_population_event(event);
 
     // Log on demand
     spdlog::debug(

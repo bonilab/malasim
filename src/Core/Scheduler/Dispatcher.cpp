@@ -49,6 +49,5 @@ void Dispatcher::execute_events(int time) {
 void Dispatcher::schedule_event(Event* event) {
   event->executable = true;
   event->dispatcher = this;
-  event->scheduler = Model::get_scheduler();
   events_.insert(std::make_pair(event->time, std::unique_ptr<Event>(event)));
 }

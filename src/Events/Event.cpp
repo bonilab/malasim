@@ -12,7 +12,6 @@ Event::Event() {}
 
 Event::~Event() {
   dispatcher = nullptr;
-  scheduler = nullptr;
 }
 
 void Event::execute() {

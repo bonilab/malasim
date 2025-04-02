@@ -12,5 +12,5 @@ ChangeInterruptedFeedingRateEvent::ChangeInterruptedFeedingRateEvent(const int &
 void ChangeInterruptedFeedingRateEvent::do_execute() {
   Model::get_config()->location_db()[location].mosquito_ifr = ifr;
   spdlog::info("{}: Change interrupted feeding rate at location {} to {}",
-    StringHelpers::date_as_string(date::year_month_day{scheduler->calendar_date}), location,ifr);
+    StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}), location,ifr);
 }

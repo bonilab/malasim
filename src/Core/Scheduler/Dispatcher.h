@@ -36,7 +36,7 @@ public:
 
   virtual void initialize();
 
-  // this will execute all events at the given time
+  // this will execute all events up to and including time
   virtual void execute_events(int time);
 
   // this will transfer ownership of the event to the dispatcher

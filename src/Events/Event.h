@@ -28,7 +28,6 @@ public:
 
     bool executable{false};
     Dispatcher* dispatcher{nullptr};
-    Scheduler* scheduler{nullptr};
     int time{-1};
 
 protected:

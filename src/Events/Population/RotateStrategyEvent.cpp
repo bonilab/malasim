@@ -32,5 +32,5 @@ void RotateStrategyEvent::do_execute() {
   auto next_time = Model::get_scheduler()->current_time() + (years_ * 365);
   auto* event = new RotateStrategyEvent(next_time, years_, next_strategy_id_,
                                         new_strategy_id_);
-  scheduler->schedule_population_event(event);
+  Model::get_scheduler()->schedule_population_event(event);
 }

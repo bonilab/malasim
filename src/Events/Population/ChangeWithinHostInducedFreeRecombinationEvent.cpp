@@ -12,5 +12,5 @@ ChangeWithinHostInducedFreeRecombinationEvent::ChangeWithinHostInducedFreeRecomb
 void ChangeWithinHostInducedFreeRecombinationEvent::do_execute() {
   Model::get_config()->get_mosquito_parameters().set_within_host_induced_free_recombination(value);
   spdlog::info("{}: Change within host induced free recombination to {}",
-    StringHelpers::date_as_string(date::year_month_day{scheduler->calendar_date}), value);
+    StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}), value);
 }
