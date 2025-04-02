@@ -464,7 +464,7 @@ void Population::initial_infection(Person* person, Genotype* parasite_type) cons
   if (p < p_clinical) {
     // progress to clinical after several days
     blood_parasite->set_update_function(model_->progress_to_clinical_update_function());
-    person->schedule_progress_to_clinical_event_by(blood_parasite);
+    person->schedule_progress_to_clinical_event(blood_parasite);
   } else {
     // only progress to clearance by Immune system
     // progress to clearance

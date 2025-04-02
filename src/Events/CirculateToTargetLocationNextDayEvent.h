@@ -31,8 +31,6 @@ public:
   CirculateToTargetLocationNextDayEvent() : target_location_(0) {}
   ~CirculateToTargetLocationNextDayEvent() override = default;
 
-  static void schedule_event(Scheduler* scheduler, Person* p,
-                             const int &target_location, const int &time);
   const std::string name() const override { return "CirculateToTargetLocationNextDayEvent"; }
 
 private:

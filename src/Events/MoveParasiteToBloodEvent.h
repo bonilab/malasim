@@ -38,9 +38,6 @@ public:
   //    MoveParasiteToBloodEvent(const MoveParasiteToBloodEvent& orig);
   virtual ~MoveParasiteToBloodEvent();
 
-  static void schedule_event(Scheduler* scheduler, Person* p,
-                             Genotype* infection_type, const int &time);
-
   const std::string name() const override { return "MoveParasiteToBloodEvent"; }
 
 private:

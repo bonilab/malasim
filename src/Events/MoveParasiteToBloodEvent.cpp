@@ -18,19 +18,6 @@ MoveParasiteToBloodEvent::MoveParasiteToBloodEvent()
 
 MoveParasiteToBloodEvent::~MoveParasiteToBloodEvent() {}
 
-void MoveParasiteToBloodEvent::schedule_event(Scheduler* scheduler, Person* p,
-                                              Genotype* infection_type,
-                                              const int &time) {
-  if (scheduler != nullptr) {
-    auto* e = new MoveParasiteToBloodEvent();
-    e->dispatcher = p;
-    e->set_infection_genotype(infection_type);
-    e->time = time;
-    p->add_event(e);
-    //scheduler->schedule_individual_event(e);
-  }
-}
-
 void MoveParasiteToBloodEvent::do_execute() {
   auto* person = dynamic_cast<Person*>(dispatcher);
   auto* parasite_type = person->liver_parasite_type();

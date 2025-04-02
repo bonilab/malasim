@@ -32,11 +32,6 @@ public:
 
   virtual ~ProgressToClinicalEvent();
 
-  static void schedule_event(Scheduler *scheduler, Person *person, ClonalParasitePopulation *clinical_caused_parasite,
-                             const int &time);
-
-  // static void receive_no_treatment_routine(Person *p);
-
   static bool should_receive_treatment(Person *person);
 
   static void handle_no_treatment(Person *person);

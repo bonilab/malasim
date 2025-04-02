@@ -138,6 +138,6 @@ void ImportationPeriodicallyRandomEvent::infect(Person* person,
   // standard for clinical
   if (log_parasite_density_ >= Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_clinical()) {
     blood_parasite->set_update_function(Model::get_instance().progress_to_clinical_update_function());
-    person->schedule_progress_to_clinical_event_by(blood_parasite);
+    person->schedule_progress_to_clinical_event(blood_parasite);
   }
 }

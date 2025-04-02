@@ -22,8 +22,6 @@ public:
   //    UpdateEveryKDaysEvent(const UpdateEveryKDaysEvent& orig);
   virtual ~UpdateEveryKDaysEvent();
 
-  static void schedule_event(Scheduler* scheduler, Person* p, const int &time);
-
   const std::string name() const override { return "UpdateEveryKDaysEvent"; }
 
 private:

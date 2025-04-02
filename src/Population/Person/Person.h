@@ -222,21 +222,6 @@ public:
 
   void add_drug_to_blood(DrugType *dt, const int &dosing_days, bool is_part_of_MAC_therapy = false);
 
-  void schedule_progress_to_clinical_event_by(ClonalParasitePopulation *blood_parasite);
-
-  void schedule_test_treatment_failure_event(ClonalParasitePopulation *blood_parasite, const int &testing_day,
-                                             const int &t_id = 0);
-
-  void schedule_update_by_drug_event(ClonalParasitePopulation *clinical_caused_parasite);
-
-  void schedule_end_clinical_event(ClonalParasitePopulation *clinical_caused_parasite);
-
-  void schedule_clinical_recurrence_event(ClonalParasitePopulation *clinical_caused_parasite);
-
-  // void schedule_move_parasite_to_blood(Genotype *genotype, const int &time);
-  //
-  void schedule_mature_gametocyte_event(ClonalParasitePopulation *clinical_caused_parasite);
-
   void change_state_when_no_parasite_in_blood();
 
   void determine_symptomatic_recrudescence(
@@ -252,8 +237,6 @@ public:
   void infected_by(const int &parasite_type_id);
 
   void randomly_choose_target_location();
-
-  void schedule_move_to_target_location_next_day_event(const int &location);
 
   bool has_return_to_residence_event() const;
 
@@ -283,19 +266,39 @@ public:
 
   static double draw_random_relative_biting_rate(utils::Random *pRandom, Config *pConfig);
 
-  void schedule_move_parasite_to_blood(Genotype* genotype, const int& time);
-
-  /*
-   * From Temple Malaria Simulation
-  */
-
   void receive_therapy(SCTherapy* sc_therapy, bool is_mac_therapy);
 
   int complied_dosing_days(const SCTherapy* therapy);
 
   double age_in_floating() const;
 
-  void schedule_update_every_K_days_event(const int &time);
+  // Helper methods for scheduling
+  int calculate_future_time(int days_from_now) const;
+
+  template<typename T>
+  void schedule_basic_event(T* event) {
+    event->dispatcher = this;
+    add_event(event);
+  }
+
+public:
+  // Group 1: Clinical Event Scheduling
+  void schedule_clinical_event(ClonalParasitePopulation* parasite, int days_delay);
+  void schedule_end_clinical_event(ClonalParasitePopulation* parasite);
+  void schedule_progress_to_clinical_event(ClonalParasitePopulation* parasite);
+  void schedule_clinical_recurrence_event(ClonalParasitePopulation* parasite);
+  void schedule_test_treatment_failure_event(ClonalParasitePopulation* parasite, int testing_day, int therapy_id = 0);
+
+  // Group 2: Parasite Event Scheduling  
+  void schedule_move_parasite_to_blood(Genotype* genotype, int days_delay);
+  void schedule_mature_gametocyte_event(ClonalParasitePopulation* parasite);
+  void schedule_update_by_drug_event(ClonalParasitePopulation* parasite);
+
+  // Group 3: Movement Event Scheduling
+  void schedule_move_to_target_location_next_day_event(int target_location);
+  
+  // Group 4: Regular Update Events
+  void schedule_update_every_K_days_event(int update_frequency);
 
 };
 

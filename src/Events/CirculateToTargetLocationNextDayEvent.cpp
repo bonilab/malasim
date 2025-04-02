@@ -15,19 +15,6 @@
 
 //OBJECTPOOL_IMPL(CirculateToTargetLocationNextDayEvent)
 
-void CirculateToTargetLocationNextDayEvent::schedule_event(
-    Scheduler* scheduler, Person* p, const int &target_location,
-    const int &time) {
-  if (scheduler != nullptr) {
-    auto* e = new CirculateToTargetLocationNextDayEvent();
-    e->dispatcher = p;
-    e->set_target_location(target_location);
-    e->time = time;
-    p->add_event(e);
-    //scheduler->schedule_individual_event(e);
-  }
-}
-
 void CirculateToTargetLocationNextDayEvent::do_execute() {
   // Get the person and perform the movement
   auto* person = dynamic_cast<Person*>(dispatcher);

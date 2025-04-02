@@ -14,18 +14,6 @@ UpdateWhenDrugIsPresentEvent::UpdateWhenDrugIsPresentEvent() : clinical_caused_p
 
 UpdateWhenDrugIsPresentEvent::~UpdateWhenDrugIsPresentEvent() = default;
 
-void UpdateWhenDrugIsPresentEvent::schedule_event(Scheduler *scheduler, Person *person,
-                                                  ClonalParasitePopulation *clinical_caused_parasite, const int &time) {
-  if (scheduler!=nullptr) {
-
-    auto *event = new UpdateWhenDrugIsPresentEvent();
-    event->dispatcher = person;
-    event->set_clinical_caused_parasite(clinical_caused_parasite);
-    event->time = time;
-    person->add_event(event);
-  }
-}
-
 void UpdateWhenDrugIsPresentEvent::do_execute() {
   auto *person = dynamic_cast<Person *>(dispatcher);
   if (person->drugs_in_blood()->size() > 0) {

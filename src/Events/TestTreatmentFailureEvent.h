@@ -27,21 +27,17 @@ public:
 
 //  OBJECTPOOL(TestTreatmentFailureEvent)
 private:
-    int therapyId_;
+    int therapy_id_;
     ClonalParasitePopulation* clinical_caused_parasite_;
 public:
     ClonalParasitePopulation* clinical_caused_parasite() { return clinical_caused_parasite_; }
     void set_clinical_caused_parasite(ClonalParasitePopulation* value) { clinical_caused_parasite_ = value; }
-    int therapyId() { return therapyId_; }
-    void set_therapyId(int value) { therapyId_ = value; }
+    int therapy_id() { return therapy_id_; }
+    void set_therapy_id(int value) { therapy_id_ = value; }
 
 public:
   TestTreatmentFailureEvent();
   ~TestTreatmentFailureEvent() override = default;
-
-  static void schedule_event(Scheduler* scheduler, Person* p,
-                             ClonalParasitePopulation* clinical_caused_parasite,
-                             const int &time, const int &t_id = 0);
 
   const std::string name() const override { return "TestTreatmentFailureEvent"; }
 

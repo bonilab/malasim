@@ -32,9 +32,6 @@ public:
   //    UpdateByHavingDrugEvent(const UpdateByHavingDrugEvent& orig);
   virtual ~UpdateWhenDrugIsPresentEvent();
 
-  static void schedule_event(Scheduler *scheduler, Person *p, ClonalParasitePopulation *clinical_caused_parasite,
-                             const int &time);
-
   const std::string name() const override {
     return "UpdateByHavingDrugEvent";
   }

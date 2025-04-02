@@ -238,19 +238,6 @@ void ProgressToClinicalEvent::transition_to_clinical_state(Person *person) {
 //     person->schedule_end_clinical_by_no_treatment_event(clinical_caused_parasite_);
 //   }
 
-
-
-void ProgressToClinicalEvent::schedule_event(Scheduler *scheduler, Person *person,
-                                             ClonalParasitePopulation *clinical_caused_parasite, const int &time) {
-  if (scheduler!=nullptr) {
-    auto *event = new ProgressToClinicalEvent();
-    event->dispatcher = person;
-    event->set_clinical_caused_parasite(clinical_caused_parasite);
-    event->time = time;
-    person->add_event(event);
-  }
-}
-
 // void ProgressToClinicalEvent::receive_no_treatment_routine(Person *p) {
 //   // if (p->will_progress_to_death_when_receive_no_treatment()) {
 //   //   p->cancel_all_events_except(nullptr);

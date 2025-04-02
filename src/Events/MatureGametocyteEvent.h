@@ -32,10 +32,6 @@ public:
   //    MatureGametocyteEvent(const MatureGametocyteEvent& orig);
   virtual ~MatureGametocyteEvent();
 
-  static void schedule_event(Scheduler* scheduler, Person* p,
-                             ClonalParasitePopulation* blood_parasite,
-                             const int &time);
-
   const std::string name() const override { return "MatureGametocyteEvent"; }
 
 private:

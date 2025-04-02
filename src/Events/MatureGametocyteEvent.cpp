@@ -13,20 +13,6 @@ MatureGametocyteEvent::MatureGametocyteEvent() : blood_parasite_(nullptr) {}
 
 MatureGametocyteEvent::~MatureGametocyteEvent() = default;
 
-void MatureGametocyteEvent::schedule_event(
-    Scheduler* scheduler, Person* p, ClonalParasitePopulation* blood_parasite,
-    const int &time) {
-  if (scheduler != nullptr) {
-    auto* e = new MatureGametocyteEvent();
-    e->dispatcher = p;
-    e->set_blood_parasite(blood_parasite);
-    e->time = time;
-    p->add_event(e);
-    //scheduler->schedule_individual_event(e);
-    // spdlog::info("Mature gametocyte event scheduled {}", e->get_id());
-  }
-}
-
 void MatureGametocyteEvent::do_execute() {
   // spdlog::info("Mature gametocyte event executed {}", get_id());
   auto* person = dynamic_cast<Person*>(dispatcher);
