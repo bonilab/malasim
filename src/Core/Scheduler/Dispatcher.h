@@ -19,6 +19,11 @@ private:
  // sorted by time
   std::multimap<int, std::unique_ptr<Event>> events_;
 
+  // Helper method to erase all events at a specific time point
+  void erase_events_at_time(int time) {
+    events_.erase(time);
+  }
+
 public:
   std::multimap<int, std::unique_ptr<Event>>& get_events() {
     return events_;
