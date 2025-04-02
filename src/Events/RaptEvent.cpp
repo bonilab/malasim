@@ -17,17 +17,6 @@
 #include "Population/Person/Person.h"
 #include "Events/TestTreatmentFailureEvent.h"
 
-void RaptEvent::schedule_event(Scheduler* scheduler, Person* p,
-                               const int &time) {
-  if (scheduler != nullptr && Model::get_config()->get_rapt_settings().get_is_defined()) {
-    auto* rapt_event = new RaptEvent();
-    rapt_event->dispatcher = p;
-    rapt_event->time = time;
-    p->add_event(rapt_event);
-    //scheduler->schedule_individual_event(rapt_event);
-  }
-}
-
 void RaptEvent::do_execute() {
   auto* person = dynamic_cast<Person*>(dispatcher);
   const auto raptConfig = Model::get_config()->get_rapt_settings();
@@ -80,6 +69,5 @@ void RaptEvent::do_execute() {
       Model::get_random()->random_uniform<int>(from, to + 1);
 
   // Schedule the event
-  schedule_event(Model::get_scheduler(), person,
-                 Model::get_scheduler()->current_time() + (int)days_to_next_event);
+  person->schedule_rapt_event(days_to_next_event);
 }

@@ -94,9 +94,9 @@ void ProgressToClinicalEvent::apply_therapy(Person *person, Therapy *therapy, bo
     person->cancel_all_events_except(nullptr);
     person->set_host_state(Person::DEAD);
     Model::get_mdc()->record_1_malaria_death(person->get_location(), person->get_age(), true);
-    ReportTreatmentFailureDeathEvent::schedule_event(
-        Model::get_scheduler(), person, therapy->get_id(),
-        Model::get_scheduler()->current_time() + Model::get_config()->get_therapy_parameters().get_tf_testing_day());
+    
+    person->schedule_report_treatment_failure_death_event(therapy->get_id(),
+                                                          Model::get_config()->get_therapy_parameters().get_tf_testing_day());
     return;
   }
 }

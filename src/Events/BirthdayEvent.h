@@ -26,8 +26,6 @@ public:
   //    BirthdayEvent(const BirthdayEvent& orig);
   virtual ~BirthdayEvent();
 
-  static void schedule_event(Scheduler* scheduler, Person* p, const int &time);
-
   const std::string name() const override { return "Birthday Event"; }
 
 private:

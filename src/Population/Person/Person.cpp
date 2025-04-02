@@ -16,9 +16,11 @@
 #include "Events/ProgressToClinicalEvent.h"
 #include "Events/ReceiveTherapyEvent.h"
 #include "Events/TestTreatmentFailureEvent.h"
-#include "Events/UpdateEveryKDaysEvent.h"
 #include "Events/UpdateWhenDrugIsPresentEvent.h"
 #include "Events/ReturnToResidenceEvent.h"
+#include "Events/ReportTreatmentFailureDeathEvent.h"
+#include "Events/ReceiveMDATherapyEvent.h"
+#include "Events/RaptEvent.h"
 #include "Utils/Helpers/ObjectHelpers.h"
 #include "MDC/ModelDataCollector.h"
 #include "Population/ClinicalUpdateFunction.h"
@@ -279,10 +281,7 @@ void Person::receive_therapy(Therapy* therapy,
       if (start_day == 1) {
         receive_therapy(sc_therapy, true);
       } else {
-        ReceiveTherapyEvent::schedule_event(
-            Model::get_scheduler(), this, sc_therapy,
-            Model::get_scheduler()->current_time() + start_day - 1,
-            clinical_caused_parasite, true);
+        schedule_receive_therapy_event(clinical_caused_parasite, sc_therapy, start_day - 1, true);
       }
     }
   }
@@ -817,6 +816,37 @@ void Person::schedule_test_treatment_failure_event(ClonalParasitePopulation* par
   schedule_basic_event(event);
 }
 
+void Person::schedule_report_treatment_failure_death_event(int therapy_id, int testing_day) {
+  auto* event = new ReportTreatmentFailureDeathEvent();
+  event->time = calculate_future_time(testing_day);
+  event->set_therapy_id(therapy_id);
+  event->set_age_class(age_class_);
+  event->set_location_id(location_);
+  schedule_basic_event(event);
+}
+
+void Person::schedule_rapt_event(int days_delay) {
+  auto* event = new RaptEvent();
+  event->time = calculate_future_time(days_delay);
+  schedule_basic_event(event);
+}
+
+void Person::schedule_receive_mda_therapy_event(Therapy* therapy, int days_delay) {
+  auto* event = new ReceiveMDATherapyEvent();
+  event->time = calculate_future_time(days_delay);
+  event->set_received_therapy(therapy);
+  schedule_basic_event(event);
+}
+
+void Person::schedule_receive_therapy_event(ClonalParasitePopulation* parasite, Therapy* therapy, int days_delay, bool is_part_of_MAC_therapy) {
+  auto* event = new ReceiveTherapyEvent();
+  event->time = calculate_future_time(days_delay);
+  event->set_clinical_caused_parasite(parasite);
+  event->set_received_therapy(therapy);
+  event->is_part_of_MAC_therapy = is_part_of_MAC_therapy;
+  schedule_basic_event(event);
+}
+
 void Person::schedule_move_parasite_to_blood(Genotype* genotype, int days_delay) {
   auto* event = new MoveParasiteToBloodEvent();
   event->time = calculate_future_time(days_delay);
@@ -835,18 +865,26 @@ void Person::schedule_mature_gametocyte_event(ClonalParasitePopulation* parasite
   schedule_basic_event(event);
 }
 
-void Person::schedule_update_every_K_days_event(int update_frequency) {
-  auto* event = new UpdateEveryKDaysEvent();
-  event->time = calculate_future_time(update_frequency);
-  schedule_basic_event(event);
-}
-
 void Person::schedule_move_to_target_location_next_day_event(int target_location) {
   this->number_of_trips_taken_++;
   
   auto* event = new CirculateToTargetLocationNextDayEvent();
   event->time = calculate_future_time(1);
   event->set_target_location(target_location);
+  schedule_basic_event(event);
+}
+
+void Person::schedule_return_to_residence_event(int length_of_trip) {
+  auto* event = new ReturnToResidenceEvent();
+  event->time = calculate_future_time(length_of_trip);
+  schedule_basic_event(event);
+}
+
+void Person::schedule_birthday_event(int days_to_next_birthday) {
+  auto* event = new BirthdayEvent();
+
+  event->time = (days_to_next_birthday <= 0) ? TimeHelpers::number_of_days_to_next_year(Model::get_scheduler()->calendar_date)
+                                              : calculate_future_time(days_to_next_birthday);
   schedule_basic_event(event);
 }
 

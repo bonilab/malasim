@@ -336,8 +336,7 @@ void Population::generate_individual(int location, int age_class) {
     spdlog::error("simulation_time_birthday have to be <= 0 when initializing population");
   }
 
-  BirthdayEvent::schedule_event(Model::get_scheduler(), p, days_to_next_birthday);
-  // RaptEvent::schedule_event(Model::get_scheduler(), p, days_to_next_birthday);
+  p->schedule_birthday_event(days_to_next_birthday);
 
   // set immune component at 6 months
   if (simulation_time_birthday + Constants::DAYS_IN_YEAR / 2 >= 0) {
@@ -512,9 +511,7 @@ void Population::give_1_birth(const int& location) {
   p->set_birthday(model_->get_scheduler()->current_time());
   const auto number_of_days_to_next_birthday =
       TimeHelpers::number_of_days_to_next_year(model_->get_scheduler()->calendar_date);
-  BirthdayEvent::schedule_event(model_->get_scheduler(), p,
-                                model_->get_scheduler()->current_time() + number_of_days_to_next_birthday);
-  // RaptEvent::schedule_event(Model::get_scheduler(), p, days_to_next_birthday);
+  p->schedule_birthday_event(number_of_days_to_next_birthday);
 
   // schedule for switch
   SwitchImmuneComponentEvent::schedule_for_switch_immune_component_event(

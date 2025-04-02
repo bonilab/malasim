@@ -37,9 +37,6 @@ public:
   ReportTreatmentFailureDeathEvent();
   ~ReportTreatmentFailureDeathEvent() override;
 
-  static void schedule_event(Scheduler* scheduler, Person* person,
-                             const int &therapy_id, const int &time);
-
   const std::string name() const override { return "ReportTreatmentFailureDeathEvent"; }
 
 private:

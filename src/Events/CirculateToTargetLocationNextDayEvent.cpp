@@ -43,7 +43,5 @@ void CirculateToTargetLocationNextDayEvent::do_execute() {
         Model::get_config()->get_movement_settings().get_length_of_stay_k())));
   }
   
-  ReturnToResidenceEvent::schedule_event(
-      Model::get_scheduler(), person,
-      Model::get_scheduler()->current_time() + length_of_trip);
+  person->schedule_return_to_residence_event(length_of_trip);
 }

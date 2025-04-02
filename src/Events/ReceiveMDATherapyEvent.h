@@ -32,9 +32,6 @@ public:
   //    ReceiveMDADrugEvent(const ReceiveMDADrugEvent& orig);
   virtual ~ReceiveMDATherapyEvent();
 
-  static void schedule_event(Scheduler* scheduler, Person* p, Therapy* therapy,
-                             const int &time);
-
   const std::string name() const override { return "ReceiveMDADrugEvent"; }
 
 private:

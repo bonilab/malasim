@@ -288,7 +288,10 @@ public:
   void schedule_progress_to_clinical_event(ClonalParasitePopulation* parasite);
   void schedule_clinical_recurrence_event(ClonalParasitePopulation* parasite);
   void schedule_test_treatment_failure_event(ClonalParasitePopulation* parasite, int testing_day, int therapy_id = 0);
-
+  void schedule_report_treatment_failure_death_event(int therapy_id, int testing_day);
+  void schedule_rapt_event(int days_delay);
+  void schedule_receive_mda_therapy_event(Therapy* therapy, int days_delay);
+  void schedule_receive_therapy_event(ClonalParasitePopulation* parasite, Therapy* therapy, int days_delay, bool is_part_of_MAC_therapy = false);
   // Group 2: Parasite Event Scheduling  
   void schedule_move_parasite_to_blood(Genotype* genotype, int days_delay);
   void schedule_mature_gametocyte_event(ClonalParasitePopulation* parasite);
@@ -296,9 +299,10 @@ public:
 
   // Group 3: Movement Event Scheduling
   void schedule_move_to_target_location_next_day_event(int target_location);
-  
-  // Group 4: Regular Update Events
-  void schedule_update_every_K_days_event(int update_frequency);
+  void schedule_return_to_residence_event(int length_of_trip);
+
+  // Group 4: Person Event Scheduling
+  void schedule_birthday_event(int days_to_next_birthday = -1);
 
 };
 

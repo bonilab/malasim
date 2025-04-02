@@ -21,8 +21,6 @@ public:
   ReturnToResidenceEvent() = default;
   virtual ~ReturnToResidenceEvent() = default;
 
-  static void schedule_event(Scheduler* scheduler, Person* p, const int &time);
-
   const std::string name() const override { return "ReturnToResidenceEvent"; }
 
 private:

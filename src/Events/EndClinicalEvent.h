@@ -31,10 +31,6 @@ public:
   //    EndClinicalEvent(const EndClinicalEvent& orig);
   virtual ~EndClinicalEvent();
 
-  static void schedule_event(Scheduler* scheduler, Person* p,
-                             ClonalParasitePopulation* clinical_caused_parasite,
-                             const int &time);
-
   const std::string name() const override { return "EndClinicalEvent"; }
 
 private:

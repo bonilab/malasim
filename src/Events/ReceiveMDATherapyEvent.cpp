@@ -13,18 +13,6 @@ ReceiveMDATherapyEvent::ReceiveMDATherapyEvent() : received_therapy_(nullptr){};
 
 ReceiveMDATherapyEvent::~ReceiveMDATherapyEvent() = default;
 
-void ReceiveMDATherapyEvent::schedule_event(Scheduler* scheduler, Person* p,
-                                            Therapy* therapy, const int &time) {
-  if (scheduler != nullptr) {
-    auto* e = new ReceiveMDATherapyEvent();
-    e->dispatcher = p;
-    e->set_received_therapy(therapy);
-    e->time = time;
-    p->add_event(e);
-    //scheduler->schedule_individual_event(e);
-  }
-}
-
 void ReceiveMDATherapyEvent::do_execute() {
   auto* person = dynamic_cast<Person*>(dispatcher);
   //    if (person->is_in_external_population()) {

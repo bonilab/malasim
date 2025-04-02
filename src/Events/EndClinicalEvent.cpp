@@ -18,18 +18,6 @@ EndClinicalEvent::EndClinicalEvent() : clinical_caused_parasite_(nullptr) {}
 
 EndClinicalEvent::~EndClinicalEvent() = default;
 
-void EndClinicalEvent::schedule_event(
-    Scheduler* scheduler, Person* person,
-    ClonalParasitePopulation* clinical_caused_parasite, const int &time) {
-  if (scheduler != nullptr) {
-    auto* event = new EndClinicalEvent();
-    event->dispatcher = person;
-    event->set_clinical_caused_parasite(clinical_caused_parasite);
-    event->time = time;
-    person->add_event(event);
-  }
-}
-
 void EndClinicalEvent::do_execute() {
   auto person = dynamic_cast<Person*>(dispatcher);
 

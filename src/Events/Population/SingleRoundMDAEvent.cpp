@@ -53,9 +53,8 @@ void SingleRoundMDAEvent::do_execute() {
         .therapy_db[Model::get_config()->get_strategy_parameters().get_mda().get_mda_therapy_id()];
         // schedule received therapy in within days_to_complete_all_treatments
         int days_to_receive_mda_therapy = Model::get_random()->random_uniform(days_to_complete_all_treatments) + 1;
-        ReceiveMDATherapyEvent::schedule_event(Model::get_scheduler(), p, therapy,
-                                               Model::get_scheduler()->current_time() +
-                                                   days_to_receive_mda_therapy);
+        
+        p->schedule_receive_mda_therapy_event(therapy, days_to_receive_mda_therapy);
 
       }
     }

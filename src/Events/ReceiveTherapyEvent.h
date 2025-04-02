@@ -38,9 +38,6 @@ public:
   //    ReceiveTherapyEvent(const ReceiveTherapyEvent& orig);
   virtual ~ReceiveTherapyEvent();
 
-  static void schedule_event(Scheduler *scheduler, Person *p, Therapy *therapy, const int &time,
-                             ClonalParasitePopulation *clinical_caused_parasite, bool is_part_of_MAC_therapy = false);
-
   const std::string name() const override {
     return "ReceiveTherapyEvent";
   }
