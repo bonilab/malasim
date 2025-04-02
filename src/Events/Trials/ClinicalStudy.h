@@ -10,6 +10,7 @@
 
 #include "../Event.h"
 
+class Scheduler;
 class Person;
 
 class ClinicalStudy : public Event {

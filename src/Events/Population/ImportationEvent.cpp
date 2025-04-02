@@ -30,7 +30,7 @@ void ImportationEvent::schedule_event(Scheduler* scheduler, const int &location,
   if (scheduler != nullptr) {
     auto* e = new ImportationEvent(location, execute_at, genotype_id,
                                    number_of_cases);
-    e->dispatcher = nullptr;
+    e->event_manager = nullptr;
     e->time = execute_at;
     scheduler->schedule_population_event(e);
   }

@@ -23,7 +23,7 @@ void DistrictImportationDailyEvent::schedule_event(Scheduler* scheduler,
   if (scheduler != nullptr) {
     auto* event = new DistrictImportationDailyEvent(
         district, dailyRate, startDay,alleles);
-    event->dispatcher = nullptr;
+    event->event_manager = nullptr;
     event->time = startDay;
     scheduler->schedule_population_event(event);
   }

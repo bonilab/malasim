@@ -3,6 +3,8 @@
 #include <string>
 
 // #include "Core/ObjectPool.h"
+#include <vector>
+#include <tuple>
 #include "Events/Event.h"
 
 class IntroduceAmodiaquineMutantEvent : public Event {

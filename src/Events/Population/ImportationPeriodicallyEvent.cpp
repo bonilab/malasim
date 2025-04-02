@@ -25,7 +25,7 @@ void ImportationPeriodicallyEvent::schedule_event(Scheduler* scheduler, const in
                                                   const int& start_day) {
   if (scheduler != nullptr) {
     auto* e = new ImportationPeriodicallyEvent(location, duration, genotype_id, number_of_cases, start_day);
-    e->dispatcher = nullptr;
+    e->event_manager = nullptr;
     e->time = start_day;
     scheduler->schedule_population_event(e);
   }

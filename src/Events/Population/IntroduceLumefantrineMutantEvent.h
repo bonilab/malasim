@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <tuple>
 
 // #include "Core/ObjectPool.h"
 #include "Events/Event.h"

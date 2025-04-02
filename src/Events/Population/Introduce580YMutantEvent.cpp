@@ -24,7 +24,6 @@ Introduce580YMutantEvent::~Introduce580YMutantEvent() = default;
 void Introduce580YMutantEvent::do_execute() {
   // TODO: rework on this
 
-
   auto* pi = Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
 
   // get the approximate current frequency of 580Y in the population

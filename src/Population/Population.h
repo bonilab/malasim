@@ -1,9 +1,10 @@
-
 #ifndef POPULATION_H
 #define POPULATION_H
 
 #include <vector>
 #include <memory>
+#include <string>
+#include "Core/Scheduler/EventManager.h"
 
 #include "Person/Person.h"
 
@@ -11,7 +12,7 @@ class Model;
 class PersonIndexAll;
 class PersonIndexByLocationStateAgeClass;
 class PersonIndexByLocationBitingLevel;
-class Population : public Dispatcher {
+class Population : public EventManager {
 public:
   // Disable copy and assignment
   Population(const Population&) = delete;

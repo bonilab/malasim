@@ -14,8 +14,8 @@ BirthdayEvent::BirthdayEvent() = default;
 BirthdayEvent::~BirthdayEvent() = default;
 
 void BirthdayEvent::do_execute() {
-  assert(dispatcher != nullptr);
-  auto* person = dynamic_cast<Person*>(dispatcher);
+  assert(event_manager != nullptr);
+  auto* person = dynamic_cast<Person*>(event_manager);
   person->increase_age_by_1_year();
 
   const auto days_to_next_birthday =

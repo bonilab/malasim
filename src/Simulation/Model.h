@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <string>
-#include <Core/Scheduler/Dispatcher.h>
+#include "Core/Scheduler/EventManager.h"
 #include <Utils/Random.h>
 #include "Population/ImmuneSystem/ImmunityClearanceUpdateFunction.h"
 #include "date/date.h"

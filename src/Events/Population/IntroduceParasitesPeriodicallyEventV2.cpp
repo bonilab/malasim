@@ -38,7 +38,7 @@ void IntroduceParasitesPeriodicallyEventV2::schedule_event(
         old_event->location(), old_event->duration(),
         old_event->number_of_cases(), old_event->start_day, old_event->end_day
     );
-    e->dispatcher = nullptr;
+    e->event_manager = nullptr;
     e->time = scheduler->current_time() + 1;
     scheduler->schedule_population_event(e);
   }

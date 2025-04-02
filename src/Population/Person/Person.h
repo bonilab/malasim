@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 #include <uuid.h>
-#include <Core/Scheduler/Dispatcher.h>
+#include <Core/Scheduler/EventManager.h>
 #include "Events/Event.h"
 #include "Population/SingleHostClonalParasitePopulations.h"
 #include "Utils/Index/PersonIndexAllHandler.h"
@@ -22,13 +22,12 @@ namespace utils {
 class Config;
 class Population;
 class Event;
-class Dispatcher;
 class ImmuneSystem;
 
 class Person :  public PersonIndexAllHandler,
                 public PersonIndexByLocationStateAgeClassHandler,
                 public PersonIndexByLocationMovingLevelHandler,
-                public Dispatcher {
+                public EventManager {
   // OBJECTPOOL(Person)
 
   // Disable copy and assignment
@@ -277,7 +276,7 @@ public:
 
   template<typename T>
   void schedule_basic_event(T* event) {
-    event->dispatcher = this;
+    event->event_manager = this;
     add_event(event);
   }
 

@@ -15,7 +15,7 @@ UpdateWhenDrugIsPresentEvent::UpdateWhenDrugIsPresentEvent() : clinical_caused_p
 UpdateWhenDrugIsPresentEvent::~UpdateWhenDrugIsPresentEvent() = default;
 
 void UpdateWhenDrugIsPresentEvent::do_execute() {
-  auto *person = dynamic_cast<Person *>(dispatcher);
+  auto *person = dynamic_cast<Person *>(event_manager);
   if (person->drugs_in_blood()->size() > 0) {
     if (person->get_all_clonal_parasite_populations()->contain(clinical_caused_parasite_) && person->get_host_state()==
         Person::CLINICAL) {

@@ -1,8 +1,11 @@
 #ifndef DISTRICTIMPORTATIONDAILYEVENT_H
 #define DISTRICTIMPORTATIONDAILYEVENT_H
 
+#include <vector>
+#include <tuple>
 #include "Events/Event.h"
 
+class Scheduler;
 class DistrictImportationDailyEvent : public Event {
 private:
   int district_;

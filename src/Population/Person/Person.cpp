@@ -59,7 +59,7 @@ Person::~Person() {
 }
 
 void Person::initialize() {
-  Dispatcher::initialize();
+  EventManager::initialize();
   
   immune_system_ = std::make_unique<ImmuneSystem>(this);
 
@@ -744,7 +744,7 @@ void Person::increase_age_by_1_year() {
 }
 
 void Person::update_events(int time) {
-  // call execute_events of dispatcher
+  // call execute_events of event_manager
   execute_events(time);
 }
 
@@ -760,7 +760,7 @@ void Person::add_event(Event* event) {
     ObjectHelpers::delete_pointer<Event>(event);
   } else {
 
-    // schedule and transfer ownership of the event to the dispatcher
+    // schedule and transfer ownership of the event to the event_manager
     schedule_event(event);
   }
 }

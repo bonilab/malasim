@@ -21,7 +21,6 @@ public:
 
   date::sys_days calendar_date;
 
-  // EventPtrVector2 individual_events_list_;
   EventPtrVector2 population_events_list_;
 
   explicit Scheduler(Model *model = nullptr);

@@ -18,7 +18,7 @@
 #include "Events/TestTreatmentFailureEvent.h"
 
 void RaptEvent::do_execute() {
-  auto* person = dynamic_cast<Person*>(dispatcher);
+  auto* person = dynamic_cast<Person*>(event_manager);
   const auto raptConfig = Model::get_config()->get_rapt_settings();
 
   // Check to see if we should receive a therapy: RAPT is currently active, the

@@ -14,7 +14,7 @@ TestTreatmentFailureEvent::TestTreatmentFailureEvent()
 
 
 void TestTreatmentFailureEvent::do_execute() {
-  auto* person = dynamic_cast<Person*>(dispatcher);
+  auto* person = dynamic_cast<Person*>(event_manager);
 
   // If the parasite is still present at a detectable level, then it's a
   // treatment failure

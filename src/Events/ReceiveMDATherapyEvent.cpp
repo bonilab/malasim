@@ -14,7 +14,7 @@ ReceiveMDATherapyEvent::ReceiveMDATherapyEvent() : received_therapy_(nullptr){};
 ReceiveMDATherapyEvent::~ReceiveMDATherapyEvent() = default;
 
 void ReceiveMDATherapyEvent::do_execute() {
-  auto* person = dynamic_cast<Person*>(dispatcher);
+  auto* person = dynamic_cast<Person*>(event_manager);
   //    if (person->is_in_external_population()) {
   //        return;
   //    }

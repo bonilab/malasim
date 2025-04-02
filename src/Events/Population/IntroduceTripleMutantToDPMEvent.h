@@ -1,9 +1,12 @@
 #ifndef POMS_SRC_EVENTS_POPULATION_INTRODUCETRIPLEMUTANTTODPMEVENT_H
 #define POMS_SRC_EVENTS_POPULATION_INTRODUCETRIPLEMUTANTTODPMEVENT_H
 
+#include <string>
+#include <vector>
+#include <tuple>
+
 //#include "Core/ObjectPool.h"
 #include "Events/Event.h"
-#include <string>
 
 class IntroduceTrippleMutantToDPMEvent : public Event {
 public:

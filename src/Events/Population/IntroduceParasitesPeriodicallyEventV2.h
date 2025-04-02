@@ -1,9 +1,12 @@
 #ifndef POMS_SRC_EVENTS_POPULATION_INTRODUCEPARASITESPERIODICALLYEVENTV2_H
 #define POMS_SRC_EVENTS_POPULATION_INTRODUCEPARASITESPERIODICALLYEVENTV2_H
 
+#include <vector>
 
 // #include "Core/ObjectPool.h"
 #include "Events/Event.h"
+
+class Scheduler;
 
 class IntroduceParasitesPeriodicallyEventV2  : public Event {
 public:

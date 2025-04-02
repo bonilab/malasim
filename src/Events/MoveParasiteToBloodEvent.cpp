@@ -19,7 +19,7 @@ MoveParasiteToBloodEvent::MoveParasiteToBloodEvent()
 MoveParasiteToBloodEvent::~MoveParasiteToBloodEvent() {}
 
 void MoveParasiteToBloodEvent::do_execute() {
-  auto* person = dynamic_cast<Person*>(dispatcher);
+  auto* person = dynamic_cast<Person*>(event_manager);
   auto* parasite_type = person->liver_parasite_type();
   person->set_liver_parasite_type(nullptr);
 

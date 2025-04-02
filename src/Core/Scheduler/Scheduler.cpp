@@ -154,7 +154,7 @@ void Scheduler::schedule_event(EventPtrVector& time_events, Event* event) {
 void Scheduler::clear_all_events(EventPtrVector2& events_list) {
   for (auto& timestep_events : events_list) {
     for (auto* event : timestep_events) {
-      // TODO: consider using dispatcher to manage events
+      // TODO: consider using event_manager to manage events
       // maybe population events will be removed
       ObjectHelpers::delete_pointer<Event>(event);
     }

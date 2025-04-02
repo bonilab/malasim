@@ -1,6 +1,6 @@
 #include "Event.h"
 
-#include <Core/Scheduler/Dispatcher.h>
+#include <Core/Scheduler/EventManager.h>
 #include <spdlog/spdlog.h>
 
 #include <iostream>
@@ -11,7 +11,7 @@
 Event::Event() {}
 
 Event::~Event() {
-  dispatcher = nullptr;
+  event_manager = nullptr;
 }
 
 void Event::execute() {

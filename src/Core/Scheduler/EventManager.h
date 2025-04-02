@@ -1,18 +1,17 @@
-#ifndef DISPATCHER_H
-#define    DISPATCHER_H
+#ifndef EVENT_MANAGER_H
+#define EVENT_MANAGER_H
 
 #include <map>
-#include <uuid.h>
 #include <vector>
 #include "Events/Event.h"
 
-class Dispatcher {
+class EventManager {
 public:
  // Disallow copy and assign
- Dispatcher(const Dispatcher&) = delete;
- void operator=(const Dispatcher&) = delete;
- Dispatcher(Dispatcher&&) = delete;
- Dispatcher& operator=(Dispatcher&&) = delete;
+ EventManager(const EventManager&) = delete;
+ void operator=(const EventManager&) = delete;
+ EventManager(EventManager&&) = delete;
+ EventManager& operator=(EventManager&&) = delete;
 
 private:
  // std::vector<Event*> *events_;
@@ -29,17 +28,17 @@ public:
     return events_;
   }
 public:
-  Dispatcher();
+  EventManager();
 
-  //    Dispatcher(const Dispatcher& orig);
-  virtual ~Dispatcher();
+  //    EventManager(const EventManager& orig);
+  virtual ~EventManager();
 
   virtual void initialize();
 
   // this will execute all events up to and including time
   virtual void execute_events(int time);
 
-  // this will transfer ownership of the event to the dispatcher
+  // this will transfer ownership of the event to the event manager
   void schedule_event(Event* event);
 
   // Convenience method to check if any event exists
@@ -71,7 +70,7 @@ public:
     }
   }
 
-  void cancel_all_events_except(Event* inEvent) const{
+  void cancel_all_events_except(Event* inEvent) const {
     for (auto& [time, event] : events_) {
       if (event.get() != inEvent) {
         event->executable = false;
@@ -79,9 +78,8 @@ public:
     }
   }
 
-
   template <typename T>
-  void cancel_all_events_except(Event* inEvent) const{
+  void cancel_all_events_except(Event* inEvent) const {
     for (auto& [time, event] : events_) {
       if (event.get() != inEvent && dynamic_cast<T*>(event.get()) != nullptr) {
         event->executable = false;
@@ -90,5 +88,5 @@ public:
   }
 };
 
-#endif    /* DISPATCHER_H */
+#endif    /* EVENT_MANAGER_H */
 

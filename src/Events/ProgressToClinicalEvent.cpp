@@ -102,7 +102,7 @@ void ProgressToClinicalEvent::apply_therapy(Person *person, Therapy *therapy, bo
 }
 
 void ProgressToClinicalEvent::do_execute() {
-  auto *person = dynamic_cast<Person *>(dispatcher);
+  auto *person = dynamic_cast<Person *>(event_manager);
   if (person->get_all_clonal_parasite_populations()->size()==0) {
     //parasites might be cleaned by immune system or other things else
     return;

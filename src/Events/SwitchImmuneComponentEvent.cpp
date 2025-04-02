@@ -13,8 +13,8 @@ SwitchImmuneComponentEvent::~SwitchImmuneComponentEvent() = default;
 
 void SwitchImmuneComponentEvent::do_execute() {
 
-  assert(dispatcher!=nullptr);
-  auto *p = dynamic_cast<Person *>(dispatcher);
+  assert(event_manager!=nullptr);
+  auto *p = dynamic_cast<Person *>(event_manager);
   p->get_immune_system()->set_immune_component(new NonInfantImmuneComponent());
 
 }
@@ -23,7 +23,7 @@ void SwitchImmuneComponentEvent::schedule_for_switch_immune_component_event(Sche
                                                                             const int &time) {
   if (scheduler!=nullptr) {
     auto *e = new SwitchImmuneComponentEvent();
-    e->dispatcher = p;
+    e->event_manager = p;
     e->time = time;
     p->add_event(e);
     //scheduler->schedule_individual_event(e);

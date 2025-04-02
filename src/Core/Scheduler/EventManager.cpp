@@ -1,28 +1,27 @@
 /* 
- * File:   Dispatcher.cpp
+ * File:   EventManager.cpp
  * Author: nguyentran
  * 
  * Created on May 3, 2013, 3:46 PM
  */
 
-#include "Dispatcher.h"
+#include "EventManager.h"
 
 #include "Events/Event.h"
 #include "Utils/Helpers/ObjectHelpers.h"
 #include "spdlog/spdlog.h"
 #include "Simulation/Model.h"
 
-Dispatcher::Dispatcher(): events_() {}
+EventManager::EventManager(): events_() {}
 
-void Dispatcher::initialize() {
+void EventManager::initialize() {
   events_.clear();
 }
 
-Dispatcher::~Dispatcher() {
+EventManager::~EventManager() {
 }
 
-
-void Dispatcher::execute_events(int time) {
+void EventManager::execute_events(int time) {
   while (!events_.empty() && events_.begin()->first <= time) {
     // Get all events at the current time point
     int current_time = events_.begin()->first;
@@ -46,8 +45,8 @@ void Dispatcher::execute_events(int time) {
   }
 }
 
-void Dispatcher::schedule_event(Event* event) {
+void EventManager::schedule_event(Event* event) {
   event->executable = true;
-  event->dispatcher = this;
+  event->event_manager = this;
   events_.insert(std::make_pair(event->time, std::unique_ptr<Event>(event)));
 }

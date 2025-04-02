@@ -6,6 +6,8 @@
 //#include "Core/ObjectPool.h"
 #include "Events/Event.h"
 
+class Scheduler;
+
 class ImportationEvent : public Event {
 public:
   //disallow copy, assign and move

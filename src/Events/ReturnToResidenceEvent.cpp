@@ -11,7 +11,7 @@
 //OBJECTPOOL_IMPL(ReturnToResidenceEvent)
 
 void ReturnToResidenceEvent::do_execute() {
-  auto* person = dynamic_cast<Person*>(dispatcher);
+  auto* person = dynamic_cast<Person*>(event_manager);
   auto source_location = person->get_location();
   person->set_location(person->get_residence_location());
   Model::get_population()->notify_movement(source_location,

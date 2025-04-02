@@ -19,7 +19,7 @@ EndClinicalEvent::EndClinicalEvent() : clinical_caused_parasite_(nullptr) {}
 EndClinicalEvent::~EndClinicalEvent() = default;
 
 void EndClinicalEvent::do_execute() {
-  auto person = dynamic_cast<Person*>(dispatcher);
+  auto person = dynamic_cast<Person*>(event_manager);
 
   if (person->get_all_clonal_parasite_populations()->size() == 0) {
     person->change_state_when_no_parasite_in_blood();

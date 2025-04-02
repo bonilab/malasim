@@ -4,6 +4,8 @@
 //#include "Core/ObjectPool.h"
 #include "Events/Event.h"
 
+class Scheduler;
+
 class ImportationPeriodicallyEvent : public Event {
 public:
   //disallow copy and assign

@@ -2,14 +2,8 @@
 #define EVENT_H
 
 #include <string>
-#include <uuid.h>
 
-class Dispatcher;
-class Scheduler;
-
-namespace utils {
-    class Indexer;
-}
+class EventManager;
 
 class Event {
 public:
@@ -27,7 +21,7 @@ public:
     virtual const std::string name() const = 0;
 
     bool executable{false};
-    Dispatcher* dispatcher{nullptr};
+    EventManager* event_manager{nullptr};
     int time{-1};
 
 protected:
@@ -36,8 +30,8 @@ protected:
 
 private:
 
-    // Friend declaration to allow Dispatcher to set executable state
-    friend class Dispatcher;
+    // Friend declaration to allow EventManager to set executable state
+    friend class EventManager;
 };
 
 #endif // EVENT_H

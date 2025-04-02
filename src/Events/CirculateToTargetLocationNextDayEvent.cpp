@@ -17,7 +17,7 @@
 
 void CirculateToTargetLocationNextDayEvent::do_execute() {
   // Get the person and perform the movement
-  auto* person = dynamic_cast<Person*>(dispatcher);
+  auto* person = dynamic_cast<Person*>(event_manager);
   auto source_location = person->get_location();
   person->set_location(target_location_);
 
