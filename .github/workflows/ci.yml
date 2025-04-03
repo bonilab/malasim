@@ -25,6 +25,8 @@ jobs:
 
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
+        with:
+          cmakeversion: "~3.31.0"
 
       - name: Setup vcpkg (no install yet)
         uses: lukka/run-vcpkg@v11
@@ -32,9 +34,9 @@ jobs:
       - name: Configure, Build, and Test using Presets
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: 'ci'
+          configurePreset: "ci"
           configurePresetAdditionalArgs: "[]"
-          buildPreset: 'ci-release'
+          buildPreset: "ci-release"
           buildPresetAdditionalArgs: "[]"
-          testPreset: 'ci-release'
+          testPreset: "ci-release"
           testPresetAdditionalArgs: "[]"
