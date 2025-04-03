@@ -8,7 +8,8 @@ on:
 
 env:
   VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-  VCPKG_TRIPLET: x64-linux
+  VCPKG_DEFAULT_TRIPLET: x64-linux
+  VCPKG_DEFAULT_HOST_TRIPLET: x64-linux
 
 jobs:
   build-and-test:
@@ -25,39 +26,15 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
 
-      - name: Setup vcpkg
+      - name: Setup vcpkg (no install yet)
         uses: lukka/run-vcpkg@v11
 
-      - name: Configure with CMake Preset (ci)
-        run: cmake --preset ci
-
-      - name: Build (Release)
-        run: cmake --build --preset ci-release
-
-      - name: Test (Release)
-        run: ctest --preset ci-release
-
-      # Optional: enable this when clang-tidy checks are ready
-      # - name: Install clang-tidy
-      #   run: sudo apt-get update && sudo apt-get install -y clang-tidy
-      #
-      # - name: Run clang-tidy
-      #   run: |
-      #     find src tests -type f \( -name '*.cpp' -o -name '*.h' \) -print0 | xargs -0 clang-tidy -p build/ci
-
-  # Optional code formatting job
-  # format:
-  #   name: Code Formatting
-  #   runs-on: ubuntu-latest
-  #
-  #   steps:
-  #     - name: Checkout Repository
-  #       uses: actions/checkout@v3
-  #
-  #     - name: Install clang-format
-  #       run: sudo apt-get update && sudo apt-get install -y clang-format
-  #
-  #     - name: Run clang-format
-  #       run: |
-  #         find src tests -type f \( -name '*.cpp' -o -name '*.h' \) -print0 | xargs -0 clang-format -i --style=file
-  #         git diff --exit-code
+      - name: Configure, Build, and Test using Presets
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'ci'
+          configurePresetAdditionalArgs: "[]"
+          buildPreset: 'ci-release'
+          buildPresetAdditionalArgs: "[]"
+          testPreset: 'ci-release'
+          testPresetAdditionalArgs: "[]"
