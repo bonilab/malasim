@@ -5,104 +5,85 @@
     "minor": 21,
     "patch": 0
   },
+
   "configurePresets": [
     {
-      "name": "ninja-multi-vcpkg-ci",
-      "displayName": "Ninja Multi-Config",
-      "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
-      "binaryDir": "${sourceDir}/build/${presetName}",
+      "name": "base-vcpkg",
+      "hidden": true,
       "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "ci",
+      "inherits": "base-vcpkg",
+      "displayName": "CI Build",
+      "description": "CI build with vcpkg",
       "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"
     },
     {
-      "name": "ninja-multi-vcpkg-local",
-      "displayName": "Ninja Multi-Config Local",
-      "description": "Configure with vcpkg toolchain and generate Ninja project files for all configurations",
-      "binaryDir": "${sourceDir}/build/${presetName}",
-      "generator": "Ninja Multi-Config",
+      "name": "local",
+      "inherits": "base-vcpkg",
+      "displayName": "Local Build",
+      "description": "Local build with vcpkg",
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
     }
   ],
+
   "buildPresets": [
     {
-      "name": "ninja-vcpkg-debug-ci",
-      "configurePreset": "ninja-multi-vcpkg-ci",
-      "displayName": "Build (Debug)",
-      "description": "Build with Ninja/vcpkg (Debug)",
+      "name": "ci-debug",
+      "configurePreset": "ci",
+      "displayName": "CI Debug",
+      "description": "CI Debug Build",
       "configuration": "Debug"
     },
     {
-      "name": "ninja-vcpkg-release-ci",
-      "configurePreset": "ninja-multi-vcpkg-ci",
-      "displayName": "Build (Release)",
-      "description": "Build with Ninja/vcpkg (Release)",
+      "name": "ci-release",
+      "configurePreset": "ci",
+      "displayName": "CI Release",
+      "description": "CI Release Build",
       "configuration": "Release"
     },
     {
-      "name": "ninja-vcpkg-ci",
-      "configurePreset": "ninja-multi-vcpkg-ci",
-      "displayName": "Build",
-      "description": "Build with Ninja/vcpkg"
-    },
-    {
-      "name": "ninja-vcpkg-debug-local",
-      "configurePreset": "ninja-multi-vcpkg-local",
-      "displayName": "Build (Debug)",
-      "description": "Build with Ninja/vcpkg (Debug)",
+      "name": "local-debug",
+      "configurePreset": "local",
+      "displayName": "Local Debug",
+      "description": "Local Debug Build",
       "configuration": "Debug"
     },
     {
-      "name": "ninja-vcpkg-release-local",
-      "configurePreset": "ninja-multi-vcpkg-local",
-      "displayName": "Build (Release)",
-      "description": "Build with Ninja/vcpkg (Release)",
+      "name": "local-release",
+      "configurePreset": "local",
+      "displayName": "Local Release",
+      "description": "Local Release Build",
       "configuration": "Release"
-    },
-    {
-      "name": "ninja-vcpkg-local",
-      "configurePreset": "ninja-multi-vcpkg-local",
-      "displayName": "Build",
-      "description": "Build with Ninja/vcpkg"
     }
   ],
+
   "testPresets": [
     {
-      "name": "test-ninja-vcpkg-ci",
-      "configurePreset": "ninja-multi-vcpkg-ci",
-      "hidden": true
-    },
-    {
-      "name": "test-debug-ci",
-      "description": "Test (Debug)",
-      "displayName": "Test (Debug)",
+      "name": "ci-debug",
+      "configurePreset": "ci",
       "configuration": "Debug",
-      "inherits": ["test-ninja-vcpkg-ci"]
+      "displayName": "CI Test (Debug)"
     },
     {
-      "name": "test-release-ci",
-      "description": "Test (Release)",
-      "displayName": "Test (Release)",
+      "name": "ci-release",
+      "configurePreset": "ci",
       "configuration": "Release",
-      "inherits": ["test-ninja-vcpkg-ci"]
+      "displayName": "CI Test (Release)"
     },
     {
-      "name": "test-ninja-vcpkg-local",
-      "configurePreset": "ninja-multi-vcpkg-local",
-      "hidden": true
-    },
-    {
-      "name": "test-debug-local",
-      "description": "Test (Debug)",
-      "displayName": "Test (Debug)",
+      "name": "local-debug",
+      "configurePreset": "local",
       "configuration": "Debug",
-      "inherits": ["test-ninja-vcpkg-local"]
+      "displayName": "Local Test (Debug)"
     },
     {
-      "name": "test-release-local",
-      "description": "Test (Release)",
-      "displayName": "Test (Release)",
+      "name": "local-release",
+      "configurePreset": "local",
       "configuration": "Release",
-      "inherits": ["test-ninja-vcpkg-local"]
+      "displayName": "Local Test (Release)"
     }
   ]
 }
