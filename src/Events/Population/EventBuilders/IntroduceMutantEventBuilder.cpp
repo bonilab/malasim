@@ -8,9 +8,9 @@
 #include "Events/Population/IntroduceMutantEvent.hxx"
 #include "Events/Population/IntroduceMutantRasterEvent.hxx"
 #include "Events/Population/PopulationEventBuilder.h"
+#include "Simulation/Model.h"
 #include "Spatial/GIS/AscFile.h"
 #include "Spatial/GIS/SpatialData.h"
-#include "Simulation/Model.h"
 
 // Parse the file provided and return the location ids from it.
 //
@@ -68,37 +68,44 @@ std::vector<int> get_locations_from_raster(const std::string &filename) {
 }
 
 std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_event(
-    const YAML::Node &node, Config* config, const std::string& admin_level_name)  {
+    const YAML::Node &node, Config* config,
+    const std::string &admin_level_name) {
   try {
     std::vector<WorldEvent*> events;
     for (const auto &entry : node) {
       // Load the values
       auto start_date = entry["day"].as<date::year_month_day>();
-      auto time =
-          (date::sys_days{start_date} - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
-              .count();
+      auto time = (date::sys_days{start_date}
+                   - date::sys_days{config->get_simulation_timeframe()
+                                        .get_starting_date()})
+                      .count();
       auto unit_id = entry["unit_id"].as<int>();
       auto fraction = entry["fraction"].as<double>();
-      std::vector<std::tuple<int,int,char>> alleles;
+      std::vector<std::tuple<int, int, char>> alleles;
       for (const auto &allele_node : entry["alleles"]) {
         if (allele_node["allele"].as<std::string>().size() > 1) {
-          spdlog::error("Allele {} should be 1 character",allele_node["allele"].as<std::string>());
-        }
-        else {
-          alleles.push_back(std::tuple(allele_node["chromosome"].as<int>(),allele_node["locus"].as<int>(),
-            allele_node["allele"].as<std::string>().front()));
+          spdlog::error("Allele {} should be 1 character",
+                        allele_node["allele"].as<std::string>());
+        } else {
+          alleles.emplace_back(allele_node["chromosome"].as<int>(),
+                               allele_node["locus"].as<int>(),
+                               allele_node["allele"].as<std::string>().front());
         }
       }
-      for (auto & allele : alleles) {
-        spdlog::info("Mutation at {}:{} {}",std::get<0>(allele),std::get<1>(allele),std::get<2>(allele));
+      for (auto &allele : alleles) {
+        spdlog::info("Mutation at {}:{} {}", std::get<0>(allele),
+                     std::get<1>(allele), std::get<2>(allele));
       }
 
-      auto admin_level_id = SpatialData::get_instance().get_admin_level_id(admin_level_name);
+      auto admin_level_id =
+          SpatialData::get_instance().get_admin_level_id(admin_level_name);
       // Make sure the GIS data is loaded and the unit id makes
       // sense
       if (unit_id < 0) {
-        spdlog::error("The target unit id must be greater than or equal to zero.");
-        throw std::invalid_argument("Target unit id must be greater than or equal to zero");
+        spdlog::error(
+            "The target unit id must be greater than or equal to zero.");
+        throw std::invalid_argument(
+            "Target unit id must be greater than or equal to zero");
       }
 
       if (SpatialData::get_instance().get_admin_levels().empty()) {
@@ -106,50 +113,58 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_event(
         throw std::invalid_argument("No admin levels found.");
       }
 
-      if (unit_id > SpatialData::get_instance().get_unit_count(admin_level_id)) {
+      if (unit_id
+          > SpatialData::get_instance().get_unit_count(admin_level_id)) {
         spdlog::error("Target unit id is greater than the unit count.");
         throw std::invalid_argument("Target unit id greater than unit count.");
       }
 
       // Log and add the event to the queue
-      auto* event = new IntroduceMutantEvent(time, unit_id, admin_level_id, fraction, alleles);
-      for (auto & allele : alleles) {
-        spdlog::info("Mutation at {}:{} {}",std::get<0>(allele),std::get<1>(allele),std::get<2>(allele));
+      auto* event = new IntroduceMutantEvent(time, unit_id, admin_level_id,
+                                             fraction, alleles);
+      for (auto &allele : alleles) {
+        spdlog::info("Mutation at {}:{} {}", std::get<0>(allele),
+                     std::get<1>(allele), std::get<2>(allele));
       }
       events.push_back(event);
     }
     return events;
   } catch (YAML::BadConversion &error) {
     spdlog::error("Unrecoverable error parsing YAML value in {} node: {}",
-                  IntroduceMutantEvent::EventName, error.msg);
+                  IntroduceMutantEvent::EVENT_NAME, error.msg);
     exit(1);
   }
 }
 
-std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_raster_event(
+std::vector<WorldEvent*>
+PopulationEventBuilder::build_introduce_mutant_raster_event(
     const YAML::Node &node, Config* config) {
   try {
     std::vector<WorldEvent*> events;
     for (const auto &entry : node) {
       // Load the values
       auto start_date = entry["date"].as<date::year_month_day>();
-      auto time =
-          (date::sys_days{start_date} - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
-              .count();
+      auto time = (date::sys_days{start_date}
+                   - date::sys_days{config->get_simulation_timeframe()
+                                        .get_starting_date()})
+                      .count();
       auto filename = entry["raster"].as<std::string>();
       auto fraction = entry["fraction"].as<double>();
-      std::vector<std::tuple<int,int,char>> alleles;
+      std::vector<std::tuple<int, int, char>> alleles;
       for (const auto &allele_node : entry["alleles"]) {
         if (allele_node["allele"].as<std::string>().size() > 1) {
-          spdlog::error("Allele {} should be 1 character",allele_node["allele"].as<std::string>());
-        }
-        else {
-          alleles.push_back(std::tuple(allele_node["chromosome"].as<int>(),allele_node["locus"].as<int>(),
-            allele_node["allele"].as<std::string>().front()));
+          spdlog::error("Allele {} should be 1 character",
+                        allele_node["allele"].as<std::string>());
+        } else {
+          alleles.push_back(
+              std::tuple(allele_node["chromosome"].as<int>(),
+                         allele_node["locus"].as<int>(),
+                         allele_node["allele"].as<std::string>().front()));
         }
       }
-      for (auto & allele : alleles) {
-        spdlog::info("Mutation at {}:{} {}",std::get<0>(allele),std::get<1>(allele),std::get<2>(allele));
+      for (auto &allele : alleles) {
+        spdlog::info("Mutation at {}:{} {}", std::get<0>(allele),
+                     std::get<1>(allele), std::get<2>(allele));
       }
 
       // Make sure the fraction makes sense
@@ -161,18 +176,20 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_raster_e
 
       // Load the locations from the file, then add the new event to the queue
       auto locations = get_locations_from_raster(filename);
-      auto* event = new IntroduceMutantRasterEvent(time, locations, fraction,alleles);
+      auto* event =
+          new IntroduceMutantRasterEvent(time, locations, fraction, alleles);
       spdlog::debug(
           "Adding event {} start date: {} with {} locations fraction: {}",
           event->name(), StringHelpers::date_as_string(start_date),
-          locations.size(),fraction);
+          locations.size(), fraction);
       events.push_back(event);
     }
     return events;
   } catch (YAML::BadConversion &error) {
-    spdlog::error("Unrecoverable error parsing YAML value in {}"
-                  " node: {}",
-                  IntroduceMutantRasterEvent::EventName, error.msg);
+    spdlog::error(
+        "Unrecoverable error parsing YAML value in {}"
+        " node: {}",
+        IntroduceMutantRasterEvent::EventName, error.msg);
     exit(EXIT_FAILURE);
   } catch (std::runtime_error &error) {
     // Runtime errors are most likely to be thrown when reading the ASC file, so

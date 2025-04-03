@@ -3,7 +3,6 @@
 #include <cassert>
 
 #include "Core/Scheduler/Scheduler.h"
-#include "Utils/Helpers/TimeHelpers.h"
 #include "Population/Person/Person.h"
 #include "Simulation/Model.h"
 
@@ -14,7 +13,8 @@ void BirthdayEvent::do_execute() {
   assert(person != nullptr);
   person->increase_age_by_1_year();
 
-  const auto days_to_next_birthday = Model::get_scheduler()->get_days_to_next_year();
+  const auto days_to_next_birthday =
+      Model::get_scheduler()->get_days_to_next_year();
 
   person->schedule_birthday_event(days_to_next_birthday);
 }

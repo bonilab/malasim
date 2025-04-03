@@ -43,25 +43,27 @@ TEST_F(PersonClinicalTest, ScheduleProgressToClinicalEvent) {
 
 TEST_F(PersonClinicalTest, CancelClinicalEvents) {
     ClonalParasitePopulation* test_parasite = nullptr; // Mock this if needed
-
     
     // Schedule multiple events
     person_->schedule_progress_to_clinical_event(test_parasite);
     person_->schedule_progress_to_clinical_event(test_parasite);
-    
     // 
     auto test_event = person_->get_events().begin()->second.get();
     // Cancel all other progress events except this one
+    // cancel only mark the event as cancelled, but not remove it from the scheduler
     person_->cancel_all_other_progress_to_clinical_events_except(test_event);
     
     // Verify only one event remains
-    int event_count = 0;
+    int executable_event_count = 0;
     for (const auto& event_pair : person_->get_events()) {
         if (dynamic_cast<ProgressToClinicalEvent*>(event_pair.second.get())) {
-            event_count++;
+            if (event_pair.second->is_executable()) {
+                // spdlog::info("Executable event found");
+                executable_event_count++;
+            }
         }
     }
-    EXPECT_EQ(event_count, 1);
+    EXPECT_EQ(executable_event_count, 1);
 }
 
 TEST_F(PersonClinicalTest, ProbabilityProgressToClinical) {

@@ -1,13 +1,13 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <memory>
-#include <string>
-#include "Core/Scheduler/EventManager.h"
 #include <Utils/Random.h>
-#include "Population/ImmuneSystem/ImmunityClearanceUpdateFunction.h"
+
+#include <memory>
+
 #include "Configuration/Config.h"
-#include "date/date.h"
+#include "Core/Scheduler/Scheduler.h"
+#include "Population/ImmuneSystem/ImmunityClearanceUpdateFunction.h"
 
 namespace Spatial {
 class Location;
@@ -16,7 +16,6 @@ class Location;
 class Reporter;
 class Random;
 class Cli;
-class Scheduler;
 class Population;
 class ModelDataCollector;
 class Mosquito;
@@ -49,19 +48,20 @@ private:
 
   bool is_initialized_;
 
-  std::unique_ptr<Config> config_ {nullptr};
-  Scheduler* scheduler_;
+  std::unique_ptr<Config> config_{nullptr};
+  std::unique_ptr<Scheduler> scheduler_{nullptr};
   Population* population_;
   utils::Random* random_;
   ModelDataCollector* mdc_;
   Mosquito* mosquito_;
-  IStrategy *treatment_strategy_{nullptr};
-  ITreatmentCoverageModel *treatment_coverage_{nullptr};
+  IStrategy* treatment_strategy_{nullptr};
+  ITreatmentCoverageModel* treatment_coverage_{nullptr};
   ClinicalUpdateFunction* progress_to_clinical_update_function_;
   ImmunityClearanceUpdateFunction* immunity_clearance_update_function_;
   ImmunityClearanceUpdateFunction* having_drug_update_function_;
   ImmunityClearanceUpdateFunction* clinical_update_function_;
-  std::vector<Reporter *> reporters_;
+  std::vector<Reporter*> reporters_;
+
 public:
   void before_run();
   void run();
@@ -72,23 +72,26 @@ public:
   void monthly_update();
   void yearly_update();
   void release();
-  Model* get_model();
+  static Model* get_model() { return &get_instance(); }
 
-  static Config* get_config(){
-    return get_instance().config_.get();
-  }
-  static void set_config(Config* config){
+  static Config* get_config() { return get_instance().config_.get(); }
+  static void set_config(Config* config) {
     get_instance().config_.reset(config);
   }
 
-  static Scheduler* get_scheduler();
+  static Scheduler* get_scheduler() { return get_instance().scheduler_.get(); }
+
+  static void set_scheduler(Scheduler* scheduler) {
+    get_instance().scheduler_.reset(scheduler);
+  }
+
   static utils::Random* get_random();
   static ModelDataCollector* get_mdc();
   static Population* get_population();
   static Mosquito* get_mosquito();
   static ITreatmentCoverageModel* get_treatment_coverage();
   static IStrategy* get_treatment_strategy();
- 
+
   ClinicalUpdateFunction* progress_to_clinical_update_function() {
     return progress_to_clinical_update_function_;
   }
@@ -107,7 +110,7 @@ public:
   void build_initial_treatment_coverage();
   void monthly_report();
   void report_begin_of_time_step();
-  void add_reporter(Reporter *reporter);
+  void add_reporter(Reporter* reporter);
 };
 
 #endif  // MODEL_H

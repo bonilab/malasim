@@ -9,14 +9,14 @@
 #define INTRODUCEMUTANTRASTEREVENT_HXX
 
 #include <utility>
-#include "Core/Scheduler/Scheduler.h"
 
+#include "Core/Scheduler/Scheduler.h"
 #include "IntroduceMutantEventBase.h"
-#include "Utils/Helpers/StringHelpers.h"
+#include "Simulation/Model.h"
 
 class IntroduceMutantRasterEvent : public IntroduceMutantEventBase {
 public:
-  //disallow copy and move
+  // disallow copy and move
   IntroduceMutantRasterEvent(const IntroduceMutantRasterEvent &) = delete;
   IntroduceMutantRasterEvent(IntroduceMutantRasterEvent &&) = delete;
 
@@ -32,19 +32,20 @@ private:
 
     // Log the event's operation
     for (auto allele : alleles_) {
-      spdlog::info("Time: {} - Introduce mutant raster event chromosome {} locus {} allele {} fraction: {} count: {}",
-                   Model::get_scheduler()->current_time(),
-                   std::get<0>(allele), std::get<1>(allele), std::get<2>(allele),
-                   target_fraction, count);
+      spdlog::info(
+          "Time: {} - Introduce mutant raster event chromosome {} locus {} "
+          "allele {} fraction: {} count: {}",
+          Model::get_scheduler()->current_time(), std::get<0>(allele),
+          std::get<1>(allele), std::get<2>(allele), target_fraction, count);
     }
   }
 
 public:
   inline static const std::string EventName = "introduce_mutant_raster_event";
 
-  IntroduceMutantRasterEvent(const int &time, std::vector<int> locations,
-                             const double &fraction,
-                            const  std::vector<std::tuple<int,int,char>> &alleles)
+  IntroduceMutantRasterEvent(
+      const int &time, std::vector<int> locations, const double &fraction,
+      const std::vector<std::tuple<int, int, char>> &alleles)
       : IntroduceMutantEventBase(fraction, alleles),
         locations_(std::move(locations)) {
     this->set_time(time);
