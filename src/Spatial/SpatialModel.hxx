@@ -9,11 +9,8 @@
 
 #include <spdlog/spdlog.h>
 
-#include "Simulation/Model.h"
-#include "Spatial/GIS/SpatialData.h"
+#include "Spatial/GIS/AscFile.h"
 #include "Utils/TypeDef.hxx"
-
-class Config;
 
 namespace Spatial {
 class SpatialModel {
@@ -24,7 +21,8 @@ class SpatialModel {
 
 protected:
   // Prepare the travel raster for the movement model
-  static std::vector<double> prepare_surface(const AscFile* travel_raster, int number_of_locations) {
+  static std::vector<double> prepare_surface(const AscFile* travel_raster,
+                                             int number_of_locations) {
     // Get the travel times raster
     spdlog::info("Preparing travel surface...");
     if (travel_raster == nullptr) {
@@ -38,7 +36,9 @@ protected:
     // Use the min and max to normalize the raster into a vector
     for (auto row = 0; row < travel_raster->NROWS; row++) {
       for (auto col = 0; col < travel_raster->NCOLS; col++) {
-        if (travel_raster->data[row][col] == travel_raster->NODATA_VALUE) { continue; }
+        if (travel_raster->data[row][col] == travel_raster->NODATA_VALUE) {
+          continue;
+        }
         travel.push_back(travel_raster->data[row][col]);
       }
     }
@@ -46,6 +46,7 @@ protected:
     // Return the pointer to the array
     return travel;
   }
+
 public:
   SpatialModel() = default;
 

@@ -2,6 +2,8 @@
 #include <gtest/gtest.h>
 
 #include "Configuration/ModelSettings.h"
+#include "Configuration/Config.h"
+#include "Configuration/SeasonalitySettings.h"
 
 class ModelSettingsTest : public ::testing::Test {
 protected:

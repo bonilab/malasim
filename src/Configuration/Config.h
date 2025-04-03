@@ -15,20 +15,20 @@
 #include "PopulationDemographic.h"
 #include "PopulationEvents.h"
 #include "RaptSettings.h"
-#include "TransmissionSettings.h"
+#include "SeasonalitySettings.h"
 #include "SimulationTimeframe.h"
 #include "SpatialSettings.h"
-#include "SeasonalitySettings.h"
 #include "StrategyParameters.h"
 #include "TherapyParameters.h"
+#include "TransmissionSettings.h"
 
-class Config{
+class Config {
 public:
-  //disallow copy, assign and move
-  Config(const Config&) = delete;
-  void operator=(const Config&) = delete;
-  Config(Config&&) = delete;
-  Config& operator=(Config&&) = delete;
+  // disallow copy, assign and move
+  Config(const Config &) = delete;
+  void operator=(const Config &) = delete;
+  Config(Config &&) = delete;
+  Config &operator=(Config &&) = delete;
 
   // Constructor and Destructor
   Config() = default;
@@ -53,12 +53,17 @@ public:
   [[nodiscard]] const TransmissionSettings &get_transmission_settings() const {
     return transmission_settings_;
   }
-  [[nodiscard]] PopulationDemographic &get_population_demographic()
-      {
+  [[nodiscard]] PopulationDemographic &get_population_demographic() {
     return population_demographic_;
   }
+
+  void set_population_demographic(const PopulationDemographic &demographic) {
+    population_demographic_ = demographic;
+  }
+
   [[nodiscard]] SpatialSettings &get_spatial_settings() {
-    /* no const here because Spatial Data class will need to access and modify later */
+    /* no const here because Spatial Data class will need to access and modify
+     * later */
     return spatial_settings_;
   }
   [[nodiscard]] SeasonalitySettings &get_seasonality_settings() {
@@ -74,45 +79,37 @@ public:
       const {
     return immune_system_parameters_;
   }
-  [[nodiscard]] GenotypeParameters &get_genotype_parameters()
-      {
+  [[nodiscard]] GenotypeParameters &get_genotype_parameters() {
     return genotype_parameters_;
   }
-  [[nodiscard]] const DrugParameters &get_drug_parameters()
-      const {
+  [[nodiscard]] const DrugParameters &get_drug_parameters() const {
     return drug_parameters_;
   }
-  [[nodiscard]] const TherapyParameters &get_therapy_parameters()
-      const {
+  [[nodiscard]] const TherapyParameters &get_therapy_parameters() const {
     return therapy_parameters_;
   }
-  [[nodiscard]] StrategyParameters &get_strategy_parameters()
-      {
+  [[nodiscard]] StrategyParameters &get_strategy_parameters() {
     return strategy_parameters_;
   }
-  [[nodiscard]] const EpidemiologicalParameters &get_epidemiological_parameters()
-      const {
+  [[nodiscard]] const EpidemiologicalParameters &
+  get_epidemiological_parameters() const {
     return epidemiological_parameters_;
   }
-  [[nodiscard]] MosquitoParameters &get_mosquito_parameters()
-      {
+  [[nodiscard]] MosquitoParameters &get_mosquito_parameters() {
     return mosquito_parameters_;
   }
-  [[nodiscard]] PopulationEvents &get_population_events()
-      {
+  [[nodiscard]] PopulationEvents &get_population_events() {
     return population_events_;
   }
-  [[nodiscard]] RaptSettings &get_rapt_settings() {
-    return rapt_settings_;
-  }
+  [[nodiscard]] RaptSettings &get_rapt_settings() { return rapt_settings_; }
 
   int number_of_locations() const;
   int number_of_age_classes() const;
   int number_of_parasite_types() const;
   int number_of_tracking_days() const;
-  std::vector<int> age_structure();
-  std::vector<Spatial::Location>& location_db();
-  std::vector<IStrategy *>& strategy_db();
+  std::vector<int> &age_structure();
+  std::vector<Spatial::Location> &location_db();
+  std::vector<IStrategy*> &strategy_db();
   GenotypeDatabase* genotype_db();
 
 private:
@@ -130,7 +127,7 @@ private:
 
   // Configuration File Path
   std::string config_file_path_;
-  Model *model_;
+  // Model *model_;
 
   ModelSettings model_settings_;
   TransmissionSettings transmission_settings_;

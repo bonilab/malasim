@@ -8,9 +8,8 @@
 #ifndef MARSHALLSM_HXX
 #define MARSHALLSM_HXX
 
-#include "Utils/Helpers/NumberHelpers.hxx"
-#include "Simulation/Model.h"
 #include "Spatial/SpatialModel.hxx"
+#include "Utils/Helpers/NumberHelpers.hxx"
 #include "Utils/TypeDef.hxx"
 
 namespace Spatial {
@@ -46,29 +45,35 @@ class MarshallSM : public SpatialModel {
     // Iterate through all  the locations and calculate the kernel
     for (auto source = 0; source < number_of_locations_; source++) {
       kernel[source] = new double[number_of_locations_];
-      for (auto destination = 0; destination < number_of_locations_; destination++) {
-        kernel[source][destination] =
-            std::pow(1 + (spatial_distance_matrix_[source][destination] / log_rho_), (-alpha_));
+      for (auto destination = 0; destination < number_of_locations_;
+           destination++) {
+        kernel[source][destination] = std::pow(
+            1 + (spatial_distance_matrix_[source][destination] / log_rho_),
+            (-alpha_));
       }
     }
   }
 
 public:
-  explicit MarshallSM(double tau, double alpha, double log_rho, int number_of_locations,
-    std::vector<std::vector<double>> spatial_distance_matrix)
-      : tau_(tau), alpha_(alpha), log_rho_(log_rho), number_of_locations_(number_of_locations),
-  spatial_distance_matrix_(spatial_distance_matrix) {}
+  explicit MarshallSM(double tau, double alpha, double log_rho,
+                      int number_of_locations,
+                      std::vector<std::vector<double>> spatial_distance_matrix)
+      : tau_(tau),
+        alpha_(alpha),
+        log_rho_(log_rho),
+        number_of_locations_(number_of_locations),
+        spatial_distance_matrix_(spatial_distance_matrix) {}
 
   ~MarshallSM() override {
     if (kernel != nullptr) {
-      for (auto ndx = 0; ndx < number_of_locations_; ndx++) { delete kernel[ndx]; }
+      for (auto ndx = 0; ndx < number_of_locations_; ndx++) {
+        delete kernel[ndx];
+      }
       delete kernel;
     }
   }
 
-  void prepare() override {
-    prepare_kernel();
-  }
+  void prepare() override { prepare_kernel(); }
 
   [[nodiscard]] DoubleVector get_v_relative_out_movement_to_destination(
       const int &from_location, const int &number_of_locations,

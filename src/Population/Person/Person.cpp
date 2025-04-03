@@ -118,16 +118,14 @@ void Person::set_age(const int& value) {
     // TODO::if age access the limit of age structure i.e. 100, remove person???
 
     NotifyChange(AGE, &age_, &value);
-
     // update biting rate level
     age_ = value;
 
     // update age class
     if (Model::get_instance().get_model() != nullptr) {
       auto ac = age_class_ == -1 ? 0 : age_class_;
-
       while (ac < (Model::get_config()->number_of_age_classes() - 1)
-        && age_ >= Model::get_config()->get_population_demographic().get_age_structure()[ac]) {
+        && age_ >= Model::get_config()->age_structure()[ac]) {
         ac++;
       }
       set_age_class(ac);
@@ -730,8 +728,8 @@ double Person::draw_random_relative_biting_rate(utils::Random* pRandom, Config* 
   return result + pConfig->get_epidemiological_parameters().get_relative_biting_info().get_min_relative_biting_value();
 }
 
-double Person::age_in_floating() const {
-  auto days = Model::get_scheduler()->current_time() - birthday_;
+double Person::age_in_floating(int simulation_time) const {
+  auto days = simulation_time - birthday_;
   return days / static_cast<double>(Constants::DAYS_IN_YEAR);
 }
 
@@ -740,7 +738,7 @@ double Person::age_in_floating() const {
  */
 
 void Person::increase_age_by_1_year() {
-  age_++;
+  set_age(age_ + 1);
 }
 
 void Person::add_event(PersonEvent* event) {

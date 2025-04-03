@@ -6,6 +6,7 @@
 #include "Core/Scheduler/EventManager.h"
 #include <Utils/Random.h>
 #include "Population/ImmuneSystem/ImmunityClearanceUpdateFunction.h"
+#include "Configuration/Config.h"
 #include "date/date.h"
 
 namespace Spatial {
@@ -13,7 +14,6 @@ class Location;
 }
 
 class Reporter;
-class Config;
 class Random;
 class Cli;
 class Scheduler;
@@ -49,7 +49,7 @@ private:
 
   bool is_initialized_;
 
-  Config* config_;
+  std::unique_ptr<Config> config_ {nullptr};
   Scheduler* scheduler_;
   Population* population_;
   utils::Random* random_;
@@ -73,7 +73,14 @@ public:
   void yearly_update();
   void release();
   Model* get_model();
-  static Config* get_config();
+
+  static Config* get_config(){
+    return get_instance().config_.get();
+  }
+  static void set_config(Config* config){
+    get_instance().config_.reset(config);
+  }
+
   static Scheduler* get_scheduler();
   static utils::Random* get_random();
   static ModelDataCollector* get_mdc();
@@ -81,9 +88,7 @@ public:
   static Mosquito* get_mosquito();
   static ITreatmentCoverageModel* get_treatment_coverage();
   static IStrategy* get_treatment_strategy();
-  static void set_config(Config* config) {
-    get_instance().config_ = config;
-  }
+ 
   ClinicalUpdateFunction* progress_to_clinical_update_function() {
     return progress_to_clinical_update_function_;
   }

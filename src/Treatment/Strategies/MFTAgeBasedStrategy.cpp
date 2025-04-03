@@ -5,6 +5,8 @@
 
 #include "Population/Person/Person.h"
 #include "Treatment/Therapies/Therapy.h"
+#include "Core/Scheduler/Scheduler.h"
+#include "Simulation/Model.h"
 
 // This is the unit test for the find_age_range_index function
 // std::vector<double> age_boundaries = {2.7, 5.5, 10.8, 20.8};
@@ -63,7 +65,7 @@ void MFTAgeBasedStrategy::add_therapy(Therapy* therapy) {
 }
 
 Therapy* MFTAgeBasedStrategy::get_therapy(Person* person) {
-  auto therapyIndex = find_age_range_index(person->age_in_floating());
+  auto therapyIndex = find_age_range_index(person->age_in_floating(Model::get_scheduler()->current_time()));
   // std::cout << "The age " << person->age_in_floating()
   //           << " is receiving therapy: " << therapyIndex << std::endl;
   return therapy_list[therapyIndex];

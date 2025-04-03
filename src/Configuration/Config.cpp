@@ -200,7 +200,7 @@ int Config::number_of_tracking_days() const {
   return epidemiological_parameters_.get_number_of_tracking_days();
 }
 
-std::vector<int> Config::age_structure() {
+std::vector<int>& Config::age_structure() {
   return population_demographic_.get_age_structure();
 }
 

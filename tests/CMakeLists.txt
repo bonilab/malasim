@@ -18,6 +18,7 @@ file(GLOB_RECURSE MALASIM_TEST_SOURCES
   "GIS/AdminLevelManagerTest/*.cpp"
   "GIS/SpatialDataTest/*.cpp"
   "Population/*.cpp"
+  "Population/Person/*.cpp"
 )
 
 

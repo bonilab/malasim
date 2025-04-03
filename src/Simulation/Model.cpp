@@ -4,6 +4,7 @@
 #include <Core/Scheduler/Scheduler.h>
 #include <Population/Population.h>
 #include <Utils/Random.h>
+#include "Configuration/Config.h"
 
 #include "Utils/Helpers/ObjectHelpers.h"
 #include "MDC/ModelDataCollector.h"
@@ -18,8 +19,8 @@
 Model::Model(const int &object_pool_size){
   // initialize_object_pool(object_pool_size);
 
+  config_ = std::make_unique<Config>();
   random_ = new utils::Random();
-  config_ = new Config();
   scheduler_ = new Scheduler(this);
   population_ = new Population(this);
   mdc_ = new ModelDataCollector(this);
@@ -110,7 +111,7 @@ bool Model::initialize() {
       config_->get_movement_settings().get_spatial_model()->prepare();
       spdlog::info("Model initialized movement model.");
 
-      mosquito_->initialize(config_);
+      mosquito_->initialize(config_.get());
       spdlog::info("Model initialized mosquito.");
 
       population_->introduce_initial_cases();
@@ -197,7 +198,7 @@ void Model::daily_update() {
   // because the prmc at the tracking index will be overridden with new cohort to use N days later and
   // infection event used the prmc at the tracking index for the today infection
   auto tracking_index = scheduler_->current_time() % config_->number_of_tracking_days();
-  mosquito_->infect_new_cohort_in_PRMC(config_, random_, population_, tracking_index);
+  mosquito_->infect_new_cohort_in_PRMC(config_.get(), random_, population_, tracking_index);
 
   // this function must be called after mosquito infect new cohort in prmc
   population_->persist_current_force_of_infection_to_use_N_days_later();
@@ -252,8 +253,9 @@ void Model::release() {
   treatment_strategy_ = nullptr;
   ObjectHelpers::delete_pointer<ITreatmentCoverageModel>(treatment_coverage_);
 
-  ObjectHelpers::delete_pointer<Config>(config_);
   ObjectHelpers::delete_pointer<utils::Random>(random_);
+  
+  config_.reset();
 
   for (Reporter* reporter : reporters_) {
     ObjectHelpers::delete_pointer<Reporter>(reporter);
@@ -263,10 +265,6 @@ void Model::release() {
 
 Model* Model::get_model() {
   return this;
-}
-
-Config* Model::get_config() {
-  return get_instance().config_;
 }
 
 Scheduler* Model::get_scheduler() {

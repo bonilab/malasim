@@ -9,10 +9,9 @@
 
 #include <cmath>
 
-#include "Utils/Helpers/NumberHelpers.hxx"
 #include "Spatial/SpatialModel.hxx"
+#include "Utils/Helpers/NumberHelpers.hxx"
 #include "Utils/TypeDef.hxx"
-#include "yaml-cpp/yaml.h"
 
 namespace Spatial {
 class WesolowskiSM : public SpatialModel {

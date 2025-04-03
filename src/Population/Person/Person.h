@@ -283,7 +283,7 @@ public:
 
   int complied_dosing_days(const SCTherapy* therapy);
 
-  double age_in_floating() const;
+  double age_in_floating(int simulation_time) const;
 
   // Helper methods for scheduling
   int calculate_future_time(int days_from_now) const;
@@ -296,7 +296,7 @@ public:
 
 public:
   // Group 1: Clinical Event Scheduling
-  void schedule_clinical_event(ClonalParasitePopulation* parasite, int days_delay);
+  // void schedule_clinical_event(ClonalParasitePopulation* parasite, int days_delay);
   void schedule_end_clinical_event(ClonalParasitePopulation* parasite);
   void schedule_progress_to_clinical_event(ClonalParasitePopulation* parasite);
   void schedule_clinical_recurrence_event(ClonalParasitePopulation* parasite);
