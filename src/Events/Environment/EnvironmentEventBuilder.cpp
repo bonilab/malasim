@@ -12,8 +12,8 @@
 #include "Utils/Helpers/StringHelpers.h"
 #include "yaml-cpp/yaml.h"
 
-std::vector<Event*> EnvironmentEventBuilder::build(const YAML::Node &node) {
-  std::vector<Event*> events;
+std::vector<WorldEvent*> EnvironmentEventBuilder::build(const YAML::Node &node) {
+  std::vector<WorldEvent*> events;
   const auto name = node["name"].as<std::string>();
 
   if (name == UpdateEcozoneEvent::EventName) {
@@ -23,10 +23,10 @@ std::vector<Event*> EnvironmentEventBuilder::build(const YAML::Node &node) {
   return events;
 }
 
-std::vector<Event*> EnvironmentEventBuilder::build_update_ecozone_event(
+std::vector<WorldEvent*> EnvironmentEventBuilder::build_update_ecozone_event(
     const YAML::Node &node, Config* config) {
   try {
-    std::vector<Event*> events;
+    std::vector<WorldEvent*> events;
     for (std::size_t ndx = 0; ndx < node.size(); ndx++) {
       // Load the values
       auto start_date = node[ndx]["day"].as<date::year_month_day>();

@@ -4,7 +4,7 @@
 #include "Events/Event.h"
 #include <vector>
 
-class SingleRoundMDAEvent : public Event {
+class SingleRoundMDAEvent : public WorldEvent {
 public:
   //disallow copy, assign and move
   SingleRoundMDAEvent(const SingleRoundMDAEvent &) = delete;

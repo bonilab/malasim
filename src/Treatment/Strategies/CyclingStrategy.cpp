@@ -32,7 +32,7 @@ void CyclingStrategy::switch_therapy() {
   // TODO: cycling_time should be match with calendar day
   next_switching_day = Model::get_scheduler()->current_time() + cycling_time;
   spdlog::info("{}: Cycling Strategy switch Therapy to: {}",
-    StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}),
+    Model::get_scheduler()->get_current_date_string(),
     therapy_list[index]->get_id());
 }
 

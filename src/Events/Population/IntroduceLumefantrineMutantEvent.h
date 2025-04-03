@@ -7,7 +7,7 @@
 // #include "Core/ObjectPool.h"
 #include "Events/Event.h"
 
-class IntroduceLumefantrineMutantEvent : public Event {
+class IntroduceLumefantrineMutantEvent : public WorldEvent {
   //disallow copy, assign and move
   IntroduceLumefantrineMutantEvent(const IntroduceLumefantrineMutantEvent &) = delete;
   void operator=(const IntroduceLumefantrineMutantEvent &) = delete;

@@ -6,7 +6,7 @@
 #include "Events/Event.h"
 #include <string>
 
-class Introduce580YMutantEvent : public Event {
+class Introduce580YMutantEvent : public WorldEvent {
   //disallow copy and assign
   Introduce580YMutantEvent(const Introduce580YMutantEvent&) = delete;
   void operator=(const Introduce580YMutantEvent&) = delete;

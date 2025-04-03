@@ -13,7 +13,7 @@
 #include "Simulation/Model.h"
 #include <spdlog/spdlog.h>
 
-class UpdateEcozoneEvent : public Event {
+class UpdateEcozoneEvent : public WorldEvent {
 private:
   int from_;
   int to_;

@@ -67,35 +67,29 @@ void NovelDrugIntroductionStrategy::monthly_update() {
       Model::get_config()->get_simulation_timeframe().set_start_of_comparison_period(Model::get_scheduler()->current_time());
 
       //reset the total time to 10 years after this time point
-      const date::sys_days next_10_year{date::year_month_day{Model::get_scheduler()->calendar_date} + date::years{10}};
-      const auto new_total_time = Model::get_scheduler()->current_time() + TimeHelpers::number_of_days(
-          Model::get_scheduler()->calendar_date, next_10_year
-      );
+      // const auto new_total_time = Model::get_scheduler()->current_time() + Model::get_scheduler()->get_days_to_next_n_year(10);
 
-      if (new_total_time > Model::get_config()->get_simulation_timeframe().get_total_time()) {
-        //extend the scheduler
-        Model::get_scheduler()->extend_total_time(new_total_time);
-      }
-      Model::get_config()->get_simulation_timeframe().set_total_time(new_total_time);
+      // if (new_total_time > Model::get_config()->get_simulation_timeframe().get_total_time()) {
+      //   //extend the scheduler
+      //   Model::get_scheduler()->extend_total_time(new_total_time);
+      // }
+      // Model::get_config()->get_simulation_timeframe().set_total_time(new_total_time);
 
-      std::cout << date::year_month_day{Model::get_scheduler()->calendar_date} << ": Switch to novel drug with id "
+      std::cout << Model::get_scheduler()->get_current_date_string() << ": Switch to novel drug with id "
                 << newly_introduced_strategy_id;
-      std::cout << "New total time: " << new_total_time;
+      // std::cout << "New total time: " << new_total_time;
       is_switched = true;
     } else {
 
       // check and extend total time if total time is less than 10 years
-      const date::sys_days next_10_year{date::year_month_day{Model::get_scheduler()->calendar_date} + date::years{10}};
-      const auto new_total_time = Model::get_scheduler()->current_time() + TimeHelpers::number_of_days(
-          Model::get_scheduler()->calendar_date, next_10_year
-      );
+      // const auto new_total_time = Model::get_scheduler()->current_time() + Model::get_scheduler()->get_days_to_next_n_year(10);
 
-      if (new_total_time > Model::get_config()->get_simulation_timeframe().get_total_time()) {
-        //extend the scheduler
-        Model::get_scheduler()->extend_total_time(new_total_time + 10 * 365);
-        Model::get_config()->get_simulation_timeframe().set_total_time(new_total_time + 10 * 365);
-        Model::get_config()->get_simulation_timeframe().set_start_of_comparison_period(new_total_time + 10 * 365);
-      }
+      // if (new_total_time > Model::get_config()->get_simulation_timeframe().get_total_time()) {
+      //   //extend the scheduler
+      //   Model::get_scheduler()->extend_total_time(new_total_time + 10 * 365);
+      //   Model::get_config()->get_simulation_timeframe().set_total_time(new_total_time + 10 * 365);
+      //   Model::get_config()->get_simulation_timeframe().set_start_of_comparison_period(new_total_time + 10 * 365);
+      // }
     }
   }
 }

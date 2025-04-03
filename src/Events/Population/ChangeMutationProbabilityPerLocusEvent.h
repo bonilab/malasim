@@ -7,7 +7,7 @@
 #include <vector>
 #include "Simulation/Model.h"
 
-class ChangeMutationProbabilityPerLocusEvent : public Event {
+class ChangeMutationProbabilityPerLocusEvent : public WorldEvent {
 public:
     //disallow copy, assign and move
     ChangeMutationProbabilityPerLocusEvent(const ChangeMutationProbabilityPerLocusEvent&) = delete;

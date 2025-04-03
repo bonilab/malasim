@@ -11,6 +11,7 @@ file(GLOB_RECURSE MALASIM_TEST_SOURCES
   "helpers/*.cpp"
   "Core/Random/*.cpp"
   "Core/Scheduler/*.cpp"
+  "Core/Scheduler/EventManager/*.cpp"
   "Configuration/*.cpp"
   "Environment/*.cpp"
   "GIS/SpatialDataTest/*.cpp"

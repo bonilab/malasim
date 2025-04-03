@@ -6,7 +6,7 @@
 
 class Scheduler;
 
-class ImportationPeriodicallyEvent : public Event {
+class ImportationPeriodicallyEvent : public WorldEvent {
 public:
   //disallow copy and assign
   ImportationPeriodicallyEvent(const ImportationPeriodicallyEvent&) = delete;

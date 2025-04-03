@@ -8,7 +8,7 @@
 #include <vector>
 #include "Simulation/Model.h"
 
-class ChangeMutationMaskEvent  : public Event {
+class ChangeMutationMaskEvent  : public WorldEvent {
 public:
   //disallow copy, assign and move
   ChangeMutationMaskEvent(const ChangeMutationMaskEvent&) = delete;

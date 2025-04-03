@@ -19,10 +19,12 @@
 
 void ImportationPeriodicallyRandomEvent::do_execute() {
   // Start by finding the number of infections to inflict
-  auto date =
-      static_cast<date::year_month_day>(Model::get_scheduler()->calendar_date);
-  auto days = TimeHelpers::days_in_month(
-      static_cast<int>(date.year()), static_cast<unsigned int>(date.month()));
+  // auto date =
+  //     static_cast<date::year_month_day>(Model::get_scheduler()->calendar_date);
+  // auto days = TimeHelpers::days_in_month(
+  //     static_cast<int>(date.year()), static_cast<unsigned int>(date.month()));
+  
+  auto days = Model::get_scheduler()->get_days_in_current_month();
   auto infections = Model::get_random()->random_poisson((double)count_ / days);
 
   // Inflict the infections
@@ -51,17 +53,19 @@ void ImportationPeriodicallyRandomEvent::do_execute() {
 
     // Log on demand
     spdlog::debug("{} - Introduced infection at {}",
-                  StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}),
+                  Model::get_scheduler()->get_current_date_string(),
                   location);
   }
 
   // Minimum schedule update is one day
   auto time = Model::get_scheduler()->current_time() + 1;
-  if (static_cast<unsigned int>(date.day()) == days) {
+  if (Model::get_scheduler()->is_today_last_day_of_month()) {
     // If it is the last day of the month, schedule for the first of the month,
     // next year
-    auto nextRun = date::year_month_day(date.year() + date::years{1},
-                                        date.month(), date::day{1});
+    auto year = Model::get_scheduler()->get_current_year();
+    auto month = Model::get_scheduler()->get_current_month_in_year();
+    auto nextRun = date::year_month_day(date::year{year + 1},
+                                        date::month{month}, date::day{1});
     time = (date::sys_days{nextRun}
             - date::sys_days{Model::get_config()->get_simulation_timeframe().get_starting_date()})
                .count();

@@ -67,10 +67,10 @@ std::vector<int> get_locations_from_raster(const std::string &filename) {
   return locations;
 }
 
-std::vector<Event*> PopulationEventBuilder::build_introduce_mutant_event(
+std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_event(
     const YAML::Node &node, Config* config, const std::string& admin_level_name)  {
   try {
-    std::vector<Event*> events;
+    std::vector<WorldEvent*> events;
     for (const auto &entry : node) {
       // Load the values
       auto start_date = entry["day"].as<date::year_month_day>();
@@ -126,10 +126,10 @@ std::vector<Event*> PopulationEventBuilder::build_introduce_mutant_event(
   }
 }
 
-std::vector<Event*> PopulationEventBuilder::build_introduce_mutant_raster_event(
+std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_raster_event(
     const YAML::Node &node, Config* config) {
   try {
-    std::vector<Event*> events;
+    std::vector<WorldEvent*> events;
     for (const auto &entry : node) {
       // Load the values
       auto start_date = entry["date"].as<date::year_month_day>();

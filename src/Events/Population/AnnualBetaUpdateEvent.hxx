@@ -16,7 +16,7 @@
 #include "Simulation/Model.h"
 #include "Utils/Helpers/StringHelpers.h"
 
-class AnnualBetaUpdateEvent : public Event {
+class AnnualBetaUpdateEvent : public WorldEvent {
 private:
   float rate_ = 0.0;
 
@@ -32,16 +32,14 @@ private:
     }
 
     // Schedule for one year from now
-    auto time =
-        Model::get_scheduler()->current_time()
-        + TimeHelpers::number_of_days_to_next_year(Model::get_scheduler()->calendar_date);
+    auto time = Model::get_scheduler()->get_days_to_next_year();
     AnnualBetaUpdateEvent* event = new AnnualBetaUpdateEvent(rate_, time);
     Model::get_scheduler()->schedule_population_event(event);
 
     // Log on demand
     spdlog::debug(
         "Annual beta update event: {} - {} {}",
-        StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}),
+        Model::get_scheduler()->get_current_date_string(),
         rate_,
         location_db[0].beta);
   }

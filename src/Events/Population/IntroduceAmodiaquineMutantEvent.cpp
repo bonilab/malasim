@@ -54,7 +54,6 @@ void IntroduceAmodiaquineMutantEvent::do_execute() {
     }
   }
 
-  spdlog::info("{}: Introduce Amodiaquine mutant event",
-              StringHelpers::date_as_string(
-                  date::year_month_day{Model::get_scheduler()->calendar_date}));
+  spdlog::info("{} - Introduce Amodiaquine mutant event",
+              Model::get_scheduler()->get_current_date_string());
 }

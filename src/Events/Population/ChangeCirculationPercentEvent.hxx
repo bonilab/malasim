@@ -11,7 +11,7 @@
 #include "Events/Event.h"
 #include "Simulation/Model.h"
 
-class ChangeCirculationPercentEvent : public Event {
+class ChangeCirculationPercentEvent : public WorldEvent {
 private:
   float rate_ = 0.0;
 
@@ -26,8 +26,7 @@ private:
     // Log on demand
     spdlog::debug(
         "Change circulation percent event: {} - {}",
-        StringHelpers::date_as_string(
-            date::year_month_day{Model::get_scheduler()->calendar_date}),
+        Model::get_scheduler()->get_current_date_string(),
         rate_);
   }
 

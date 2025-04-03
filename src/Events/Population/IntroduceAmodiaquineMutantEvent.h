@@ -7,7 +7,7 @@
 #include <tuple>
 #include "Events/Event.h"
 
-class IntroduceAmodiaquineMutantEvent : public Event {
+class IntroduceAmodiaquineMutantEvent : public WorldEvent {
 public:
   //disallow copy, assign and move
   IntroduceAmodiaquineMutantEvent(const IntroduceAmodiaquineMutantEvent &) = delete;

@@ -15,7 +15,7 @@
 #include "Simulation/Model.h"
 #include <spdlog/spdlog.h>
 
-class UpdateBetaRasterEvent : public Event {
+class UpdateBetaRasterEvent : public WorldEvent {
 private:
   std::string filename_;
 

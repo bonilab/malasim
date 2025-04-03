@@ -18,7 +18,7 @@ ChangeTreatmentCoverageEvent::~ChangeTreatmentCoverageEvent() {
 
 void ChangeTreatmentCoverageEvent::do_execute() {
 spdlog::info("{}: change treatment coverage model to {}",
-             StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}),
+             Model::get_scheduler()->get_current_date_string(),
              treatment_coverage_model->type);
   Model::get_instance().set_treatment_coverage(treatment_coverage_model);
 

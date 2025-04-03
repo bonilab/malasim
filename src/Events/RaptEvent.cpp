@@ -53,8 +53,8 @@ void RaptEvent::do_execute() {
 
   // Determine when the next RAPT dose should take place based upon scheduling
   // period
-  const auto ymd = date::year_month_day(Model::get_scheduler()->calendar_date)
-                   + date::months(Model::get_config()->get_rapt_settings().get_period());
+  const auto ymd = Model::get_scheduler()->get_ymd_after_months(Model::get_config()->get_rapt_settings().get_period());
+  
 
   // Find the first and last day of the month of the next dose
   const auto first_day =
@@ -65,10 +65,8 @@ void RaptEvent::do_execute() {
   // Following adjustment scheduler days, conduct a uniform draw across the next
   // dosing month to determine the actual next date when the RAPT dose may be
   // taken
-  const auto from =
-      (date::sys_days(first_day) - Model::get_scheduler()->calendar_date).count();
-  const auto to =
-      (date::sys_days(last_day) - Model::get_scheduler()->calendar_date).count();
+  const auto from = Model::get_scheduler()->get_days_to_ymd(first_day);
+  const auto to = Model::get_scheduler()->get_days_to_ymd(last_day);
   const auto days_to_next_event =
       Model::get_random()->random_uniform<int>(from, to + 1);
 

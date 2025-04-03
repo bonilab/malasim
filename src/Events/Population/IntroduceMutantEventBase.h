@@ -11,7 +11,7 @@
 // #include "Core/PropertyMacro.h"
 #include "Events/Event.h"
 
-class IntroduceMutantEventBase : public Event {
+class IntroduceMutantEventBase : public WorldEvent {
 protected:
   double fraction_;
   std::vector<std::tuple<int,int,char>> alleles_;

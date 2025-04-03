@@ -12,11 +12,18 @@
 #include "Events/Event.h"
 #include "Population/Person/Person.h"
 
-class ImportationPeriodicallyRandomEvent : public Event {
+/**
+ * @brief ImportationPeriodicallyRandomEvent is a class that imports infections
+ * on a population weighted basis at the time step indicated, rescheduling the
+ * event to occur periodically afterwards.
+ * Import for a particular month of the year and reschedule for the same month
+ * of the following year.
+ */
+class ImportationPeriodicallyRandomEvent : public WorldEvent {
 private:
-  int count_ = 0;
-  int genotypeId_ = 0;
-  double log_parasite_density_ = 0.0;
+  int count_ = 0; // Number of infections to inflict per month
+  int genotypeId_ = 0; // Genotype id to inflict
+  double log_parasite_density_ = 0.0; // Log parasite density to inflict
 
   // Execute the import event
   void do_execute() override;

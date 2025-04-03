@@ -52,7 +52,6 @@ void IntroducePlas2CopyParasiteEvent::do_execute() {
   }
 
   spdlog::info("{}: Introduce Plas2 Copy Parasite with fraction {}",
-               StringHelpers::date_as_string(
-                   date::year_month_day{Model::get_scheduler()->calendar_date}),
-                   fraction_);
+               Model::get_scheduler()->get_current_date_string(),
+               fraction_);
 }

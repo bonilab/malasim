@@ -17,7 +17,7 @@ SingleRoundMDAEvent::SingleRoundMDAEvent(const int &execute_at) {
 
 void SingleRoundMDAEvent::do_execute() {
   spdlog::info("{}: executing Single Round MDA",
-    StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}));
+    Model::get_scheduler()->get_current_date_string());
 
   // for all location
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {

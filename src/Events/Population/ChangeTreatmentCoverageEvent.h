@@ -4,7 +4,7 @@
 #include "Events/Event.h"
 #include "Treatment/ITreatmentCoverageModel.h"
 
-class ChangeTreatmentCoverageEvent : public Event {
+class ChangeTreatmentCoverageEvent : public WorldEvent {
 public:
   ITreatmentCoverageModel* treatment_coverage_model;
 

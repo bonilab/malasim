@@ -32,8 +32,8 @@ private:
 
     // Log the event's operation
     for (auto allele : alleles_) {
-      spdlog::info("{}: Introduce mutant raster event chromosome {} locus {} allele {} fraction: {} count: {}",
-                    StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}),
+      spdlog::info("Time: {} - Introduce mutant raster event chromosome {} locus {} allele {} fraction: {} count: {}",
+                   Model::get_scheduler()->current_time(),
                    std::get<0>(allele), std::get<1>(allele), std::get<2>(allele),
                    target_fraction, count);
     }

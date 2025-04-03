@@ -46,8 +46,7 @@ void Introduce580YMutantEvent::do_execute() {
   double target_fraction = fraction_ - current_580Y_fraction;
   if (target_fraction <= 0) {
     spdlog::info("{}: Introduce 580Y Copy event with 0 cases",
-                StringHelpers::date_as_string(
-                    date::year_month_day{Model::get_scheduler()->calendar_date}));
+                Model::get_scheduler()->get_current_date_string());
     return;
   }
 //  std::cout << target_fraction << std::endl;
@@ -80,7 +79,6 @@ void Introduce580YMutantEvent::do_execute() {
   }
 
   spdlog::info("{}: Introduce 580Y mutant event with fraction {}",
-              StringHelpers::date_as_string(
-                  date::year_month_day{Model::get_scheduler()->calendar_date}),
-                  target_fraction);
+              Model::get_scheduler()->get_current_date_string(),
+              target_fraction);
 }

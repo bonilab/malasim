@@ -19,9 +19,9 @@ class Node;
 
 class EnvironmentEventBuilder {
 public:
-  static std::vector<Event*> build(const YAML::Node &node);
+  static std::vector<WorldEvent*> build(const YAML::Node &node);
 
-  static std::vector<Event*> build_update_ecozone_event(const YAML::Node &node,
+  static std::vector<WorldEvent*> build_update_ecozone_event(const YAML::Node &node,
                                                         Config* config);
 };
 

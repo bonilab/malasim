@@ -167,7 +167,7 @@ void Population::perform_infection_event() {
     if (force_of_infection <= DBL_EPSILON) continue;
 
     const auto new_beta = model_->get_config()->get_spatial_settings().location_db[loc].beta
-                          * model_->get_config()->get_seasonality_settings().get_seasonal_factor(model_->get_scheduler()->calendar_date, loc);
+                          * model_->get_config()->get_seasonality_settings().get_seasonal_factor(Model::get_scheduler()->get_calendar_date(), loc);
 
     auto poisson_means = new_beta * force_of_infection;
 
@@ -328,8 +328,11 @@ void Population::generate_individual(int location, int age_class) {
 
   auto days_to_next_birthday = static_cast<int>(Model::get_random()->random_uniform(
       (Constants::DAYS_IN_YEAR)));
-  auto simulation_time_birthday = TimeHelpers::get_simulation_time_birthday(
-      days_to_next_birthday, p->get_age(), Model::get_scheduler()->calendar_date);
+  
+  // this will get the birthday in simulation time
+  auto ymd = Model::get_scheduler()->get_ymd_after_days(days_to_next_birthday) - date::years(p->get_age() + 1);
+  auto simulation_time_birthday = Model::get_scheduler()->get_days_to_ymd(ymd);
+
   p->set_birthday(simulation_time_birthday);
 
   if (simulation_time_birthday > 0) {
@@ -479,7 +482,7 @@ void Population::perform_birth_event() {
     for (auto i = 0; i < number_of_births; i++) {
       give_1_birth(loc);
       model_->get_mdc()->update_person_days_by_years(
-          loc, Constants::DAYS_IN_YEAR - model_->get_scheduler()->current_day_in_year());
+          loc, Constants::DAYS_IN_YEAR - model_->get_scheduler()->get_current_day_in_year());
     }
   }
   //    std::cout << "End Birth Event" << std::endl;
@@ -507,8 +510,7 @@ void Population::give_1_birth(const int& location) {
   p->set_moving_level(model_->get_config()->get_movement_settings().get_moving_level_generator().draw_random_level(model_->get_random()));
 
   p->set_birthday(model_->get_scheduler()->current_time());
-  const auto number_of_days_to_next_birthday =
-      TimeHelpers::number_of_days_to_next_year(model_->get_scheduler()->calendar_date);
+  const auto number_of_days_to_next_birthday = Model::get_scheduler()->get_days_to_next_year();
   p->schedule_birthday_event(number_of_days_to_next_birthday);
 
   // schedule for switch

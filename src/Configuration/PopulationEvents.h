@@ -40,12 +40,12 @@ public:
     [[nodiscard]] const std::vector<PopulationEvent>& get_events_raw() const { return events_raw_; }
     void set_events_raw(const std::vector<PopulationEvent>& value) { events_raw_ = value; }
 
-    [[nodiscard]] const std::vector<Event*>& get_events() { return events_; }
-    void set_events(const std::vector<Event*>& value) { events_ = value; }
+    [[nodiscard]] const std::vector<WorldEvent*>& get_events() { return events_; }
+    void set_events(const std::vector<WorldEvent*>& value) { events_ = value; }
 
 private:
     std::vector<PopulationEvent> events_raw_;
-    std::vector<Event*> events_;
+    std::vector<WorldEvent*> events_;
 };
 
 // Conversion functions inside namespace YAML
@@ -102,7 +102,7 @@ struct convert<PopulationEvents> {
     static bool decode(const Node& node, PopulationEvents& rhs) {
         spdlog::info("Decoding PopulationEvents");
         std::vector<PopulationEvents::PopulationEvent> events_raw;
-        std::vector<Event*> events;
+        std::vector<WorldEvent*> events;
         for (const auto &eventNode : node) {
             PopulationEvents::PopulationEvent event;
             convert<PopulationEvents::PopulationEvent>::decode(eventNode, event);

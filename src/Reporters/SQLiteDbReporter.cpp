@@ -333,10 +333,9 @@ void SQLiteDbReporter::initialize(int jobNumber, const std::string &path) {
 void SQLiteDbReporter::monthly_report() {
   // Get the relevant data
   auto daysElapsed = Model::get_scheduler()->current_time();
-  auto modelTime =
-      std::chrono::system_clock::to_time_t(Model::get_scheduler()->calendar_date);
+  auto modelTime = Model::get_scheduler()->get_unix_time();
   auto seasonalFactor = Model::get_config()->get_seasonality_settings().get_seasonal_factor(
-      Model::get_scheduler()->calendar_date, 0);
+      Model::get_scheduler()->get_calendar_date(), 0);
 
   auto monthId = db->insert_data(insert_common_query_, daysElapsed, modelTime,
                                  seasonalFactor);

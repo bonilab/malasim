@@ -91,8 +91,8 @@ void ImportationPeriodicallyEvent::do_execute() {
     //        Model::CONFIG->parasite_db()->get(0));
   }
   if (number_of_importation_cases > 0) {
-    spdlog::debug("Day {}: Importing (periodically) {} at location {} with genotype {}",
-    Model::get_scheduler()->current_time(),
+    spdlog::debug("{} - Importing (periodically) {} at location {} with genotype {}",
+    Model::get_scheduler()->get_current_date_string(),
                  number_of_importation_cases, location_,
                  Model::get_config()->get_genotype_parameters().genotype_db->at(genotype_id_)->get_aa_sequence());
   }

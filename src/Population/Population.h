@@ -12,7 +12,7 @@ class Model;
 class PersonIndexAll;
 class PersonIndexByLocationStateAgeClass;
 class PersonIndexByLocationBitingLevel;
-class Population : public EventManager {
+class Population {
 public:
   // Disable copy and assignment
   Population(const Population&) = delete;
@@ -22,7 +22,7 @@ public:
 
   ~Population();
 
-  void initialize() override;
+  void initialize();
   //
   // void update(int current_time);
   //

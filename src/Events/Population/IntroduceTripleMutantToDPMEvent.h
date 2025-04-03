@@ -8,7 +8,7 @@
 //#include "Core/ObjectPool.h"
 #include "Events/Event.h"
 
-class IntroduceTrippleMutantToDPMEvent : public Event {
+class IntroduceTrippleMutantToDPMEvent : public WorldEvent {
 public:
   //disallow copy, assign and move
   IntroduceTrippleMutantToDPMEvent(const IntroduceTrippleMutantToDPMEvent &) = delete;

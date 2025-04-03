@@ -53,12 +53,8 @@ public:
     return 29;
   }
 
-  static int get_day_count(const date::year_month_day& start_date, const date::year_month_day& end_date) {
-    return (date::sys_days{end_date} - date::sys_days{start_date}).count();
-  }
-
   static int days_between(const date::year_month_day& start_date, const date::year_month_day& end_date) {
-    return get_day_count(start_date, end_date);
+    return (date::sys_days{end_date} - date::sys_days{start_date}).count();
   }
 
   static int month_of_year(const date::sys_days &day) {

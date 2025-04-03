@@ -36,7 +36,6 @@ void ModifyNestedMFTEvent::do_execute() {
   }
 
   spdlog::info("{}: ModifyNestedMFTEvent: {}",
-               StringHelpers::date_as_string(
-                   date::year_month_day{Model::get_scheduler()->calendar_date}),
+               Model::get_scheduler()->get_current_date_string(),
                new_strategy->name);
 }

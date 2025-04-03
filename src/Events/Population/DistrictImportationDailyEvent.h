@@ -6,7 +6,7 @@
 #include "Events/Event.h"
 
 class Scheduler;
-class DistrictImportationDailyEvent : public Event {
+class DistrictImportationDailyEvent : public WorldEvent {
 private:
   int district_;
   double daily_rate_;

@@ -84,9 +84,9 @@ void MMCReporter::print_ntf_by_location() {
 
 void MMCReporter::monthly_report() {
   ss << Model::get_scheduler()->current_time() << sep;
-  ss << std::chrono::system_clock::to_time_t(Model::get_scheduler()->calendar_date) << sep;
-  ss << date::format("%Y\t%m\t%d", Model::get_scheduler()->calendar_date) << sep;
-  ss << Model::get_config()->get_seasonality_settings().get_seasonal_factor(Model::get_scheduler()->calendar_date, 0) << sep;
+  ss << Model::get_scheduler()->get_unix_time() << sep;
+  ss << Model::get_scheduler()->get_calendar_date() << sep;
+  ss << Model::get_config()->get_seasonality_settings().get_seasonal_factor(Model::get_scheduler()->get_calendar_date(), 0) << sep;
   ss << Model::get_treatment_coverage()->get_probability_to_be_treated(0, 1) << sep;
   ss << Model::get_treatment_coverage()->get_probability_to_be_treated(0, 10) << sep;
   ss << Model::get_population()->size() << sep;

@@ -39,7 +39,7 @@ private:
     spdlog::info(
         "Introduce mutant event: {} : Introduce mutant event, target fraction: "
         "{}, mutations: {}",
-        StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}), target_fraction, count);
+        Model::get_scheduler()->get_current_date_string(), target_fraction, count);
   }
 
 public:

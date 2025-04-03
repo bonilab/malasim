@@ -7,7 +7,7 @@
 #include <vector>
 #include "Simulation/Model.h"
 
-class ChangeInterruptedFeedingRateEvent : public Event {
+class ChangeInterruptedFeedingRateEvent : public WorldEvent {
 public:
   //disallow copy, assign and move
   ChangeInterruptedFeedingRateEvent(const ChangeInterruptedFeedingRateEvent&) = delete;

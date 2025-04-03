@@ -13,7 +13,7 @@
 class Scheduler;
 class Person;
 
-class ClinicalStudy : public Event {
+class ClinicalStudy : public WorldEvent {
 private:
   const int OBSERVATION_PERIOD = 28;
   const int TOTAL_OBSERVATIONS = 10000;

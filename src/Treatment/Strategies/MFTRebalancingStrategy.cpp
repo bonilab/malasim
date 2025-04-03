@@ -42,7 +42,7 @@ void MFTRebalancingStrategy::update_end_of_time_step() {
       distribution[i] = next_distribution[i];
     }
     next_update_time = Model::get_scheduler()->current_time() + update_duration_after_rebalancing;
-    std::cout << date::year_month_day{Model::get_scheduler()->calendar_date} << ": MFT Rebalancing adjust distribution: "
+    std::cout << Model::get_scheduler()->get_current_date_string() << ": MFT Rebalancing adjust distribution: "
               << to_string();
     //            std::cout << to_string() << std::endl;
   } else {
@@ -64,7 +64,7 @@ void MFTRebalancingStrategy::update_end_of_time_step() {
         next_distribution[i] = next_distribution[i]/sum;
       }
       latest_adjust_distribution_time = Model::get_scheduler()->current_time() + delay_until_actual_trigger;
-      std::cout << date::year_month_day{Model::get_scheduler()->calendar_date}
+      std::cout << Model::get_scheduler()->get_current_date_string()
                 << ": MFT Rebalancing will adjust distribution after " <<
                 delay_until_actual_trigger << "days";
     }

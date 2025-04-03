@@ -2,7 +2,7 @@
 #define POMS_CHANGEWITHINHOSTINDUCEDFREERECOMBINATIONEVENT_H
 #include "Events/Event.h"
 
-class ChangeWithinHostInducedFreeRecombinationEvent : public Event {
+class ChangeWithinHostInducedFreeRecombinationEvent : public WorldEvent {
 public:
   //disallow copy, assign and move
     ChangeWithinHostInducedFreeRecombinationEvent(const ChangeWithinHostInducedFreeRecombinationEvent&) = delete;

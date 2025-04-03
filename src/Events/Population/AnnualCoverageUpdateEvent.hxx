@@ -17,7 +17,7 @@
 #include "Simulation/Model.h"
 #include "Treatment/ITreatmentCoverageModel.h"
 
-class AnnualCoverageUpdateEvent : public Event {
+class AnnualCoverageUpdateEvent : public WorldEvent {
 private:
   float rate_ = 0.0;
 
@@ -35,9 +35,7 @@ private:
     }
 
     // Schedule for one year from now
-    auto time =
-        Model::get_scheduler()->current_time()
-        + TimeHelpers::number_of_days_to_next_year(Model::get_scheduler()->calendar_date);
+    auto time = Model::get_scheduler()->get_days_to_next_year();
     AnnualCoverageUpdateEvent* event =
         new AnnualCoverageUpdateEvent(rate_, time);
     Model::get_scheduler()->schedule_population_event(event);
@@ -45,8 +43,7 @@ private:
     // Log on demand
     spdlog::debug(
         "Annual coverage update event: {} - {} {}",
-        StringHelpers::date_as_string(
-            date::year_month_day{Model::get_scheduler()->calendar_date}),
+        Model::get_scheduler()->get_current_date_string(),
         rate_,
         tcm_db->p_treatment_under_5[0]);
   }

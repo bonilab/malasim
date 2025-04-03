@@ -4,17 +4,19 @@
 #include <map>
 #include <vector>
 #include "Events/Event.h"
+#include "spdlog/spdlog.h"
 
+template<typename EventType>
 class EventManager {
 public:
- // Disallow copy and assign
- EventManager(const EventManager&) = delete;
- void operator=(const EventManager&) = delete;
- EventManager(EventManager&&) = delete;
- EventManager& operator=(EventManager&&) = delete;
+  // Disallow copy and assign
+  EventManager(const EventManager&) = delete;
+  void operator=(const EventManager&) = delete;
+  EventManager(EventManager&&) = delete;
+  EventManager& operator=(EventManager&&) = delete;
 
 private:
-  std::multimap<int, std::unique_ptr<Event>> events_;
+  std::multimap<int, std::unique_ptr<EventType>> events_;
 
   // Helper method to erase all events at a specific time point
   void erase_events_at_time(int time) {
@@ -22,22 +24,55 @@ private:
   }
 
 public:
-  std::multimap<int, std::unique_ptr<Event>>& get_events() {
+  std::multimap<int, std::unique_ptr<EventType>>& get_events() {
     return events_;
   }
 
-  EventManager();
-  virtual ~EventManager();
-  virtual void initialize();
+  // Constructor and destructor
+  EventManager() = default;
+  virtual ~EventManager() = default;
 
-  // this will execute all events up to and including time
-  virtual void execute_events(int time);
+  // Initialize/clear events
+  virtual void initialize() {
+    events_.clear();
+  }
+
+  // Execute all events up to and including time
+  virtual void execute_events(int time) {
+    while (!events_.empty() && events_.begin()->first <= time) {
+      // Get all events at the current time point
+      int current_time = events_.begin()->first;
+      auto range = events_.equal_range(current_time);
+      
+      // Execute all events at this time point
+      for (auto it = range.first; it != range.second; ++it) {
+        auto* event = it->second.get();
+        try {
+          if (event->is_executable()) {
+            event->execute();
+          }
+        }
+        catch (const std::exception& ex) {
+          spdlog::error("Error in event {} at time {}", event->name(), current_time);
+          spdlog::error("Error: {}", ex.what());
+        }
+      }
+      // Erase all events at this time point at once
+      erase_events_at_time(current_time);
+    } 
+  }
 
   // Schedule an event and transfer ownership
-  void schedule_event(Event* event) {
+  void schedule_event(EventType* event) {
     if (event) {
       event->set_executable(true);
-      events_.emplace(event->get_time(), std::unique_ptr<Event>(event));
+      events_.emplace(event->get_time(), std::unique_ptr<EventType>(event));
+    }
+  }
+
+  void cancel_event(EventType* event) {
+    if (event) {
+      event->set_executable(false);
     }
   }
 
@@ -48,12 +83,7 @@ public:
 
   template <typename T>
   bool has_event() const {
-    for (auto& [time, event] : events_) {
-      // For Event base class, return true if any event exists
-      if constexpr (std::is_same_v<T, Event>) {
-        return !events_.empty();
-      }
-      // For specific event types, use dynamic_cast to check exact type
+    for (const auto& [time, event] : events_) {
       if (dynamic_cast<T*>(event.get()) != nullptr) {
         return true;
       }
@@ -61,8 +91,9 @@ public:
     return false;
   }
 
+  // Cancel all events of a specific type
   template <typename T>
-  void cancel_all_events() const {
+  void cancel_all_events() {
     for (auto& [time, event] : events_) {
       if (dynamic_cast<T*>(event.get()) != nullptr) {
         event->set_executable(false);
@@ -70,7 +101,8 @@ public:
     }
   }
 
-  void cancel_all_events_except(Event* inEvent) const {
+  // Cancel all events except the specified one
+  void cancel_all_events_except(EventType* inEvent) {
     for (auto& [time, event] : events_) {
       if (event.get() != inEvent) {
         event->set_executable(false);
@@ -78,13 +110,19 @@ public:
     }
   }
 
+  // Cancel all events of type T except the specified one
   template <typename T>
-  void cancel_all_events_except(Event* inEvent) const {
+  void cancel_all_events_except(EventType* inEvent) {
     for (auto& [time, event] : events_) {
       if (event.get() != inEvent && dynamic_cast<T*>(event.get()) != nullptr) {
         event->set_executable(false);
       }
     }
+  }
+
+  // Clear all events
+  void clear_all_events() {
+    events_.clear();
   }
 };
 

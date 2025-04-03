@@ -2,6 +2,7 @@
 #include <gmock/gmock.h>
 #include "Core/Scheduler/EventManager.h"
 #include "Events/Event.h"
+#include "Population/Person/Person.h"
 #include <memory>
 
 using ::testing::_;
@@ -12,10 +13,10 @@ using ::testing::InSequence;
 class EventManagerTest;  // Forward declaration
 
 // Mock Event class using GMock
-class MockEvent : public Event {
+class MockEvent : public PersonEvent {
 public:
-    explicit MockEvent(const int time) {
-        this->set_time(time);
+    explicit MockEvent(const int time) : PersonEvent(nullptr) {
+        set_time(time);
     }
 
     MOCK_METHOD(const std::string, name, (), (const, override));
@@ -33,35 +34,134 @@ protected:
     friend class Event;  // Allow base class to access protected members
 };
 
-// // Add a test event class that tracks destruction
-// class DestructionTrackingEvent : public Event {
-// public:
-//     explicit DestructionTrackingEvent(const int time, bool* destroyed) 
-//         : destroyed_(destroyed) {
-//         this->set_time(time);
-//     }
-    
-//     ~DestructionTrackingEvent() override {
-//         if (destroyed_) {
-//             *destroyed_ = true;
-//         }
-//     }
-
-//     std::string name() override { return "DestructionTrackingEvent"; }
-//     void do_execute() override {}
-
-// private:
-//     bool* destroyed_;
-// };
-
 class EventManagerTest : public ::testing::Test {
 protected:
+    EventManager<PersonEvent> event_manager;
+
     void SetUp() override {
         event_manager.initialize();
     }
 
-    EventManager event_manager;
+    void TearDown() override {
+    }
 };
+
+TEST_F(EventManagerTest, Initialize) {
+    ASSERT_FALSE(event_manager.has_event());
+}
+
+TEST_F(EventManagerTest, ScheduleEvent) {
+    auto* event = new MockEvent(0);
+    event_manager.schedule_event(event);
+    ASSERT_TRUE(event_manager.has_event());
+}
+
+TEST_F(EventManagerTest, ExecuteEvents) {
+    auto* event1 = new testing::StrictMock<MockEvent>(0);
+    auto* event2 = new testing::StrictMock<MockEvent>(1);
+    auto* event3 = new testing::StrictMock<MockEvent>(2);
+
+    // Set expectations for execution order and cleanup
+    {
+        testing::InSequence seq;  // Enforce strict ordering
+        
+        // At time 0
+        EXPECT_CALL(*event1, do_execute()).Times(1);
+        EXPECT_CALL(*event1, die()).Times(1);
+        
+        // At time 1
+        EXPECT_CALL(*event2, do_execute()).Times(1);
+        EXPECT_CALL(*event2, die()).Times(1);
+        
+        // At time 2
+        EXPECT_CALL(*event3, do_execute()).Times(1);
+        EXPECT_CALL(*event3, die()).Times(1);
+    }
+
+    event_manager.schedule_event(event1);
+    event_manager.schedule_event(event2);
+    event_manager.schedule_event(event3);
+
+    // Execute events at time 0
+    event_manager.execute_events(0);
+    EXPECT_EQ(event_manager.get_events().size(), 2);  // event2 and event3 should remain
+
+    // Execute events at time 1
+    event_manager.execute_events(1);
+    EXPECT_EQ(event_manager.get_events().size(), 1);  // only event3 should remain
+
+    // Execute events at time 2
+    event_manager.execute_events(2);
+    EXPECT_TRUE(event_manager.get_events().empty());  // all events should be executed and cleaned up
+}
+
+TEST_F(EventManagerTest, CancelEvent) {
+    auto* event = new testing::StrictMock<MockEvent>(0);
+    
+    // Event should not be executed after being cancelled
+    EXPECT_CALL(*event, do_execute()).Times(0);
+    EXPECT_CALL(*event, die()).Times(1);  // Should still be destroyed
+    
+    event_manager.schedule_event(event);
+    event_manager.cancel_all_events_except(event);
+    
+    event_manager.execute_events(0);
+    EXPECT_TRUE(event_manager.get_events().empty());
+}
+
+TEST_F(EventManagerTest, HasEventOfType) {
+    auto* event = new testing::StrictMock<MockEvent>(0);
+    event_manager.schedule_event(event);
+    
+    EXPECT_TRUE(event_manager.has_event<MockEvent>());
+    
+    // Cleanup
+    EXPECT_CALL(*event, do_execute()).Times(1);
+    EXPECT_CALL(*event, die()).Times(1);
+    event_manager.execute_events(0);
+}
+
+TEST_F(EventManagerTest, CancelEventsByType) {
+    auto* event1 = new testing::StrictMock<MockEvent>(0);
+    auto* event2 = new testing::StrictMock<MockEvent>(0);
+    
+    // Events should not be executed after being cancelled
+    EXPECT_CALL(*event1, do_execute()).Times(0);
+    EXPECT_CALL(*event2, do_execute()).Times(0);
+    
+    // But they should still be destroyed
+    EXPECT_CALL(*event1, die()).Times(1);
+    EXPECT_CALL(*event2, die()).Times(1);
+    
+    event_manager.schedule_event(event1);
+    event_manager.schedule_event(event2);
+    
+    event_manager.cancel_all_events<MockEvent>();
+    
+    event_manager.execute_events(0);
+    EXPECT_TRUE(event_manager.get_events().empty());
+}
+
+TEST_F(EventManagerTest, CopyConstructorDeleted) {
+    ASSERT_FALSE(std::is_copy_constructible_v<EventManager<PersonEvent>>);
+}
+
+TEST_F(EventManagerTest, MoveConstructorDeleted) {
+    ASSERT_FALSE(std::is_move_constructible_v<EventManager<PersonEvent>>);
+}
+
+TEST_F(EventManagerTest, CopyAssignmentDeleted) {
+    ASSERT_FALSE(std::is_copy_assignable_v<EventManager<PersonEvent>>);
+}
+
+TEST_F(EventManagerTest, MoveAssignmentDeleted) {
+    ASSERT_FALSE(std::is_move_assignable_v<EventManager<PersonEvent>>);
+}
+
+TEST_F(EventManagerTest, LocalEventManager) {
+    EventManager<PersonEvent> local_event_manager;
+    ASSERT_FALSE(local_event_manager.has_event());
+}
 
 TEST_F(EventManagerTest, InitialStateIsEmpty) {
     EXPECT_TRUE(event_manager.get_events().empty());

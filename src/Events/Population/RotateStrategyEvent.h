@@ -10,7 +10,7 @@
 // #include "Core/PropertyMacro.h"
 #include "Events/Event.h"
 
-class RotateStrategyEvent : public Event {
+class RotateStrategyEvent : public WorldEvent {
 private:
   int new_strategy_id_;
   int next_strategy_id_;

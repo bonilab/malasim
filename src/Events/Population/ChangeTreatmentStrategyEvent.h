@@ -5,7 +5,7 @@
 
 #include "Events/Event.h"
 
-class ChangeTreatmentStrategyEvent : public Event {
+class ChangeTreatmentStrategyEvent : public WorldEvent {
 public:
   //disallow copy and move
   ChangeTreatmentStrategyEvent(const ChangeTreatmentStrategyEvent&) = delete;

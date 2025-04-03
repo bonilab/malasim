@@ -8,7 +8,7 @@
 
 class Scheduler;
 
-class IntroduceParasitesPeriodicallyEventV2  : public Event {
+class IntroduceParasitesPeriodicallyEventV2  : public WorldEvent {
 public:
   //disallow copy and assign
   IntroduceParasitesPeriodicallyEventV2(const IntroduceParasitesPeriodicallyEventV2&) = delete;

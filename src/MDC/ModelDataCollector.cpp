@@ -546,7 +546,7 @@ void ModelDataCollector::record_1_death(
     const int& age_group, const int& age
 ) {
   if (Model::get_scheduler()->current_time() >= Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) {
-    update_person_days_by_years(location, -(Constants::DAYS_IN_YEAR - Model::get_scheduler()->current_day_in_year()));
+    update_person_days_by_years(location, -(Constants::DAYS_IN_YEAR - Model::get_scheduler()->get_current_day_in_year()));
     update_average_number_bitten(location, birthday, number_of_times_bitten);
     number_of_death_by_location_age_group_[location][age_group] += 1;
     if (age < 79) {
@@ -558,7 +558,7 @@ void ModelDataCollector::record_1_death(
     deaths_by_location_[location]++;
     update_person_days_by_years(
         location,
-        -(Constants::DAYS_IN_YEAR - Model::get_scheduler()->current_day_in_year()));
+        -(Constants::DAYS_IN_YEAR - Model::get_scheduler()->get_current_day_in_year()));
     update_average_number_bitten(location, birthday, number_of_times_bitten);
     number_of_death_by_location_age_group_[location][age_group] += 1;
   }
@@ -763,7 +763,7 @@ void ModelDataCollector::record_1_mutation(const int& location, Genotype* from, 
 
 void ModelDataCollector::record_1_mutation_by_drug(const int& location, Genotype* from, Genotype* to, int drug_id) {
   auto mutation_tracker_info = std::make_tuple(location,Model::get_scheduler()->current_time(),
-    Model::get_scheduler()->current_month_in_year(), drug_id, from->genotype_id(), to->genotype_id());
+    Model::get_scheduler()->get_current_month_in_year(), drug_id, from->genotype_id(), to->genotype_id());
   mutation_tracker[location].push_back(mutation_tracker_info);
 }
 

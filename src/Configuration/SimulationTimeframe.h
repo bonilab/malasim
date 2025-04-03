@@ -73,8 +73,8 @@ public:
 
   void process_config() override {
     spdlog::info("Processing SimulationTimeframe");
-    total_time_ = TimeHelpers::get_day_count(starting_date_, ending_date_);
-    start_of_comparison_period_ = (date::sys_days { start_of_comparison_period_date_ } - date::sys_days(starting_date_)).count();
+    total_time_ = TimeHelpers::days_between(starting_date_, ending_date_);
+    start_of_comparison_period_ = TimeHelpers::days_between(starting_date_, start_of_comparison_period_date_);
   }
 
 private:
@@ -118,7 +118,7 @@ struct YAML::convert<SimulationTimeframe> {
     rhs.set_ending_date(node["ending_date"].as<date::year_month_day>());
     rhs.set_start_collect_data_day(node["start_collect_data_day"].as<int>());
 
-    rhs.set_total_time(TimeHelpers::get_day_count(rhs.get_starting_date(), rhs.get_ending_date()));
+    rhs.set_total_time(TimeHelpers::days_between(rhs.get_starting_date(), rhs.get_ending_date()));
     return true;
   }
 };

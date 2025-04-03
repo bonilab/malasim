@@ -25,7 +25,7 @@ void RotateStrategyEvent::do_execute() {
   Model::get_instance().get_model()->set_treatment_strategy(new_strategy_id_);
   spdlog::info(
       "{}: Switching treatment strategy to {} ",
-      StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}),
+      Model::get_scheduler()->get_current_date_string(),
       Model::get_treatment_strategy()->name);
 
   // Queue the next iteration of this event

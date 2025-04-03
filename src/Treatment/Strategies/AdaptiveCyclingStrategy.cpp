@@ -30,7 +30,7 @@ void AdaptiveCyclingStrategy::switch_therapy() {
 
   Model::get_mdc()->update_UTL_vector();
   spdlog::info("{}: Adaptive Cycling Strategy switch Therapy to: {}",
-    StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}),
+    Model::get_scheduler()->get_current_date_string(),
     therapy_list[index]->get_id());
 }
 
@@ -60,7 +60,7 @@ void AdaptiveCyclingStrategy::update_end_of_time_step() {
       if (Model::get_scheduler()->current_time() > latest_switch_time + turn_off_days) {
         latest_switch_time = Model::get_scheduler()->current_time() + delay_until_actual_trigger;
           spdlog::info("{}: Adaptive Cycling will switch therapy next year",
-          StringHelpers::date_as_string(date::year_month_day{Model::get_scheduler()->calendar_date}));
+          Model::get_scheduler()->get_current_date_string());
       }
     }
   }

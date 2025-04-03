@@ -4,7 +4,7 @@
 #include "Events/Event.h"
 #include <string>
 
-class TurnOnMutationEvent : public Event {
+class TurnOnMutationEvent : public WorldEvent {
 public:
   // Disable copy and assignment and move
   TurnOnMutationEvent(const TurnOnMutationEvent&) = delete;

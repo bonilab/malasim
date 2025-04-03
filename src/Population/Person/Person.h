@@ -92,7 +92,7 @@ public:
 #endif
 
 private:
-  EventManager event_manager_;
+  EventManager<PersonEvent> event_manager_;
 
 public:
     void initialize();
@@ -105,18 +105,18 @@ public:
     bool has_event() const { return event_manager_.has_event<T>(); }
     
     template <typename T>
-    void cancel_all_events() const { event_manager_.cancel_all_events<T>(); }
+    void cancel_all_events() { event_manager_.cancel_all_events<T>(); }
     
-    void cancel_all_events_except(Event* event) const { 
+    void cancel_all_events_except(PersonEvent* event) { 
         event_manager_.cancel_all_events_except(event); 
     }
     
     template <typename T>
-    void cancel_all_events_except(Event* event) const {
+    void cancel_all_events_except(PersonEvent* event) {
         event_manager_.cancel_all_events_except<T>(event);
     }
 
-    std::multimap<int, std::unique_ptr<Event>>& get_events() {
+    std::multimap<int, std::unique_ptr<PersonEvent>>& get_events() {
       return event_manager_.get_events();
     }
 
@@ -223,7 +223,7 @@ public:
   //
   virtual bool will_progress_to_death_when_recieve_treatment();
 
-  void cancel_all_other_progress_to_clinical_events_except(Event *event) const;
+  void cancel_all_other_progress_to_clinical_events_except(PersonEvent *event);
 
   void change_all_parasite_update_function(ParasiteDensityUpdateFunction *from,
                                            ParasiteDensityUpdateFunction *to) const;
@@ -253,7 +253,7 @@ public:
 
   bool has_return_to_residence_event() const;
 
-  void cancel_all_return_to_residence_events() const;
+  void cancel_all_return_to_residence_events();
 
   bool has_detectable_parasite() const;
 

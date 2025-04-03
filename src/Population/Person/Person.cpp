@@ -86,7 +86,7 @@ void Person::NotifyChange(const Property& property, const void* oldValue, const 
 void Person::set_location(const int& value) {
   if (location_ != value) {
     if (Model::get_mdc() != nullptr) {
-      const auto day_diff = (Constants::DAYS_IN_YEAR - Model::get_scheduler()->current_day_in_year());
+      const auto day_diff = (Constants::DAYS_IN_YEAR - Model::get_scheduler()->get_current_day_in_year());
       if (location_ != -1) {
         Model::get_mdc()->update_person_days_by_years(location_, -day_diff);
       }
@@ -180,7 +180,7 @@ double Person::get_probability_progress_to_clinical() {
   return immune_system_->get_clinical_progression_probability();
 }
 
-void Person::cancel_all_other_progress_to_clinical_events_except(Event* inEvent) const {
+void Person::cancel_all_other_progress_to_clinical_events_except(PersonEvent* inEvent) {
   cancel_all_events_except<ProgressToClinicalEvent>(inEvent);
 }
 
@@ -628,7 +628,7 @@ bool Person::has_return_to_residence_event() const {
   return has_event<ReturnToResidenceEvent>();
 }
 
-void Person::cancel_all_return_to_residence_events() const {
+void Person::cancel_all_return_to_residence_events() {
   cancel_all_events<ReturnToResidenceEvent>();
 }
 
@@ -744,19 +744,20 @@ void Person::increase_age_by_1_year() {
 }
 
 void Person::add_event(PersonEvent* event) {
-  if (event->get_time() > Model::get_config()->get_simulation_timeframe().get_total_time() || event->get_time() < Model::get_scheduler()->current_time_) {
-    if (event->get_time() < Model::get_scheduler()->current_time()) {
-      spdlog::error("Error when schedule event {} at {}. Current_time: {} - total time: {}",
-      event->name(), event->get_time(), Model::get_scheduler()->current_time_,Model::get_scheduler()->total_available_time_);
-      spdlog::error("Cannot schedule event {} at {}. Current_time: {} - total time: {}",
-        event->name(), event->get_time(), Model::get_scheduler()->current_time_, Model::get_scheduler()->total_available_time_);
-    }
-    ObjectHelpers::delete_pointer<PersonEvent>(event);
-  } else {
-
-    // schedule and transfer ownership of the event to the event_manager
-    event_manager_.schedule_event(event);
+  if ( event->get_time() < Model::get_scheduler()->current_time()) {
+    spdlog::error("Event time is less than current time");
+    throw std::invalid_argument("Event time is less than current time");
   }
+
+  if (event->get_time() > Model::get_config()->get_simulation_timeframe().get_total_time()) {
+    spdlog::warn("Event time is greater than total time, event will not be scheduled");
+    // delete the event
+    ObjectHelpers::delete_pointer<PersonEvent>(event);
+    return;
+  }
+
+  // schedule and transfer ownership of the event to the event_manager
+  event_manager_.schedule_event(event);
 }
 
 void Person::schedule_update_by_drug_event(ClonalParasitePopulation* parasite) {
@@ -881,10 +882,11 @@ void Person::schedule_return_to_residence_event(int length_of_trip) {
 }
 
 void Person::schedule_birthday_event(int days_to_next_birthday) {
+  if (days_to_next_birthday <= 0) {
+    throw std::invalid_argument("days_to_next_birthday must be greater than 0");
+  }
   auto* event = new BirthdayEvent(this);
-
-  event->set_time((days_to_next_birthday <= 0) ? TimeHelpers::number_of_days_to_next_year(Model::get_scheduler()->calendar_date)
-                                              : calculate_future_time(days_to_next_birthday));
+  event->set_time(calculate_future_time(days_to_next_birthday));
   schedule_basic_event(event);
 }
 

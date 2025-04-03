@@ -8,7 +8,7 @@
 
 class Scheduler;
 
-class ImportationEvent : public Event {
+class ImportationEvent : public WorldEvent {
 public:
   //disallow copy, assign and move
   ImportationEvent(const ImportationEvent&) = delete;

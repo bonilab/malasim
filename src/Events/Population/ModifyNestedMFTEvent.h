@@ -5,7 +5,7 @@
 
 #include "Events/Event.h"
 
-class ModifyNestedMFTEvent : public Event {
+class ModifyNestedMFTEvent : public WorldEvent {
 public:
   //disallow copy, assign and move
   ModifyNestedMFTEvent(const ModifyNestedMFTEvent &) = delete;
