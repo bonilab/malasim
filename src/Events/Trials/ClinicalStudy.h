@@ -31,8 +31,6 @@ public:
   ClinicalStudy() = default;
   ~ClinicalStudy() = default;
 
-  static void schedule_event(Scheduler* schedule, const int &time);
-
   const std::string name() const override { return "ClinicalStudy"; }
 
 private:

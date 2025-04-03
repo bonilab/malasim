@@ -34,10 +34,6 @@ public:
   //    ImportationEvent(const ImportationEvent& orig);
   virtual ~ImportationEvent();
 
-  static void schedule_event(Scheduler* scheduler, const int &location,
-                             const int &execute_at, const int &genotype_id,
-                             const int &number_of_cases);
-
   const std::string name() const override { return "ImportationEvent"; }
 
 private:

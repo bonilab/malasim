@@ -20,21 +20,13 @@ ImportationPeriodicallyEvent::ImportationPeriodicallyEvent(const int& location, 
 
 ImportationPeriodicallyEvent::~ImportationPeriodicallyEvent() = default;
 
-void ImportationPeriodicallyEvent::schedule_event(Scheduler* scheduler, const int& location, const int& duration,
-                                                  unsigned int genotype_id, const int& number_of_cases,
-                                                  const int& start_day) {
-  if (scheduler != nullptr) {
-    auto* e = new ImportationPeriodicallyEvent(location, duration, genotype_id, number_of_cases, start_day);
-    e->set_time(start_day);
-    scheduler->schedule_population_event(e);
-  }
-}
 
 void ImportationPeriodicallyEvent::do_execute() {
   // std::cout << date::year_month_day{ Model::get_scheduler()->calendar_date } << ":import periodically event" << std::endl;
   // schedule importation for the next day
-  schedule_event(Model::get_scheduler(), location_, duration_, genotype_id_, number_of_cases_,
-                 Model::get_scheduler()->current_time() + 1);
+  auto* event = new ImportationPeriodicallyEvent(location_, duration_, genotype_id_, number_of_cases_,
+                                                Model::get_scheduler()->current_time() + 1);
+  Model::get_scheduler()->schedule_population_event(event);
 
   const auto number_of_importation_cases =
       Model::get_random()->random_poisson(static_cast<double>(number_of_cases_) / duration_);

@@ -36,7 +36,3 @@ void ClinicalStudy::do_execute() {
   check_enrollees();
   check_population();
 }
-
-void ClinicalStudy::schedule_event(Scheduler* schedule, const int &time) {
-  // TODO The clinical study event needs to trigger at the end of each time step
-}

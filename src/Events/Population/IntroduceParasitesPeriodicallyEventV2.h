@@ -43,8 +43,6 @@ public:
   //    ImportationEvent(const ImportationEvent& orig);
   virtual ~IntroduceParasitesPeriodicallyEventV2();
 
-  static void schedule_event(Scheduler *scheduler, IntroduceParasitesPeriodicallyEventV2* old_event);
-
   const std::string name() const override {
     return "IntroduceParasitesPeriodicallyEventV2";
   }

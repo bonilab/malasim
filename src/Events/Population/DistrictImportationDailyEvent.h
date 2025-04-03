@@ -28,9 +28,6 @@ public:
   inline static const std::string EventName =
       "district_importation_daily_event";
 
-  static void schedule_event(Scheduler* scheduler, int district, double dailyRate, int startDay,
-    const std::vector<std::tuple<int,int,char>> &alleles);
-
   const std::string name() const override { return "DistrictImportationDailyEvent"; }
 
 private:

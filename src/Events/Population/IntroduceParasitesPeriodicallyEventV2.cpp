@@ -29,19 +29,6 @@ IntroduceParasitesPeriodicallyEventV2::IntroduceParasitesPeriodicallyEventV2(
 
 IntroduceParasitesPeriodicallyEventV2::~IntroduceParasitesPeriodicallyEventV2() = default;
 
-void IntroduceParasitesPeriodicallyEventV2::schedule_event(
-    Scheduler* scheduler, IntroduceParasitesPeriodicallyEventV2* old_event
-) {
-  if (scheduler != nullptr) {
-    auto* e = new IntroduceParasitesPeriodicallyEventV2(
-        old_event->allele_distributions,
-        old_event->location(), old_event->duration(),
-        old_event->number_of_cases(), old_event->start_day, old_event->end_day
-    );
-    e->set_time(scheduler->current_time() + 1);
-    scheduler->schedule_population_event(e);
-  }
-}
 
 void IntroduceParasitesPeriodicallyEventV2::do_execute() {
   // TODO: rework this
@@ -49,7 +36,13 @@ void IntroduceParasitesPeriodicallyEventV2::do_execute() {
   // std::cout << date::year_month_day{ Model::get_scheduler()->calendar_date } << ":import periodically event" << std::endl;
   //schedule importation for the next day
   if (Model::get_scheduler()->current_time() < end_day) {
-    schedule_event(Model::get_scheduler(), this);
+    auto* event = new IntroduceParasitesPeriodicallyEventV2(allele_distributions,
+                                                            location_,
+                                                            duration_,
+                                                            number_of_cases_,
+                                                            Model::get_scheduler()->current_time() + 1);
+    Model::get_scheduler()->schedule_population_event(event);
+    // schedule_event(Model::get_scheduler(), this);
   }
 //  else {
 //    LOG(INFO) << "Hello End importation" ;

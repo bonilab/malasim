@@ -15,25 +15,17 @@ DistrictImportationDailyEvent::DistrictImportationDailyEvent(
   set_time(startDay);
 }
 
-void DistrictImportationDailyEvent::schedule_event(Scheduler* scheduler,
-                                                   int district,
-                                                   double dailyRate,
-                                                   int startDay,
-                                                   const std::vector<std::tuple<int,int,char>> &alleles) {
-  if (scheduler != nullptr) {
-    auto* event = new DistrictImportationDailyEvent(
-        district, dailyRate, startDay,alleles);
-    event->set_time(startDay);
-    scheduler->schedule_population_event(event);
-  }
-}
 
 void DistrictImportationDailyEvent::do_execute() {
-  // std::cout << date::year_month_day{ Model::get_scheduler()->calendar_date } <<
-  // ":import periodically event" << std::endl;
   // schedule importation for the next day
-  schedule_event(Model::get_scheduler(), district_,
-                 daily_rate_, Model::get_scheduler()->current_time() + 1,alleles_);
+  auto* event = new DistrictImportationDailyEvent(district_,
+                                                 daily_rate_,
+                                                 Model::get_scheduler()->current_time() + 1,
+                                                 alleles_);
+  Model::get_scheduler()->schedule_population_event(event);
+
+  // schedule_event(Model::get_scheduler(), district_,
+  //                daily_rate_, Model::get_scheduler()->current_time() + 1,alleles_);
 
   auto number_of_importation_cases = Model::get_random()->random_poisson(daily_rate_);
 

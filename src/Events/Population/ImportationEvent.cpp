@@ -23,18 +23,6 @@ ImportationEvent::ImportationEvent(const int &location, const int &execute_at,
 
 ImportationEvent::~ImportationEvent() = default;
 
-void ImportationEvent::schedule_event(Scheduler* scheduler, const int &location,
-                                      const int &execute_at,
-                                      const int &genotype_id,
-                                      const int &number_of_cases) {
-  if (scheduler != nullptr) {
-    auto* e = new ImportationEvent(location, execute_at, genotype_id,
-                                   number_of_cases);
-    e->set_time(execute_at);
-    scheduler->schedule_population_event(e);
-  }
-}
-
 void ImportationEvent::do_execute() {
   const auto number_of_importation_cases =
       Model::get_random()->random_poisson(number_of_cases_);
