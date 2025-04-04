@@ -26,7 +26,7 @@ protected:
 
         // Initialize Model::CONFIG
         if (Model::get_config() == nullptr) {
-            Model::get_instance().set_config(new Config());
+            Model::get_instance()->set_config(new Config());
         }
 
         Model::get_config()->get_spatial_settings().set_number_of_locations(0);
@@ -105,7 +105,7 @@ protected:
         Model::get_config()->location_db().clear();
 
         if (Model::get_config() != nullptr) {
-            Model::get_instance().set_config(nullptr);
+            Model::get_instance()->set_config(nullptr);
         }
 
         // Reset test configuration

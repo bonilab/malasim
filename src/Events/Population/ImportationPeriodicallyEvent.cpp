@@ -93,7 +93,7 @@ void ImportationPeriodicallyEvent::do_execute() {
                                              .get_gametocyte_level_full());
     blood_parasite->set_last_update_log10_parasite_density(size);
     blood_parasite->set_update_function(
-        Model::get_instance().immunity_clearance_update_function());
+        Model::get_instance()->immunity_clearance_update_function());
 
     //        Model::get_population()->initial_infection(pi->vPerson()[0][0][ind_ac][index],
     //        Model::CONFIG->parasite_db()->get(0));

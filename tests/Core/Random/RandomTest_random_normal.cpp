@@ -9,13 +9,13 @@
 TEST_F(RandomTest, random_normal_ThrowsWhenStdDevNonPositive_Integral) {
   int mean = 0;
   double stddev = 0.0;
-  EXPECT_THROW(rng.random_normal<int>(mean, stddev), std::invalid_argument);
+  EXPECT_THROW(rng.random_normal_int(mean, stddev), std::invalid_argument);
 }
 
 TEST_F(RandomTest, random_normal_ThrowsWhenStdDevNonPositive_Floating) {
   double mean = 0.0;
   double stddev = -1.0;
-  EXPECT_THROW(rng.random_normal<double>(mean, stddev), std::invalid_argument);
+  EXPECT_THROW(rng.random_normal_double(mean, stddev), std::invalid_argument);
 }
 
 // Integral Type Tests
@@ -29,7 +29,7 @@ TEST_F(RandomTest, random_normal_ReturnsValuesAroundMean_Integral) {
   std::vector<int> samples(sample_size);
 
   for (int i = 0; i < sample_size; ++i) {
-    samples[i] = rng.random_normal<int>(mean, stddev);
+    samples[i] = rng.random_normal_int(mean, stddev);
   }
 
   // Calculate sample mean and stddev
@@ -56,7 +56,7 @@ TEST_F(RandomTest, random_normal_ReturnsValuesAroundMean_Floating) {
   std::vector<double> samples(sample_size);
 
   for (int i = 0; i < sample_size; ++i) {
-    samples[i] = rng.random_normal<double>(mean, stddev);
+    samples[i] = rng.random_normal_double(mean, stddev);
   }
 
   // Calculate sample mean and stddev
@@ -81,7 +81,7 @@ TEST_F(RandomTest, random_normal_HandlesLargeStdDev_Floating) {
   std::vector<double> samples(sample_size);
 
   for (int i = 0; i < sample_size; ++i) {
-    samples[i] = rng.random_normal<double>(mean, stddev);
+    samples[i] = rng.random_normal_double(mean, stddev);
   }
 
   double sample_mean = calculate_mean(samples);
@@ -103,7 +103,7 @@ TEST_F(RandomTest, random_normal_HandlesNegativeMean_Integral) {
   std::vector<int> samples(sample_size);
 
   for (int i = 0; i < sample_size; ++i) {
-    samples[i] = rng.random_normal<int>(mean, stddev);
+    samples[i] = rng.random_normal_int(mean, stddev);
   }
 
   double sample_mean =
@@ -125,7 +125,7 @@ TEST_F(RandomTest, random_normal_HandlesNegativeMean_Floating) {
   std::vector<double> samples(sample_size);
 
   for (int i = 0; i < sample_size; ++i) {
-    samples[i] = rng.random_normal<double>(mean, stddev);
+    samples[i] = rng.random_normal_double(mean, stddev);
   }
 
   double sample_mean = calculate_mean(samples);

@@ -23,8 +23,8 @@ void ReceiveMDATherapyEvent::do_execute() {
   // if this person has progress to clinical event then cancel it
   person->cancel_all_other_progress_to_clinical_events_except(nullptr);
   person->change_all_parasite_update_function(
-      Model::get_instance().progress_to_clinical_update_function(),
-      Model::get_instance().immunity_clearance_update_function());
+      Model::get_instance()->progress_to_clinical_update_function(),
+      Model::get_instance()->immunity_clearance_update_function());
 
   person->schedule_update_by_drug_event(nullptr);
 }

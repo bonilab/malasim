@@ -64,7 +64,7 @@ void NovelDrugIntroductionStrategy::monthly_update() {
       Model::get_config()->strategy_db().push_back(new_public_stategy);
 
       //reset the time point to collect ntf
-      Model::get_config()->get_simulation_timeframe().set_start_of_comparison_period(Model::get_scheduler()->current_time());
+      // Model::get_config()->get_simulation_timeframe().set_start_of_comparison_period(Model::get_scheduler()->current_time());
 
       //reset the total time to 10 years after this time point
       // const auto new_total_time = Model::get_scheduler()->current_time() + Model::get_scheduler()->get_days_to_next_n_year(10);

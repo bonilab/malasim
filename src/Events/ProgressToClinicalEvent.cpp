@@ -81,7 +81,7 @@ std::pair<Therapy *, bool> ProgressToClinicalEvent::determine_therapy(Person *pe
 void ProgressToClinicalEvent::apply_therapy(Person *person, Therapy *therapy, bool is_public_sector) {
   person->receive_therapy(therapy, clinical_caused_parasite_, false, is_public_sector);
 
-  clinical_caused_parasite_->set_update_function(Model::get_instance().having_drug_update_function());
+  clinical_caused_parasite_->set_update_function(Model::get_instance()->having_drug_update_function());
 
   person->schedule_update_by_drug_event(clinical_caused_parasite_);
   // check if the person will progress to death despite of the treatment, this should be 
@@ -114,7 +114,7 @@ void ProgressToClinicalEvent::do_execute() {
   }
 
   if (person->get_host_state()==Person::CLINICAL) {
-    clinical_caused_parasite_->set_update_function(Model::get_instance().immunity_clearance_update_function());
+    clinical_caused_parasite_->set_update_function(Model::get_instance()->immunity_clearance_update_function());
     return;
   }
 
@@ -138,10 +138,10 @@ void ProgressToClinicalEvent::transition_to_clinical_state(Person *person) {
   // episode to be cancled (i.e recrudescence epidsodes)
   person->cancel_all_other_progress_to_clinical_events_except(this);
 
-  person->change_all_parasite_update_function(Model::get_instance().progress_to_clinical_update_function(),
-                                              Model::get_instance().immunity_clearance_update_function());
+  person->change_all_parasite_update_function(Model::get_instance()->progress_to_clinical_update_function(),
+                                              Model::get_instance()->immunity_clearance_update_function());
 
-  clinical_caused_parasite_->set_update_function(Model::get_instance().clinical_update_function());
+  clinical_caused_parasite_->set_update_function(Model::get_instance()->clinical_update_function());
 
   //Statistic collect cumulative clinical episodes
   Model::get_mdc()->collect_1_clinical_episode(person->get_location(), person->get_age(), person->get_age_class());
@@ -188,7 +188,7 @@ void ProgressToClinicalEvent::transition_to_clinical_state(Person *person) {
 //     //Statistic increase today treatments
 //     Model::get_mdc()->record_1_treatment(person->get_location(), person->get_age(), person->get_age_class(), therapy->get_id());
 
-//     clinical_caused_parasite_->set_update_function(Model::get_instance().having_drug_update_function());
+//     clinical_caused_parasite_->set_update_function(Model::get_instance()->having_drug_update_function());
 
 //     // calculate EAMU
 //     Model::get_mdc()->record_AMU_AFU(person, therapy, clinical_caused_parasite_);

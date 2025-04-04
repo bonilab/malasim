@@ -20,7 +20,7 @@ void ChangeTreatmentCoverageEvent::do_execute() {
 spdlog::info("{}: change treatment coverage model to {}",
              Model::get_scheduler()->get_current_date_string(),
              treatment_coverage_model->type);
-  Model::get_instance().set_treatment_coverage(treatment_coverage_model);
+  Model::get_instance()->set_treatment_coverage(treatment_coverage_model);
 
   if (auto* linear_tcm = dynamic_cast<LinearTCM*>(treatment_coverage_model)) {
     linear_tcm->update_rate_of_change();

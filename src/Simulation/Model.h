@@ -8,13 +8,13 @@
 #include "Configuration/Config.h"
 #include "Core/Scheduler/Scheduler.h"
 #include "Population/ImmuneSystem/ImmunityClearanceUpdateFunction.h"
+#include "Population/Population.h"
 
 namespace Spatial {
 class Location;
 }
 
 class Reporter;
-class Random;
 class Cli;
 class Population;
 class ModelDataCollector;
@@ -27,8 +27,10 @@ class ClinicalUpdateFunction;
 class Model {
 public:
   // Provides global access to the singleton instance
-  static Model &get_instance() {
-    static Model instance;
+  static Model* get_instance() {
+    if (instance == nullptr) {
+      instance = new Model();
+    }
     return instance;
   }
 
@@ -46,12 +48,13 @@ private:
   Model(const int &object_pool_size = 100000);
   ~Model() = default;
 
+  static Model* instance;
   bool is_initialized_;
 
   std::unique_ptr<Config> config_{nullptr};
   std::unique_ptr<Scheduler> scheduler_{nullptr};
-  Population* population_;
-  utils::Random* random_;
+  std::unique_ptr<Population> population_{nullptr};
+  std::unique_ptr<utils::Random> random_;
   ModelDataCollector* mdc_;
   Mosquito* mosquito_;
   IStrategy* treatment_strategy_{nullptr};
@@ -72,22 +75,30 @@ public:
   void monthly_update();
   void yearly_update();
   void release();
-  static Model* get_model() { return &get_instance(); }
-
-  static Config* get_config() { return get_instance().config_.get(); }
+  
+  static Config* get_config() { return get_instance()->config_.get(); }
   static void set_config(Config* config) {
-    get_instance().config_.reset(config);
+    get_instance()->config_.reset(config);
   }
 
-  static Scheduler* get_scheduler() { return get_instance().scheduler_.get(); }
+  static Scheduler* get_scheduler() { return get_instance()->scheduler_.get(); }
 
   static void set_scheduler(Scheduler* scheduler) {
-    get_instance().scheduler_.reset(scheduler);
+    get_instance()->scheduler_.reset(scheduler);
   }
 
-  static utils::Random* get_random();
+  static utils::Random* get_random() { return get_instance()->random_.get(); }
+  
+  static void set_random(utils::Random* random) {
+    get_instance()->random_.reset(random);
+  }
+
+  static Population* get_population() { return get_instance()->population_.get(); }
+  static void set_population(Population* population) {
+    get_instance()->population_.reset(population);
+  }
+  
   static ModelDataCollector* get_mdc();
-  static Population* get_population();
   static Mosquito* get_mosquito();
   static ITreatmentCoverageModel* get_treatment_coverage();
   static IStrategy* get_treatment_strategy();

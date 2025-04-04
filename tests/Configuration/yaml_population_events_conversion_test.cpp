@@ -1,12 +1,14 @@
 #include <gtest/gtest.h>
 #include <yaml-cpp/yaml.h>
 #include "Configuration/PopulationEvents.h"  // Assuming this is the correct include path
+#include "Simulation/Model.h"
 
 class PopulationEventsTest : public ::testing::Test {
 protected:
     PopulationEvents population_events;
 
     void SetUp() override {
+        Model::get_instance()->initialize();
         // Set up default PopulationEvents
 
         // Setting up EventInfo

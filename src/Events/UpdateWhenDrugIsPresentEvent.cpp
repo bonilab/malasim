@@ -28,8 +28,8 @@ void UpdateWhenDrugIsPresentEvent::do_execute() {
   } else {
     for (auto i = 0; i < person->get_all_clonal_parasite_populations()->size(); i++) {
       auto* blood_parasite = person->get_all_clonal_parasite_populations()->at(i);
-      if (blood_parasite->update_function()==Model::get_instance().having_drug_update_function()) {
-        blood_parasite->set_update_function(Model::get_instance().immunity_clearance_update_function());
+      if (blood_parasite->update_function()==Model::get_instance()->having_drug_update_function()) {
+        blood_parasite->set_update_function(Model::get_instance()->immunity_clearance_update_function());
       }
     }
   }

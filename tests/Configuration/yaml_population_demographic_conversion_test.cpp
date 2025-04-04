@@ -10,7 +10,6 @@ protected:
 
   void SetUp() override {
     // Initialize default PopulationDemographic object using setters
-    default_demographic.set_number_of_age_classes(5);
     default_demographic.set_age_structure({100, 150, 200, 150, 100});
     default_demographic.set_initial_age_structure({100, 150, 200, 150, 100});
     default_demographic.set_birth_rate(0.02);
@@ -27,8 +26,6 @@ TEST_F(PopulationDemographicTest, EncodePopulationDemographic) {
   YAML::Node node =
       YAML::convert<PopulationDemographic>::encode(default_demographic);
 
-  EXPECT_EQ(node["number_of_age_classes"].as<int>(),
-            default_demographic.get_number_of_age_classes());
   EXPECT_EQ(node["age_structure"].as<std::vector<int>>(),
             default_demographic.get_age_structure());
   EXPECT_EQ(node["initial_age_structure"].as<std::vector<int>>(),
@@ -49,7 +46,6 @@ TEST_F(PopulationDemographicTest, EncodePopulationDemographic) {
 // Test decoding functionality
 TEST_F(PopulationDemographicTest, DecodePopulationDemographic) {
   YAML::Node node;
-  node["number_of_age_classes"] = 5;
   node["age_structure"] = std::vector<int>{100, 150, 200, 150, 100};
   node["initial_age_structure"] = std::vector<int>{100, 150, 200, 150, 100};
   node["birth_rate"] = 0.02;

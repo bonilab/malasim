@@ -20,7 +20,7 @@ public:
 
   Population(Model* model);
 
-  ~Population();
+  virtual ~Population();
 
   void initialize();
   //

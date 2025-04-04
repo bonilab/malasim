@@ -32,7 +32,7 @@ public:
 
   // Constructor and Destructor
   Config() = default;
-  ~Config() = default;
+  virtual ~Config() = default;
 
   // Load configuration from a YAML file
   bool load(const std::string &filename);
@@ -47,18 +47,36 @@ public:
   [[nodiscard]] const ModelSettings &get_model_settings() const {
     return model_settings_;
   }
-  [[nodiscard]] SimulationTimeframe &get_simulation_timeframe() {
+  [[nodiscard]] const SimulationTimeframe &get_simulation_timeframe() const{
     return simulation_timeframe_;
   }
+  void set_simulation_timeframe(const SimulationTimeframe &timeframe) {
+    simulation_timeframe_ = timeframe;
+  }
+
   [[nodiscard]] const TransmissionSettings &get_transmission_settings() const {
     return transmission_settings_;
   }
-  [[nodiscard]] PopulationDemographic &get_population_demographic() {
+  [[nodiscard]] const PopulationDemographic &get_population_demographic() const {
     return population_demographic_;
   }
 
   void set_population_demographic(const PopulationDemographic &demographic) {
     population_demographic_ = demographic;
+  }
+
+  [[nodiscard]] const EpidemiologicalParameters &get_epidemiological_parameters() const {
+    return epidemiological_parameters_;
+  }
+  void set_epidemiological_parameters(const EpidemiologicalParameters &parameters) {
+    epidemiological_parameters_ = parameters;
+  }
+
+  [[nodiscard]] const ParasiteParameters &get_parasite_parameters() const {
+    return parasite_parameters_;
+  }
+  void set_parasite_parameters(const ParasiteParameters &parameters) {
+    parasite_parameters_ = parameters;
   }
 
   [[nodiscard]] SpatialSettings &get_spatial_settings() {
@@ -72,13 +90,16 @@ public:
   [[nodiscard]] MovementSettings &get_movement_settings() {
     return movement_settings_;
   }
-  [[nodiscard]] const ParasiteParameters &get_parasite_parameters() const {
-    return parasite_parameters_;
-  }
+
+  
   [[nodiscard]] const ImmuneSystemParameters &get_immune_system_parameters()
       const {
     return immune_system_parameters_;
   }
+  void set_immune_system_parameters(const ImmuneSystemParameters &parameters) {
+    immune_system_parameters_ = parameters;
+  }
+
   [[nodiscard]] GenotypeParameters &get_genotype_parameters() {
     return genotype_parameters_;
   }
@@ -91,10 +112,6 @@ public:
   [[nodiscard]] StrategyParameters &get_strategy_parameters() {
     return strategy_parameters_;
   }
-  [[nodiscard]] const EpidemiologicalParameters &
-  get_epidemiological_parameters() const {
-    return epidemiological_parameters_;
-  }
   [[nodiscard]] MosquitoParameters &get_mosquito_parameters() {
     return mosquito_parameters_;
   }
@@ -103,11 +120,14 @@ public:
   }
   [[nodiscard]] RaptSettings &get_rapt_settings() { return rapt_settings_; }
 
-  int number_of_locations() const;
-  int number_of_age_classes() const;
-  int number_of_parasite_types() const;
-  int number_of_tracking_days() const;
-  std::vector<int> &age_structure();
+  // Make relevant getters virtual for mocking
+  [[nodiscard]] int number_of_locations() const;
+  [[nodiscard]] int number_of_age_classes() const;
+  [[nodiscard]] int number_of_parasite_types() const;
+  [[nodiscard]] int number_of_tracking_days() const;
+  [[nodiscard]] const std::vector<int> &age_structure() const;
+  
+  // Keep non-virtual if not mocked directly
   std::vector<Spatial::Location> &location_db();
   std::vector<IStrategy*> &strategy_db();
   GenotypeDatabase* genotype_db();

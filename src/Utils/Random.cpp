@@ -14,6 +14,7 @@
 #include <random>
 #include <stdexcept>
 #include <vector>
+#include <cmath> // Ensure cmath is included for std::round
 
 using utils::Random;
 
@@ -24,12 +25,9 @@ Random::Random(gsl_rng* rng, uint64_t seed) : seed_(seed) {
     rng_.reset(rng);
   } else {
     // Initialize with default seed
-    initialize();
+    initialize(seed);
   }
 }
-
-// Destructor
-Random::~Random() = default;
 
 void Random::initialize(uint64_t initial_seed) {
   // Select the Mersenne Twister 19937 generator
@@ -175,6 +173,16 @@ double Random::cdf_standard_normal_distribution(double value) {
   return gsl_cdf_ugaussian_P(value);
 }
 
-double Random::random_flat(const double &from, const double &to) {
+double Random::random_flat(double from, double to) {
   return gsl_ran_flat(rng_.get(), from, to);
+}
+
+// Implementation for random_normal (double)
+double Random::random_normal_double(double mean, double standard_deviation) {
+  return random_normal<double>(mean, standard_deviation);
+}
+
+// Implementation for random_normal (int)
+int Random::random_normal_int(int mean, double standard_deviation) {
+  return random_normal<int>(mean, standard_deviation);
 }

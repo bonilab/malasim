@@ -50,7 +50,7 @@ public:
    *
    * Ensures proper resource deallocation of the GSL RNG.
    */
-  ~Random();
+  virtual ~Random() = default;
 
   /**
    * @brief Retrieves the current RNG seed.
@@ -86,7 +86,7 @@ public:
    *
    * @throws std::runtime_error If RNG is not initialized.
    */
-  uint64_t random_uniform(uint64_t upper_bound);
+  virtual uint64_t random_uniform(uint64_t upper_bound);
 
   /**
    * @brief Generates a uniform random double in [0, 1).
@@ -95,7 +95,7 @@ public:
    *
    * @throws std::runtime_error If RNG is not initialized.
    */
-  double random_uniform();
+  virtual double random_uniform();
 
   /**
    * @brief Generates a uniformly distributed random number within a specified
@@ -146,40 +146,6 @@ public:
     } else {
       double value = gsl_ran_flat(rng_.get(), static_cast<double>(from),
                                   static_cast<double>(to));
-      return static_cast<T>(value);
-    }
-  }
-
-  /**
-   * @brief Generates a normally distributed random number with given mean and
-   * standard deviation.
-   *
-   * @tparam T The return type, typically `double` or `int`.
-   * @param mean The mean of the normal distribution.
-   * @param standard_deviation The standard deviation of the normal
-   * distribution.
-   * @return T A random number following the normal distribution.
-   *
-   * @throws std::runtime_error If RNG is not initialized.
-   */
-  template <typename T>
-  T random_normal(T mean, double standard_deviation) {
-    static_assert(std::is_arithmetic_v<T>,
-                  "Template parameter T must be numeric.");
-
-    if (!rng_) {
-      throw std::runtime_error("Random number generator not initialized.");
-    }
-
-    if (standard_deviation <= 0) {
-      throw std::invalid_argument(
-          "Parameters 'standard_deviation' must be greater than 0.");
-    }
-    double value = mean + gsl_ran_gaussian(rng_.get(), standard_deviation);
-
-    if constexpr (std::is_integral_v<T>) {
-      return static_cast<T>(std::round(value));
-    } else {
       return static_cast<T>(value);
     }
   }
@@ -255,7 +221,7 @@ public:
   double random_gamma(double shape, double scale);
 
 
-  double random_flat(const double &from, const double &to);
+  virtual double random_flat(double from, double to);
 
   /**
    * @brief Computes the CDF of the Gamma distribution.
@@ -307,7 +273,7 @@ public:
    *
    * @throws std::runtime_error If RNG is not initialized.
    */
-  double cdf_standard_normal_distribution(double value);
+  virtual double cdf_standard_normal_distribution(double value);
 
   /**
    * @brief Generates a binomially distributed random integer.
@@ -425,6 +391,69 @@ public:
                                                                              std::vector<T *> &all_objects,
                                                                              bool is_shuffled,
                                                                              double sum_distribution = -1);
+
+  /**
+   * @brief Generates a normally distributed random number with given mean and
+   * standard deviation.
+   *
+   * @param mean The mean of the normal distribution (integer).
+   * @param standard_deviation The standard deviation of the normal
+   * distribution.
+   * @return A random integer following the normal distribution.
+   *
+   * @throws std::runtime_error If RNG is not initialized.
+   * @throws std::invalid_argument If standard_deviation <= 0.
+   */
+  virtual int random_normal_int(int mean, double standard_deviation);
+
+  /**
+   * @brief Generates a normally distributed random number with given mean and
+   * standard deviation.
+   *
+   * @param mean The mean of the normal distribution.
+   * @param standard_deviation The standard deviation of the normal
+   * distribution.
+   * @return A random double following the normal distribution.
+   *
+   * @throws std::runtime_error If RNG is not initialized.
+   * @throws std::invalid_argument If standard_deviation <= 0.
+   */
+  virtual double random_normal_double(double mean, double standard_deviation);
+
+private:
+ /**
+   * @brief Generates a normally distributed random number with given mean and
+   * standard deviation.
+   *
+   * @tparam T The return type, typically `double` or `int`.
+   * @param mean The mean of the normal distribution.
+   * @param standard_deviation The standard deviation of the normal
+   * distribution.
+   * @return T A random number following the normal distribution.
+   *
+   * @throws std::runtime_error If RNG is not initialized.
+   */
+  template <typename T>
+  T random_normal(T mean, double standard_deviation) {
+    static_assert(std::is_arithmetic_v<T>,
+                  "Template parameter T must be numeric.");
+
+    if (!rng_) {
+      throw std::runtime_error("Random number generator not initialized.");
+    }
+
+    if (standard_deviation <= 0) {
+      throw std::invalid_argument(
+          "Parameters 'standard_deviation' must be greater than 0.");
+    }
+    double value = mean + gsl_ran_gaussian(rng_.get(), standard_deviation);
+
+    if constexpr (std::is_integral_v<T>) {
+      return static_cast<T>(std::round(value));
+    } else {
+      return static_cast<T>(value);
+    }
+  }
 };
 }  // namespace utils
 

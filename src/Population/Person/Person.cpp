@@ -122,7 +122,7 @@ void Person::set_age(const int& value) {
     age_ = value;
 
     // update age class
-    if (Model::get_instance().get_model() != nullptr) {
+    if (Model::get_instance() != nullptr) {
       auto ac = age_class_ == -1 ? 0 : age_class_;
       while (ac < (Model::get_config()->number_of_age_classes() - 1)
         && age_ >= Model::get_config()->age_structure()[ac]) {
@@ -171,7 +171,8 @@ double Person::relative_infectivity(const double& log10_parasite_density) {
                    + Model::get_config()->get_epidemiological_parameters().get_relative_infectivity().get_ro_star();
   const auto p = Model::get_random()->cdf_standard_normal_distribution(d_n);
 
-  return p * p + 0.01;
+  auto result = p * p + 0.01;
+  return result > 1.0 ? 1.0 : result;
 }
 
 double Person::get_probability_progress_to_clinical() {
@@ -420,7 +421,7 @@ void Person::determine_symptomatic_recrudescence(ClonalParasitePopulation* clini
     // regardless whether the induvidual are under treatment or not
     // Set the update function to progress to clinical
     clinical_caused_parasite->set_update_function(
-        Model::get_instance().progress_to_clinical_update_function());
+        Model::get_instance()->progress_to_clinical_update_function());
 
     // Set the last update parasite density to the asymptomatic level
 
@@ -465,11 +466,11 @@ void Person::determine_symptomatic_recrudescence(ClonalParasitePopulation* clini
     if (drugs_in_blood_->size() > 0) {
       // Set the update function to having drug
       clinical_caused_parasite->set_update_function(
-          Model::get_instance().having_drug_update_function());
+          Model::get_instance()->having_drug_update_function());
     } else {
       // Set the update function to immunity clearance
       clinical_caused_parasite->set_update_function(
-          Model::get_instance().immunity_clearance_update_function());
+          Model::get_instance()->immunity_clearance_update_function());
     }
   }
 }
@@ -479,13 +480,13 @@ void Person::determine_clinical_or_not(ClonalParasitePopulation* clinical_caused
     const auto p = Model::get_random()->random_flat(0.0, 1.0);
     if (p <= get_probability_progress_to_clinical()) {
       // progress to clinical after several days
-      clinical_caused_parasite->set_update_function(Model::get_instance().progress_to_clinical_update_function());
+      clinical_caused_parasite->set_update_function(Model::get_instance()->progress_to_clinical_update_function());
       clinical_caused_parasite->set_last_update_log10_parasite_density(
           Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_asymptomatic());
       schedule_progress_to_clinical_event(clinical_caused_parasite);
     } else {
       // progress to clearance
-      clinical_caused_parasite->set_update_function(Model::get_instance().immunity_clearance_update_function());
+      clinical_caused_parasite->set_update_function(Model::get_instance()->immunity_clearance_update_function());
     }
   }
 }
@@ -767,7 +768,7 @@ void Person::schedule_update_by_drug_event(ClonalParasitePopulation* parasite) {
 
 void Person::schedule_end_clinical_event(ClonalParasitePopulation* parasite) {
   // Clinical duration is normally distributed between 5-14 days, centered at 7
-  int clinical_duration = Model::get_random()->random_normal(7, 2);
+  int clinical_duration = Model::get_random()->random_normal_int(7, 2);
   clinical_duration = std::min(std::max(clinical_duration, 5), 14);
 
   auto* event = new EndClinicalEvent(this);
@@ -792,7 +793,7 @@ void Person::schedule_clinical_recurrence_event(ClonalParasitePopulation* parasi
   // assumming the onset of clinical symptoms is day 14 to 63 and end of
   // clinical symptom is day 7.
   // Clinical recurrence occurs between days 7-54, normally distributed around day 14
-  int days_to_clinical = Model::get_random()->random_normal(14, 5);
+  int days_to_clinical = Model::get_random()->random_normal_int(14, 5);
   days_to_clinical = std::min(std::max(days_to_clinical, 7), 54);
 
   auto* event = new ProgressToClinicalEvent(this);

@@ -99,6 +99,7 @@ alwaysApply: false
   - Except for third-party dependencies that are not expensive to execute.
 - Write integration tests for each module.
 - Follow the Given-When-Then convention.
+- Destructor of class should be declare virtual if it is intended to be mocked.
 
 ## Project Structure
 

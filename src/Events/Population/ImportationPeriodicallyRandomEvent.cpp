@@ -136,12 +136,12 @@ void ImportationPeriodicallyRandomEvent::infect(Person* person,
   auto* blood_parasite = person->add_new_parasite_to_blood(genotype);
   blood_parasite->set_gametocyte_level(Model::get_config()->get_epidemiological_parameters().get_gametocyte_level_full());
   blood_parasite->set_last_update_log10_parasite_density(log_parasite_density_);
-  blood_parasite->set_update_function(Model::get_instance().immunity_clearance_update_function());
+  blood_parasite->set_update_function(Model::get_instance()->immunity_clearance_update_function());
 
   // Check if the configured log density is equal to or greater than the
   // standard for clinical
   if (log_parasite_density_ >= Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_clinical()) {
-    blood_parasite->set_update_function(Model::get_instance().progress_to_clinical_update_function());
+    blood_parasite->set_update_function(Model::get_instance()->progress_to_clinical_update_function());
     person->schedule_progress_to_clinical_event(blood_parasite);
   }
 }

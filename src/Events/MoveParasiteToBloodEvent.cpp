@@ -40,14 +40,14 @@ void MoveParasiteToBloodEvent::do_execute() {
   if (person->has_effective_drug_in_blood()) {
     // person has drug in blood
     new_parasite->set_update_function(
-        Model::get_instance().having_drug_update_function());
+        Model::get_instance()->having_drug_update_function());
   } else {
     if (person->get_all_clonal_parasite_populations()->size() > 1) {
       if (Model::get_config()->get_epidemiological_parameters().get_allow_new_coinfection_to_cause_symptoms()) {
         person->determine_clinical_or_not(new_parasite);
       } else {
         new_parasite->set_update_function(
-            Model::get_instance().immunity_clearance_update_function());
+            Model::get_instance()->immunity_clearance_update_function());
       }
     } else {
       person->determine_clinical_or_not(new_parasite);

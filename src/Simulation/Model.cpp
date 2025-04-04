@@ -17,6 +17,8 @@
 #include "Utils/Cli.hxx"
 #include "Utils/Helpers/ObjectHelpers.h"
 
+Model* Model::instance = nullptr;
+
 // Private constructor: creates the Config instance
 Model::Model(const int &object_pool_size)
     : is_initialized_(false),
@@ -63,9 +65,10 @@ void Model::build_initial_treatment_coverage() {
 
 bool Model::initialize() {
   config_ = std::make_unique<Config>();
-  random_ = new utils::Random();
+  random_ = std::make_unique<utils::Random>(nullptr, -1);
   scheduler_ = std::make_unique<Scheduler>(this);
-  population_ = new Population(this);
+  population_ = std::make_unique<Population>(this);
+
   mdc_ = new ModelDataCollector(this);
   mosquito_ = new Mosquito(this);
 
@@ -75,92 +78,99 @@ bool Model::initialize() {
   having_drug_update_function_ = new ImmunityClearanceUpdateFunction(this);
   clinical_update_function_ = new ImmunityClearanceUpdateFunction(this);
 
-  if (!utils::Cli::get_instance().get_input_path().empty()) {
-    if (config_->load(utils::Cli::get_instance().get_input_path())) {
-      if (config_->get_model_settings().get_initial_seed_number() <= 0) {
-        random_->set_seed(
-            std::chrono::system_clock::now().time_since_epoch().count());
-      } else {
-        random_->set_seed(
-            config_->get_model_settings().get_initial_seed_number());
-      }
+  if (utils::Cli::get_instance().get_input_path().empty()) {
+    // spdlog::error("Input path is empty. Please provide a valid input path.");
+    // return false;
+    spdlog::warn("Input path is empty. Model initialized without configuration file.");
+    return true;
+  }
 
-      if (utils::Cli::get_instance().get_output_path().empty()) {
-        utils::Cli::get_instance().set_output_path("./");
-      }
+  // if input path is not empty, load configuration file
+  spdlog::info("Loading configuration file: " + utils::Cli::get_instance().get_input_path());
+  if (config_->load(utils::Cli::get_instance().get_input_path())) {
+    if (config_->get_model_settings().get_initial_seed_number() <= 0) {
+      random_->set_seed(
+          std::chrono::system_clock::now().time_since_epoch().count());
+    } else {
+      random_->set_seed(
+          config_->get_model_settings().get_initial_seed_number());
+    }
 
-      spdlog::info("Model initialized with seed: "
-                   + std::to_string(random_->get_seed()));
-      // add reporter here
-      if (utils::Cli::get_instance().get_reporter().empty()) {
-        add_reporter(Reporter::MakeReport(Reporter::SQLITE_MONTHLY_REPORTER));
-      } else {
-        if (Reporter::ReportTypeMap.find(
-                utils::Cli::get_instance().get_reporter())
-            != Reporter::ReportTypeMap.end()) {
-          add_reporter(Reporter::MakeReport(
-              Reporter::ReportTypeMap[utils::Cli::get_instance()
-                                          .get_reporter()]));
-        }
+    if (utils::Cli::get_instance().get_output_path().empty()) {
+      utils::Cli::get_instance().set_output_path("./");
+    }
+
+    spdlog::info("Model initialized with seed: "
+                  + std::to_string(random_->get_seed()));
+    // add reporter here
+    if (utils::Cli::get_instance().get_reporter().empty()) {
+      add_reporter(Reporter::MakeReport(Reporter::SQLITE_MONTHLY_REPORTER));
+    } else {
+      if (Reporter::ReportTypeMap.find(
+              utils::Cli::get_instance().get_reporter())
+          != Reporter::ReportTypeMap.end()) {
+        add_reporter(Reporter::MakeReport(
+            Reporter::ReportTypeMap[utils::Cli::get_instance()
+                                        .get_reporter()]));
       }
+    }
 
 #ifdef ENABLE_TRAVEL_TRACKING
-      add_reporter(Reporter::MakeReport(Reporter::TRAVEL_TRACKING_REPORTER));
+    add_reporter(Reporter::MakeReport(Reporter::TRAVEL_TRACKING_REPORTER));
 #endif
 
-      // initialize reporters
-      for (auto* reporter : reporters_) {
-        reporter->initialize(utils::Cli::get_instance().get_job_number(),
-                             utils::Cli::get_instance().get_output_path());
-      }
-      spdlog::info("Model initialized reporters.");
-
-      scheduler_->initialize(
-          config_->get_simulation_timeframe().get_starting_date(),
-          config_->get_simulation_timeframe().get_ending_date());
-      spdlog::info("Model initialized scheduler.");
-
-      set_treatment_strategy(
-          config_->get_strategy_parameters().get_initial_strategy_id());
-      spdlog::info("Model initialized treatment strategy.");
-
-      build_initial_treatment_coverage();
-      spdlog::info("Model initialized treatment coverage model.");
-
-      mdc_->initialize();
-      spdlog::info("Model initialized data collector.");
-
-      spdlog::info("Model initializing population...");
-      population_->initialize();
-      spdlog::info("Model initialized population.");
-
-      config_->get_movement_settings().get_spatial_model()->prepare();
-      spdlog::info("Model initialized movement model.");
-
-      mosquito_->initialize(config_.get());
-      spdlog::info("Model initialized mosquito.");
-
-      population_->introduce_initial_cases();
-      spdlog::info("Model initialized initial cases.");
-
-      for (auto* event : config_->get_population_events().get_events()) {
-        spdlog::info("Model initialized population event: " + event->name());
-        scheduler_->schedule_population_event(event);
-      }
-
-      if (utils::Cli::get_instance().get_record_movement()) {
-        // Generate a movement reporter
-        Reporter* reporter =
-            Reporter::MakeReport(Reporter::ReportType::MOVEMENT_REPORTER);
-        add_reporter(reporter);
-        reporter->initialize(utils::Cli::get_instance().get_job_number(),
-                             utils::Cli::get_instance().get_output_path());
-      }
-      is_initialized_ = true;
-    } else {
-      spdlog::error("Failed to load configuration file: "
-                    + utils::Cli::get_instance().get_input_path());
+    // initialize reporters
+    for (auto* reporter : reporters_) {
+      reporter->initialize(utils::Cli::get_instance().get_job_number(),
+                            utils::Cli::get_instance().get_output_path());
     }
+    spdlog::info("Model initialized reporters.");
+
+    scheduler_->initialize(
+        config_->get_simulation_timeframe().get_starting_date(),
+        config_->get_simulation_timeframe().get_ending_date());
+    spdlog::info("Model initialized scheduler.");
+
+    set_treatment_strategy(
+        config_->get_strategy_parameters().get_initial_strategy_id());
+    spdlog::info("Model initialized treatment strategy.");
+
+    build_initial_treatment_coverage();
+    spdlog::info("Model initialized treatment coverage model.");
+
+    mdc_->initialize();
+    spdlog::info("Model initialized data collector.");
+
+    spdlog::info("Model initializing population...");
+    population_->initialize();
+    spdlog::info("Model initialized population.");
+
+    config_->get_movement_settings().get_spatial_model()->prepare();
+    spdlog::info("Model initialized movement model.");
+
+    mosquito_->initialize(config_.get());
+    spdlog::info("Model initialized mosquito.");
+
+    population_->introduce_initial_cases();
+    spdlog::info("Model initialized initial cases.");
+
+    for (auto* event : config_->get_population_events().get_events()) {
+      spdlog::info("Model initialized population event: " + event->name());
+      scheduler_->schedule_population_event(event);
+    }
+
+    if (utils::Cli::get_instance().get_record_movement()) {
+      // Generate a movement reporter
+      Reporter* reporter =
+          Reporter::MakeReport(Reporter::ReportType::MOVEMENT_REPORTER);
+      add_reporter(reporter);
+      reporter->initialize(utils::Cli::get_instance().get_job_number(),
+                            utils::Cli::get_instance().get_output_path());
+    }
+    is_initialized_ = true;
+  } else {
+    spdlog::error("Failed to load configuration file: "
+                  + utils::Cli::get_instance().get_input_path());
   }
   return is_initialized_;
 }
@@ -175,14 +185,13 @@ void Model::release() {
       having_drug_update_function_);
   ObjectHelpers::delete_pointer<ImmunityClearanceUpdateFunction>(
       clinical_update_function_);
-  ObjectHelpers::delete_pointer<Population>(population_);
   ObjectHelpers::delete_pointer<ModelDataCollector>(mdc_);
 
   treatment_strategy_ = nullptr;
   ObjectHelpers::delete_pointer<ITreatmentCoverageModel>(treatment_coverage_);
 
-  ObjectHelpers::delete_pointer<utils::Random>(random_);
-
+  population_.reset();
+  random_.reset();
   scheduler_.reset();
   config_.reset();
 
@@ -251,7 +260,7 @@ void Model::daily_update() {
   // event used the prmc at the tracking index for the today infection
   auto tracking_index =
       scheduler_->current_time() % config_->number_of_tracking_days();
-  mosquito_->infect_new_cohort_in_PRMC(config_.get(), random_, population_,
+  mosquito_->infect_new_cohort_in_PRMC(config_.get(), random_.get(), population_.get(),
                                        tracking_index);
 
   // this function must be called after mosquito infect new cohort in prmc
@@ -288,19 +297,15 @@ void Model::add_reporter(Reporter* reporter) {
   reporter->set_model(this);
 }
 
-utils::Random* Model::get_random() { return get_instance().random_; }
+ModelDataCollector* Model::get_mdc() { return get_instance()->mdc_; }
 
-ModelDataCollector* Model::get_mdc() { return get_instance().mdc_; }
-
-Population* Model::get_population() { return get_instance().population_; }
-
-Mosquito* Model::get_mosquito() { return get_instance().mosquito_; }
+Mosquito* Model::get_mosquito() { return get_instance()->mosquito_; }
 
 IStrategy* Model::get_treatment_strategy() {
-  return get_instance().treatment_strategy_;
+  return get_instance()->treatment_strategy_;
 }
 
 ITreatmentCoverageModel* Model::get_treatment_coverage() {
-  return get_instance().treatment_coverage_;
+  return get_instance()->treatment_coverage_;
 }
 

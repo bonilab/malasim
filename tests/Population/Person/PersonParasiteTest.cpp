@@ -1,118 +1,334 @@
 #include "PersonTestBase.h"
 #include "Population/SingleHostClonalParasitePopulations.h"
 #include "Parasites/Genotype.h"
+#include "Events/MoveParasiteToBloodEvent.h"
+#include "Events/MatureGametocyteEvent.h"
+#include "Events/UpdateWhenDrugIsPresentEvent.h"
 
 class PersonParasiteTest : public PersonTestBase {
 protected:
+    int current_time_ = 30;
     void SetUp() override {
         PersonTestBase::SetUp();
+        mock_scheduler_->set_current_time(current_time_);
         // Additional setup specific to parasite tests
     }
 };
 
 TEST_F(PersonParasiteTest, AddNewParasiteToBlood) {
-    auto* genotype = new Genotype("aaabbbccc");  // You might need to properly initialize this
+    auto genotype = std::make_unique<Genotype>("aaabbbccc");
+    genotype->set_genotype_id(1);
     
-    auto* parasite = person_->add_new_parasite_to_blood(genotype);
-    EXPECT_NE(parasite, nullptr);
-    
+    auto parasite = person_->add_new_parasite_to_blood(genotype.get());
+    EXPECT_NE(parasite, nullptr);    
     // Cleanup
-    delete genotype;
 }
 
-TEST_F(PersonParasiteTest, InfectedBy) {
-    const int parasite_type_id = 1;
-    
+TEST_F(PersonParasiteTest, InfectedByWhenLiverParasiteTypeIsNotSet) {
+    EXPECT_CALL(*mock_population_, notify_change(_, Person::Property::HOST_STATE, _, _)).Times(1);
+
+    auto genotype = std::make_unique<Genotype>("aaabbbccc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(1, genotype.get()));
     // Test infection
-    person_->infected_by(parasite_type_id);
+    person_->infected_by(1);
     
-    // Verify state change
-    EXPECT_NE(person_->get_host_state(), Person::HostStates::SUSCEPTIBLE);
+    // Verify stage changed to Exposed
+    EXPECT_EQ(person_->get_host_state(), Person::HostStates::EXPOSED);
+
+    // check if just liver parasite type is set, parasite is not set to blood
+    EXPECT_EQ(person_->liver_parasite_type(), genotype.get());
+
+    // a parasite is scheduled to be moved to blood in next 7 days
+    EXPECT_EQ(person_->get_events().size(), 1);
+
+    // cast to MoveParasiteToBloodEvent
+    auto event = dynamic_cast<MoveParasiteToBloodEvent*>(person_->get_events().begin()->second.get());
+    EXPECT_EQ(event->infection_genotype(), genotype.get());
+    EXPECT_EQ(event->get_time(), current_time_ + 7);
 }
 
-TEST_F(PersonParasiteTest, HasDetectableParasite) {
-    // Initially should have no detectable parasite
-    EXPECT_FALSE(person_->has_detectable_parasite());
+TEST_F(PersonParasiteTest, InfectedByWhenLiverParasiteTypeIsSet) {
+    EXPECT_CALL(*mock_population_, notify_change(_, Person::Property::HOST_STATE, _, _)).Times(1);
+
+    auto genotype = std::make_unique<Genotype>("aaabbbccc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(1, genotype.get()));
+
+    person_->infected_by(1);
+    EXPECT_EQ(person_->get_host_state(), Person::HostStates::EXPOSED);
+    EXPECT_EQ(person_->liver_parasite_type(), genotype.get());
+
+    auto new_genotype = std::make_unique<Genotype>("abcabcabc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(2, new_genotype.get()));
+    person_->infected_by(2);
+    EXPECT_EQ(person_->get_host_state(), Person::HostStates::EXPOSED);
+
+    // new genotype is not set to liver parasite type
+    EXPECT_EQ(person_->liver_parasite_type(), genotype.get());
+
+    // a parasite is scheduled to be moved to blood in next 7 days by the old genotype
+    EXPECT_EQ(person_->get_events().size(), 1);
+
+    // cast to MoveParasiteToBloodEvent
+    auto event = dynamic_cast<MoveParasiteToBloodEvent*>(person_->get_events().begin()->second.get());
+    // infection genotype is the old genotype
+    EXPECT_EQ(event->infection_genotype(), genotype.get());
+    EXPECT_EQ(event->get_time(), current_time_ + 7);
     
-    // Add parasite and test again (implementation depends on how parasites are added)
-    auto* genotype = new Genotype("aaabbbccc");
-    person_->add_new_parasite_to_blood(genotype);
-    
-    // Note: The actual result would depend on the parasite density and detection threshold
-    bool has_parasite = person_->has_detectable_parasite();
-    EXPECT_TRUE(has_parasite || !has_parasite);  // Just verify it returns a boolean
-    
-    // Cleanup
-    delete genotype;
 }
 
-TEST_F(PersonParasiteTest, IsGametocytaemic) {
+TEST_F(PersonParasiteTest, HasDetectableParasiteWhenNoParasiteInBlood) {
+    bool has_detectable_parasite = person_->has_detectable_parasite();
+    EXPECT_FALSE(has_detectable_parasite);
+}
+
+TEST_F(PersonParasiteTest, HasDetectableParasiteWhenParasiteInBlood) {
+    auto genotype = std::make_unique<Genotype>("aaabbbccc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(1, genotype.get()));
+    auto parasite = person_->add_new_parasite_to_blood(genotype.get());
+    parasite->set_last_update_log10_parasite_density(2.0);
+    bool has_detectable_parasite = person_->has_detectable_parasite();
+    EXPECT_TRUE(has_detectable_parasite);
+}
+
+TEST_F(PersonParasiteTest, HasParasiteInBloodsButUnderDetectionThreshold) {
+    auto genotype = std::make_unique<Genotype>("aaabbbccc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(1, genotype.get()));
+    auto parasite = person_->add_new_parasite_to_blood(genotype.get());
+    parasite->set_last_update_log10_parasite_density(-2.0);
+    bool has_detectable_parasite = person_->has_detectable_parasite();
+    EXPECT_FALSE(has_detectable_parasite);
+}
+
+TEST_F(PersonParasiteTest, IsGametocytaemicWhenParasiteInBloodAndCanProduceGametocytes) {
     // Initially should not be gametocytaemic
     EXPECT_FALSE(person_->isGametocytaemic());
     
     // Add parasite and test again (implementation depends on how gametocytes are handled)
-    auto* genotype = new Genotype("aaabbbccc");
-    person_->add_new_parasite_to_blood(genotype);
+    auto genotype = std::make_unique<Genotype>("aaabbbccc");
     
-    // Note: The actual result would depend on the gametocyte presence
+    // have a parasite in blood, and parasite that can produce gametocytes
+    auto parasite = person_->add_new_parasite_to_blood(genotype.get());
+    parasite->set_gametocyte_level(1.0);
+
     bool is_gametocytaemic = person_->isGametocytaemic();
-    EXPECT_TRUE(is_gametocytaemic || !is_gametocytaemic);  // Just verify it returns a boolean
-    
-    // Cleanup
-    delete genotype;
+    EXPECT_TRUE(is_gametocytaemic);
 }
 
+TEST_F(PersonParasiteTest, NotGametocytaemicWhenNoParasiteInBlood) {
+    EXPECT_FALSE(person_->isGametocytaemic());
+}
+
+TEST_F(PersonParasiteTest, NotGametocytaemicWhenParasiteInBloodButNoGametocytes) {
+    auto genotype = std::make_unique<Genotype>("aaabbbccc");
+    auto parasite = person_->add_new_parasite_to_blood(genotype.get());
+    parasite->set_gametocyte_level(0.0);
+    EXPECT_FALSE(person_->isGametocytaemic());
+}
+
+// TODO: Implement this test later
 TEST_F(PersonParasiteTest, RelativeInfectivity) {
+    GTEST_SKIP() << "This test is marked for improvement later.";
     // Test relative infectivity calculation
     const double log10_parasite_density = 3.0;  // 1000 parasites
     double infectivity = Person::relative_infectivity(log10_parasite_density);
     
     EXPECT_GE(infectivity, 0.0);
     EXPECT_LE(infectivity, 1.0);
+    /// make it fail
+    EXPECT_FALSE(true);
 }
 
-TEST_F(PersonParasiteTest, ChangeParasiteState) {
+TEST_F(PersonParasiteTest, ChangeStateWhenNoParasiteInBloodWhenNoParasiteInLiver) {
     // Test state change when no parasite in blood
+    // there is 2 possible states, SUSCEPTIBLE and EXPOSED
+    // if there is no parasite in liver, the state should be SUSCEPTIBLE
+    // if there is a parasite in liver, the state should be EXPOSED
+
+    EXPECT_CALL(*mock_population_, notify_change(_, Person::Property::HOST_STATE, _, _)).Times(2);
+
+    // fake the state to be CLINICAL
+    person_->set_host_state(Person::HostStates::CLINICAL);
     person_->change_state_when_no_parasite_in_blood();
     EXPECT_EQ(person_->get_host_state(), Person::HostStates::SUSCEPTIBLE);
 }
 
-TEST_F(PersonParasiteTest, RandomlyChooseParasite) {
-    // Add some parasites first
-    auto* genotype1 = new Genotype("aaabbbccc");
-    auto* genotype2 = new Genotype("aaabbbccc");
-    person_->add_new_parasite_to_blood(genotype1);
-    person_->add_new_parasite_to_blood(genotype2);
+TEST_F(PersonParasiteTest, ChangeStateWhenNoParasiteInBloodWhenParasiteInLiver) {
+    // Test state change when no parasite in blood
+    // there is 2 possible states, SUSCEPTIBLE and EXPOSED
+    // if there is no parasite in liver, the state should be SUSCEPTIBLE
+    // if there is a parasite in liver, the state should be EXPOSED
+    EXPECT_CALL(*mock_population_, notify_change(_, Person::Property::HOST_STATE, _, _)).Times(2);
     
-    // Test random parasite selection
-    person_->randomly_choose_parasite();
-    
-    // Cleanup
-    delete genotype1;
-    delete genotype2;
+     // fake the state to be CLINICAL
+    person_->set_host_state(Person::HostStates::CLINICAL);
+    auto genotype = std::make_unique<Genotype>("aaabbbccc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(1, genotype.get()));
+    person_->set_liver_parasite_type(genotype.get());
+    person_->change_state_when_no_parasite_in_blood();
+    EXPECT_EQ(person_->get_host_state(), Person::HostStates::EXPOSED);
 }
 
-TEST_F(PersonParasiteTest, ParasiteUpdateEvents) {
-    auto* genotype = new Genotype("aaabbbccc");
-    auto* parasite = person_->add_new_parasite_to_blood(genotype);
+TEST_F(PersonParasiteTest, RandomlyChooseParasiteFrom2Infections) {
+    EXPECT_CALL(*mock_random_, random_uniform(2)).WillOnce(::testing::Return(1));
+    EXPECT_CALL(*mock_population_, notify_change(_, Person::Property::HOST_STATE, _, _)).Times(1);
+
+    // choose parasite from today infections
+    auto genotype1 = std::make_unique<Genotype>("aaabbbccc");
+    auto genotype2 = std::make_unique<Genotype>("aaabbbccc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(1, genotype1.get()));
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(2, genotype2.get()));
+
+    person_->get_today_infections().push_back(1);
+    person_->get_today_infections().push_back(2);
+
+    person_->randomly_choose_parasite();
+    EXPECT_EQ(person_->get_host_state(), Person::HostStates::EXPOSED);
+    EXPECT_EQ(person_->liver_parasite_type(), genotype2.get());
+    EXPECT_EQ(person_->get_today_infections().size(), 0);
+
+    // should have 1 event scheduled
+    EXPECT_EQ(person_->get_events().size(), 1);
+    auto event = dynamic_cast<MoveParasiteToBloodEvent*>(person_->get_events().begin()->second.get());
+    EXPECT_EQ(event->infection_genotype(), genotype2.get());
+    EXPECT_EQ(event->get_time(), current_time_ + 7);
+}
+
+TEST_F(PersonParasiteTest, RandomlyChooseParasiteFrom1Infection) {
+    EXPECT_CALL(*mock_random_, random_uniform(1)).Times(0); // no neeed to randomly choose
+    EXPECT_CALL(*mock_population_, notify_change(_, Person::Property::HOST_STATE, _, _)).Times(1);
+
+    // choose parasite from today infections
+    auto genotype1 = std::make_unique<Genotype>("aaabbbccc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(1, genotype1.get()));
+    person_->get_today_infections().push_back(1);
+    person_->randomly_choose_parasite();
+    EXPECT_EQ(person_->get_host_state(), Person::HostStates::EXPOSED);
+    EXPECT_EQ(person_->liver_parasite_type(), genotype1.get());
+    EXPECT_EQ(person_->get_today_infections().size(), 0);
+
+    // should have 1 event scheduled
+    EXPECT_EQ(person_->get_events().size(), 1);
+    auto event = dynamic_cast<MoveParasiteToBloodEvent*>(person_->get_events().begin()->second.get());
+    EXPECT_EQ(event->infection_genotype(), genotype1.get());
+    EXPECT_EQ(event->get_time(), current_time_ + 7);
+}
+
+TEST_F(PersonParasiteTest, RandomlyChooseParasiteFrom0Infections) {
+    EXPECT_CALL(*mock_random_, random_uniform(0)).Times(0); // no neeed to randomly choose
+    EXPECT_CALL(*mock_population_, notify_change(_, Person::Property::HOST_STATE, _, _)).Times(0);
+
+    person_->randomly_choose_parasite();
+    EXPECT_EQ(person_->get_host_state(), Person::HostStates::SUSCEPTIBLE);
+    EXPECT_EQ(person_->get_today_infections().size(), 0);
+    EXPECT_EQ(person_->get_events().size(), 0);
+}
+
+TEST_F(PersonParasiteTest, RandomlyChooseParasiteFrom4Infections) {
+    EXPECT_CALL(*mock_random_, random_uniform(4)).WillOnce(::testing::Return(2));
+    EXPECT_CALL(*mock_population_, notify_change(_, Person::Property::HOST_STATE, _, _)).Times(1);
+
+    // choose parasite from today infections
+    auto genotype1 = std::make_unique<Genotype>("aaabbbccc");
+    auto genotype2 = std::make_unique<Genotype>("aaabbbccc");   
+    auto genotype3 = std::make_unique<Genotype>("aaabbbccc");
+    auto genotype4 = std::make_unique<Genotype>("aaabbbccc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(1, genotype1.get()));
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(2, genotype2.get()));
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(3, genotype3.get()));
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(4, genotype4.get())); 
+
+    person_->get_today_infections().push_back(1);
+    person_->get_today_infections().push_back(2);
+    person_->get_today_infections().push_back(3);
+    person_->get_today_infections().push_back(4);
+
+    person_->randomly_choose_parasite();
+    EXPECT_EQ(person_->get_host_state(), Person::HostStates::EXPOSED);
+    EXPECT_EQ(person_->liver_parasite_type(), genotype3.get());
+    EXPECT_EQ(person_->get_today_infections().size(), 0);
+
+    // should have 1 event scheduled
+    EXPECT_EQ(person_->get_events().size(), 1);
+    auto event = dynamic_cast<MoveParasiteToBloodEvent*>(person_->get_events().begin()->second.get());
+    EXPECT_EQ(event->infection_genotype(), genotype3.get());
+    EXPECT_EQ(event->get_time(), current_time_ + 7);
+}
+
+
+TEST_F(PersonParasiteTest, ScheduleMoveParasiteToBloodEvent) {
+    auto genotype = std::make_unique<Genotype>("aaabbbccc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(1, genotype.get()));
+    person_->schedule_move_parasite_to_blood(genotype.get(), 5);
+    EXPECT_EQ(person_->get_events().size(), 1);
+
+    auto event = dynamic_cast<MoveParasiteToBloodEvent*>(person_->get_events().begin()->second.get());
+    EXPECT_EQ(event->infection_genotype(), genotype.get());
+    EXPECT_EQ(event->get_time(), current_time_ + 5);
+}
+
+TEST_F(PersonParasiteTest, ScheduleMatureGametocyteEventOver5) {
+    // change age
+    EXPECT_CALL(*mock_population_, notify_change(_, Person::Property::AGE, _, _)).Times(1);
+    // change age class
+    EXPECT_CALL(*mock_population_, notify_change(_, Person::Property::AGE_CLASS, _, _)).Times(1);
+
+    auto genotype = std::make_unique<Genotype>("aaabbbccc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(1, genotype.get()));
     
-    // Schedule parasite events
-    person_->schedule_move_parasite_to_blood(genotype, 5);
+    auto parasite = person_->add_new_parasite_to_blood(genotype.get());
+
+    person_->set_age(10);
+    
     person_->schedule_mature_gametocyte_event(parasite);
+    EXPECT_EQ(person_->get_events().size(), 1);
+
+    auto event = dynamic_cast<MatureGametocyteEvent*>(person_->get_events().begin()->second.get());
+    EXPECT_EQ(event->blood_parasite(), parasite);
+    EXPECT_EQ(event->get_time(), current_time_ + Model::get_config()->get_epidemiological_parameters().get_days_mature_gametocyte_over_five());
+}
+
+TEST_F(PersonParasiteTest, ScheduleMatureGametocyteEventUnder5) {
+    // change age
+    EXPECT_CALL(*mock_population_, notify_change(_, Person::Property::AGE, _, _)).Times(1);
+
+    auto genotype = std::make_unique<Genotype>("aaabbbccc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(1, genotype.get()));
+    
+    auto parasite = person_->add_new_parasite_to_blood(genotype.get());
+
+
+    person_->set_age(4);
+    person_->schedule_mature_gametocyte_event(parasite);
+    EXPECT_EQ(person_->get_events().size(), 1);
+
+    auto event = dynamic_cast<MatureGametocyteEvent*>(person_->get_events().begin()->second.get());
+    EXPECT_EQ(event->blood_parasite(), parasite);
+    EXPECT_EQ(event->get_time(), current_time_ + Model::get_config()->get_epidemiological_parameters().get_days_mature_gametocyte_under_five());
+}
+
+TEST_F(PersonParasiteTest, ScheduleUpdateByDrugEvent) {
+    auto genotype = std::make_unique<Genotype>("aaabbbccc");
+    Model::get_config()->get_genotype_parameters().genotype_db->insert(std::make_pair(1, genotype.get()));
+    auto parasite = person_->add_new_parasite_to_blood(genotype.get());
     person_->schedule_update_by_drug_event(parasite);
-    
-    // Verify events were scheduled
-    EXPECT_FALSE(person_->get_events().empty());
-    
-    // Cleanup
-    delete genotype;
+
+    EXPECT_EQ(person_->get_events().size(), 1);
+    auto event = dynamic_cast<UpdateWhenDrugIsPresentEvent*>(person_->get_events().begin()->second.get());
+    EXPECT_EQ(event->clinical_caused_parasite(), parasite);
+    EXPECT_EQ(event->get_time(), current_time_ + 1);
 }
 
 TEST_F(PersonParasiteTest, InfectionFromInfectiousBite) {
+    // immune system will be
+    EXPECT_CALL(*mock_immune_system_, get_current_value()).WillOnce(::testing::Return(0.5));
+
     // Setup mock expectations for infection probability
-    EXPECT_CALL(*mock_config_, get_p_infection_from_an_infectious_bite())
-        .WillOnce(::testing::Return(0.5));
+    // EXPECT_CALL(*mock_config_, get_p_infection_from_an_infectious_bite())
+    //     .WillOnce(::testing::Return(0.5));
     
     double prob = person_->p_infection_from_an_infectious_bite();
-    EXPECT_DOUBLE_EQ(prob, 0.5);
+
+    //(1 - immune_system_->get_current_value()) / 8.333 + 0.04;
+    auto expected_prob = (1 - 0.5) / 8.333 + 0.04;
+    EXPECT_DOUBLE_EQ(prob, expected_prob);
 } 

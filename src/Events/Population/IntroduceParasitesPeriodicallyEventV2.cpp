@@ -99,7 +99,7 @@ void IntroduceParasitesPeriodicallyEventV2::do_execute() {
 
     blood_parasite->set_gametocyte_level(Model::get_config()->get_epidemiological_parameters().get_gametocyte_level_full());
     blood_parasite->set_last_update_log10_parasite_density(size);
-    blood_parasite->set_update_function(Model::get_instance().immunity_clearance_update_function());
+    blood_parasite->set_update_function(Model::get_instance()->immunity_clearance_update_function());
   }
   spdlog::info("Day {}: Importing v2 {} at location {}",
                 Model::get_scheduler()->current_time(), number_of_importation_cases,

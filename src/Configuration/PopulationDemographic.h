@@ -14,22 +14,16 @@ public:
   [[nodiscard]] int get_number_of_age_classes() const {
     return number_of_age_classes_;
   }
-  // Setters with validation
-  void set_number_of_age_classes(const int value) {
-    if (value <= 0)
-      throw std::invalid_argument(
-          "number_of_age_classes must be greater than 0");
-    number_of_age_classes_ = value;
-  }
 
-  [[nodiscard]] std::vector<int> &get_age_structure() {
+  [[nodiscard]] const std::vector<int> &get_age_structure() const {
     return age_structure_;
   }
   void set_age_structure(const std::vector<int> &value) {
-    if (value.size() != number_of_age_classes_)
-      throw std::invalid_argument(
-          "age_structure size must match number_of_age_classes");
+    if (value.size() <= 0){
+      throw std::invalid_argument("age_structure size must be greater than 0");
+    }
     age_structure_ = value;
+    number_of_age_classes_ = value.size();
   }
 
   [[nodiscard]] const std::vector<int> &get_initial_age_structure() const {
@@ -91,20 +85,19 @@ public:
   }
 
 private:
-  int number_of_age_classes_ = 15;
-  std::vector<int> age_structure_;
-  std::vector<int> initial_age_structure_;
-  double birth_rate_ = 0.0288;
-  std::vector<double> death_rate_by_age_class_;
-  std::vector<double> mortality_when_treatment_fail_by_age_class_;
-  double artificial_rescaling_of_population_size_ = 0.25;
+  int number_of_age_classes_{-1}; // read only
+  std::vector<int> age_structure_{};
+  std::vector<int> initial_age_structure_{};
+  double birth_rate_{0.0};
+  std::vector<double> death_rate_by_age_class_{};
+  std::vector<double> mortality_when_treatment_fail_by_age_class_{};
+  double artificial_rescaling_of_population_size_{1.0};
 };
 
 template <>
 struct YAML::convert<PopulationDemographic> {
   static Node encode(PopulationDemographic &rhs) {
     Node node;
-    node["number_of_age_classes"] = rhs.get_number_of_age_classes();
     node["age_structure"] = rhs.get_age_structure();
     node["initial_age_structure"] = rhs.get_initial_age_structure();
     node["birth_rate"] = rhs.get_birth_rate();
@@ -117,9 +110,6 @@ struct YAML::convert<PopulationDemographic> {
   }
 
   static bool decode(const Node &node, PopulationDemographic &rhs) {
-    if (!node["number_of_age_classes"]) {
-      throw std::runtime_error("Missing 'number_of_age_classes' field.");
-    }
     if (!node["age_structure"]) {
       throw std::runtime_error("Missing 'age_structure' field.");
     }
@@ -140,9 +130,6 @@ struct YAML::convert<PopulationDemographic> {
       throw std::runtime_error(
           "Missing 'artificial_rescaling_of_population_size' field.");
     }
-
-    rhs.set_number_of_age_classes(node["number_of_age_classes"].as<int>());
-
     // Validate and assign age structure vectors
     rhs.set_age_structure(node["age_structure"].as<std::vector<int>>());
 

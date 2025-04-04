@@ -5,7 +5,7 @@ namespace utils{
 class Cli {
 
   struct MaSimAppInput {
-    std::string input_path { "input.yml" };
+    std::string input_path { "" };
     std::string output_path { "" };
     std::string reporter { "" };
     int verbosity { 0 };

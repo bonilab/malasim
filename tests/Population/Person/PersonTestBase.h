@@ -5,123 +5,125 @@
 #include <gtest/gtest.h>
 
 #include "Configuration/Config.h"
+#include "Configuration/PopulationDemographic.h"
+#include "Population/ImmuneSystem/ImmuneSystem.h"
 #include "Population/Person/Person.h"
 #include "Population/Population.h"
 #include "Simulation/Model.h"
+#include "Utils/Random.h"
 #include "date/date.h"
 
 using namespace testing;
 
-// Mock classes
+// Mock classes, if there is no mock method, it is fake class
 class MockConfig : public Config {
 public:
-  MOCK_METHOD(double, get_age_dependent_biting_factor, (const int &), (const));
-  MOCK_METHOD(double, get_p_infection_from_an_infectious_bite, (), (const));
-  MOCK_METHOD(int, number_of_age_classes, (), (const));
-  MOCK_METHOD(const std::vector<int> &, age_structure, (), (const));
-  MOCK_METHOD(const PopulationDemographic &, get_population_demographic, (),
-              (const));
+  MockConfig() : Config() {
+  // Set up simulation timeframe
+    SimulationTimeframe simulation_timeframe_;
+    simulation_timeframe_.set_total_time(1000);
+    set_simulation_timeframe(simulation_timeframe_);
+
+    EpidemiologicalParameters epidemiological_parameters;
+    epidemiological_parameters.set_days_to_clinical_under_five(5);
+    epidemiological_parameters.set_days_to_clinical_over_five(7);
+    epidemiological_parameters.set_days_mature_gametocyte_under_five(10);
+    epidemiological_parameters.set_days_mature_gametocyte_over_five(14);
+    set_epidemiological_parameters(epidemiological_parameters);
+    // configure_immune_system(person_.get(), 0.5);  // Default probability
+    
+    PopulationDemographic population_demographic;
+    auto default_age_structure = std::vector<int>{5, 15, 30, 50, 70, 90};
+    population_demographic.set_age_structure(default_age_structure);
+    population_demographic.set_mortality_when_treatment_fail_by_age_class(std::vector<double>(6, 0.4));
+    population_demographic.set_death_rate_by_age_class(std::vector<double>(6, 0.2));
+    set_population_demographic(population_demographic);
+
+    ImmuneSystemParameters immune_system_parameters;
+    set_immune_system_parameters(immune_system_parameters);
+
+    ParasiteParameters parasite_parameters;
+    // use the default values
+    set_parasite_parameters(parasite_parameters);
+  }
 };
 
 class MockScheduler : public Scheduler {
 public:
-  MockScheduler(Model* model) : Scheduler(model) {}
+  explicit MockScheduler(Model* model) : Scheduler(model) {}
   MOCK_METHOD(void, schedule_population_event, (WorldEvent*));
 };
 
 class MockPopulation : public Population {
 public:
-  MockPopulation(Model* model) : Population(model) {}
+  explicit MockPopulation(Model* model) : Population(model) {}
   MOCK_METHOD(void, notify_change,
               (Person*, const Person::Property &, const void*, const void*));
 };
 
+class MockImmuneSystem : public ImmuneSystem {
+public:
+  explicit MockImmuneSystem(Person* person) : ImmuneSystem(person) {}
+
+  MOCK_METHOD(double, get_current_value, (), (const));
+  MOCK_METHOD(double, get_clinical_progression_probability, (), (const));
+  MOCK_METHOD(void, update, ());
+  MOCK_METHOD(void, draw_random_immune, ());
+};
+
+class MockRandom : public utils::Random {
+public:
+  explicit MockRandom() : Random(nullptr) {}
+  MOCK_METHOD(double, random_normal_double, (double mean, double standard_deviation), (override));
+  MOCK_METHOD(int, random_normal_int, (int mean, double standard_deviation), (override));
+  MOCK_METHOD(double, random_flat, (double, double), (override));
+  MOCK_METHOD(uint64_t, random_uniform, (uint64_t), (override));
+  // MOCK_METHOD(int, random_uniform, (int, int), (override));
+  // MOCK_METHOD(double, random_beta, (double, double), (override));
+  // MOCK_METHOD(double, random_gamma, (double, double), (override));
+};
+
 class PersonTestBase : public ::testing::Test {
 protected:
-  void SetUp() override {
-    // Store original model instance
-    original_model_ = &Model::get_instance();
 
-    // model initialization
+  void SetUp() override {
+    // Get the Model instance, DO NOT initialize it here
+    original_model_ = Model::get_instance();
     original_model_->initialize();
 
-    setup_mock_config();
+    original_model_->set_config(new MockConfig()); 
+    mock_config_ = static_cast<MockConfig*>(original_model_->get_config()); 
 
-    setup_mock_scheduler();
+    original_model_->set_scheduler(new MockScheduler(original_model_));
+    mock_scheduler_ = static_cast<MockScheduler*>(original_model_->get_scheduler());
 
-    setup_mock_population();
+    original_model_->set_random(new MockRandom());
+    mock_random_ = static_cast<MockRandom*>(original_model_->get_random());
 
-    // Create person instance
+    original_model_->set_population(new MockPopulation(original_model_));
+    mock_population_ = static_cast<MockPopulation*>(original_model_->get_population());
+
+    // Create person instance and initialize it (it should use the correctly configured mocks)
     person_ = std::make_unique<Person>();
-    person_->set_population(mock_population_.get());
-    person_->initialize();
+    person_->set_population(mock_population_); 
+    person_->initialize(); 
+    person_->set_immune_system(new MockImmuneSystem(person_.get()));
+    mock_immune_system_ = static_cast<MockImmuneSystem*>(person_->get_immune_system());
   }
 
   void TearDown() override {
-    // Restore original model state
     person_.reset();
-    mock_population_.reset();
-
-    // config will be released automatically
     original_model_->release();
-  }
-
-  void setup_mock_config() {
-    // Setup Model singleton with mock config
-    Model::set_config(new MockConfig());
-    mock_config_ = static_cast<MockConfig*>(Model::get_config());
-
-    // Setup default config expectations
-    age_structure_ = {5, 15, 30, 50, 70, 90};  // Example age structure
-
-    demographic_.set_number_of_age_classes(age_structure_.size());
-    demographic_.set_age_structure(age_structure_);
-    mock_config_->set_population_demographic(demographic_);
-
-    mock_config_->get_simulation_timeframe().set_starting_date(date::year_month_day{date::year(2020), date::month(1), date::day(1)});
-    mock_config_->get_simulation_timeframe().set_ending_date(date::year_month_day{date::year(2030), date::month(1), date::day(1)}); 
-
-    mock_config_->get_simulation_timeframe().process_config();
-  }
-
-  void setup_mock_scheduler() {
-    Model::set_scheduler(new MockScheduler(original_model_));
-    mock_scheduler_ = static_cast<MockScheduler*>(Model::get_scheduler());
-
-    mock_scheduler_->initialize(
-        mock_config_->get_simulation_timeframe().get_starting_date(),
-        mock_config_->get_simulation_timeframe().get_ending_date());
-    
-  }
-
-  void setup_mock_population() {
-    // Model::set_population(new MockPopulation(original_model_));
-    // mock_population_ = static_cast<MockPopulation*>(Model::get_population());
-    mock_population_ = std::make_unique<MockPopulation>(original_model_);
-  }
-
-  // Helper methods
-  void set_person_age(int age) { person_->set_age(age); }
-
-  void set_person_location(int location) { person_->set_location(location); }
-
-  // Helper method to determine expected age class based on age
-  int get_expected_age_class(int age) {
-    int ac = 0;
-    while (ac < (age_structure_.size() - 1) && age >= age_structure_[ac]) {
-      ac++;
-    }
-    return ac;
   }
 
 protected:
   std::unique_ptr<Person> person_;
+  Model* original_model_;
   MockConfig* mock_config_;
   MockScheduler* mock_scheduler_;
-  std::unique_ptr<MockPopulation> mock_population_;
-  Model* original_model_;  // Store original model instance
-  std::vector<int> age_structure_;
-  PopulationDemographic demographic_;  // Add demographic as member variable
+  MockRandom* mock_random_;
+  MockPopulation* mock_population_;
+  MockImmuneSystem* mock_immune_system_;
 };
 
 #endif  // PERSON_TEST_BASE_H
