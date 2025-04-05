@@ -8,21 +8,20 @@
 #include "Configuration/Config.h"
 #include "Core/Scheduler/Scheduler.h"
 #include "Population/ImmuneSystem/ImmunityClearanceUpdateFunction.h"
+#include "Population/ClinicalUpdateFunction.h"
 #include "Population/Population.h"
+#include "MDC/ModelDataCollector.h"
+#include "Mosquito/Mosquito.h"
+#include "Reporters/Reporter.h"
 
 namespace Spatial {
 class Location;
 }
 
-class Reporter;
 class Cli;
 class Population;
-class ModelDataCollector;
-class Mosquito;
 class IStrategy;
 class ITreatmentCoverageModel;
-class ImmunityClearanceUpdateFunction;
-class ClinicalUpdateFunction;
 
 class Model {
 public:
@@ -45,26 +44,29 @@ public:
 
 private:
   // Private constructor and destructor
-  Model(const int &object_pool_size = 100000);
+  // Model(const int &object_pool_size = 100000);
+  Model() = default;
   ~Model() = default;
 
   static Model* instance;
-  bool is_initialized_;
+  bool is_initialized_{false};
 
   std::unique_ptr<Config> config_{nullptr};
   std::unique_ptr<Scheduler> scheduler_{nullptr};
   std::unique_ptr<Population> population_{nullptr};
-  std::unique_ptr<utils::Random> random_;
+  std::unique_ptr<utils::Random> random_{nullptr};
   std::unique_ptr<GenotypeDatabase> genotype_db_{nullptr};
-  ModelDataCollector* mdc_;
-  Mosquito* mosquito_;
+  std::unique_ptr<ModelDataCollector> mdc_{nullptr};
+  std::unique_ptr<Mosquito> mosquito_{nullptr};
+  std::unique_ptr<ClinicalUpdateFunction> progress_to_clinical_update_function_{nullptr};
+  std::unique_ptr<ImmunityClearanceUpdateFunction> immunity_clearance_update_function_{nullptr};
+  std::unique_ptr<ImmunityClearanceUpdateFunction> having_drug_update_function_{nullptr};
+  std::unique_ptr<ImmunityClearanceUpdateFunction> clinical_update_function_{nullptr};
+
+  std::vector<std::unique_ptr<Reporter>> reporters_{};
+
   IStrategy* treatment_strategy_{nullptr};
   ITreatmentCoverageModel* treatment_coverage_{nullptr};
-  ClinicalUpdateFunction* progress_to_clinical_update_function_;
-  ImmunityClearanceUpdateFunction* immunity_clearance_update_function_;
-  ImmunityClearanceUpdateFunction* having_drug_update_function_;
-  ImmunityClearanceUpdateFunction* clinical_update_function_;
-  std::vector<Reporter*> reporters_;
 
 public:
   void before_run();
@@ -104,23 +106,47 @@ public:
     get_instance()->genotype_db_.reset(genotype_db);
   }
   
-  static ModelDataCollector* get_mdc();
-  static Mosquito* get_mosquito();
-  static ITreatmentCoverageModel* get_treatment_coverage();
-  static IStrategy* get_treatment_strategy();
+  static ModelDataCollector* get_mdc() { return get_instance()->mdc_.get(); }
+  static void set_mdc(ModelDataCollector* mdc) {
+    get_instance()->mdc_.reset(mdc);
+  }
+
+  static Mosquito* get_mosquito() { return get_instance()->mosquito_.get(); }
+  static void set_mosquito(Mosquito* mosquito) {
+    get_instance()->mosquito_.reset(mosquito);
+  }
 
   ClinicalUpdateFunction* progress_to_clinical_update_function() {
-    return progress_to_clinical_update_function_;
+    return get_instance()->progress_to_clinical_update_function_.get();
   }
+  void set_progress_to_clinical_update_function(ClinicalUpdateFunction* function) {
+    get_instance()->progress_to_clinical_update_function_.reset(function);
+  }
+
+  
   ImmunityClearanceUpdateFunction* having_drug_update_function() {
-    return having_drug_update_function_;
+    return get_instance()->having_drug_update_function_.get();
   }
+  void set_having_drug_update_function(ImmunityClearanceUpdateFunction* function) {
+    get_instance()->having_drug_update_function_.reset(function);
+  }
+
   ImmunityClearanceUpdateFunction* immunity_clearance_update_function() {
-    return immunity_clearance_update_function_;
+    return get_instance()->immunity_clearance_update_function_.get();
   }
+  void set_immunity_clearance_update_function(ImmunityClearanceUpdateFunction* function) {
+    get_instance()->immunity_clearance_update_function_.reset(function);
+  }
+
   ImmunityClearanceUpdateFunction* clinical_update_function() {
-    return clinical_update_function_;
+    return get_instance()->clinical_update_function_.get();
   }
+  void set_clinical_update_function(ImmunityClearanceUpdateFunction* function) {
+    get_instance()->clinical_update_function_.reset(function);
+  }
+
+  static ITreatmentCoverageModel* get_treatment_coverage();
+  static IStrategy* get_treatment_strategy();
 
   void set_treatment_coverage(ITreatmentCoverageModel* tcm);
   void set_treatment_strategy(const int &strategy_id);

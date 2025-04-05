@@ -10,8 +10,6 @@
 #include "Configuration/Config.h"
 #include "MDC/ModelDataCollector.h"
 #include "Mosquito/Mosquito.h"
-#include "Population/ClinicalUpdateFunction.h"
-#include "Population/ImmuneSystem/ImmunityClearanceUpdateFunction.h"
 #include "Reporters/Reporter.h"
 #include "Treatment/SteadyTCM.h"
 #include "Utils/Cli.hxx"
@@ -19,29 +17,6 @@
 
 Model* Model::instance = nullptr;
 
-// Private constructor: creates the Config instance
-Model::Model(const int &object_pool_size)
-    : is_initialized_(false),
-      config_(nullptr),
-      scheduler_(nullptr),
-      random_(nullptr),
-      population_(nullptr),
-      mdc_(nullptr),
-      mosquito_(nullptr),
-      treatment_strategy_(nullptr),
-      treatment_coverage_(nullptr),
-      genotype_db_(nullptr) {
-  // initialize_object_pool(object_pool_size);
-}
-
-void Model::set_treatment_strategy(const int &strategy_id) {
-  treatment_strategy_ =
-      strategy_id == -1
-          ? nullptr
-          : config_->get_strategy_parameters().strategy_db[strategy_id];
-  treatment_strategy_->adjust_started_time_point(
-      Model::get_scheduler()->current_time());
-}
 
 void Model::set_treatment_coverage(ITreatmentCoverageModel* tcm) {
   if (treatment_coverage_ != tcm) {
@@ -70,15 +45,15 @@ bool Model::initialize() {
   random_ = std::make_unique<utils::Random>(nullptr, -1);
   scheduler_ = std::make_unique<Scheduler>(this);
   population_ = std::make_unique<Population>(this);
+  mdc_ = std::make_unique<ModelDataCollector>(this);
+  mosquito_ = std::make_unique<Mosquito>(this);
 
-  mdc_ = new ModelDataCollector(this);
-  mosquito_ = new Mosquito(this);
-
-  progress_to_clinical_update_function_ = new ClinicalUpdateFunction(this);
+  progress_to_clinical_update_function_ = std::make_unique<ClinicalUpdateFunction>(this);
   immunity_clearance_update_function_ =
-      new ImmunityClearanceUpdateFunction(this);
-  having_drug_update_function_ = new ImmunityClearanceUpdateFunction(this);
-  clinical_update_function_ = new ImmunityClearanceUpdateFunction(this);
+      std::make_unique<ImmunityClearanceUpdateFunction>(this);
+  having_drug_update_function_ = std::make_unique<ImmunityClearanceUpdateFunction>(this);
+  clinical_update_function_ = std::make_unique<ImmunityClearanceUpdateFunction>(this);
+  reporters_.clear();
 
   if (utils::Cli::get_instance().get_input_path().empty()) {
     // spdlog::error("Input path is empty. Please provide a valid input path.");
@@ -122,7 +97,7 @@ bool Model::initialize() {
 #endif
 
     // initialize reporters
-    for (auto* reporter : reporters_) {
+    for (auto& reporter : reporters_) {
       reporter->initialize(utils::Cli::get_instance().get_job_number(),
                             utils::Cli::get_instance().get_output_path());
     }
@@ -179,28 +154,24 @@ bool Model::initialize() {
 
 void Model::release() {
   // Clean up the memory used by the model
-  ObjectHelpers::delete_pointer<ClinicalUpdateFunction>(
-      progress_to_clinical_update_function_);
-  ObjectHelpers::delete_pointer<ImmunityClearanceUpdateFunction>(
-      immunity_clearance_update_function_);
-  ObjectHelpers::delete_pointer<ImmunityClearanceUpdateFunction>(
-      having_drug_update_function_);
-  ObjectHelpers::delete_pointer<ImmunityClearanceUpdateFunction>(
-      clinical_update_function_);
-  ObjectHelpers::delete_pointer<ModelDataCollector>(mdc_);
 
   treatment_strategy_ = nullptr;
   ObjectHelpers::delete_pointer<ITreatmentCoverageModel>(treatment_coverage_);
 
+  progress_to_clinical_update_function_.reset();
+  immunity_clearance_update_function_.reset();
+  having_drug_update_function_.reset();
+  clinical_update_function_.reset();
+
+  mosquito_.reset();
+  mdc_.reset();
   genotype_db_.reset();
   population_.reset();
   random_.reset();
   scheduler_.reset();
   config_.reset();
 
-  for (Reporter* reporter : reporters_) {
-    ObjectHelpers::delete_pointer<Reporter>(reporter);
-  }
+  // simply clear the vector, the unique_ptr will be deleted automatically
   reporters_.clear();
 }
 
@@ -216,7 +187,7 @@ void Model::run() {
 
 void Model::before_run() {
   spdlog::info("Perform before run events");
-  for (auto* reporter : reporters_) { reporter->before_run(); }
+  for (auto& reporter : reporters_) { reporter->before_run(); }
 }
 
 void Model::after_run() {
@@ -224,7 +195,7 @@ void Model::after_run() {
 
   mdc_->update_after_run();
 
-  for (auto* reporter : reporters_) { reporter->after_run(); }
+  for (auto& reporter : reporters_) { reporter->after_run(); }
 }
 
 void Model::begin_time_step() {
@@ -288,24 +259,29 @@ void Model::yearly_update() { mdc_->yearly_update(); }
 void Model::monthly_report() {
   mdc_->perform_population_statistic();
 
-  for (auto* reporter : reporters_) { reporter->monthly_report(); }
+  for (auto& reporter : reporters_) { reporter->monthly_report(); }
 }
 
 void Model::report_begin_of_time_step() {
-  for (auto* reporter : reporters_) { reporter->begin_time_step(); }
+  for (auto& reporter : reporters_) { reporter->begin_time_step(); }
 }
 
 void Model::add_reporter(Reporter* reporter) {
-  reporters_.push_back(reporter);
   reporter->set_model(this);
+  reporters_.push_back(std::unique_ptr<Reporter>(reporter));
 }
-
-ModelDataCollector* Model::get_mdc() { return get_instance()->mdc_; }
-
-Mosquito* Model::get_mosquito() { return get_instance()->mosquito_; }
 
 IStrategy* Model::get_treatment_strategy() {
   return get_instance()->treatment_strategy_;
+}
+
+void Model::set_treatment_strategy(const int &strategy_id) {
+  treatment_strategy_ =
+      strategy_id == -1
+          ? nullptr
+          : config_->get_strategy_parameters().strategy_db[strategy_id];
+  treatment_strategy_->adjust_started_time_point(
+      Model::get_scheduler()->current_time());
 }
 
 ITreatmentCoverageModel* Model::get_treatment_coverage() {
