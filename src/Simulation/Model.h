@@ -7,29 +7,25 @@
 
 #include "Configuration/Config.h"
 #include "Core/Scheduler/Scheduler.h"
-#include "Population/ImmuneSystem/ImmunityClearanceUpdateFunction.h"
-#include "Population/ClinicalUpdateFunction.h"
-#include "Population/Population.h"
 #include "MDC/ModelDataCollector.h"
 #include "Mosquito/Mosquito.h"
+#include "Population/ClinicalUpdateFunction.h"
+#include "Population/ImmuneSystem/ImmunityClearanceUpdateFunction.h"
+#include "Population/Population.h"
 #include "Reporters/Reporter.h"
+#include "Treatment/ITreatmentCoverageModel.h"
+#include "Treatment/Strategies/IStrategy.h"
 
 namespace Spatial {
 class Location;
 }
 
 class Cli;
-class Population;
-class IStrategy;
-class ITreatmentCoverageModel;
-
 class Model {
 public:
   // Provides global access to the singleton instance
   static Model* get_instance() {
-    if (instance == nullptr) {
-      instance = new Model();
-    }
+    if (instance == nullptr) { instance = new Model(); }
     return instance;
   }
 
@@ -67,8 +63,9 @@ private:
 
   std::vector<std::unique_ptr<IStrategy>> strategy_db_{};
 
+  std::unique_ptr<ITreatmentCoverageModel> treatment_coverage_{nullptr};
+
   IStrategy* treatment_strategy_{nullptr};
-  ITreatmentCoverageModel* treatment_coverage_{nullptr};
 
 public:
   void before_run();
@@ -80,23 +77,17 @@ public:
   void monthly_update();
   void yearly_update();
   void release();
-  
+
   static Config* get_config() { return get_instance()->config_.get(); }
-  static void set_config(Config* config) {
-    get_instance()->config_.reset(config);
-  }
+  static void set_config(Config* config) { get_instance()->config_.reset(config); }
 
   static Scheduler* get_scheduler() { return get_instance()->scheduler_.get(); }
 
-  static void set_scheduler(Scheduler* scheduler) {
-    get_instance()->scheduler_.reset(scheduler);
-  }
+  static void set_scheduler(Scheduler* scheduler) { get_instance()->scheduler_.reset(scheduler); }
 
   static utils::Random* get_random() { return get_instance()->random_.get(); }
-  
-  static void set_random(utils::Random* random) {
-    get_instance()->random_.reset(random);
-  }
+
+  static void set_random(utils::Random* random) { get_instance()->random_.reset(random); }
 
   static Population* get_population() { return get_instance()->population_.get(); }
   static void set_population(Population* population) {
@@ -108,18 +99,15 @@ public:
     get_instance()->genotype_db_.reset(genotype_db);
   }
 
-  static std::vector<std::unique_ptr<IStrategy>>& get_strategy_db() { return get_instance()->strategy_db_; }
-
-  
-  static ModelDataCollector* get_mdc() { return get_instance()->mdc_.get(); }
-  static void set_mdc(ModelDataCollector* mdc) {
-    get_instance()->mdc_.reset(mdc);
+  static std::vector<std::unique_ptr<IStrategy>> &get_strategy_db() {
+    return get_instance()->strategy_db_;
   }
+
+  static ModelDataCollector* get_mdc() { return get_instance()->mdc_.get(); }
+  static void set_mdc(ModelDataCollector* mdc) { get_instance()->mdc_.reset(mdc); }
 
   static Mosquito* get_mosquito() { return get_instance()->mosquito_.get(); }
-  static void set_mosquito(Mosquito* mosquito) {
-    get_instance()->mosquito_.reset(mosquito);
-  }
+  static void set_mosquito(Mosquito* mosquito) { get_instance()->mosquito_.reset(mosquito); }
 
   ClinicalUpdateFunction* progress_to_clinical_update_function() {
     return get_instance()->progress_to_clinical_update_function_.get();
@@ -128,7 +116,6 @@ public:
     get_instance()->progress_to_clinical_update_function_.reset(function);
   }
 
-  
   ImmunityClearanceUpdateFunction* having_drug_update_function() {
     return get_instance()->having_drug_update_function_.get();
   }
@@ -151,10 +138,11 @@ public:
   }
 
   static ITreatmentCoverageModel* get_treatment_coverage();
-  static IStrategy* get_treatment_strategy();
-
   void set_treatment_coverage(ITreatmentCoverageModel* tcm);
+
+  static IStrategy* get_treatment_strategy();
   void set_treatment_strategy(const int &strategy_id);
+
   void build_initial_treatment_coverage();
   void monthly_report();
   void report_begin_of_time_step();

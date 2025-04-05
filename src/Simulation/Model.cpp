@@ -4,7 +4,7 @@
 #include <Population/Population.h>
 #include <Utils/Random.h>
 
-#include <iostream>
+#include <memory>
 #include <stdexcept>
 
 #include "Configuration/Config.h"
@@ -13,31 +13,8 @@
 #include "Reporters/Reporter.h"
 #include "Treatment/SteadyTCM.h"
 #include "Utils/Cli.hxx"
-#include "Utils/Helpers/ObjectHelpers.h"
 
 Model* Model::instance = nullptr;
-
-
-void Model::set_treatment_coverage(ITreatmentCoverageModel* tcm) {
-  if (treatment_coverage_ != tcm) {
-    if (tcm->p_treatment_under_5.empty() || tcm->p_treatment_over_5.empty()) {
-      // copy current value
-      tcm->p_treatment_under_5 = treatment_coverage_->p_treatment_under_5;
-      tcm->p_treatment_over_5 = treatment_coverage_->p_treatment_over_5;
-    }
-    ObjectHelpers::delete_pointer<ITreatmentCoverageModel>(treatment_coverage_);
-  }
-  treatment_coverage_ = tcm;
-}
-
-void Model::build_initial_treatment_coverage() {
-  auto* tcm = new SteadyTCM();
-  for (auto &location : config_->get_spatial_settings().location_db) {
-    tcm->p_treatment_under_5.push_back(location.p_treatment_under_5);
-    tcm->p_treatment_over_5.push_back(location.p_treatment_over_5);
-  }
-  set_treatment_coverage(tcm);
-}
 
 bool Model::initialize() {
   config_ = std::make_unique<Config>();
@@ -49,8 +26,7 @@ bool Model::initialize() {
   mosquito_ = std::make_unique<Mosquito>(this);
 
   progress_to_clinical_update_function_ = std::make_unique<ClinicalUpdateFunction>(this);
-  immunity_clearance_update_function_ =
-      std::make_unique<ImmunityClearanceUpdateFunction>(this);
+  immunity_clearance_update_function_ = std::make_unique<ImmunityClearanceUpdateFunction>(this);
   having_drug_update_function_ = std::make_unique<ImmunityClearanceUpdateFunction>(this);
   clinical_update_function_ = std::make_unique<ImmunityClearanceUpdateFunction>(this);
   reporters_.clear();
@@ -66,29 +42,23 @@ bool Model::initialize() {
   spdlog::info("Loading configuration file: " + utils::Cli::get_instance().get_input_path());
   if (config_->load(utils::Cli::get_instance().get_input_path())) {
     if (config_->get_model_settings().get_initial_seed_number() <= 0) {
-      random_->set_seed(
-          std::chrono::system_clock::now().time_since_epoch().count());
+      random_->set_seed(std::chrono::system_clock::now().time_since_epoch().count());
     } else {
-      random_->set_seed(
-          config_->get_model_settings().get_initial_seed_number());
+      random_->set_seed(config_->get_model_settings().get_initial_seed_number());
     }
 
     if (utils::Cli::get_instance().get_output_path().empty()) {
       utils::Cli::get_instance().set_output_path("./");
     }
 
-    spdlog::info("Model initialized with seed: "
-                  + std::to_string(random_->get_seed()));
+    spdlog::info("Model initialized with seed: " + std::to_string(random_->get_seed()));
     // add reporter here
     if (utils::Cli::get_instance().get_reporter().empty()) {
       add_reporter(Reporter::MakeReport(Reporter::SQLITE_MONTHLY_REPORTER));
     } else {
-      if (Reporter::ReportTypeMap.find(
-              utils::Cli::get_instance().get_reporter())
-          != Reporter::ReportTypeMap.end()) {
+      if (Reporter::ReportTypeMap.contains(utils::Cli::get_instance().get_reporter())) {
         add_reporter(Reporter::MakeReport(
-            Reporter::ReportTypeMap[utils::Cli::get_instance()
-                                        .get_reporter()]));
+            Reporter::ReportTypeMap[utils::Cli::get_instance().get_reporter()]));
       }
     }
 
@@ -97,19 +67,17 @@ bool Model::initialize() {
 #endif
 
     // initialize reporters
-    for (auto& reporter : reporters_) {
+    for (auto &reporter : reporters_) {
       reporter->initialize(utils::Cli::get_instance().get_job_number(),
-                            utils::Cli::get_instance().get_output_path());
+                           utils::Cli::get_instance().get_output_path());
     }
     spdlog::info("Model initialized reporters.");
 
-    scheduler_->initialize(
-        config_->get_simulation_timeframe().get_starting_date(),
-        config_->get_simulation_timeframe().get_ending_date());
+    scheduler_->initialize(config_->get_simulation_timeframe().get_starting_date(),
+                           config_->get_simulation_timeframe().get_ending_date());
     spdlog::info("Model initialized scheduler.");
 
-    set_treatment_strategy(
-        config_->get_strategy_parameters().get_initial_strategy_id());
+    set_treatment_strategy(config_->get_strategy_parameters().get_initial_strategy_id());
     spdlog::info("Model initialized treatment strategy.");
 
     build_initial_treatment_coverage();
@@ -138,11 +106,10 @@ bool Model::initialize() {
 
     if (utils::Cli::get_instance().get_record_movement()) {
       // Generate a movement reporter
-      Reporter* reporter =
-          Reporter::MakeReport(Reporter::ReportType::MOVEMENT_REPORTER);
+      Reporter* reporter = Reporter::MakeReport(Reporter::ReportType::MOVEMENT_REPORTER);
       add_reporter(reporter);
       reporter->initialize(utils::Cli::get_instance().get_job_number(),
-                            utils::Cli::get_instance().get_output_path());
+                           utils::Cli::get_instance().get_output_path());
     }
     is_initialized_ = true;
   } else {
@@ -156,7 +123,7 @@ void Model::release() {
   // Clean up the memory used by the model
 
   treatment_strategy_ = nullptr;
-  ObjectHelpers::delete_pointer<ITreatmentCoverageModel>(treatment_coverage_);
+  treatment_coverage_.reset();
 
   progress_to_clinical_update_function_.reset();
   immunity_clearance_update_function_.reset();
@@ -177,8 +144,7 @@ void Model::release() {
 
 void Model::run() {
   if (!is_initialized_) {
-    throw std::runtime_error(
-        "Model is not initialized. Call Initialize() first.");
+    throw std::runtime_error("Model is not initialized. Call Initialize() first.");
   }
   before_run();
   scheduler_->run();
@@ -187,7 +153,7 @@ void Model::run() {
 
 void Model::before_run() {
   spdlog::info("Perform before run events");
-  for (auto& reporter : reporters_) { reporter->before_run(); }
+  for (auto &reporter : reporters_) { reporter->before_run(); }
 }
 
 void Model::after_run() {
@@ -195,7 +161,7 @@ void Model::after_run() {
 
   mdc_->update_after_run();
 
-  for (auto& reporter : reporters_) { reporter->after_run(); }
+  for (auto &reporter : reporters_) { reporter->after_run(); }
 }
 
 void Model::begin_time_step() {
@@ -232,8 +198,7 @@ void Model::daily_update() {
   // infection event and update current foi because the prmc at the tracking
   // index will be overridden with new cohort to use N days later and infection
   // event used the prmc at the tracking index for the today infection
-  auto tracking_index =
-      scheduler_->current_time() % config_->number_of_tracking_days();
+  auto tracking_index = scheduler_->current_time() % config_->number_of_tracking_days();
   mosquito_->infect_new_cohort_in_PRMC(config_.get(), random_.get(), population_.get(),
                                        tracking_index);
 
@@ -259,11 +224,11 @@ void Model::yearly_update() { mdc_->yearly_update(); }
 void Model::monthly_report() {
   mdc_->perform_population_statistic();
 
-  for (auto& reporter : reporters_) { reporter->monthly_report(); }
+  for (auto &reporter : reporters_) { reporter->monthly_report(); }
 }
 
 void Model::report_begin_of_time_step() {
-  for (auto& reporter : reporters_) { reporter->begin_time_step(); }
+  for (auto &reporter : reporters_) { reporter->begin_time_step(); }
 }
 
 void Model::add_reporter(Reporter* reporter) {
@@ -271,20 +236,34 @@ void Model::add_reporter(Reporter* reporter) {
   reporters_.push_back(std::unique_ptr<Reporter>(reporter));
 }
 
-IStrategy* Model::get_treatment_strategy() {
-  return get_instance()->treatment_strategy_;
-}
+IStrategy* Model::get_treatment_strategy() { return get_instance()->treatment_strategy_; }
 
 void Model::set_treatment_strategy(const int &strategy_id) {
-  treatment_strategy_ =
-      strategy_id == -1
-          ? nullptr
-          : Model::get_strategy_db()[strategy_id].get();
-  treatment_strategy_->adjust_started_time_point(
-      Model::get_scheduler()->current_time());
+  treatment_strategy_ = strategy_id == -1 ? nullptr : Model::get_strategy_db()[strategy_id].get();
+  treatment_strategy_->adjust_started_time_point(Model::get_scheduler()->current_time());
 }
 
 ITreatmentCoverageModel* Model::get_treatment_coverage() {
-  return get_instance()->treatment_coverage_;
+  return get_instance()->treatment_coverage_.get();
+}
+
+void Model::set_treatment_coverage(ITreatmentCoverageModel* tcm) {
+  if (treatment_coverage_.get() != tcm) {
+    if (tcm->p_treatment_under_5.empty() || tcm->p_treatment_over_5.empty()) {
+      // copy current value
+      tcm->p_treatment_under_5 = treatment_coverage_->p_treatment_under_5;
+      tcm->p_treatment_over_5 = treatment_coverage_->p_treatment_over_5;
+    }
+  }
+  treatment_coverage_.reset(tcm);
+}
+
+void Model::build_initial_treatment_coverage() {
+  auto tcm_ptr = std::make_unique<SteadyTCM>();
+  for (const auto &location : config_->get_spatial_settings().location_db) {
+    tcm_ptr->p_treatment_under_5.push_back(location.p_treatment_under_5);
+    tcm_ptr->p_treatment_over_5.push_back(location.p_treatment_over_5);
+  }
+  set_treatment_coverage(tcm_ptr.release());
 }
 
