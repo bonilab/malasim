@@ -142,42 +142,8 @@ public:
     }
 
     //process config data
-    void process_config() override {
-      spdlog::info("Processing StrategyParameters");
-      /*
-       * Here we have to parse directly from YAML config file
-       * because strategies are implemented in different classes
-       * and this will make implementation more flexible.
-       */
-      for (std::size_t i = 0; i < node_.size(); i++) {
-        auto *s = read_strategy(node_, static_cast<int>(i));
-        strategy_db.push_back(s);
-      }
-      std::vector<MassDrugAdministration::beta_distribution_params> prob_individual_present_at_mda_distribution_;
-      for (std::size_t i = 0;
-       i < mass_drug_administration_.get_mean_prob_individual_present_at_mda().size(); i++) {
-        const auto mean = mass_drug_administration_.get_mean_prob_individual_present_at_mda()[i];
-        const auto sd = mass_drug_administration_.get_sd_prob_individual_present_at_mda()[i];
+    void process_config() override;
 
-        MassDrugAdministration::beta_distribution_params params{};
-
-        if (NumberHelpers::is_zero(sd)) {
-          params.alpha = mean;
-          params.beta = 0.0;
-        } else {
-          params.alpha = mean * mean * (1 - mean) / (sd * sd) - mean;
-          params.beta = params.alpha / mean - params.alpha;
-        }
-
-        prob_individual_present_at_mda_distribution_.push_back(params);
-       }
-      // for (auto mda_prob : prob_individual_present_at_mda_distribution_) {
-      //   std::cout << "alpha: " << mda_prob.alpha << " beta: " << mda_prob.beta << std::endl;
-      // }
-      mass_drug_administration_.set_prob_individual_present_at_mda_distribution(prob_individual_present_at_mda_distribution_);
-    }
-
-    std::vector<IStrategy *> strategy_db = std::vector<IStrategy *>();
 private:
     std::map<int, StrategyInfo> strategy_db_raw_;  // Changed from vector to map
     int initial_strategy_id_ = -1;

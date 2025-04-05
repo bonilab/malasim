@@ -127,7 +127,7 @@ IStrategy* StrategyBuilder::buildNestedSwitchingStrategy(
 
   for (int i = 0; i < ns["strategy_ids"].size(); i++) {
     result->add_strategy(
-        Model::get_config()->strategy_db()[ns["strategy_ids"][i].as<int>()]);
+        Model::get_strategy_db()[ns["strategy_ids"][i].as<int>()].get());
   }
 
   return result;
@@ -249,7 +249,7 @@ StrategyBuilder::buildNestedMFTDifferentDistributionByLocationStrategy(
 
   for (auto i = 0; i < ns["strategy_ids"].size(); i++) {
     result->add_strategy(
-        Model::get_config()->strategy_db()[ns["strategy_ids"][i].as<int>()]);
+        Model::get_strategy_db()[ns["strategy_ids"][i].as<int>()].get());
   }
 
   result->peak_after = ns["peak_after"].as<int>();
@@ -272,7 +272,7 @@ IStrategy* StrategyBuilder::buildNovelDrugIntroductionStrategy(
 
   for (int i = 0; i < ns["strategy_ids"].size(); i++) {
     result->add_strategy(
-        Model::get_config()->strategy_db()[ns["strategy_ids"][i].as<int>()]);
+        Model::get_strategy_db()[ns["strategy_ids"][i].as<int>()].get());
   }
 
   result->newly_introduced_strategy_id =

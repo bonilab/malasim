@@ -22,7 +22,7 @@ void SQLiteDbReporter::populate_genotype_table() {
     batch_values.reserve(config->number_of_parasite_types());
 
     for (auto id = 0; id < config->number_of_parasite_types(); id++) {
-      auto* genotype = (*config->genotype_db())[id];
+      auto* genotype = Model::get_genotype_db()->at(id);
       // Escape single quotes in genotype string if needed
       std::string genotype_str = genotype->get_aa_sequence();
       StringHelpers::replace_all(genotype_str, "'", "''");

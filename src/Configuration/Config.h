@@ -129,8 +129,8 @@ public:
   
   // Keep non-virtual if not mocked directly
   std::vector<Spatial::Location> &location_db();
-  std::vector<IStrategy*> &strategy_db();
-  GenotypeDatabase* genotype_db();
+  // std::vector<IStrategy*> &strategy_db();
+  // GenotypeDatabase* genotype_db();
 
 private:
   // Template method for getting a field

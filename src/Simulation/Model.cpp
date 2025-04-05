@@ -279,7 +279,7 @@ void Model::set_treatment_strategy(const int &strategy_id) {
   treatment_strategy_ =
       strategy_id == -1
           ? nullptr
-          : config_->get_strategy_parameters().strategy_db[strategy_id];
+          : Model::get_strategy_db()[strategy_id].get();
   treatment_strategy_->adjust_started_time_point(
       Model::get_scheduler()->current_time());
 }

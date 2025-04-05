@@ -215,10 +215,10 @@ PopulationEventBuilder::build_change_treatment_strategy_event(
     auto strategy_id = entry["strategy_id"].as<int>();
 
     // Verify that the strategy id is valid, if not fail
-    if (strategy_id >= config->get_strategy_parameters().strategy_db.size()) {
+    if (strategy_id >= Model::get_strategy_db().size()) {
       spdlog::error(
           "Invalid strategy_id! {} supplied, but strategy_db size is {}",
-          strategy_id, config->get_strategy_parameters().strategy_db.size());
+          strategy_id, Model::get_strategy_db().size());
       exit(-1);
     }
 

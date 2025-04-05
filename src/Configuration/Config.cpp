@@ -209,13 +209,13 @@ std::vector<Spatial::Location>& Config::location_db() {
   return spatial_settings_.location_db;
 }
 
-std::vector<IStrategy *>& Config::strategy_db() {
-  return strategy_parameters_.strategy_db;
-}
+// std::vector<IStrategy *>& Config::strategy_db() {
+//   return strategy_parameters_.strategy_db;
+// }
 
-GenotypeDatabase* Config::genotype_db() {
-  return Model::get_genotype_db();
-}
+// GenotypeDatabase* Config::genotype_db() {
+//   return Model::get_genotype_db();
+// }
 
 void Config::validate_all_cross_field_validations() {
   spdlog::info("Validating all cross field validations");

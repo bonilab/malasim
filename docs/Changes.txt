@@ -23,7 +23,7 @@ Model::get_config()->get_drug_parameters().drug_db
 
 Model::get_config()->get_therapy_parameters().therapy_db
 
-Model::get_config()->strategy_db()
+Model::get_strategy_db()
 
 Model::get_config()->get_immune_system_parameters()
 

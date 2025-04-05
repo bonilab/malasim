@@ -65,6 +65,8 @@ private:
 
   std::vector<std::unique_ptr<Reporter>> reporters_{};
 
+  std::vector<std::unique_ptr<IStrategy>> strategy_db_{};
+
   IStrategy* treatment_strategy_{nullptr};
   ITreatmentCoverageModel* treatment_coverage_{nullptr};
 
@@ -105,6 +107,9 @@ public:
   static void set_genotype_db(GenotypeDatabase* genotype_db) {
     get_instance()->genotype_db_.reset(genotype_db);
   }
+
+  static std::vector<std::unique_ptr<IStrategy>>& get_strategy_db() { return get_instance()->strategy_db_; }
+
   
   static ModelDataCollector* get_mdc() { return get_instance()->mdc_.get(); }
   static void set_mdc(ModelDataCollector* mdc) {
