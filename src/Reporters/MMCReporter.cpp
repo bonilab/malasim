@@ -55,7 +55,7 @@ void MMCReporter::initialize(int job_number, const std::string &path) {
 
 void MMCReporter::before_run() {
   // // std::cout << "MMC Reporter" << std::endl;
-  // for (auto genotype : (*Model::get_config()->get_genotype_parameters().genotype_db)){
+  // for (auto genotype : (*Model::get_genotype_db())){
   //   std::cout << *genotype.second << std::endl;
   // }
 
@@ -105,7 +105,7 @@ void MMCReporter::monthly_report() {
 
   ReporterUtils::output_genotype_frequency3(
       ss,
-      Model::get_config()->get_genotype_parameters().genotype_db->size(),
+      Model::get_genotype_db()->size(),
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
 
   ss << group_sep;

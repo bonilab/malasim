@@ -29,7 +29,8 @@ Model::Model(const int &object_pool_size)
       mdc_(nullptr),
       mosquito_(nullptr),
       treatment_strategy_(nullptr),
-      treatment_coverage_(nullptr) {
+      treatment_coverage_(nullptr),
+      genotype_db_(nullptr) {
   // initialize_object_pool(object_pool_size);
 }
 
@@ -65,6 +66,7 @@ void Model::build_initial_treatment_coverage() {
 
 bool Model::initialize() {
   config_ = std::make_unique<Config>();
+  genotype_db_ = std::make_unique<GenotypeDatabase>();
   random_ = std::make_unique<utils::Random>(nullptr, -1);
   scheduler_ = std::make_unique<Scheduler>(this);
   population_ = std::make_unique<Population>(this);
@@ -190,6 +192,7 @@ void Model::release() {
   treatment_strategy_ = nullptr;
   ObjectHelpers::delete_pointer<ITreatmentCoverageModel>(treatment_coverage_);
 
+  genotype_db_.reset();
   population_.reset();
   random_.reset();
   scheduler_.reset();

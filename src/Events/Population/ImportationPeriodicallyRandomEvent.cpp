@@ -130,7 +130,7 @@ void ImportationPeriodicallyRandomEvent::infect(Person* person,
   person->set_host_state(Person::ASYMPTOMATIC);
 
   // Prepare the genotype
-  Genotype* genotype = Model::get_config()->get_genotype_parameters().genotype_db->at(genotypeId);
+  Genotype* genotype = Model::get_genotype_db()->at(genotypeId);
 
   // Inflict the infection
   auto* blood_parasite = person->add_new_parasite_to_blood(genotype);

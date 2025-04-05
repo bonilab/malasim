@@ -55,8 +55,7 @@ PopulationEventBuilder::build_introduce_parasite_events(const YAML::Node &node,
       for (std::size_t j = 0; j < entry["parasite_info"].size(); j++) {
         auto genotype_aa_sequence =
             entry["parasite_info"][j]["genotype_aa_sequence"].as<std::string>();
-        auto genotype_id = config->get_genotype_parameters()
-                               .genotype_db->get_genotype(genotype_aa_sequence)
+        auto genotype_id = Model::get_genotype_db()->get_genotype(genotype_aa_sequence)
                                ->genotype_id();
         auto num = entry["parasite_info"][j]["number_of_cases"].as<int>();
 
@@ -93,8 +92,7 @@ PopulationEventBuilder::build_introduce_parasites_periodically_events(
         //            ipi.location = location;
         auto genotype_aa_sequence =
             entry["parasite_info"][j]["genotype_aa_sequence"].as<std::string>();
-        auto genotype_id = config->get_genotype_parameters()
-                               .genotype_db->get_genotype(genotype_aa_sequence)
+        auto genotype_id = Model::get_genotype_db()->get_genotype(genotype_aa_sequence)
                                ->genotype_id();
         // TODO: implement new importation parasite genotype based on allele
         // distribution
@@ -582,12 +580,8 @@ PopulationEventBuilder::build_rotate_treatment_strategy_event(
             "RotateStrategyEvent");
         throw std::invalid_argument("Strategy id cannot be less than zero");
       }
-      if (first_strategy_id >= Model::get_config()
-                                   ->get_genotype_parameters()
-                                   .genotype_db->size()
-          || second_strategy_id >= Model::get_config()
-                                       ->get_genotype_parameters()
-                                       .genotype_db->size()) {
+      if (first_strategy_id >= Model::get_genotype_db()->size()
+          || second_strategy_id >= Model::get_genotype_db()->size()) {
         spdlog::error(
             "Strategy id should be less than the total number of "
             "strategies (zero-indexing) for RotateStrategyEvent");
@@ -764,9 +758,7 @@ PopulationEventBuilder::build_importation_periodically_random_event(
             ImportationPeriodicallyRandomEvent::EventName);
         throw std::invalid_argument("Genotype id cannot be less than zero");
       }
-      if (genotype_id >= Model::get_config()
-                             ->get_genotype_parameters()
-                             .genotype_db->size()) {
+      if (genotype_id >= Model::get_genotype_db()->size()) {
         spdlog::error(
             "Invalid genotype id supplied for {} genotype id cannot be greater "
             "than genotype_db size",

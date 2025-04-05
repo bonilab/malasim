@@ -15,7 +15,7 @@ Model::get_config()->number_of_locations()
 
 Model::get_config()->number_of_tracking_days()
 
-Model::get_config()->get_genotype_parameters().genotype_db
+Model::get_genotype_db()
 
 Model::get_config()->location_db()
 

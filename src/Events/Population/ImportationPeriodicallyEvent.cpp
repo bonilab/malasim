@@ -64,20 +64,17 @@ void ImportationPeriodicallyEvent::do_execute() {
         //      copy, last allele will always be x
         if (random_id % 2 == 1) { random_id -= 1; }
         imported_genotype =
-            Model::get_config()->get_genotype_parameters().genotype_db->at(
-                random_id);
+            Model::get_genotype_db()->at(random_id);
         break;
       case -2:
         // all random even last xX locus new genotype will have
         // 50% chance of 580Y and 50% plasmepsin-2 copy and %50 X ....
         imported_genotype =
-            Model::get_config()->get_genotype_parameters().genotype_db->at(
-                random_id);
+            Model::get_genotype_db()->at(random_id);
         break;
       default:
         imported_genotype =
-            Model::get_config()->get_genotype_parameters().genotype_db->at(
-                genotype_id_);
+            Model::get_genotype_db()->at(genotype_id_);
     }
 
     auto* blood_parasite = p->add_new_parasite_to_blood(imported_genotype);
@@ -103,9 +100,7 @@ void ImportationPeriodicallyEvent::do_execute() {
         "{} - Importing (periodically) {} at location {} with genotype {}",
         Model::get_scheduler()->get_current_date_string(),
         number_of_importation_cases, location_,
-        Model::get_config()
-            ->get_genotype_parameters()
-            .genotype_db->at(genotype_id_)
+        Model::get_genotype_db()->at(genotype_id_)
             ->get_aa_sequence());
   }
 }

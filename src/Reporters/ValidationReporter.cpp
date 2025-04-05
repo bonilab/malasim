@@ -263,10 +263,10 @@ void ValidationReporter::monthly_report() {
     monthly_data_logger->info(ss.str());
 
     std::stringstream gene_freq_ss;
-//    ReporterUtils::output_genotype_frequency3(gene_freq_ss, Model::get_config()->get_genotype_parameters().genotype_db->size(),
+//    ReporterUtils::output_genotype_frequency3(gene_freq_ss, Model::get_genotype_db()->size(),
 //                                              Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
     std::stringstream prmc_freq_ss;
-    ReporterUtils::output_genotype_frequency4(gene_freq_ss, prmc_freq_ss, Model::get_config()->get_genotype_parameters().genotype_db->size(),
+    ReporterUtils::output_genotype_frequency4(gene_freq_ss, prmc_freq_ss, Model::get_genotype_db()->size(),
                                               Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
 
     gene_freq_logger->info(gene_freq_ss.str());
@@ -378,17 +378,17 @@ void ValidationReporter::after_run() {
     }
     summary_data_logger->info(ss.str());
 
-    for (auto [g_id, genotype] : *(Model::get_config()->get_genotype_parameters().genotype_db)) {
+    for (auto [g_id, genotype] : *(Model::get_genotype_db())) {
         gene_db_logger->info("{}{}{}",g_id,sep,genotype->aa_sequence);
         // prmc_db_logger->info("{}{}{}",g_id,sep,genotype->aa_sequence);
     }
 
-    for (auto [g_id, genotype] : *(Model::get_config()->get_genotype_parameters().genotype_db)) {
+    for (auto [g_id, genotype] : *(Model::get_genotype_db())) {
         spdlog::debug("{}:{}",genotype->aa_sequence,genotype->daily_fitness_multiple_infection);
     }
     for(int resistant_drug_pair_id = 0; resistant_drug_pair_id < Model::get_mosquito()->resistant_drug_list.size(); resistant_drug_pair_id++){
         auto drugs = Model::get_mosquito()->resistant_drug_list[resistant_drug_pair_id].second;
-        for (auto [g_id, genotype] : *(Model::get_config()->get_genotype_parameters().genotype_db)) {
+        for (auto [g_id, genotype] : *(Model::get_genotype_db())) {
             if(resistant_drug_pair_id < 3){
                 spdlog::debug(fmt::format("resistant_drug_pair_id: {} {}\tR-0: {}\tR-1: {}\tEC50-0: {}\tEC50-1: {}\tminEC50-0: {}\tminEC50-1: {}",
                                        resistant_drug_pair_id,

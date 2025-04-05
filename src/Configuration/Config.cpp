@@ -2,6 +2,7 @@
 #include <yaml-cpp/yaml.h>
 #include "Config.h"
 #include "Utils/Cli.hxx"
+#include "Simulation/Model.h"
 
 int inline get_pipe_count(const std::string &str) {
   int pipe_count = 0;
@@ -185,7 +186,7 @@ bool Config::load(const std::string &filename) {
 }
 
 int Config::number_of_parasite_types() const {
-  return genotype_parameters_.genotype_db->size();
+  return Model::get_genotype_db()->size();
 }
 
 int Config::number_of_locations() const {
@@ -213,7 +214,7 @@ std::vector<IStrategy *>& Config::strategy_db() {
 }
 
 GenotypeDatabase* Config::genotype_db() {
-  return genotype_parameters_.genotype_db;
+  return Model::get_genotype_db();
 }
 
 void Config::validate_all_cross_field_validations() {

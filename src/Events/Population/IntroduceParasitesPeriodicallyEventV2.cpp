@@ -91,7 +91,7 @@ void IntroduceParasitesPeriodicallyEventV2::do_execute() {
       gene_structure[j] = k;
     }
 
-    Genotype* imported_genotype =Model::get_config()->get_genotype_parameters().genotype_db->get_genotype_from_alleles_structure(gene_structure);
+    Genotype* imported_genotype = Model::get_genotype_db()->get_genotype_from_alleles_structure(gene_structure);
 
     auto* blood_parasite = p->add_new_parasite_to_blood(imported_genotype);
 

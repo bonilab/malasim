@@ -41,7 +41,7 @@ void ImportationEvent::do_execute() {
     p->set_host_state(Person::ASYMPTOMATIC);
 
     auto* blood_parasite =
-        p->add_new_parasite_to_blood(Model::get_config()->get_genotype_parameters().genotype_db->at(
+        p->add_new_parasite_to_blood(Model::get_genotype_db()->at(
             static_cast<const unsigned long &>(genotype_id_)));
 
     auto size = Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_asymptomatic();
@@ -58,5 +58,5 @@ void ImportationEvent::do_execute() {
   spdlog::info("Day {}: Importation event: {} at location {} with genotype {}",
             Model::get_scheduler()->current_time(),
             number_of_cases_,location_,
-            Model::get_config()->get_genotype_parameters().genotype_db->at(genotype_id_)->get_aa_sequence());
+            Model::get_genotype_db()->at(genotype_id_)->get_aa_sequence());
 }

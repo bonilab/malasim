@@ -55,6 +55,7 @@ private:
   std::unique_ptr<Scheduler> scheduler_{nullptr};
   std::unique_ptr<Population> population_{nullptr};
   std::unique_ptr<utils::Random> random_;
+  std::unique_ptr<GenotypeDatabase> genotype_db_{nullptr};
   ModelDataCollector* mdc_;
   Mosquito* mosquito_;
   IStrategy* treatment_strategy_{nullptr};
@@ -96,6 +97,11 @@ public:
   static Population* get_population() { return get_instance()->population_.get(); }
   static void set_population(Population* population) {
     get_instance()->population_.reset(population);
+  }
+
+  static GenotypeDatabase* get_genotype_db() { return get_instance()->genotype_db_.get(); }
+  static void set_genotype_db(GenotypeDatabase* genotype_db) {
+    get_instance()->genotype_db_.reset(genotype_db);
   }
   
   static ModelDataCollector* get_mdc();

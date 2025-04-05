@@ -1,4 +1,5 @@
 # Review 
+- genotype_db should be owned by Model???
 - p_infection_from_infectious_bite biology validation
 - relative_infectivity biology validation
 

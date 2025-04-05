@@ -94,7 +94,7 @@ void MonthlyReporter::monthly_report() {
 
     // Log gene frequency
     std::stringstream gene_freq_ss;
-    ReporterUtils::output_genotype_frequency3(gene_freq_ss, Model::get_config()->get_genotype_parameters().genotype_db->size(),
+    ReporterUtils::output_genotype_frequency3(gene_freq_ss, Model::get_genotype_db()->size(),
                                               Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
     gene_freq_logger->info(gene_freq_ss.str());
 }
@@ -126,7 +126,7 @@ void MonthlyReporter::after_run() {
   summary_data_logger->info(ss.str());
 
   // Log gene database
-  for (auto [g_id, genotype] : *(Model::get_config()->get_genotype_parameters().genotype_db)) {
+  for (auto [g_id, genotype] : *(Model::get_genotype_db())) {
     gene_db_logger->info("{}{}{}", g_id, sep, genotype->get_aa_sequence());
   }
 }

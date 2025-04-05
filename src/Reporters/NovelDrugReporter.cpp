@@ -52,7 +52,7 @@ void NovelDrugReporter::before_run() {
   // output header for csv file
   ss << "TIME" << sep << "PFPR" << sep << "MUTATIONS" << sep << "NUMBER_OF_TREATMENTS" << sep
      << "NUMBER_OF_TREATMENT_FAILURES" << sep << "NUMBER_OF_SYMPTOMATIC_CASES" << sep;
-  for (auto i = 0; i < Model::get_config()->get_genotype_parameters().genotype_db->size(); i++) {
+  for (auto i = 0; i < Model::get_genotype_db()->size(); i++) {
     ss << "GENOTYPE_ID_" << i << sep;
   }
   ss << "IS_SWITCHED" << sep;
@@ -81,7 +81,7 @@ void NovelDrugReporter::monthly_report() {
     ss << Model::get_mdc()->monthly_number_of_clinical_episode_by_location()[loc] << sep;
   }
 
-  output_genotype_frequency_3(Model::get_config()->get_genotype_parameters().genotype_db->size(),
+  output_genotype_frequency_3(Model::get_genotype_db()->size(),
                               Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
 
   ss << (dynamic_cast<NovelDrugIntroductionStrategy*>(Model::get_treatment_strategy())->is_switched ? 1 : 0) << sep;

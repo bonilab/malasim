@@ -71,7 +71,7 @@ Genotype* Genotype::modify_genotype_allele(const std::vector<std::tuple<int,int,
       if (new_aa_sequence[char_counter] == '|') chromosome_counter++;
     }
   }
-  return pConfig->get_genotype_parameters().genotype_db->get_genotype(new_aa_sequence);
+  return Model::get_genotype_db()->get_genotype(new_aa_sequence);
 }
 
 double Genotype::get_EC50_power_n(DrugType *dt) {
@@ -326,7 +326,7 @@ Genotype *Genotype::perform_mutation_by_drug(Config *pConfig, utils::Random *pRa
     }
   }
   // get genotype pointer from gene database based on aa sequence
-  return pConfig->get_genotype_parameters().genotype_db->get_genotype(new_aa_sequence);
+  return Model::get_genotype_db()->get_genotype(new_aa_sequence);
 }
 
 void Genotype::override_EC50_power_n(const std::vector<GenotypeParameters::OverrideEC50Pattern> &override_patterns, DrugDatabase *drug_db) {
@@ -401,7 +401,7 @@ Genotype *Genotype::free_recombine_with(Config *pConfig, utils::Random *pRandom,
   }
 
   auto new_aa_sequence = Convert_PfGenotypeStr_To_String(new_pf_genotype_str);
-  return pConfig->get_genotype_parameters().genotype_db->get_genotype(new_aa_sequence);
+  return Model::get_genotype_db()->get_genotype(new_aa_sequence);
 }
 
 std::string Genotype::Convert_PfGenotypeStr_To_String(const PfGenotypeStr &pfGenotypeStr) {
@@ -470,5 +470,5 @@ Genotype *Genotype::free_recombine(Config *config, utils::Random *pRandom, Genot
   }
 
   auto new_aa_sequence = Convert_PfGenotypeStr_To_String(new_pf_genotype_str);
-  return config->get_genotype_parameters().genotype_db->get_genotype(new_aa_sequence);
+  return Model::get_genotype_db()->get_genotype(new_aa_sequence);
 }
