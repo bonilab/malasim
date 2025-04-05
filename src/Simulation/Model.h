@@ -51,19 +51,18 @@ private:
   std::unique_ptr<Scheduler> scheduler_{nullptr};
   std::unique_ptr<Population> population_{nullptr};
   std::unique_ptr<utils::Random> random_{nullptr};
-  std::unique_ptr<GenotypeDatabase> genotype_db_{nullptr};
   std::unique_ptr<ModelDataCollector> mdc_{nullptr};
   std::unique_ptr<Mosquito> mosquito_{nullptr};
   std::unique_ptr<ClinicalUpdateFunction> progress_to_clinical_update_function_{nullptr};
   std::unique_ptr<ImmunityClearanceUpdateFunction> immunity_clearance_update_function_{nullptr};
   std::unique_ptr<ImmunityClearanceUpdateFunction> having_drug_update_function_{nullptr};
   std::unique_ptr<ImmunityClearanceUpdateFunction> clinical_update_function_{nullptr};
-
+  std::unique_ptr<ITreatmentCoverageModel> treatment_coverage_{nullptr};
   std::vector<std::unique_ptr<Reporter>> reporters_{};
 
+  std::unique_ptr<GenotypeDatabase> genotype_db_{nullptr};
   std::vector<std::unique_ptr<IStrategy>> strategy_db_{};
 
-  std::unique_ptr<ITreatmentCoverageModel> treatment_coverage_{nullptr};
 
   IStrategy* treatment_strategy_{nullptr};
 
