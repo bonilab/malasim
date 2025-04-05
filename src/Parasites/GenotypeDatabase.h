@@ -8,9 +8,9 @@
 class Genotype;
 class Config;
 
-using GenotypePtrMap = std::map<ul, std::unique_ptr<Genotype>>;
+using GenotypePtrVector = std::vector<std::unique_ptr<Genotype>>;
 
-class GenotypeDatabase : public GenotypePtrMap {
+class GenotypeDatabase : public GenotypePtrVector {
 public:
   // disallow copy, assign and move
   GenotypeDatabase(const GenotypeDatabase &) = delete;
@@ -24,13 +24,12 @@ public:
 
   GenotypeDatabase* operator()() { return this; }
 
-  void add(Genotype* genotype);
+  // transfer ownership of genotype to the database
+  void add(std::unique_ptr<Genotype> genotype);
 
   Genotype* get_genotype(const std::string &aa_sequence);
 
   unsigned int get_id(const std::string &aa_sequence);
-
-  Genotype* get_genotype_by_id(const int &id);
 
   Genotype* get_genotype_from_alleles_structure(const IntVector &alleles);
 
@@ -40,11 +39,7 @@ public:
   void set_weight(const std::vector<int> &value) { weight_ = value; }
 
   // override at
-  Genotype* at(const int &id) {
-    auto it = GenotypePtrMap::find(id);
-    if (it != GenotypePtrMap::end()) { return it->second.get(); }
-    return nullptr;
-  }
+  Genotype* at(int id) { return GenotypePtrVector::at(id).get(); }
 
 private:
   std::map<std::string, Genotype*> aa_sequence_id_map_;

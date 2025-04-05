@@ -566,7 +566,7 @@ void Person::infected_by(const int& parasite_type_id) {
     if (host_state_ == SUSCEPTIBLE) {
       set_host_state(EXPOSED);
     }
-
+    
     Genotype* genotype = Model::get_genotype_db()->at(parasite_type_id);
     liver_parasite_type_ = genotype;
 

@@ -129,8 +129,8 @@ void MonthlyReporter::after_run() {
   summary_data_logger->info(ss.str());
 
   // Log gene database
-  for (const auto &[g_id, genotype] : *Model::get_genotype_db()) {
-    gene_db_logger->info("{}{}{}", g_id, sep, genotype->get_aa_sequence());
+  for (const auto &genotype : *Model::get_genotype_db()) {
+    gene_db_logger->info("{}{}{}", genotype->genotype_id(), sep, genotype->get_aa_sequence());
   }
 }
 

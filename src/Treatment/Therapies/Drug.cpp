@@ -97,5 +97,5 @@ void Drug::set_number_of_dosing_days(int dosingDays) {
 
 double Drug::get_parasite_killing_rate(const int &genotype_id) const {
   return drug_type_->get_parasite_killing_rate_by_concentration(
-      last_update_value_, Model::get_genotype_db()->get_genotype_by_id(genotype_id)->get_EC50_power_n(drug_type_));
+      last_update_value_, Model::get_genotype_db()->at(genotype_id)->get_EC50_power_n(drug_type_));
 }

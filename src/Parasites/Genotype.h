@@ -36,8 +36,6 @@ public:
   explicit Genotype(const std::string &aa_sequence);
   virtual ~Genotype();
 
-  std::map<std::string, Genotype*> aa_sequence_id_map;
-  std::map<int, std::map<std::string, double>> drug_id_ec50;
   int genotype_id_{-1};
   PfGenotypeStr pf_genotype_str = std::vector<ChromosomalGenotypeStr>(14);
   std::string aa_sequence;

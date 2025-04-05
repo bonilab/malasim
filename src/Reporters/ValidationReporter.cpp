@@ -409,19 +409,19 @@ void ValidationReporter::after_run() {
   }
   summary_data_logger->info(ss.str());
 
-  for (const auto &[g_id, genotype] : *(Model::get_genotype_db())) {
-    gene_db_logger->info("{}{}{}", g_id, sep, genotype->aa_sequence);
+  for (const auto &genotype : *(Model::get_genotype_db())) {
+    gene_db_logger->info("{}{}{}", genotype->genotype_id(), sep, genotype->aa_sequence);
     // prmc_db_logger->info("{}{}{}",g_id,sep,genotype->aa_sequence);
   }
 
-  for (const auto &[g_id, genotype] : *(Model::get_genotype_db())) {
+  for (const auto &genotype : *(Model::get_genotype_db())) {
     spdlog::debug("{}:{}", genotype->aa_sequence, genotype->daily_fitness_multiple_infection);
   }
   for (int resistant_drug_pair_id = 0;
        resistant_drug_pair_id < Model::get_mosquito()->resistant_drug_list.size();
        resistant_drug_pair_id++) {
     auto drugs = Model::get_mosquito()->resistant_drug_list[resistant_drug_pair_id].second;
-    for (const auto &[g_id, genotype] : *(Model::get_genotype_db())) {
+    for (const auto &genotype : *(Model::get_genotype_db())) {
       if (resistant_drug_pair_id < 3) {
         spdlog::debug(fmt::format(
             "resistant_drug_pair_id: {} {}\tR-0: {}\tR-1: {}\tEC50-0: {}\tEC50-1: {}\tminEC50-0: "

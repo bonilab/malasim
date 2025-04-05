@@ -15,16 +15,13 @@ GenotypeDatabase::~GenotypeDatabase() {
   clear();
 }
 
-void GenotypeDatabase::add(Genotype* genotype) {
+void GenotypeDatabase::add(std::unique_ptr<Genotype> genotype) {
   auto id = genotype->genotype_id();
-  auto it = GenotypePtrMap::find(id);
-  if (it != GenotypePtrMap::end()) {
-    it->second.reset(genotype);
-  } else {
-    GenotypePtrMap::insert(std::make_pair(id, std::unique_ptr<Genotype>(genotype)));
-  }
+  if (id >= size()) { resize(id + 1); }
+  aa_sequence_id_map_[genotype->get_aa_sequence()] = genotype.get();
+  GenotypePtrVector::operator[](id) = std::move(genotype);
+
   // spdlog::info("GenotypeDatabase Added genotype id: {} aa_sequence: {}", genotype->genotype_id(),
-  // genotype->get_aa_sequence());
 }
 
 Genotype* GenotypeDatabase::get_genotype_from_alleles_structure(const IntVector &alleles) {
@@ -41,7 +38,8 @@ Genotype* GenotypeDatabase::get_genotype(const std::string &aa_sequence) {
   if (!aa_sequence_id_map_.contains(aa_sequence)) {
     // not yet exist then initialize new genotype
     auto new_id = auto_id_;
-    auto* new_genotype = new Genotype(aa_sequence);
+    auto_id_++;
+    auto new_genotype = std::make_unique<Genotype>(aa_sequence);
     new_genotype->set_genotype_id(static_cast<int>(new_id));
     new_genotype->resistant_recombinations_in_mosquito =
         std::vector<MosquitoRecombinedGenotypeInfo>();
@@ -81,13 +79,11 @@ Genotype* GenotypeDatabase::get_genotype(const std::string &aa_sequence) {
       }
     }
 
-    aa_sequence_id_map_[aa_sequence] = new_genotype;
-    add(new_genotype);
     new_genotype->resistant_recombinations_in_mosquito =
         std::vector<MosquitoRecombinedGenotypeInfo>();
-    auto_id_++;
+    // this will update aa_sequence_id_map_ as well
+    add(std::move(new_genotype));
     // spdlog::info("GenotypeDB new genotype id {} aa_sequence {}",auto_id,aa_sequence);
-    return new_genotype;
   }
   return aa_sequence_id_map_[aa_sequence];
 }
@@ -99,10 +95,4 @@ double GenotypeDatabase::get_min_ec50(int drug_id) {
 
   return it->second;
 }
-
-Genotype* GenotypeDatabase::get_genotype_by_id(const int &id) { return (*this)[id].get(); }
-
-// GenotypeDatabase* GenotypeDatabase::all() {
-//   return this;
-// }
 
