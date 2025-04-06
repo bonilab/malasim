@@ -1,5 +1,5 @@
 {
-  "dependencies": ["fmt", "gsl", "date", "gtest", "lua", "spdlog", "yaml-cpp", "cli11", "stduuid", "sqlite3"],
+  "dependencies": ["fmt", "gsl", "date", "gtest", "lua", "spdlog", "yaml-cpp", "cli11", "sqlite3"],
   "version": "1.0",
   "name": "malasim"
 }

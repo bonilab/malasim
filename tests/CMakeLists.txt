@@ -1,13 +1,5 @@
 # Find Google Test
 find_package(GTest REQUIRED)
-find_package(fmt CONFIG REQUIRED)
-find_package(GSL REQUIRED)
-find_package(yaml-cpp CONFIG REQUIRED)
-find_package(spdlog REQUIRED)
-find_package(date CONFIG REQUIRED)
-find_package(CLI11 CONFIG REQUIRED)
-find_package(stduuid CONFIG REQUIRED)
-find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
 include_directories(${PROJECT_SOURCE_DIR}/tests)

@@ -4,7 +4,6 @@ find_package(yaml-cpp CONFIG REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(date CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
-find_package(stduuid CONFIG REQUIRED)
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
 option(ENABLE_TRAVEL_TRACKING "Enable tracking of individual travel data and generating travel reports" OFF)
@@ -54,7 +53,6 @@ target_link_libraries(MalaSimCore PRIVATE
   spdlog::spdlog
   date::date date::date-tz
   CLI11::CLI11
-  stduuid
   unofficial::sqlite3::sqlite3
 )
 
@@ -83,7 +81,6 @@ target_link_libraries(MalaSim PRIVATE
   spdlog::spdlog
   date::date date::date-tz
   CLI11::CLI11
-  stduuid
   unofficial::sqlite3::sqlite3
 )
 

@@ -5,7 +5,6 @@
 #include <Utils/Helpers/TimeHelpers.h>
 #include <Utils/Random.h>
 #include <spdlog/spdlog.h>
-#include <uuid.h>
 
 #include <algorithm>
 #include <memory>
