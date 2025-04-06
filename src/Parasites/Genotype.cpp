@@ -196,7 +196,7 @@ void Genotype::calculate_daily_fitness(const GenotypeParameters::PfGenotypeInfo 
 void Genotype::calculate_EC50_power_n(const GenotypeParameters::PfGenotypeInfo &gene_info,
                                       DrugDatabase* drug_db) {
   EC50_power_n.resize(drug_db->size());
-  for (const auto &[drug_id, dt] : *drug_db) { EC50_power_n[drug_id] = dt->base_EC50; }
+  for (const auto &dt : *drug_db) { EC50_power_n[dt->id()] = dt->base_EC50; }
 
   for (int chromosome_i = 0; chromosome_i < pf_genotype_str.size(); ++chromosome_i) {
     auto chromosome_info = gene_info.chromosome_infos[chromosome_i];
@@ -219,35 +219,35 @@ void Genotype::calculate_EC50_power_n(const GenotypeParameters::PfGenotypeInfo &
         }
         auto element_id = it - aa_pos_info.get_amino_acids().begin();
 
-        for (const auto &[drug_id, dt] : *drug_db) {
+        for (const auto &dt : *drug_db) {
           for (auto const &ec50s : aa_pos_info.get_multiplicative_effect_on_EC50()) {
-            if (ec50s.get_drug_id() == drug_id) {
+            if (ec50s.get_drug_id() == dt->id()) {
               auto multiplicative_effect_factor = ec50s.get_factors()[element_id];
               if (multiplicative_effect_factor > 1) {
                 // encounter resistant aa
-                number_of_effective_mutations_in_same_genes[drug_id] += 1;
-                if (number_of_effective_mutations_in_same_genes[drug_id] > 1) {
+                number_of_effective_mutations_in_same_genes[dt->id()] += 1;
+                if (number_of_effective_mutations_in_same_genes[dt->id()] > 1) {
                   for (auto const &ec50s_2_or_more :
                        res_gene_info.get_multiplicative_effect_on_ec50_for_2_or_more_mutations()) {
-                    if (ec50s_2_or_more.get_drug_id() == drug_id) {
+                    if (ec50s_2_or_more.get_drug_id() == dt->id()) {
                       multiplicative_effect_factor = ec50s_2_or_more.get_factor();
                       spdlog::trace(
                           "aa_sequence: {} DOUBLE MUT drug_id: {} chr: {} gene: {} aa: {} "
                           "EC50_power_n: {} * multiplicative_effect_factor: {}  = {}",
-                          aa_sequence, drug_id, chromosome_i + 1, gene_i, aa_i,
-                          EC50_power_n[drug_id], multiplicative_effect_factor,
-                          EC50_power_n[drug_id] * multiplicative_effect_factor);
+                          aa_sequence, dt->id(), chromosome_i + 1, gene_i, aa_i,
+                          EC50_power_n[dt->id()], multiplicative_effect_factor,
+                          EC50_power_n[dt->id()] * multiplicative_effect_factor);
                     }
                     spdlog::trace(
                         "aa_sequence: {} SINGLE MUT drug_id: {} chr: {} gene: {} aa: {} "
                         "EC50_power_n: {} * multiplicative_effect_factor: {}  = {}",
-                        aa_sequence, drug_id, chromosome_i + 1, gene_i, aa_i, EC50_power_n[drug_id],
+                        aa_sequence, dt->id(), chromosome_i + 1, gene_i, aa_i, EC50_power_n[dt->id()],
                         multiplicative_effect_factor,
-                        EC50_power_n[drug_id] * multiplicative_effect_factor);
+                        EC50_power_n[dt->id()] * multiplicative_effect_factor);
                   }
                 }
               }
-              EC50_power_n[drug_id] *= multiplicative_effect_factor;
+              EC50_power_n[dt->id()] *= multiplicative_effect_factor;
             }
           }
         }
@@ -257,15 +257,15 @@ void Genotype::calculate_EC50_power_n(const GenotypeParameters::PfGenotypeInfo &
       if (res_gene_info.get_max_copies() > 1) {
         auto copy_number = static_cast<int>(pf_genotype_str[chromosome_i][gene_i].back()) - 48;
         if (copy_number > 1) {
-          for (const auto &[drug_id, dt] : *drug_db) {
+          for (const auto &dt : *drug_db) {
             for (auto const &ec50s : res_gene_info.get_cnv_multiplicative_effect_on_EC50()) {
-              if (ec50s.get_drug_id() == drug_id) {
+              if (ec50s.get_drug_id() == dt->id()) {
                 spdlog::trace(
                     "aa_sequence: {} CNV drug_id: {} chr: {} gene: {} EC50_power_n: {} * "
                     "multiplicative_effect_factor: {}  = {}",
-                    aa_sequence, drug_id, chromosome_i + 1, gene_i, EC50_power_n[drug_id],
+                    aa_sequence, dt->id(), chromosome_i + 1, gene_i, EC50_power_n[dt->id()],
                     ec50s.get_factors()[copy_number - 1],
-                    EC50_power_n[drug_id] * ec50s.get_factors()[copy_number - 1]);
+                    EC50_power_n[dt->id()] * ec50s.get_factors()[copy_number - 1]);
               }
             }
           }
@@ -275,8 +275,8 @@ void Genotype::calculate_EC50_power_n(const GenotypeParameters::PfGenotypeInfo &
   }
 
   // power n
-  for (const auto &[drug_id, dt] : *drug_db) {
-    EC50_power_n[drug_id] = pow(EC50_power_n[drug_id], dt->n());
+  for (const auto &dt : *drug_db) {
+    EC50_power_n[dt->id()] = pow(EC50_power_n[dt->id()], dt->n());
   }
 }
 

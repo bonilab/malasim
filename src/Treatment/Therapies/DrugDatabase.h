@@ -1,28 +1,25 @@
 #ifndef DRUGDATABASE_H
-#define    DRUGDATABASE_H
+#define DRUGDATABASE_H
 
 #include "DrugType.h"
-#include <map>
 
-typedef std::map<int, DrugType *> DrugTypePtrMap;
+using DrugTypePtrVector = std::vector<std::unique_ptr<DrugType>>;
 
-class DrugDatabase : public DrugTypePtrMap {
-  //Dsiallow copy and assign
-  DrugDatabase(const DrugDatabase&) = delete;
-  void operator=(const DrugDatabase&) = delete;
+class DrugDatabase : public DrugTypePtrVector {
+public:
+  // Dsiallow copy and assign
+  DrugDatabase(const DrugDatabase &) = delete;
+  void operator=(const DrugDatabase &) = delete;
+  DrugDatabase(DrugDatabase &&) = delete;
+  DrugDatabase &operator=(DrugDatabase &&) = delete;
 
- public:
   DrugDatabase();
-
-  //    DrugDatabase(const DrugDatabase& orig);
   virtual ~DrugDatabase();
 
-  void add(DrugType *dt);
+  void add(std::unique_ptr<DrugType> dt);
 
-
- private:
-
+private:
 };
 
-#endif    /* DRUGDATABASE_H */
+#endif /* DRUGDATABASE_H */
 

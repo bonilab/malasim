@@ -19,7 +19,7 @@ Model::get_genotype_db()
 
 Model::get_config()->location_db()
 
-Model::get_config()->get_drug_parameters().drug_db
+Model::get_drug_db()
 
 Model::get_config()->get_therapy_parameters().therapy_db
 

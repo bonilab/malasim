@@ -44,7 +44,7 @@ double ClonalParasitePopulation::get_log10_infectious_density() const {
 }
 
 bool ClonalParasitePopulation::resist_to(const int &drug_id) const {
-  return genotype_->resist_to(Model::get_config()->get_drug_parameters().drug_db->at(drug_id));
+  return genotype_->resist_to(Model::get_drug_db()->at(drug_id).get());
 }
 
 void ClonalParasitePopulation::update() {

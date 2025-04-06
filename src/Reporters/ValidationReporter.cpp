@@ -427,29 +427,29 @@ void ValidationReporter::after_run() {
             "resistant_drug_pair_id: {} {}\tR-0: {}\tR-1: {}\tEC50-0: {}\tEC50-1: {}\tminEC50-0: "
             "{}\tminEC50-1: {}",
             resistant_drug_pair_id, genotype->aa_sequence,
-            genotype->resist_to(Model::get_config()->get_drug_parameters().drug_db->at(drugs[0])),
-            genotype->resist_to(Model::get_config()->get_drug_parameters().drug_db->at(drugs[1])),
+            genotype->resist_to(Model::get_drug_db()->at(drugs[0]).get()),
+            genotype->resist_to(Model::get_drug_db()->at(drugs[1]).get()),
             genotype->EC50_power_n[drugs[0]], genotype->EC50_power_n[drugs[1]],
-            pow(Model::get_config()->get_drug_parameters().drug_db->at(drugs[0])->base_EC50,
-                Model::get_config()->get_drug_parameters().drug_db->at(drugs[0])->n()),
-            pow(Model::get_config()->get_drug_parameters().drug_db->at(drugs[1])->base_EC50,
-                Model::get_config()->get_drug_parameters().drug_db->at(drugs[1])->n())));
+            pow(Model::get_drug_db()->at(drugs[0])->base_EC50,
+                Model::get_drug_db()->at(drugs[0])->n()),
+            pow(Model::get_drug_db()->at(drugs[1])->base_EC50,
+                Model::get_drug_db()->at(drugs[1])->n())));
       } else {
         spdlog::debug(fmt::format(
             "resistant_drug_pair_id: {} {}\tR-0: {}\tR-1: {}\tR-2: {}\tEC50-0: {}\tEC50-1: "
             "{}\tEC50-2: {}\tminEC50-0: {}\tminEC50-1: {}\tminEC50-2: {}",
             resistant_drug_pair_id, genotype->aa_sequence,
-            genotype->resist_to(Model::get_config()->get_drug_parameters().drug_db->at(drugs[0])),
-            genotype->resist_to(Model::get_config()->get_drug_parameters().drug_db->at(drugs[1])),
-            genotype->resist_to(Model::get_config()->get_drug_parameters().drug_db->at(drugs[2])),
+            genotype->resist_to(Model::get_drug_db()->at(drugs[0]).get()),
+            genotype->resist_to(Model::get_drug_db()->at(drugs[1]).get()),
+            genotype->resist_to(Model::get_drug_db()->at(drugs[2]).get()),
             genotype->EC50_power_n[drugs[0]], genotype->EC50_power_n[drugs[1]],
             genotype->EC50_power_n[drugs[2]],
-            pow(Model::get_config()->get_drug_parameters().drug_db->at(drugs[0])->base_EC50,
-                Model::get_config()->get_drug_parameters().drug_db->at(drugs[0])->n()),
-            pow(Model::get_config()->get_drug_parameters().drug_db->at(drugs[1])->base_EC50,
-                Model::get_config()->get_drug_parameters().drug_db->at(drugs[1])->n()),
-            pow(Model::get_config()->get_drug_parameters().drug_db->at(drugs[1])->base_EC50,
-                Model::get_config()->get_drug_parameters().drug_db->at(drugs[2])->n())));
+            pow(Model::get_drug_db()->at(drugs[0])->base_EC50,
+                Model::get_drug_db()->at(drugs[0])->n()),
+            pow(Model::get_drug_db()->at(drugs[1])->base_EC50,
+                Model::get_drug_db()->at(drugs[1])->n()),
+            pow(Model::get_drug_db()->at(drugs[1])->base_EC50,
+                Model::get_drug_db()->at(drugs[2])->n())));
       }
     }
     spdlog::debug("###############");

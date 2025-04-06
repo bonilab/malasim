@@ -286,8 +286,8 @@ void Person::receive_therapy(SCTherapy* sc_therapy, bool is_mac_therapy) {
 
   // Add the treatment to the blood
   for (int drug_id : sc_therapy->drug_ids) {
-    add_drug_to_blood(Model::get_config()->get_drug_parameters().drug_db->at(drug_id), dosing_days,
-                      is_mac_therapy);
+    add_drug_to_blood(Model::get_drug_db()->at(drug_id).get(),
+                      dosing_days, is_mac_therapy);
   }
 }
 

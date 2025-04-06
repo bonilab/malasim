@@ -26,9 +26,9 @@ int SCTherapy::get_max_dosing_day() const {
 }
 
 void SCTherapy::print(std::ostream &os) const {
-  os << Model::get_config()->get_drug_parameters().drug_db->at(drug_ids[0])->name();
+  os << Model::get_drug_db()->at(drug_ids[0])->name();
   for (std::size_t i = 1; i < drug_ids.size(); ++i) {
-    os << "+" + Model::get_config()->get_drug_parameters().drug_db->at(drug_ids[i])->name();
+    os << "+" + Model::get_drug_db()->at(drug_ids[i])->name();
   }
   os << "(" << dosing_day[0];
   for (auto ndx = 1; ndx < dosing_day.size(); ndx++) {

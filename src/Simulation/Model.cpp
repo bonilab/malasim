@@ -18,7 +18,6 @@ Model* Model::instance = nullptr;
 
 bool Model::initialize() {
   config_ = std::make_unique<Config>();
-  genotype_db_ = std::make_unique<GenotypeDatabase>();
   random_ = std::make_unique<utils::Random>(nullptr, -1);
   scheduler_ = std::make_unique<Scheduler>(this);
   population_ = std::make_unique<Population>(this);
@@ -30,6 +29,8 @@ bool Model::initialize() {
   having_drug_update_function_ = std::make_unique<ImmunityClearanceUpdateFunction>(this);
   clinical_update_function_ = std::make_unique<ImmunityClearanceUpdateFunction>(this);
   reporters_.clear();
+  genotype_db_ = std::make_unique<GenotypeDatabase>();
+  drug_db_ = std::make_unique<DrugDatabase>();
 
   if (utils::Cli::get_instance().get_input_path().empty()) {
     // spdlog::error("Input path is empty. Please provide a valid input path.");
@@ -130,9 +131,10 @@ void Model::release() {
   having_drug_update_function_.reset();
   clinical_update_function_.reset();
 
+  drug_db_.reset();
+  genotype_db_.reset();
   mosquito_.reset();
   mdc_.reset();
-  genotype_db_.reset();
   population_.reset();
   random_.reset();
   scheduler_.reset();

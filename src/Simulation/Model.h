@@ -3,6 +3,7 @@
 
 #include <Utils/Random.h>
 
+#include <cstddef>
 #include <memory>
 
 #include "Configuration/Config.h"
@@ -15,6 +16,7 @@
 #include "Reporters/Reporter.h"
 #include "Treatment/ITreatmentCoverageModel.h"
 #include "Treatment/Strategies/IStrategy.h"
+#include "Treatment/Therapies/DrugDatabase.h"
 
 namespace Spatial {
 class Location;
@@ -58,11 +60,12 @@ private:
   std::unique_ptr<ImmunityClearanceUpdateFunction> having_drug_update_function_{nullptr};
   std::unique_ptr<ImmunityClearanceUpdateFunction> clinical_update_function_{nullptr};
   std::unique_ptr<ITreatmentCoverageModel> treatment_coverage_{nullptr};
-  std::vector<std::unique_ptr<Reporter>> reporters_{};
+
+  std::vector<std::unique_ptr<Reporter>> reporters_;
+  std::vector<std::unique_ptr<IStrategy>> strategy_db_;
 
   std::unique_ptr<GenotypeDatabase> genotype_db_{nullptr};
-  std::vector<std::unique_ptr<IStrategy>> strategy_db_{};
-
+  std::unique_ptr<DrugDatabase> drug_db_{nullptr};
 
   IStrategy* treatment_strategy_{nullptr};
 
@@ -94,8 +97,13 @@ public:
   }
 
   static GenotypeDatabase* get_genotype_db() { return get_instance()->genotype_db_.get(); }
-  static void set_genotype_db(GenotypeDatabase* genotype_db) {
-    get_instance()->genotype_db_.reset(genotype_db);
+  static void set_genotype_db(std::unique_ptr<GenotypeDatabase> genotype_db) {
+    get_instance()->genotype_db_ = std::move(genotype_db);
+  }
+
+  static DrugDatabase* get_drug_db() { return get_instance()->drug_db_.get(); }
+  static void set_drug_db(std::unique_ptr<DrugDatabase> value) {
+    get_instance()->drug_db_ = std::move(value);
   }
 
   static std::vector<std::unique_ptr<IStrategy>> &get_strategy_db() {
@@ -108,31 +116,31 @@ public:
   static Mosquito* get_mosquito() { return get_instance()->mosquito_.get(); }
   static void set_mosquito(Mosquito* mosquito) { get_instance()->mosquito_.reset(mosquito); }
 
-  ClinicalUpdateFunction* progress_to_clinical_update_function() {
+  static ClinicalUpdateFunction* progress_to_clinical_update_function() {
     return get_instance()->progress_to_clinical_update_function_.get();
   }
-  void set_progress_to_clinical_update_function(ClinicalUpdateFunction* function) {
+  static void set_progress_to_clinical_update_function(ClinicalUpdateFunction* function) {
     get_instance()->progress_to_clinical_update_function_.reset(function);
   }
 
-  ImmunityClearanceUpdateFunction* having_drug_update_function() {
+  static ImmunityClearanceUpdateFunction* having_drug_update_function() {
     return get_instance()->having_drug_update_function_.get();
   }
-  void set_having_drug_update_function(ImmunityClearanceUpdateFunction* function) {
+  static void set_having_drug_update_function(ImmunityClearanceUpdateFunction* function) {
     get_instance()->having_drug_update_function_.reset(function);
   }
 
-  ImmunityClearanceUpdateFunction* immunity_clearance_update_function() {
+  static ImmunityClearanceUpdateFunction* immunity_clearance_update_function() {
     return get_instance()->immunity_clearance_update_function_.get();
   }
-  void set_immunity_clearance_update_function(ImmunityClearanceUpdateFunction* function) {
+  static void set_immunity_clearance_update_function(ImmunityClearanceUpdateFunction* function) {
     get_instance()->immunity_clearance_update_function_.reset(function);
   }
 
-  ImmunityClearanceUpdateFunction* clinical_update_function() {
+  static ImmunityClearanceUpdateFunction* clinical_update_function() {
     return get_instance()->clinical_update_function_.get();
   }
-  void set_clinical_update_function(ImmunityClearanceUpdateFunction* function) {
+  static void set_clinical_update_function(ImmunityClearanceUpdateFunction* function) {
     get_instance()->clinical_update_function_.reset(function);
   }
 

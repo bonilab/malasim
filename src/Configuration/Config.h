@@ -44,10 +44,8 @@ public:
   void validate_all_cross_field_validations();
 
   // Getters for entire configuration structures
-  [[nodiscard]] const ModelSettings &get_model_settings() const {
-    return model_settings_;
-  }
-  [[nodiscard]] const SimulationTimeframe &get_simulation_timeframe() const{
+  [[nodiscard]] const ModelSettings &get_model_settings() const { return model_settings_; }
+  [[nodiscard]] const SimulationTimeframe &get_simulation_timeframe() const {
     return simulation_timeframe_;
   }
   void set_simulation_timeframe(const SimulationTimeframe &timeframe) {
@@ -84,49 +82,33 @@ public:
      * later */
     return spatial_settings_;
   }
-  [[nodiscard]] SeasonalitySettings &get_seasonality_settings() {
-    return seasonality_settings_;
-  }
-  [[nodiscard]] MovementSettings &get_movement_settings() {
-    return movement_settings_;
-  }
+  [[nodiscard]] SeasonalitySettings &get_seasonality_settings() { return seasonality_settings_; }
+  [[nodiscard]] MovementSettings &get_movement_settings() { return movement_settings_; }
 
-  
-  [[nodiscard]] const ImmuneSystemParameters &get_immune_system_parameters()
-      const {
+  [[nodiscard]] const ImmuneSystemParameters &get_immune_system_parameters() const {
     return immune_system_parameters_;
   }
   void set_immune_system_parameters(const ImmuneSystemParameters &parameters) {
     immune_system_parameters_ = parameters;
   }
 
-  [[nodiscard]] GenotypeParameters &get_genotype_parameters() {
-    return genotype_parameters_;
-  }
-  [[nodiscard]] const DrugParameters &get_drug_parameters() const {
-    return drug_parameters_;
-  }
+  [[nodiscard]] GenotypeParameters &get_genotype_parameters() { return genotype_parameters_; }
+  [[nodiscard]] const DrugParameters &get_drug_parameters() const { return drug_parameters_; }
   [[nodiscard]] const TherapyParameters &get_therapy_parameters() const {
     return therapy_parameters_;
   }
-  [[nodiscard]] StrategyParameters &get_strategy_parameters() {
-    return strategy_parameters_;
-  }
-  [[nodiscard]] MosquitoParameters &get_mosquito_parameters() {
-    return mosquito_parameters_;
-  }
-  [[nodiscard]] PopulationEvents &get_population_events() {
-    return population_events_;
-  }
+  [[nodiscard]] StrategyParameters &get_strategy_parameters() { return strategy_parameters_; }
+  [[nodiscard]] MosquitoParameters &get_mosquito_parameters() { return mosquito_parameters_; }
+  [[nodiscard]] PopulationEvents &get_population_events() { return population_events_; }
   [[nodiscard]] RaptSettings &get_rapt_settings() { return rapt_settings_; }
 
   // Make relevant getters virtual for mocking
   [[nodiscard]] int number_of_locations() const;
   [[nodiscard]] int number_of_age_classes() const;
-  [[nodiscard]] int number_of_parasite_types() const;
+  static size_t number_of_parasite_types();
   [[nodiscard]] int number_of_tracking_days() const;
   [[nodiscard]] const std::vector<int> &age_structure() const;
-  
+
   // Keep non-virtual if not mocked directly
   std::vector<Spatial::Location> &location_db();
   // std::vector<IStrategy*> &strategy_db();
