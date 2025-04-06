@@ -127,9 +127,8 @@ void Person::set_immune_system(ImmuneSystem* value) {
 }
 
 ClonalParasitePopulation* Person::add_new_parasite_to_blood(Genotype* parasite_type) const {
-  auto* blood_parasite = new ClonalParasitePopulation(parasite_type);
-
-  all_clonal_parasite_populations_->add(blood_parasite);
+  auto blood_parasite = std::make_unique<ClonalParasitePopulation>(parasite_type);
+  auto* raw_ptr = blood_parasite.get();
 
   blood_parasite->set_last_update_log10_parasite_density(
       Model::get_config()
@@ -137,7 +136,8 @@ ClonalParasitePopulation* Person::add_new_parasite_to_blood(Genotype* parasite_t
           .get_parasite_density_levels()
           .get_log_parasite_density_from_liver());
 
-  return blood_parasite;
+  all_clonal_parasite_populations_->add(std::move(blood_parasite));
+  return raw_ptr;
 }
 
 double Person::relative_infectivity(const double &log10_parasite_density) {
@@ -199,7 +199,7 @@ int Person::complied_dosing_days(const int &dosing_day) const {
           (Model::get_config()->get_epidemiological_parameters().get_min_dosing_days() - dosing_day)
           / (1 - Model::get_config()->get_epidemiological_parameters().get_p_compliance());
       return static_cast<int>(std::ceil(
-          weight * prob
+          (weight * prob)
           + Model::get_config()->get_epidemiological_parameters().get_min_dosing_days() - weight));
     }
   }
