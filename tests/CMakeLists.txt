@@ -1,7 +1,13 @@
-include_directories(${CMAKE_SOURCE_DIR}/src)
-
 # Find Google Test
 find_package(GTest REQUIRED)
+find_package(fmt CONFIG REQUIRED)
+find_package(GSL REQUIRED)
+find_package(yaml-cpp CONFIG REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(date CONFIG REQUIRED)
+find_package(CLI11 CONFIG REQUIRED)
+find_package(stduuid CONFIG REQUIRED)
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
 include_directories(${PROJECT_SOURCE_DIR}/tests)
@@ -21,13 +27,21 @@ file(GLOB_RECURSE MALASIM_TEST_SOURCES
   "Population/Person/*.cpp"
 )
 
-
 # Add test executable
 add_executable(malasim_test
   ${MALASIM_TEST_SOURCES}
 )
 
 add_dependencies( malasim_test MalaSimCore)
+
+# Add coverage flags if enabled
+if(ENABLE_COVERAGE)
+  message(STATUS "LLVM Code coverage enabled for malasim_test")
+  # Add flags for compiling the test executable itself
+  target_compile_options(malasim_test PRIVATE -fprofile-instr-generate -fcoverage-mapping)
+  # Add flags needed during linking
+  target_link_options(malasim_test PRIVATE -fprofile-instr-generate)
+endif()
 
 # Link the core library and GTest to the test executable
 target_link_libraries(malasim_test PRIVATE

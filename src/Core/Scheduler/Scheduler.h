@@ -2,6 +2,7 @@
 #define SCHEDULER_H
 
 #include "Core/Scheduler/EventManager.h"
+#include "Events/Event.h"
 #include "Utils/Helpers/StringHelpers.h"
 #include "date/date.h"
 
@@ -20,8 +21,7 @@ private:
   Model* model_;
   bool is_force_stop_;
   date::sys_days calendar_date_;
-  EventManager<WorldEvent>
-      world_events_;  // Use EventManager for world/population events
+  EventManager<WorldEvent> world_events_;  // Use EventManager for world/population events
 
 public:
   explicit Scheduler(Model* model = nullptr);
@@ -84,9 +84,7 @@ public:
   }
   // Access to event manager
   EventManager<WorldEvent> &get_world_events() { return world_events_; }
-  const EventManager<WorldEvent> &get_world_events() const {
-    return world_events_;
-  }
+  const EventManager<WorldEvent> &get_world_events() const { return world_events_; }
 };
 
 #endif /* SCHEDULER_H */

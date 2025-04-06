@@ -9,6 +9,8 @@ endif()
 
 project(malasim)
 
+option(ENABLE_COVERAGE "Enable code coverage support" OFF)
+
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)

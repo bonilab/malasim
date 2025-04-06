@@ -41,16 +41,24 @@ setup-vcpkg:
 install-deps: setup-vcpkg
 	[ -z "$(VCPKG_ROOT_PATH)" ] || $(VCPKG_EXEC) install
 
+generate-test gt:
+	@$(MAKE) generate BUILD_TESTS=ON
+
+generate-coverage gc:
+	@$(MAKE) generate BUILD_TESTS=ON ENABLE_COVERAGE=ON
+
 generate g:
-	cmake -Bbuild -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DENABLE_TRAVEL_TRACKING=$(ENABLE_TRAVEL_TRACKING) -DBUILD_TESTS=$(BUILD_TESTS) $(TOOLCHAIN_ARG) .
+	cmake -Bbuild -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DENABLE_TRAVEL_TRACKING=$(ENABLE_TRAVEL_TRACKING) -DBUILD_TESTS=$(BUILD_TESTS) -DENABLE_COVERAGE=$(ENABLE_COVERAGE) $(TOOLCHAIN_ARG) .
 	cp $(PWD)build/compile_commands.json $(PWD)
 
 generate-ninja gn:
 	cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DENABLE_TRAVEL_TRACKING=$(ENABLE_TRAVEL_TRACKING) -DBUILD_TESTS=$(BUILD_TESTS) $(TOOLCHAIN_ARG) .
 	cp $(PWD)build/compile_commands.json $(PWD)
 
-generate-test gt:
-	@$(MAKE) generate BUILD_TESTS=ON
+coverage:
+	./build/bin/malasim_test
+	xcrun llvm-profdata merge -sparse default.profraw -o coverage.profdata
+	xcrun llvm-cov report  ./build/bin/malasim_test -instr-profile=coverage.profdata
 
 format:
 	find src tests -name '*.cpp' -o -name '*.h' | xargs clang-format -i --style=file

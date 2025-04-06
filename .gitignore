@@ -40,3 +40,5 @@ reporter\.txt
 # Ignore log files
 *.log
 /vcpkg/
+coverage.profdata
+default.profraw
