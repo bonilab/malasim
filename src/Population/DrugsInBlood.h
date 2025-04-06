@@ -56,7 +56,7 @@ class DrugsInBlood {
 
   void init();
 
-  Drug *add_drug(Drug *drug);
+  Drug *add_drug(std::unique_ptr<Drug> drug);
 
   std::size_t size() const;
 

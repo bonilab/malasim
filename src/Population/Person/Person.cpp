@@ -54,7 +54,7 @@ void Person::initialize() {
   current_relative_biting_rate_ = 0;
 }
 
-void Person::NotifyChange(const Property &property, const void* old_value, const void* new_value) {
+void Person::notify_change(const Property &property, const void* old_value, const void* new_value) {
   if (population_ != nullptr) { population_->notify_change(this, property, old_value, new_value); }
 }
 
@@ -67,7 +67,7 @@ void Person::set_location(const int &value) {
       Model::get_mdc()->update_person_days_by_years(value, day_diff);
     }
 
-    NotifyChange(LOCATION, &location_, &value);
+    notify_change(LOCATION, &location_, &value);
 
     location_ = value;
   }
@@ -75,7 +75,7 @@ void Person::set_location(const int &value) {
 
 void Person::set_host_state(const HostStates &value) {
   if (host_state_ != value) {
-    NotifyChange(HOST_STATE, &host_state_, &value);
+    notify_change(HOST_STATE, &host_state_, &value);
     if (value == DEAD) {
       // clear also remove all infection forces
       all_clonal_parasite_populations_->clear();
@@ -92,7 +92,7 @@ void Person::set_age(const int &value) {
   if (age_ != value) {
     // TODO::if age access the limit of age structure i.e. 100, remove person???
 
-    NotifyChange(AGE, &age_, &value);
+    notify_change(AGE, &age_, &value);
     // update biting rate level
     age_ = value;
 
@@ -110,14 +110,14 @@ void Person::set_age(const int &value) {
 
 void Person::set_age_class(const int &value) {
   if (age_class_ != value) {
-    NotifyChange(AGE_CLASS, &age_class_, &value);
+    notify_change(AGE_CLASS, &age_class_, &value);
     age_class_ = value;
   }
 }
 
 void Person::set_moving_level(const int &value) {
   if (moving_level_ != value) {
-    NotifyChange(MOVING_LEVEL, &moving_level_, &value);
+    notify_change(MOVING_LEVEL, &moving_level_, &value);
     moving_level_ = value;
   }
 }
@@ -190,7 +190,7 @@ bool Person::will_progress_to_death_when_recieve_treatment() {
                      * 0.1;
 }
 
-int Person::complied_dosing_days(const int &dosing_day) const {
+int Person::complied_dosing_days(const int &dosing_day) {
   if (Model::get_config()->get_epidemiological_parameters().get_p_compliance() < 1) {
     const auto prob = Model::get_random()->random_flat(0.0, 1.0);
     if (prob > Model::get_config()->get_epidemiological_parameters().get_p_compliance()) {
@@ -293,7 +293,7 @@ void Person::receive_therapy(SCTherapy* sc_therapy, bool is_mac_therapy) {
 
 void Person::add_drug_to_blood(DrugType* dt, const int &dosing_days, bool is_part_of_mac_therapy) {
   // Prepare the drug object
-  auto* drug = new Drug(dt);
+  auto drug = std::make_unique<Drug>(dt);
   drug->set_dosing_days(dosing_days);
   drug->set_last_update_time(Model::get_scheduler()->current_time());
 
@@ -330,7 +330,7 @@ void Person::add_drug_to_blood(DrugType* dt, const int &dosing_days, bool is_par
   drug->set_end_time(Model::get_scheduler()->current_time()
                      + dt->get_total_duration_of_drug_activity(dosing_days));
 
-  drugs_in_blood_->add_drug(drug);
+  drugs_in_blood_->add_drug(std::move(drug));
 }
 
 void Person::change_state_when_no_parasite_in_blood() {
@@ -924,7 +924,7 @@ void Person::schedule_birthday_event(int days_to_next_birthday) {
   schedule_basic_event(std::move(event));
 }
 
-int Person::calculate_future_time(int days_from_now) const {
+int Person::calculate_future_time(int days_from_now) {
   return Model::get_scheduler()->current_time() + days_from_now;
 }
 

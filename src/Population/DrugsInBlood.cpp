@@ -22,14 +22,12 @@ DrugsInBlood::~DrugsInBlood() {
   }
 }
 
-Drug *DrugsInBlood::add_drug(Drug *drug) {
+Drug *DrugsInBlood::add_drug(std::unique_ptr<Drug> drug) {
   int typeID = drug->drug_type()->id();
   drug->set_person_drugs(this);
   
   // Create unique_ptr from raw pointer
-  std::unique_ptr<Drug> new_drug(drug);
-  
-  auto [it, inserted] = drugs_.insert_or_assign(typeID, std::move(new_drug));
+  auto [it, inserted] = drugs_.insert_or_assign(typeID, std::move(drug));
   return it->second.get();
 }
 

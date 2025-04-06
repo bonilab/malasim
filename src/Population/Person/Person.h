@@ -33,6 +33,9 @@ public:
   Person(Person &&) = delete;
   Person &operator=(Person &&) = delete;
 
+  Person();
+  ~Person() override;
+
   enum RecurrenceStatus : uint8_t { NONE = 0, WITHOUT_SYMPTOM = 1, WITH_SYMPTOM = 2 };
 
   enum Property : uint8_t {
@@ -54,48 +57,6 @@ public:
     NUMBER_OF_STATE = 5
   };
 
-  Person();
-
-  ~Person() override;
-
-private:
-  int age_{0};
-  Population* population_{nullptr};
-  int location_{0};
-  int residence_location_{0};
-  HostStates host_state_{SUSCEPTIBLE};
-  int age_class_{0};
-  int birthday_{0};
-  int latest_update_time_{-1};
-  int moving_level_{0};
-  std::vector<int> today_infections_;
-  std::vector<int> today_target_locations_;
-  std::vector<double> prob_present_at_mda_by_age_;
-  int number_of_times_bitten_{0};
-  int number_of_trips_taken_{0};
-  int last_therapy_id_{-1};
-  std::map<int, double> starting_drug_values_for_MAC_;
-  double innate_relative_biting_rate_{0};
-  double current_relative_biting_rate_{0};
-  std::unique_ptr<ImmuneSystem> immune_system_{nullptr};
-  std::unique_ptr<SingleHostClonalParasitePopulations> all_clonal_parasite_populations_{nullptr};
-  std::unique_ptr<DrugsInBlood> drugs_in_blood_{nullptr};
-  Genotype* liver_parasite_type_{nullptr};
-  int latest_time_received_public_treatment_{-30};
-  RecurrenceStatus recurrence_status_{RecurrenceStatus::NONE};
-  EventManager<PersonEvent> event_manager_;
-
-#ifdef ENABLE_TRAVEL_TRACKING
-  int day_that_last_trip_was_initiated_{-1};
-  int day_that_last_trip_outside_district_was_initiated_{-1};
-
-public:
-  int get_day_that_last_trip_was_initiated() const { return day_that_last_trip_was_initiated_; }
-  int get_day_that_last_trip_outside_district_was_initiated() const {
-    return day_that_last_trip_outside_district_was_initiated_;
-  }
-#endif
-public:
   void initialize();
 
   // Delegate event management methods to event_manager_
@@ -229,7 +190,7 @@ public:
 
   void update_relative_bitting_rate();
 
-  void NotifyChange(const Property &property, const void* old_value, const void* new_value);
+  void notify_change(const Property &property, const void* old_value, const void* new_value);
 
   void set_location(const int &value);
 
@@ -254,8 +215,6 @@ public:
 
   void change_all_parasite_update_function(ParasiteDensityUpdateFunction* from,
                                            ParasiteDensityUpdateFunction* to) const;
-
-  [[nodiscard]] int complied_dosing_days(const int &dosing_day) const;
 
   void receive_therapy(Therapy* therapy, ClonalParasitePopulation* clinical_caused_parasite,
                        bool is_part_of_mac_therapy = false, bool is_public_sector = true);
@@ -306,12 +265,7 @@ public:
 
   void receive_therapy(SCTherapy* sc_therapy, bool is_mac_therapy);
 
-  int complied_dosing_days(const SCTherapy* therapy);
-
   [[nodiscard]] double age_in_floating(int simulation_time) const;
-
-  // Helper methods for scheduling
-  [[nodiscard]] int calculate_future_time(int days_from_now) const;
 
   // Group 1: Clinical Event Scheduling
   // void schedule_clinical_event(ClonalParasitePopulation* parasite, int days_delay);
@@ -338,6 +292,49 @@ public:
 
   // Group 4: Person Event Scheduling
   void schedule_birthday_event(int days_to_next_birthday = -1);
+
+  static int complied_dosing_days(const int &dosing_day);
+  static int complied_dosing_days(const SCTherapy* therapy);
+  // Helper methods for scheduling
+  static int calculate_future_time(int days_from_now);
+
+private:
+  int age_{0};
+  Population* population_{nullptr};
+  int location_{0};
+  int residence_location_{0};
+  HostStates host_state_{SUSCEPTIBLE};
+  int age_class_{0};
+  int birthday_{0};
+  int latest_update_time_{-1};
+  int moving_level_{0};
+  std::vector<int> today_infections_;
+  std::vector<int> today_target_locations_;
+  std::vector<double> prob_present_at_mda_by_age_;
+  int number_of_times_bitten_{0};
+  int number_of_trips_taken_{0};
+  int last_therapy_id_{-1};
+  std::map<int, double> starting_drug_values_for_MAC_;
+  double innate_relative_biting_rate_{0};
+  double current_relative_biting_rate_{0};
+  std::unique_ptr<ImmuneSystem> immune_system_{nullptr};
+  std::unique_ptr<SingleHostClonalParasitePopulations> all_clonal_parasite_populations_{nullptr};
+  std::unique_ptr<DrugsInBlood> drugs_in_blood_{nullptr};
+  Genotype* liver_parasite_type_{nullptr};
+  int latest_time_received_public_treatment_{-30};
+  RecurrenceStatus recurrence_status_{RecurrenceStatus::NONE};
+  EventManager<PersonEvent> event_manager_;
+
+#ifdef ENABLE_TRAVEL_TRACKING
+  int day_that_last_trip_was_initiated_{-1};
+  int day_that_last_trip_outside_district_was_initiated_{-1};
+
+public:
+  int get_day_that_last_trip_was_initiated() const { return day_that_last_trip_was_initiated_; }
+  int get_day_that_last_trip_outside_district_was_initiated() const {
+    return day_that_last_trip_outside_district_was_initiated_;
+  }
+#endif
 };
 
 #endif  // PERSON_H
