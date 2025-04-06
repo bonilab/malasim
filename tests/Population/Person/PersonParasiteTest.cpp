@@ -117,7 +117,7 @@ TEST_F(PersonParasiteTest, HasParasiteInBloodsButUnderDetectionThreshold) {
 
 TEST_F(PersonParasiteTest, IsGametocytaemicWhenParasiteInBloodAndCanProduceGametocytes) {
     // Initially should not be gametocytaemic
-    EXPECT_FALSE(person_->isGametocytaemic());
+    EXPECT_FALSE(person_->is_gametocytaemic());
 
     // Add parasite and test again (implementation depends on how gametocytes are handled)
     auto genotype_ptr = std::make_unique<Genotype>("aaabbbccc");
@@ -128,12 +128,12 @@ TEST_F(PersonParasiteTest, IsGametocytaemicWhenParasiteInBloodAndCanProduceGamet
     auto parasite = person_->add_new_parasite_to_blood(genotype_raw);
     parasite->set_gametocyte_level(1.0);
 
-    bool is_gametocytaemic = person_->isGametocytaemic();
+    bool is_gametocytaemic = person_->is_gametocytaemic();
     EXPECT_TRUE(is_gametocytaemic);
 }
 
 TEST_F(PersonParasiteTest, NotGametocytaemicWhenNoParasiteInBlood) {
-    EXPECT_FALSE(person_->isGametocytaemic());
+    EXPECT_FALSE(person_->is_gametocytaemic());
 }
 
 TEST_F(PersonParasiteTest, NotGametocytaemicWhenParasiteInBloodButNoGametocytes) {
@@ -143,7 +143,7 @@ TEST_F(PersonParasiteTest, NotGametocytaemicWhenParasiteInBloodButNoGametocytes)
     Model::get_genotype_db()->add(std::move(genotype_ptr));
     auto parasite = person_->add_new_parasite_to_blood(genotype_raw);
     parasite->set_gametocyte_level(0.0);
-    EXPECT_FALSE(person_->isGametocytaemic());
+    EXPECT_FALSE(person_->is_gametocytaemic());
 }
 
 // TODO: Implement this test later

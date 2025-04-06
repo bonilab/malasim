@@ -20,7 +20,6 @@ class Random;
 
 class Config;
 class Population;
-class Event;
 class ImmuneSystem;
 
 class Person : public PersonIndexAllHandler,
@@ -34,9 +33,9 @@ public:
   Person(Person &&) = delete;
   Person &operator=(Person &&) = delete;
 
-  enum RecurrenceStatus { NONE = 0, WITHOUT_SYMPTOM = 1, WITH_SYMPTOM = 2 };
+  enum RecurrenceStatus : uint8_t { NONE = 0, WITHOUT_SYMPTOM = 1, WITH_SYMPTOM = 2 };
 
-  enum Property {
+  enum Property : uint8_t {
     LOCATION = 0,
     HOST_STATE,
     AGE,
@@ -46,7 +45,7 @@ public:
     EXTERNAL_POPULATION_MOVING_LEVEL
   };
 
-  enum HostStates {
+  enum HostStates : uint8_t {
     SUSCEPTIBLE = 0,
     EXPOSED = 1,
     ASYMPTOMATIC = 2,
@@ -57,32 +56,32 @@ public:
 
   Person();
 
-  ~Person();
+  ~Person() override;
 
 private:
-  int age_;
+  int age_{0};
   Population* population_{nullptr};
-  int location_{};
-  int residence_location_{};
-  HostStates host_state_;
-  int age_class_{};
-  int birthday_{};
-  int latest_update_time_{};
-  int moving_level_{};
+  int location_{0};
+  int residence_location_{0};
+  HostStates host_state_{SUSCEPTIBLE};
+  int age_class_{0};
+  int birthday_{0};
+  int latest_update_time_{-1};
+  int moving_level_{0};
   std::vector<int> today_infections_;
   std::vector<int> today_target_locations_;
   std::vector<double> prob_present_at_mda_by_age_;
-  int number_of_times_bitten_{};
-  int number_of_trips_taken_{};
-  int last_therapy_id_{};
+  int number_of_times_bitten_{0};
+  int number_of_trips_taken_{0};
+  int last_therapy_id_{-1};
   std::map<int, double> starting_drug_values_for_MAC_;
-  double innate_relative_biting_rate_;
-  double current_relative_biting_rate_;
+  double innate_relative_biting_rate_{0};
+  double current_relative_biting_rate_{0};
   std::unique_ptr<ImmuneSystem> immune_system_{nullptr};
   std::unique_ptr<SingleHostClonalParasitePopulations> all_clonal_parasite_populations_{nullptr};
   std::unique_ptr<DrugsInBlood> drugs_in_blood_{nullptr};
   Genotype* liver_parasite_type_{nullptr};
-  int latest_time_received_public_treatment_{-1};
+  int latest_time_received_public_treatment_{-30};
   RecurrenceStatus recurrence_status_{RecurrenceStatus::NONE};
   EventManager<PersonEvent> event_manager_;
 
@@ -100,7 +99,7 @@ public:
   void initialize();
 
   // Delegate event management methods to event_manager_
-  void add_event(PersonEvent* event);
+  void schedule_basic_event(std::unique_ptr<PersonEvent> event);
   void update_events(int time) { event_manager_.execute_events(time); }
 
   template <typename T>
@@ -195,11 +194,11 @@ public:
   [[nodiscard]] int get_last_therapy_id() const { return last_therapy_id_; }
   void set_last_therapy_id(int last_therapy_id) { last_therapy_id_ = last_therapy_id; }
 
-  std::map<int, double> get_starting_drug_values_for_MAC() const {
+  [[nodiscard]] std::map<int, double> get_starting_drug_values_for_mac() const {
     return starting_drug_values_for_MAC_;
   }
-  void set_starting_drug_values_for_MAC(const std::map<int, double> &starting_drug_values_for_MAC) {
-    starting_drug_values_for_MAC_ = starting_drug_values_for_MAC;
+  void set_starting_drug_values_for_mac(const std::map<int, double> &starting_drug_values_for_mac) {
+    starting_drug_values_for_MAC_ = starting_drug_values_for_mac;
   }
 
   [[nodiscard]] double get_innate_relative_biting_rate() const {
@@ -259,9 +258,9 @@ public:
   [[nodiscard]] int complied_dosing_days(const int &dosing_day) const;
 
   void receive_therapy(Therapy* therapy, ClonalParasitePopulation* clinical_caused_parasite,
-                       bool is_part_of_MAC_therapy = false, bool is_public_sector = true);
+                       bool is_part_of_mac_therapy = false, bool is_public_sector = true);
 
-  void add_drug_to_blood(DrugType* dt, const int &dosing_days, bool is_part_of_MAC_therapy = false);
+  void add_drug_to_blood(DrugType* dt, const int &dosing_days, bool is_part_of_mac_therapy = false);
 
   void change_state_when_no_parasite_in_blood();
 
@@ -295,7 +294,7 @@ public:
 
   [[nodiscard]] double p_infection_from_an_infectious_bite() const;
 
-  [[nodiscard]] bool isGametocytaemic() const;
+  [[nodiscard]] bool is_gametocytaemic() const;
 
   void generate_prob_present_at_mda_by_age();
 
@@ -314,13 +313,6 @@ public:
   // Helper methods for scheduling
   [[nodiscard]] int calculate_future_time(int days_from_now) const;
 
-  template <typename T>
-  void schedule_basic_event(T* event) {
-    event->set_person(this);
-    add_event(event);
-  }
-
-public:
   // Group 1: Clinical Event Scheduling
   // void schedule_clinical_event(ClonalParasitePopulation* parasite, int days_delay);
   void schedule_end_clinical_event(ClonalParasitePopulation* parasite);
@@ -332,7 +324,7 @@ public:
   void schedule_rapt_event(int days_delay);
   void schedule_receive_mda_therapy_event(Therapy* therapy, int days_delay);
   void schedule_receive_therapy_event(ClonalParasitePopulation* parasite, Therapy* therapy,
-                                      int days_delay, bool is_part_of_MAC_therapy = false);
+                                      int days_delay, bool is_part_of_mac_therapy = false);
   void schedule_switch_immune_component_event(int days_delay);
 
   // Group 2: Parasite Event Scheduling

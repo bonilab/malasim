@@ -7,8 +7,7 @@
 #include "Utils/Helpers/TimeHelpers.h"
 #include "spdlog/spdlog.h"
 
-Scheduler::Scheduler(Model* model)
-    : current_time_(-1), model_(model), is_force_stop_(false) {}
+Scheduler::Scheduler(Model* model) : current_time_(-1), model_(model), is_force_stop_(false) {}
 
 Scheduler::~Scheduler() = default;
 
@@ -22,10 +21,7 @@ void Scheduler::initialize(const date::year_month_day &starting_date,
 void Scheduler::run() {
   current_time_ = 0;
   for (current_time_ = 0; !can_stop(); current_time_++) {
-    if (current_time_
-            % Model::get_config()
-                  ->get_model_settings()
-                  .get_days_between_stdout_output()
+    if (current_time_ % Model::get_config()->get_model_settings().get_days_between_stdout_output()
         == 0) {
       spdlog::info("Day: {}", current_time_);
     }
@@ -61,13 +57,10 @@ void Scheduler::end_time_step() {
 }
 
 bool Scheduler::can_stop() {
-  return current_time_
-         > Model::get_config()->get_simulation_timeframe().get_total_time();
+  return current_time_ > Model::get_config()->get_simulation_timeframe().get_total_time();
 }
 
-int Scheduler::get_current_day_in_year() {
-  return TimeHelpers::day_of_year(calendar_date_);
-}
+int Scheduler::get_current_day_in_year() { return TimeHelpers::day_of_year(calendar_date_); }
 
 unsigned int Scheduler::get_current_month_in_year() {
   return TimeHelpers::month_of_year(calendar_date_);
@@ -136,7 +129,5 @@ int Scheduler::get_unix_time() const {
   return std::chrono::system_clock::to_time_t(calendar_date_);
 }
 
-date::year_month_day Scheduler::get_calendar_date() const {
-  return calendar_date_;
-}
+date::year_month_day Scheduler::get_calendar_date() const { return calendar_date_; }
 

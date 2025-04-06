@@ -1,6 +1,8 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+#include <memory>
+
 #include "Core/Scheduler/EventManager.h"
 #include "Events/Event.h"
 #include "Utils/Helpers/StringHelpers.h"
@@ -45,7 +47,7 @@ public:
   void clear_all_events() { world_events_.get_events().clear(); }
 
   virtual void schedule_population_event(WorldEvent* event) {
-    if (event != nullptr) { world_events_.schedule_event(event); }
+    if (event != nullptr) { world_events_.schedule_event(std::unique_ptr<WorldEvent>(event)); }
   }
 
   virtual void cancel(WorldEvent* event) {

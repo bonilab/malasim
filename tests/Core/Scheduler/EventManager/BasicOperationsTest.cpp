@@ -7,8 +7,8 @@ TEST_F(BasicOperationsTest, Initialize) {
 }
 
 TEST_F(BasicOperationsTest, ScheduleEvent) {
-    auto* event = new MockEvent(0);
-    event_manager.schedule_event(event);
+    auto event = std::make_unique<MockEvent>(0);
+    event_manager.schedule_event(std::move(event));
     ASSERT_TRUE(event_manager.has_event());
 }
 
@@ -17,8 +17,8 @@ TEST_F(BasicOperationsTest, InitialStateIsEmpty) {
 }
 
 TEST_F(BasicOperationsTest, ScheduleEventAddsToQueue) {
-    auto* event = new NiceMock<MockEvent>(10);
-    event_manager.schedule_event(event);
+    auto event = std::make_unique<NiceMock<MockEvent>>(10);
+    event_manager.schedule_event(std::move(event));
     
     EXPECT_EQ(event_manager.get_events().size(), 1);
     EXPECT_EQ(event_manager.get_events().begin()->first, 10);
@@ -34,8 +34,8 @@ TEST_F(BasicOperationsTest, ExecuteEmptyEventManager) {
 TEST_F(BasicOperationsTest, HasEventWithoutType) {
     EXPECT_FALSE(event_manager.has_event());
 
-    auto* event = new NiceMock<MockEvent>(10);
-    event_manager.schedule_event(event);
+    auto event = std::make_unique<NiceMock<MockEvent>>(10);
+    event_manager.schedule_event(std::move(event));
     EXPECT_TRUE(event_manager.has_event());
 
     event_manager.execute_events(20);

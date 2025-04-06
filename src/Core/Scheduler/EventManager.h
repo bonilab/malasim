@@ -2,6 +2,7 @@
 #define EVENT_MANAGER_H
 
 #include <map>
+#include <memory>
 
 #include "spdlog/spdlog.h"
 
@@ -53,10 +54,10 @@ public:
   }
 
   // Schedule an event and transfer ownership
-  void schedule_event(EventType* event) {
+  void schedule_event(std::unique_ptr<EventType> event) {
     if (event) {
       event->set_executable(true);
-      events_.emplace(event->get_time(), std::unique_ptr<EventType>(event));
+      events_.emplace(event->get_time(), std::move(event));
     }
   }
 
@@ -65,10 +66,10 @@ public:
   }
 
   // Convenience method to check if any event exists
-  bool has_event() const { return !events_.empty(); }
+  [[nodiscard]] bool has_event() const { return !events_.empty(); }
 
   template <typename T>
-  bool has_event() const {
+  [[nodiscard]] bool has_event() const {
     for (const auto &[time, event] : events_) {
       if (dynamic_cast<T*>(event.get()) != nullptr) { return true; }
     }
@@ -84,17 +85,17 @@ public:
   }
 
   // Cancel all events except the specified one
-  void cancel_all_events_except(EventType* inEvent) {
+  void cancel_all_events_except(EventType* in_event) {
     for (auto &[time, event] : events_) {
-      if (event.get() != inEvent) { event->set_executable(false); }
+      if (event.get() != in_event) { event->set_executable(false); }
     }
   }
 
   // Cancel all events of type T except the specified one
   template <typename T>
-  void cancel_all_events_except(EventType* inEvent) {
+  void cancel_all_events_except(EventType* in_event) {
     for (auto &[time, event] : events_) {
-      if (event.get() != inEvent && dynamic_cast<T*>(event.get()) != nullptr) {
+      if (event.get() != in_event && dynamic_cast<T*>(event.get()) != nullptr) {
         event->set_executable(false);
       }
     }
