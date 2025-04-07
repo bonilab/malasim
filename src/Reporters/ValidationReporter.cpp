@@ -123,7 +123,7 @@ void ValidationReporter::monthly_report() {
     ss << group_sep;  /// 32
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    for (auto ac = 0ul; ac < Model::get_config()->number_of_age_classes(); ac++) {
+    for (auto ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
       ss << Model::get_mdc()->blood_slide_prevalence_by_location_age_group()[loc][ac] << sep;
     }
     ss << group_sep;  // 48
@@ -143,7 +143,7 @@ void ValidationReporter::monthly_report() {
     ss << group_sep;  // 133
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    for (auto ac = 0ul; ac < Model::get_config()->number_of_age_classes(); ac++) {
+    for (auto ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
       ss << Model::get_mdc()->number_of_treatments_by_location_age_year()[loc][ac] << sep;
     }
     ss << group_sep;  // 149
@@ -197,14 +197,15 @@ void ValidationReporter::monthly_report() {
       } else {
         ss << std::setprecision(6)
            << Model::get_mdc()->number_of_clinical_by_location_age_group()[loc][ac]
-                  / (double)all_infected_pop
+                  / static_cast<double>(all_infected_pop)
            << sep;
       }
     }
     ss << group_sep;  // 337
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->total_immune_by_location()[loc] / Model::get_population()->size_at(loc)
+    ss << Model::get_mdc()->total_immune_by_location()[loc]
+              / static_cast<double>(Model::get_population()->size_at(loc))
        << sep;
     ss << group_sep;  // 339
   }
@@ -217,7 +218,7 @@ void ValidationReporter::monthly_report() {
     } else {
       ss << std::setprecision(6)
          << Model::get_mdc()->monthly_number_of_clinical_episode_by_location()[loc]
-                / (double)all_infected_pop
+                / static_cast<double>(all_infected_pop)
          << sep;
     }
     ss << group_sep;  // 341
@@ -234,13 +235,12 @@ void ValidationReporter::monthly_report() {
     ss << Model::get_mdc()->monthly_number_of_TF_by_location()[loc] << sep;
     ss << group_sep;  // 360
   }
-  for (int t_id = 0; t_id < Model::get_config()->get_therapy_parameters().therapy_db.size();
-       t_id++) {
-    int nTreaments = Model::get_mdc()->number_of_treatments_with_therapy_ID()[t_id];
-    int nSuccess = Model::get_mdc()->number_of_treatments_success_with_therapy_ID()[t_id];
-    int nFail = Model::get_mdc()->number_of_treatments_fail_with_therapy_ID()[t_id];
-    double pSuccess = (nTreaments == 0) ? 0 : nSuccess * 100.0 / nTreaments;
-    ss << nTreaments << sep << nSuccess << sep << nFail << sep << pSuccess << sep;
+  for (int t_id = 0; t_id < Model::get_therapy_db().size(); t_id++) {
+    int n_treaments = Model::get_mdc()->number_of_treatments_with_therapy_ID()[t_id];
+    int n_success = Model::get_mdc()->number_of_treatments_success_with_therapy_ID()[t_id];
+    int n_fail = Model::get_mdc()->number_of_treatments_fail_with_therapy_ID()[t_id];
+    double p_success = (n_treaments == 0) ? 0 : n_success * 100.0 / n_treaments;
+    ss << n_treaments << sep << n_success << sep << n_fail << sep << p_success << sep;
   }
   ss << group_sep;  // 417
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
@@ -288,7 +288,7 @@ void ValidationReporter::monthly_report() {
   //                                              Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
   std::stringstream prmc_freq_ss;
   ReporterUtils::output_genotype_frequency4(
-      gene_freq_ss, prmc_freq_ss, Model::get_genotype_db()->size(),
+      gene_freq_ss, prmc_freq_ss, static_cast<int>(Model::get_genotype_db()->size()),
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
 
   gene_freq_logger->info(gene_freq_ss.str());
@@ -297,14 +297,14 @@ void ValidationReporter::monthly_report() {
   ss.str("");
   int sum = 0;
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    sum += Model::get_mdc()->mutation_tracker[loc].size();
-    for (int i = 0; i < Model::get_mdc()->mutation_tracker[loc].size(); i++) {
-      ss << std::get<0>(Model::get_mdc()->mutation_tracker[loc][i]) << sep;
-      ss << std::get<1>(Model::get_mdc()->mutation_tracker[loc][i]) << sep;
-      ss << std::get<2>(Model::get_mdc()->mutation_tracker[loc][i]) << sep;
-      ss << std::get<3>(Model::get_mdc()->mutation_tracker[loc][i]) << sep;
-      ss << std::get<4>(Model::get_mdc()->mutation_tracker[loc][i]) << sep;
-      ss << std::get<5>(Model::get_mdc()->mutation_tracker[loc][i]) << '\n';
+    sum += static_cast<int>(Model::get_mdc()->mutation_tracker[loc].size());
+    for (auto &yearly_data : Model::get_mdc()->mutation_tracker[loc]) {
+      ss << std::get<0>(yearly_data) << sep;
+      ss << std::get<1>(yearly_data) << sep;
+      ss << std::get<2>(yearly_data) << sep;
+      ss << std::get<3>(yearly_data) << sep;
+      ss << std::get<4>(yearly_data) << sep;
+      ss << std::get<5>(yearly_data) << '\n';
     }
   }
   if (sum > 0) {
@@ -317,17 +317,14 @@ void ValidationReporter::monthly_report() {
   ss.str("");
   sum = 0;
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    sum += Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].size();
-    for (int i = 0;
-         i < Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].size(); i++) {
-      ss << std::get<0>(Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc][i])
-         << sep;
-      ss << std::get<1>(Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc][i])
-         << sep;
-      ss << std::get<2>(Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc][i])
-         << sep;
-      ss << std::get<3>(Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc][i])
-         << '\n';
+    sum += static_cast<int>(
+        Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].size());
+    for (auto &genotype_tracked :
+         Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc]) {
+      ss << std::get<0>(genotype_tracked) << sep;
+      ss << std::get<1>(genotype_tracked) << sep;
+      ss << std::get<2>(genotype_tracked) << sep;
+      ss << std::get<3>(genotype_tracked) << '\n';
     }
   }
   if (sum > 0) {
@@ -360,7 +357,7 @@ void ValidationReporter::after_run() {
     sum_ntf += Model::get_mdc()->cumulative_NTF_by_location()[loc];
     pop_size += Model::get_mdc()->popsize_by_location()[loc];
   }
-  ss << (sum_ntf * 100 / pop_size) / total_time_in_years << sep;
+  ss << (sum_ntf * 100 / static_cast<double>(pop_size)) / total_time_in_years << sep;
   ss << group_sep;  // 12
   for (int loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
     ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
@@ -375,16 +372,17 @@ void ValidationReporter::after_run() {
     ss << group_sep;  // 16
   }
   for (int loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    double location_NTF = Model::get_mdc()->cumulative_NTF_by_location()[loc] * 100
-                          / (double)Model::get_mdc()->popsize_by_location()[loc];
-    location_NTF /= total_time_in_years;
-    ss << location_NTF << sep;
+    double location_ntf = Model::get_mdc()->cumulative_NTF_by_location()[loc] * 100
+                          / static_cast<double>(Model::get_mdc()->popsize_by_location()[loc]);
+    location_ntf /= total_time_in_years;
+    ss << location_ntf << sep;
     //        std::cout << location_NTF << "\t";
     ss << group_sep;  // 18
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
     for (auto age = 0; age < 80; age++) {
-      ss << Model::get_mdc()->cumulative_clinical_episodes_by_location_age()[loc][age]
+      ss << static_cast<double>(
+                Model::get_mdc()->cumulative_clinical_episodes_by_location_age()[loc][age])
                 / total_time_in_years / Model::get_mdc()->popsize_by_location_age()[loc][age]
          << sep;
     }

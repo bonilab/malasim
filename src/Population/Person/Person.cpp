@@ -251,8 +251,7 @@ void Person::receive_therapy(Therapy* therapy, ClonalParasitePopulation* clinica
       assert(start_day >= 1);
 
       // Verify the therapy that is part of the regimen
-      sc_therapy = dynamic_cast<SCTherapy*>(
-          Model::get_config()->get_therapy_parameters().therapy_db[therapy_id]);
+      sc_therapy = dynamic_cast<SCTherapy*>(Model::get_therapy_db()[therapy_id].get());
       if (sc_therapy == nullptr) {
         auto message = "Complex therapy (" + std::to_string(therapy->get_id())
                        + ") contains a reference to an unknown therapy id ("
@@ -286,8 +285,7 @@ void Person::receive_therapy(SCTherapy* sc_therapy, bool is_mac_therapy) {
 
   // Add the treatment to the blood
   for (int drug_id : sc_therapy->drug_ids) {
-    add_drug_to_blood(Model::get_drug_db()->at(drug_id).get(),
-                      dosing_days, is_mac_therapy);
+    add_drug_to_blood(Model::get_drug_db()->at(drug_id).get(), dosing_days, is_mac_therapy);
   }
 }
 
@@ -406,8 +404,7 @@ void Person::determine_symptomatic_recrudescence(
     // The last clinical caused parasite is going to relapse
     // regardless whether the induvidual are under treatment or not
     // Set the update function to progress to clinical
-    clinical_caused_parasite->set_update_function(
-        Model::get_instance()->progress_to_clinical_update_function());
+    clinical_caused_parasite->set_update_function(Model::progress_to_clinical_update_function());
 
     // Set the last update parasite density to the asymptomatic level
 
@@ -457,12 +454,10 @@ void Person::determine_symptomatic_recrudescence(
 
     if (drugs_in_blood_->size() > 0) {
       // Set the update function to having drug
-      clinical_caused_parasite->set_update_function(
-          Model::get_instance()->having_drug_update_function());
+      clinical_caused_parasite->set_update_function(Model::having_drug_update_function());
     } else {
       // Set the update function to immunity clearance
-      clinical_caused_parasite->set_update_function(
-          Model::get_instance()->immunity_clearance_update_function());
+      clinical_caused_parasite->set_update_function(Model::immunity_clearance_update_function());
     }
   }
 }
@@ -472,8 +467,7 @@ void Person::determine_clinical_or_not(ClonalParasitePopulation* clinical_caused
     const auto prob = Model::get_random()->random_flat(0.0, 1.0);
     if (prob <= get_probability_progress_to_clinical()) {
       // progress to clinical after several days
-      clinical_caused_parasite->set_update_function(
-          Model::get_instance()->progress_to_clinical_update_function());
+      clinical_caused_parasite->set_update_function(Model::progress_to_clinical_update_function());
       clinical_caused_parasite->set_last_update_log10_parasite_density(
           Model::get_config()
               ->get_parasite_parameters()
@@ -482,8 +476,7 @@ void Person::determine_clinical_or_not(ClonalParasitePopulation* clinical_caused
       schedule_progress_to_clinical_event(clinical_caused_parasite);
     } else {
       // progress to clearance
-      clinical_caused_parasite->set_update_function(
-          Model::get_instance()->immunity_clearance_update_function());
+      clinical_caused_parasite->set_update_function(Model::immunity_clearance_update_function());
     }
   }
 }

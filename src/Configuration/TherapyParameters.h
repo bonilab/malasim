@@ -56,22 +56,14 @@ public:
   [[nodiscard]] YAML::Node get_node() const { return node_; }
   void set_node(const YAML::Node& value) { node_ = value; }
 
-  Therapy *read_therapy(const YAML::Node &n, const int &therapy_id) {
+  std::unique_ptr<Therapy> read_therapy(const YAML::Node &n, const int &therapy_id) {
     const auto t_id = NumberHelpers::number_to_string<int>(therapy_id);
-    auto *t = TherapyBuilder::build(n[t_id], therapy_id);
+    auto t = TherapyBuilder::build(n[t_id], therapy_id);
     return t;
   }
 
-  void process_config() override {
-    spdlog::info("Processing TherapyParameters");
+  void process_config() override; 
 
-    for (std::size_t i = 0; i < node_.size(); i++) {
-      auto *t = read_therapy(node_, static_cast<int>(i));
-      therapy_db.push_back(t);
-    }
-  }
-
-  std::vector<Therapy*> therapy_db;
 private:
   int tf_testing_day_ = 28;
   double tf_rate_ = 0.1;

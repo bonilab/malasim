@@ -60,12 +60,14 @@ private:
   std::unique_ptr<ImmunityClearanceUpdateFunction> clinical_update_function_{nullptr};
   std::unique_ptr<ITreatmentCoverageModel> treatment_coverage_{nullptr};
 
-  std::vector<std::unique_ptr<Reporter>> reporters_;
-  std::vector<std::unique_ptr<IStrategy>> strategy_db_;
 
   std::unique_ptr<GenotypeDatabase> genotype_db_{nullptr};
   std::unique_ptr<DrugDatabase> drug_db_{nullptr};
   std::unique_ptr<SpatialData> spatial_data_{nullptr};
+
+  std::vector<std::unique_ptr<Reporter>> reporters_;
+  std::vector<std::unique_ptr<IStrategy>> strategy_db_;
+  std::vector<std::unique_ptr<Therapy>> therapy_db_;
 
   IStrategy* treatment_strategy_{nullptr};
 
@@ -109,6 +111,10 @@ public:
   static SpatialData* get_spatial_data() { return get_instance()->spatial_data_.get(); }
   static void set_spatial_data(std::unique_ptr<SpatialData> spatial_data) {
     get_instance()->spatial_data_ = std::move(spatial_data);
+  }
+
+  static std::vector<std::unique_ptr<Therapy>> &get_therapy_db() {
+    return get_instance()->therapy_db_;
   }
 
   static std::vector<std::unique_ptr<IStrategy>> &get_strategy_db() {

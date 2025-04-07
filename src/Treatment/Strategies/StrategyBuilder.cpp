@@ -1,5 +1,7 @@
 #include "StrategyBuilder.h"
 
+#include <algorithm>
+
 #include "AdaptiveCyclingStrategy.h"
 #include "CyclingStrategy.h"
 #include "DistrictMftStrategy.h"
@@ -22,27 +24,27 @@ IStrategy* StrategyBuilder::build(const YAML::Node &ns, const int &strategy_id) 
   const auto type = IStrategy::StrategyTypeMap[ns["type"].as<std::string>()];
   switch (type) {
     case IStrategy::SFT:
-      return buildSFTStrategy(ns, strategy_id);
+      return build_sft_strategy(ns, strategy_id);
     case IStrategy::Cycling:
-      return buildCyclingStrategy(ns, strategy_id);
+      return build_cycling_strategy(ns, strategy_id);
     case IStrategy::AdaptiveCycling:
-      return buildAdaptiveCyclingStrategy(ns, strategy_id);
+      return build_adaptive_cycling_strategy(ns, strategy_id);
     case IStrategy::MFT:
-      return buildMFTStrategy(ns, strategy_id);
+      return build_mft_strategy(ns, strategy_id);
     case IStrategy::MFTRebalancing:
-      return buildMFTRebalancingStrategy(ns, strategy_id);
+      return build_mft_rebalancing_strategy(ns, strategy_id);
     case IStrategy::NestedMFT:
-      return buildNestedSwitchingStrategy(ns, strategy_id);
+      return build_nested_switching_strategy(ns, strategy_id);
     case IStrategy::MFTMultiLocation:
-      return buildMFTMultiLocationStrategy(ns, strategy_id);
+      return build_mft_multi_location_strategy(ns, strategy_id);
     case IStrategy::NestedMFTMultiLocation:
-      return buildNestedMFTDifferentDistributionByLocationStrategy(ns, strategy_id);
+      return build_nested_mft_different_distribution_by_location_strategy(ns, strategy_id);
     case IStrategy::NovelDrugIntroduction:
-      return buildNovelDrugIntroductionStrategy(ns, strategy_id);
+      return build_novel_drug_introduction_strategy(ns, strategy_id);
     case IStrategy::DistrictMft:
-      return buildDistrictMftStrategy(ns, strategy_id);
+      return build_district_mft_strategy(ns, strategy_id);
     case IStrategy::MFTAgeBased:
-      return buildMFTAgeBasedStrategy(ns, strategy_id);
+      return build_mft_age_based_strategy(ns, strategy_id);
     default:
       return nullptr;
   }
@@ -50,25 +52,23 @@ IStrategy* StrategyBuilder::build(const YAML::Node &ns, const int &strategy_id) 
 
 void StrategyBuilder::add_therapies(const YAML::Node &ns, IStrategy* result) {
   for (auto i = 0; i < ns["therapy_ids"].size(); i++) {
-    result->add_therapy(
-        Model::get_config()->get_therapy_parameters().therapy_db[ns["therapy_ids"][i].as<int>()]);
+    result->add_therapy(Model::get_therapy_db()[ns["therapy_ids"][i].as<int>()].get());
   }
 }
 
-void StrategyBuilder::add_distributions(const YAML::Node &ns, DoubleVector &v) {
-  for (auto i = 0; i < ns.size(); i++) { v.push_back(ns[i].as<double>()); }
+void StrategyBuilder::add_distributions(const YAML::Node &ns, DoubleVector &distribution) {
+  for (const auto &node : ns) { distribution.push_back(node.as<double>()); }
 }
 
-IStrategy* StrategyBuilder::buildSFTStrategy(const YAML::Node &ns, const int &strategy_id) {
+IStrategy* StrategyBuilder::build_sft_strategy(const YAML::Node &ns, const int &strategy_id) {
   auto* result = new SFTStrategy();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
-  result->add_therapy(
-      Model::get_config()->get_therapy_parameters().therapy_db[ns["therapy_ids"][0].as<int>()]);
+  result->add_therapy(Model::get_therapy_db()[ns["therapy_ids"][0].as<int>()].get());
   return result;
 }
 
-IStrategy* StrategyBuilder::buildCyclingStrategy(const YAML::Node &ns, const int &strategy_id) {
+IStrategy* StrategyBuilder::build_cycling_strategy(const YAML::Node &ns, const int &strategy_id) {
   auto* result = new CyclingStrategy();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
@@ -81,8 +81,8 @@ IStrategy* StrategyBuilder::buildCyclingStrategy(const YAML::Node &ns, const int
   return result;
 }
 
-IStrategy* StrategyBuilder::buildAdaptiveCyclingStrategy(const YAML::Node &ns,
-                                                         const int &strategy_id) {
+IStrategy* StrategyBuilder::build_adaptive_cycling_strategy(const YAML::Node &ns,
+                                                            const int &strategy_id) {
   auto* result = new AdaptiveCyclingStrategy();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
@@ -95,7 +95,7 @@ IStrategy* StrategyBuilder::buildAdaptiveCyclingStrategy(const YAML::Node &ns,
   return result;
 }
 
-IStrategy* StrategyBuilder::buildMFTStrategy(const YAML::Node &ns, const int &strategy_id) {
+IStrategy* StrategyBuilder::build_mft_strategy(const YAML::Node &ns, const int &strategy_id) {
   auto* result = new MFTStrategy();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
@@ -105,8 +105,8 @@ IStrategy* StrategyBuilder::buildMFTStrategy(const YAML::Node &ns, const int &st
   return result;
 }
 
-IStrategy* StrategyBuilder::buildNestedSwitchingStrategy(const YAML::Node &ns,
-                                                         const int &strategy_id) {
+IStrategy* StrategyBuilder::build_nested_switching_strategy(const YAML::Node &ns,
+                                                            const int &strategy_id) {
   auto* result = new NestedMFTStrategy();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
@@ -124,8 +124,8 @@ IStrategy* StrategyBuilder::buildNestedSwitchingStrategy(const YAML::Node &ns,
   return result;
 }
 
-IStrategy* StrategyBuilder::buildMFTRebalancingStrategy(const YAML::Node &ns,
-                                                        const int &strategy_id) {
+IStrategy* StrategyBuilder::build_mft_rebalancing_strategy(const YAML::Node &ns,
+                                                           const int &strategy_id) {
   auto* result = new MFTRebalancingStrategy();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
@@ -142,23 +142,22 @@ IStrategy* StrategyBuilder::buildMFTRebalancingStrategy(const YAML::Node &ns,
   return result;
 }
 
-IStrategy* StrategyBuilder::buildMFTMultiLocationStrategy(const YAML::Node &ns,
-                                                          const int &strategy_id) {
+IStrategy* StrategyBuilder::build_mft_multi_location_strategy(const YAML::Node &ns,
+                                                              const int &strategy_id) {
   auto* result = new MFTMultiLocationStrategy();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
 
   result->distribution.clear();
-  result->distribution.resize(
-      static_cast<unsigned long long int>(Model::get_config()->number_of_locations()));
+  result->distribution.resize(static_cast<uint64_t>(Model::get_config()->number_of_locations()));
 
   result->start_distribution.clear();
   result->start_distribution.resize(
-      static_cast<unsigned long long int>(Model::get_config()->number_of_locations()));
+      static_cast<uint64_t>(Model::get_config()->number_of_locations()));
 
   result->peak_distribution.clear();
   result->peak_distribution.resize(
-      static_cast<unsigned long long int>(Model::get_config()->number_of_locations()));
+      static_cast<uint64_t>(Model::get_config()->number_of_locations()));
 
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
     auto input_loc =
@@ -190,23 +189,22 @@ IStrategy* StrategyBuilder::buildMFTMultiLocationStrategy(const YAML::Node &ns,
   return result;
 }
 
-IStrategy* StrategyBuilder::buildNestedMFTDifferentDistributionByLocationStrategy(
+IStrategy* StrategyBuilder::build_nested_mft_different_distribution_by_location_strategy(
     const YAML::Node &ns, const int &strategy_id) {
   auto* result = new NestedMFTMultiLocationStrategy();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
 
   result->distribution.clear();
-  result->distribution.resize(
-      static_cast<unsigned long long int>(Model::get_config()->number_of_locations()));
+  result->distribution.resize(static_cast<uint64_t>(Model::get_config()->number_of_locations()));
 
   result->start_distribution.clear();
   result->start_distribution.resize(
-      static_cast<unsigned long long int>(Model::get_config()->number_of_locations()));
+      static_cast<uint64_t>(Model::get_config()->number_of_locations()));
 
   result->peak_distribution.clear();
   result->peak_distribution.resize(
-      static_cast<unsigned long long int>(Model::get_config()->number_of_locations()));
+      static_cast<uint64_t>(Model::get_config()->number_of_locations()));
 
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
     auto input_loc =
@@ -243,8 +241,8 @@ IStrategy* StrategyBuilder::buildNestedMFTDifferentDistributionByLocationStrateg
   return result;
 }
 
-IStrategy* StrategyBuilder::buildNovelDrugIntroductionStrategy(const YAML::Node &ns,
-                                                               const int strategy_id) {
+IStrategy* StrategyBuilder::build_novel_drug_introduction_strategy(const YAML::Node &ns,
+                                                                   const int strategy_id) {
   auto* result = new NovelDrugIntroductionStrategy();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
@@ -263,14 +261,14 @@ IStrategy* StrategyBuilder::buildNovelDrugIntroductionStrategy(const YAML::Node 
   result->tf_threshold = ns["tf_threshold"].as<double>();
 
   result->replacement_fraction = ns["replacement_fraction"].as<double>();
-  result->replacement_duration = ns["replacement_duration"].as<double>();
+  result->replacement_duration = ns["replacement_duration"].as<int>();
 
   return result;
 }
 
 // Read the YAML and create the DistrictMftStrategy object.
-IStrategy* StrategyBuilder::buildDistrictMftStrategy(const YAML::Node &node,
-                                                     const int &strategy_id) {
+IStrategy* StrategyBuilder::build_district_mft_strategy(const YAML::Node &node,
+                                                        const int &strategy_id) {
   // Load the initial parts of the object
   auto* strategy = new DistrictMftStrategy();
   strategy->id = strategy_id;
@@ -309,7 +307,7 @@ IStrategy* StrategyBuilder::buildDistrictMftStrategy(const YAML::Node &node,
         spdlog::error("Drug id should not be less than zero, reading {}", ndx);
         throw std::invalid_argument("Drug id should not be less than zero.");
       }
-      if (id > Model::get_config()->get_therapy_parameters().therapy_db.size()) {
+      if (id > Model::get_therapy_db().size()) {
         spdlog::error("Drug id exceeds count of known drugs, reading {}", ndx);
         throw std::invalid_argument("Drug id exceeds count of known drugs.");
       }
@@ -318,7 +316,7 @@ IStrategy* StrategyBuilder::buildDistrictMftStrategy(const YAML::Node &node,
 
     // Read the distribution percentages for the MFT and make sure they make
     // sense
-    auto sum = 0.0f;
+    auto sum = 0.0;
     for (auto ndy = 0; ndy < child["distribution"].size(); ndy++) {
       auto percent = child["distribution"][ndy].as<float>();
       if (percent <= 0.0) {
@@ -336,7 +334,7 @@ IStrategy* StrategyBuilder::buildDistrictMftStrategy(const YAML::Node &node,
       sum += percent;
       template_mft->percentages.push_back(percent);
     }
-    if (int(sum) != 1) {
+    if (static_cast<int>(sum) != 1) {
       spdlog::error("Distribution percentage sum does not equal 100%, reading  {}", ndx);
       throw std::invalid_argument("Distribution percentage sum must equal 100%.");
     }
@@ -352,7 +350,7 @@ IStrategy* StrategyBuilder::buildDistrictMftStrategy(const YAML::Node &node,
         throw std::invalid_argument("District ID out of valid range");
       }
 
-      if (std::find(districts.begin(), districts.end(), id) != districts.end()) {
+      if (std::ranges::find(districts, id) != districts.end()) {
         spdlog::error("District {} encountered a second time, reading {}", id, ndx);
         throw std::invalid_argument("District duplication detected.");
       }
@@ -380,14 +378,13 @@ IStrategy* StrategyBuilder::buildDistrictMftStrategy(const YAML::Node &node,
   return strategy;
 }
 
-IStrategy* StrategyBuilder::buildMFTAgeBasedStrategy(const YAML::Node &node,
-                                                     const int &strategyId) {
+IStrategy* StrategyBuilder::build_mft_age_based_strategy(const YAML::Node &node,
+                                                         const int &strategy_id) {
   auto* result = new MFTAgeBasedStrategy();
-  result->id = strategyId;
+  result->id = strategy_id;
   result->name = node["name"].as<std::string>();
   for (std::size_t i = 0; i < node["therapy_ids"].size(); i++) {
-    result->add_therapy(
-        Model::get_config()->get_therapy_parameters().therapy_db[node["therapy_ids"][i].as<int>()]);
+    result->add_therapy(Model::get_therapy_db()[node["therapy_ids"][i].as<int>()].get());
   }
   add_distributions(node["age_boundaries"], result->age_boundaries);
 
