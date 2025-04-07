@@ -14,8 +14,6 @@
 #include "Treatment/SteadyTCM.h"
 #include "Utils/Cli.hxx"
 
-Model* Model::instance = nullptr;
-
 bool Model::initialize() {
   config_ = std::make_unique<Config>();
   random_ = std::make_unique<utils::Random>(nullptr, -1);

@@ -27,8 +27,8 @@ class Model {
 public:
   // Provides global access to the singleton instance
   static Model* get_instance() {
-    if (instance == nullptr) { instance = new Model(); }
-    return instance;
+    static Model instance;
+    return &instance;
   }
 
   // Initialize the model
@@ -46,7 +46,6 @@ private:
   Model() = default;
   ~Model() = default;
 
-  static Model* instance;
   bool is_initialized_{false};
 
   std::unique_ptr<Config> config_{nullptr};
