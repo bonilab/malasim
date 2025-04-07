@@ -49,7 +49,7 @@ void ConsoleReporter::after_run() {
   // report EIR
   std::cout << "EIR by location:" << '\n';
   for (int location = 0; location < Model::get_config()->number_of_locations(); location++) {
-    std::cout << Model::get_mdc()->EIR_by_location()[location] << "\t";
+    std::cout << Model::get_mdc()->eir_by_location()[location] << "\t";
   }
   std::cout << '\n';
 
@@ -75,7 +75,7 @@ void ConsoleReporter::after_run() {
 
   std::cout << "NTF by location: " << '\n';
   for (int location = 0; location < Model::get_config()->number_of_locations(); location++) {
-    double location_ntf = Model::get_mdc()->cumulative_NTF_by_location()[location] * 100
+    double location_ntf = Model::get_mdc()->cumulative_ntf_by_location()[location] * 100
                           / static_cast<double>(Model::get_mdc()->popsize_by_location()[location]);
     location_ntf /= total_time_in_years;
 
@@ -90,9 +90,9 @@ void ConsoleReporter::after_run() {
   std::cout << '\n';
 
   for (int t_id = 0; t_id < Model::get_therapy_db().size(); t_id++) {
-    int n_treaments = Model::get_mdc()->number_of_treatments_with_therapy_ID()[t_id];
-    int n_success = Model::get_mdc()->number_of_treatments_success_with_therapy_ID()[t_id];
-    int n_fail = Model::get_mdc()->number_of_treatments_fail_with_therapy_ID()[t_id];
+    int n_treaments = Model::get_mdc()->number_of_treatments_with_therapy_id()[t_id];
+    int n_success = Model::get_mdc()->number_of_treatments_success_with_therapy_id()[t_id];
+    int n_fail = Model::get_mdc()->number_of_treatments_fail_with_therapy_id()[t_id];
     double p_success = (n_treaments == 0) ? 0 : n_success * 100.0 / n_treaments;
 
     std::cout << "Number of patients (with non-resistant parasite) treated with therapy " << t_id
@@ -102,10 +102,10 @@ void ConsoleReporter::after_run() {
 
   std::cout << "Strategy UTL: " << Model::get_mdc()->current_utl_duration() << '\n';
 
-  std::cout << "AMU per parasite population: " << Model::get_mdc()->AMU_per_parasite_pop() << '\n';
-  std::cout << "AMU per per: " << Model::get_mdc()->AMU_per_person() << '\n';
+  std::cout << "AMU per parasite population: " << Model::get_mdc()->amu_per_parasite_pop() << '\n';
+  std::cout << "AMU per per: " << Model::get_mdc()->amu_per_person() << '\n';
   std::cout << "EAMU count only clinical caused parasite: "
-            << Model::get_mdc()->AMU_for_clinical_caused_parasite() << '\n';
+            << Model::get_mdc()->amu_for_clinical_caused_parasite() << '\n';
 }
 
 void ConsoleReporter::begin_time_step() {}
@@ -127,8 +127,8 @@ void ConsoleReporter::monthly_report() {
       std::cout << Model::get_mdc()->total_immune_by_location()[location]
                        / static_cast<double>(Model::get_population()->size(location))
                 << "\t";
-      std::cout << Model::get_mdc()->current_RITF_by_location()[location] << "-"
-                << Model::get_mdc()->current_TF_by_location()[location] << "\t";
+      std::cout << Model::get_mdc()->current_ritf_by_location()[location] << "-"
+                << Model::get_mdc()->current_tf_by_location()[location] << "\t";
     }
     std::cout << '\n';
   }

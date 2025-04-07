@@ -18,14 +18,14 @@
 #include "Mosquito/Mosquito.h"
 #include "Parasites/Genotype.h"
 #include "Person/Person.h"
+#include "Utils/Constants.h"
 #include "Utils/Helpers/ObjectHelpers.h"
 #include "Utils/Index/PersonIndex.h"
 #include "Utils/Index/PersonIndexAll.h"
 #include "Utils/Index/PersonIndexByLocationMovingLevel.h"
 #include "Utils/Index/PersonIndexByLocationStateAgeClass.h"
 
-Population::Population(Model* model) {
-  model_ = model;
+Population::Population(Model* model) : model_(model) {
   person_index_list_ = new PersonIndexPtrList();
   all_persons_ = new PersonIndexAll();
 

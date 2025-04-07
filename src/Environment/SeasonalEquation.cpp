@@ -9,6 +9,7 @@
 #include <cstdint>
 
 #include "Simulation/Model.h"
+#include "Utils/Constants.h"
 
 SeasonalEquation::SeasonalEquation() = default;
 

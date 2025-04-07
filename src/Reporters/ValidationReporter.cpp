@@ -135,7 +135,7 @@ void ValidationReporter::monthly_report() {
     ss << group_sep;  /// 129
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->current_TF_by_location()[loc] << sep;
+    ss << Model::get_mdc()->current_tf_by_location()[loc] << sep;
   }
   ss << group_sep;  // 131
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
@@ -224,7 +224,7 @@ void ValidationReporter::monthly_report() {
     ss << group_sep;  // 341
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->cumulative_NTF_by_location()[loc] << sep;
+    ss << Model::get_mdc()->cumulative_ntf_by_location()[loc] << sep;
     ss << group_sep;  // 343
   }
   for (auto tf_by_therapy : Model::get_mdc()->current_tf_by_therapy()) {
@@ -232,13 +232,13 @@ void ValidationReporter::monthly_report() {
   }
   ss << group_sep;  // 358
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->monthly_number_of_TF_by_location()[loc] << sep;
+    ss << Model::get_mdc()->monthly_number_of_tf_by_location()[loc] << sep;
     ss << group_sep;  // 360
   }
   for (int t_id = 0; t_id < Model::get_therapy_db().size(); t_id++) {
-    int n_treaments = Model::get_mdc()->number_of_treatments_with_therapy_ID()[t_id];
-    int n_success = Model::get_mdc()->number_of_treatments_success_with_therapy_ID()[t_id];
-    int n_fail = Model::get_mdc()->number_of_treatments_fail_with_therapy_ID()[t_id];
+    int n_treaments = Model::get_mdc()->number_of_treatments_with_therapy_id()[t_id];
+    int n_success = Model::get_mdc()->number_of_treatments_success_with_therapy_id()[t_id];
+    int n_fail = Model::get_mdc()->number_of_treatments_fail_with_therapy_id()[t_id];
     double p_success = (n_treaments == 0) ? 0 : n_success * 100.0 / n_treaments;
     ss << n_treaments << sep << n_success << sep << n_fail << sep << p_success << sep;
   }
@@ -248,7 +248,7 @@ void ValidationReporter::monthly_report() {
     ss << group_sep;  // 419
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->cumulative_TF_by_location()[loc] << sep;
+    ss << Model::get_mdc()->cumulative_tf_by_location()[loc] << sep;
     ss << group_sep;  // 421
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
@@ -354,7 +354,7 @@ void ValidationReporter::after_run() {
   auto sum_ntf = 0.0;
   ul pop_size = 0;
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    sum_ntf += Model::get_mdc()->cumulative_NTF_by_location()[loc];
+    sum_ntf += Model::get_mdc()->cumulative_ntf_by_location()[loc];
     pop_size += Model::get_mdc()->popsize_by_location()[loc];
   }
   ss << (sum_ntf * 100 / static_cast<double>(pop_size)) / total_time_in_years << sep;
@@ -372,7 +372,7 @@ void ValidationReporter::after_run() {
     ss << group_sep;  // 16
   }
   for (int loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    double location_ntf = Model::get_mdc()->cumulative_NTF_by_location()[loc] * 100
+    double location_ntf = Model::get_mdc()->cumulative_ntf_by_location()[loc] * 100
                           / static_cast<double>(Model::get_mdc()->popsize_by_location()[loc]);
     location_ntf /= total_time_in_years;
     ss << location_ntf << sep;
@@ -393,7 +393,7 @@ void ValidationReporter::after_run() {
     ss << group_sep;  // 101
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->cumulative_TF_by_location()[loc] << sep;
+    ss << Model::get_mdc()->cumulative_tf_by_location()[loc] << sep;
     ss << group_sep;  // 103
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
@@ -458,11 +458,11 @@ void ValidationReporter::print_EIR_PfPR_by_location(std::stringstream &ss) {
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); ++loc) {
     //
     // EIR
-    if (Model::get_mdc()->EIR_by_location_year()[loc].empty()) {
+    if (Model::get_mdc()->eir_by_location_year()[loc].empty()) {
       ss << 0 << sep;
       // spdlog::info("print_EIR_PfPR_by_location {}: EIR_by_location_year is empty", loc);
     } else {
-      ss << Model::get_mdc()->EIR_by_location_year()[loc].back() << sep;
+      ss << Model::get_mdc()->eir_by_location_year()[loc].back() << sep;
       // spdlog::info("print_EIR_PfPR_by_location {}: EIR_by_location_year {:.8f}", loc,
       // Model::get_mdc()->EIR_by_location_year()[loc].back());
     }

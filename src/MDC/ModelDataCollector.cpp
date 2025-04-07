@@ -27,26 +27,7 @@
 
 class PersonIndexByLocationStateAgeClass;
 
-ModelDataCollector::ModelDataCollector(Model* model)
-    : model_(model),
-      current_utl_duration_(0),
-      AMU_per_parasite_pop_(0),
-      AMU_per_person_(0),
-      AMU_for_clinical_caused_parasite_(0),
-      AFU_(0),
-      discounted_AMU_per_parasite_pop_(0),
-      discounted_AMU_per_person_(0),
-      discounted_AMU_for_clinical_caused_parasite_(0),
-      discounted_AFU_(0),
-      tf_at_15_(0),
-      single_resistance_frequency_at_15_(0),
-      double_resistance_frequency_at_15_(0),
-      triple_resistance_frequency_at_15_(0),
-      quadruple_resistance_frequency_at_15_(0),
-      quintuple_resistance_frequency_at_15_(0),
-      art_resistance_frequency_at_15_(0),
-      total_resistance_frequency_at_15_(0),
-      mean_moi_(0) {}
+ModelDataCollector::ModelDataCollector(Model* model) : model_(model) {}
 
 ModelDataCollector::~ModelDataCollector() = default;
 
@@ -108,9 +89,9 @@ void ModelDataCollector::initialize() {
         LongVector(Model::get_config()->number_of_locations(), 0);
     person_days_by_location_year_ = LongVector(Model::get_config()->number_of_locations(), 0);
 
-    EIR_by_location_year_ =
+    eir_by_location_year_ =
         DoubleVector2(Model::get_config()->number_of_locations(), DoubleVector());
-    EIR_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
+    eir_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
 
     cumulative_clinical_episodes_by_location_ =
         LongVector(Model::get_config()->number_of_locations(), 0);
@@ -127,59 +108,59 @@ void ModelDataCollector::initialize() {
 
     cumulative_mutants_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
 
-    cumulative_discounted_NTF_by_location_ =
+    cumulative_discounted_ntf_by_location_ =
         DoubleVector(Model::get_config()->number_of_locations(), 0.0);
-    cumulative_NTF_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
-    cumulative_TF_by_location_ = LongVector(Model::get_config()->number_of_locations(), 0.0);
+    cumulative_ntf_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
+    cumulative_tf_by_location_ = LongVector(Model::get_config()->number_of_locations(), 0.0);
     cumulative_number_treatments_by_location_ =
         LongVector(Model::get_config()->number_of_locations(), 0.0);
 
-    today_TF_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
+    today_tf_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
     today_number_of_treatments_by_location_ =
         IntVector(Model::get_config()->number_of_locations(), 0);
-    today_RITF_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
+    today_ritf_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
 
     total_number_of_treatments_60_by_location_ = IntVector2(
         Model::get_config()->number_of_locations(),
         IntVector(Model::get_config()->get_epidemiological_parameters().get_tf_window_size(), 0));
-    total_RITF_60_by_location_ = IntVector2(
+    total_ritf_60_by_location_ = IntVector2(
         Model::get_config()->number_of_locations(),
         IntVector(Model::get_config()->get_epidemiological_parameters().get_tf_window_size(), 0));
-    total_TF_60_by_location_ = IntVector2(
+    total_tf_60_by_location_ = IntVector2(
         Model::get_config()->number_of_locations(),
         IntVector(Model::get_config()->get_epidemiological_parameters().get_tf_window_size(), 0));
 
-    current_RITF_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
-    current_TF_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
+    current_ritf_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
+    current_tf_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
 
     cumulative_mutants_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
 
     current_utl_duration_ = 0;
-    UTL_duration_ = IntVector();
+    utl_duration_ = IntVector();
 
-    number_of_treatments_with_therapy_ID_ = IntVector(Model::get_therapy_db().size(), 0);
-    number_of_treatments_success_with_therapy_ID_ = IntVector(Model::get_therapy_db().size(), 0);
-    number_of_treatments_fail_with_therapy_ID_ = IntVector(Model::get_therapy_db().size(), 0);
+    number_of_treatments_with_therapy_id_ = IntVector(Model::get_therapy_db().size(), 0);
+    number_of_treatments_success_with_therapy_id_ = IntVector(Model::get_therapy_db().size(), 0);
+    number_of_treatments_fail_with_therapy_id_ = IntVector(Model::get_therapy_db().size(), 0);
 
     mosquito_recombination_events_count_ =
         LongVector2(Model::get_config()->number_of_locations(), LongVector(2, 0));
 
-    AMU_per_parasite_pop_ = 0;
-    AMU_per_person_ = 0;
-    AMU_for_clinical_caused_parasite_ = 0;
+    amu_per_parasite_pop_ = 0;
+    amu_per_person_ = 0;
+    amu_for_clinical_caused_parasite_ = 0;
 
-    AFU_ = 0;
+    afu_ = 0;
 
-    discounted_AMU_per_parasite_pop_ = 0;
-    discounted_AMU_per_person_ = 0;
-    discounted_AMU_for_clinical_caused_parasite_ = 0;
+    discounted_amu_per_parasite_pop_ = 0;
+    discounted_amu_per_person_ = 0;
+    discounted_amu_for_clinical_caused_parasite_ = 0;
 
-    discounted_AFU_ = 0;
+    discounted_afu_ = 0;
 
     multiple_of_infection_by_location_ = IntVector2(Model::get_config()->number_of_locations(),
-                                                    IntVector(number_of_reported_MOI, 0));
+                                                    IntVector(NUMBER_OF_REPORTED_MOI, 0));
 
-    current_EIR_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
+    current_eir_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
     last_update_total_number_of_bites_by_location_ =
         LongVector(Model::get_config()->number_of_locations(), 0);
 
@@ -250,7 +231,7 @@ void ModelDataCollector::initialize() {
         IntVector(Model::get_config()->number_of_locations(), 0);
     monthly_number_of_recrudescence_treatment_by_location_ =
         IntVector(Model::get_config()->number_of_locations(), 0);
-    monthly_number_of_TF_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
+    monthly_number_of_tf_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
     monthly_number_of_new_infections_by_location_ =
         IntVector(Model::get_config()->number_of_locations(), 0);
     monthly_number_of_clinical_episode_by_location_ =
@@ -262,10 +243,10 @@ void ModelDataCollector::initialize() {
 
     current_number_of_mutation_events_in_this_year_ = 0;
     mutation_tracker =
-        std::vector<std::vector<mutation_tracker_info>>(Model::get_config()->number_of_locations());
+        std::vector<std::vector<MutationTrackerInfo>>(Model::get_config()->number_of_locations());
 
     mosquito_recombined_resistant_genotype_tracker =
-        std::vector<std::vector<recombined_resistant_genotype_info>>(
+        std::vector<std::vector<RecombinedResistantGenotypeInfo>>(
             Model::get_config()->number_of_locations());
 
     number_of_mutation_events_by_year_ = LongVector();
@@ -370,8 +351,8 @@ void ModelDataCollector::perform_population_statistic() {
 
           int moi = static_cast<int>(person->get_all_clonal_parasite_populations()->size());
 
-          if (moi >= number_of_reported_MOI) {
-            multiple_of_infection_by_location_[loc][number_of_reported_MOI - 1]++;
+          if (moi >= NUMBER_OF_REPORTED_MOI) {
+            multiple_of_infection_by_location_[loc][NUMBER_OF_REPORTED_MOI - 1]++;
           } else {
             multiple_of_infection_by_location_[loc][moi]++;
           }
@@ -416,7 +397,7 @@ void ModelDataCollector::perform_population_statistic() {
     blood_slide_prevalence_by_location_[loc] =
         blood_slide_prevalence_by_location_[loc] / static_cast<double>(popsize_by_location_[loc]);
 
-    current_EIR_by_location_[loc] =
+    current_eir_by_location_[loc] =
         popsize_by_location_[loc] == 0
             ? 0
             : static_cast<double>(total_number_of_bites_by_location_[loc]
@@ -470,7 +451,7 @@ void ModelDataCollector::perform_population_statistic() {
 void ModelDataCollector::update_person_days_by_years(const int &location, const int &days) {
   if (Model::get_scheduler()->current_time()
       >= Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) {
-    if (!recording) { return; }
+    if (!recording_) { return; }
     person_days_by_location_year_[location] += days;
   }
 }
@@ -480,12 +461,12 @@ void ModelDataCollector::calculate_eir() {
   // divide-by-zero errors when determining the total time in year
   if (Model::get_scheduler()->current_time()
       < Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) {
-    zero_fill(EIR_by_location_);
+    zero_fill(eir_by_location_);
     return;
   }
 
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    if (EIR_by_location_year_[loc].empty()) {
+    if (eir_by_location_year_[loc].empty()) {
       // collect data for less than 1 year
       const auto total_time_in_years =
           (Model::get_scheduler()->current_time()
@@ -497,17 +478,17 @@ void ModelDataCollector::calculate_eir() {
                           / static_cast<double>(person_days_by_location_year_[loc]))
                              * static_cast<double>(Constants::DAYS_IN_YEAR);
       eir = eir / total_time_in_years;
-      EIR_by_location_[loc] = eir;
+      eir_by_location_[loc] = eir;
     } else {
-      double sum_eir = std::accumulate(EIR_by_location_year_[loc].begin(),
-                                       EIR_by_location_year_[loc].end(), 0.0);
+      double sum_eir = std::accumulate(eir_by_location_year_[loc].begin(),
+                                       eir_by_location_year_[loc].end(), 0.0);
       auto number_of_0 =
-          std::count(EIR_by_location_year_[loc].begin(), EIR_by_location_year_[loc].end(), 0);
+          std::count(eir_by_location_year_[loc].begin(), eir_by_location_year_[loc].end(), 0);
 
-      EIR_by_location_[loc] =
-          (static_cast<double>(EIR_by_location_year_[loc].size() - number_of_0) == 0.0)
+      eir_by_location_[loc] =
+          (static_cast<double>(eir_by_location_year_[loc].size() - number_of_0) == 0.0)
               ? 0.0
-              : sum_eir / static_cast<double>(EIR_by_location_year_[loc].size() - number_of_0);
+              : sum_eir / static_cast<double>(eir_by_location_year_[loc].size() - number_of_0);
     }
   }
 }
@@ -538,7 +519,7 @@ void ModelDataCollector::collect_1_clinical_episode(const int &location, const i
     cumulative_clinical_episodes_by_location_age_group_[location][age_class]++;
   }
 
-  if (!recording) { return; }
+  if (!recording_) { return; }
   cumulative_clinical_episodes_by_location_[location]++;
   monthly_number_of_clinical_episode_by_location_[location]++;
   monthly_number_of_clinical_episode_by_location_age_class_[location][age_class]++;
@@ -558,7 +539,7 @@ void ModelDataCollector::record_1_death(const int &location, const int &birthday
     } else {
       number_of_deaths_by_location_age_year_[location][79] += 1;
     }
-    if (!recording) { return; }
+    if (!recording_) { return; }
     deaths_by_location_[location]++;
     update_person_days_by_years(
         location, -(Constants::DAYS_IN_YEAR - Model::get_scheduler()->get_current_day_in_year()));
@@ -637,7 +618,7 @@ void ModelDataCollector::record_1_non_treated_case(const int &location, const in
       number_of_untreated_cases_by_location_age_year_[location][79] += 1;
     }
   }
-  if (!recording) { return; }
+  if (!recording_) { return; }
   monthly_nontreatment_by_location_[location]++;
   monthly_nontreatment_by_location_age_class_[location][age_class]++;
 }
@@ -645,8 +626,8 @@ void ModelDataCollector::record_1_non_treated_case(const int &location, const in
 void ModelDataCollector::begin_time_step() {
   for (int location = 0; location < Model::get_config()->number_of_locations(); location++) {
     today_number_of_treatments_by_location_[location] = 0;
-    today_RITF_by_location_[location] = 0;
-    today_TF_by_location_[location] = 0;
+    today_ritf_by_location_[location] = 0;
+    today_tf_by_location_[location] = 0;
   }
 
   for (auto therapy_id = 0; static_cast<size_t>(therapy_id) < Model::get_therapy_db().size();
@@ -654,10 +635,10 @@ void ModelDataCollector::begin_time_step() {
     today_number_of_treatments_by_therapy_[therapy_id] = 0;
     today_tf_by_therapy_[therapy_id] = 0;
   }
-  if (!recording
+  if (!recording_
       && Model::get_scheduler()->current_time()
              >= Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) {
-    recording = true;
+    recording_ = true;
   }
 }
 
@@ -671,14 +652,14 @@ void ModelDataCollector::end_of_time_step() {
           [location][Model::get_scheduler()->current_time()
                      % Model::get_config()->get_epidemiological_parameters().get_tf_window_size()] =
               today_number_of_treatments_by_location_[location];
-      total_RITF_60_by_location_
+      total_ritf_60_by_location_
           [location][Model::get_scheduler()->current_time()
                      % Model::get_config()->get_epidemiological_parameters().get_tf_window_size()] =
-              today_RITF_by_location_[location];
-      total_TF_60_by_location_
+              today_ritf_by_location_[location];
+      total_tf_60_by_location_
           [location][Model::get_scheduler()->current_time()
                      % Model::get_config()->get_epidemiological_parameters().get_tf_window_size()] =
-              today_TF_by_location_[location];
+              today_tf_by_location_[location];
 
       auto t_treatment60 = 0;
       auto t_ritf60 = 0;
@@ -686,20 +667,20 @@ void ModelDataCollector::end_of_time_step() {
       for (auto i = 0;
            i < Model::get_config()->get_epidemiological_parameters().get_tf_window_size(); i++) {
         t_treatment60 += total_number_of_treatments_60_by_location_[location][i];
-        t_ritf60 += total_RITF_60_by_location_[location][i];
-        t_tf60 += total_TF_60_by_location_[location][i];
+        t_ritf60 += total_ritf_60_by_location_[location][i];
+        t_tf60 += total_tf_60_by_location_[location][i];
       }
-      current_RITF_by_location_[location] =
+      current_ritf_by_location_[location] =
           (t_treatment60 == 0) ? 0 : static_cast<double>(t_ritf60) / t_treatment60;
-      current_TF_by_location_[location] =
+      current_tf_by_location_[location] =
           (t_treatment60 == 0) ? 0 : static_cast<double>(t_tf60) / t_treatment60;
 
-      current_TF_by_location_[location] =
-          (current_TF_by_location_[location]) > 1 ? 1 : current_TF_by_location_[location];
-      current_RITF_by_location_[location] =
-          (current_RITF_by_location_[location]) > 1 ? 1 : current_RITF_by_location_[location];
+      current_tf_by_location_[location] =
+          (current_tf_by_location_[location]) > 1 ? 1 : current_tf_by_location_[location];
+      current_ritf_by_location_[location] =
+          (current_ritf_by_location_[location]) > 1 ? 1 : current_ritf_by_location_[location];
 
-      avg_tf += current_TF_by_location_[location];
+      avg_tf += current_tf_by_location_[location];
     }
 
     // update UTL
@@ -743,7 +724,7 @@ void ModelDataCollector::record_1_treatment(const int &location, const int &age,
     today_number_of_treatments_by_location_[location] += 1;
     today_number_of_treatments_by_therapy_[therapy_id] += 1;
 
-    number_of_treatments_with_therapy_ID_[therapy_id] += 1;
+    number_of_treatments_with_therapy_id_[therapy_id] += 1;
 
     monthly_number_of_treatment_by_location_[location] += 1;
 
@@ -757,7 +738,7 @@ void ModelDataCollector::record_1_treatment(const int &location, const int &age,
       >= Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) {
     cumulative_number_treatments_by_location_[location] += 1;
   }
-  if (!recording) { return; }
+  if (!recording_) { return; }
   monthly_number_of_treatment_by_location_[location] += 1;
   monthly_number_of_treatment_by_location_age_class_[location][age_class] += 1;
   monthly_number_of_treatment_by_location_therapy_[location][therapy_id] += 1;
@@ -766,7 +747,7 @@ void ModelDataCollector::record_1_treatment(const int &location, const int &age,
 void ModelDataCollector::record_1_recrudescence_treatment(const int &location, const int &age,
                                                           const int &age_class,
                                                           const int &therapy_id) {
-  if (!recording) { return; }
+  if (!recording_) { return; }
   monthly_number_of_recrudescence_treatment_by_location_[location] += 1;
 }
 
@@ -780,7 +761,7 @@ void ModelDataCollector::record_1_mutation(const int &location, Genotype* from, 
       >= Model::get_config()->get_simulation_timeframe().get_start_of_comparison_period()) {
     current_number_of_mutation_events_in_this_year_ += 1;
   }
-  if (!recording) { return; }
+  if (!recording_) { return; }
   cumulative_mutants_by_location_[location] += 1;
   current_number_of_mutation_events_ += 1;
 }
@@ -796,9 +777,9 @@ void ModelDataCollector::record_1_mutation_by_drug(const int &location, Genotype
 void ModelDataCollector::record_1_treatment_failure_by_therapy(const int &location,
                                                                const int &age_class,
                                                                const int &therapy_id) {
-  number_of_treatments_fail_with_therapy_ID_[therapy_id] += 1;
+  number_of_treatments_fail_with_therapy_id_[therapy_id] += 1;
   today_tf_by_therapy_[therapy_id] += 1;
-  if (!recording) { return; }
+  if (!recording_) { return; }
   monthly_treatment_complete_by_location_therapy_[location][therapy_id]++;
   monthly_treatment_failure_by_location_[location]++;
   monthly_treatment_failure_by_location_age_class_[location][age_class]++;
@@ -808,26 +789,26 @@ void ModelDataCollector::record_1_treatment_failure_by_therapy(const int &locati
 void ModelDataCollector::record_1_treatment_success_by_therapy(const int &location,
                                                                const int &age_class,
                                                                const int &therapy_id) {
-  number_of_treatments_success_with_therapy_ID_[therapy_id] += 1;
-  if (!recording) { return; }
+  number_of_treatments_success_with_therapy_id_[therapy_id] += 1;
+  if (!recording_) { return; }
   monthly_treatment_complete_by_location_therapy_[location][therapy_id]++;
   monthly_treatment_success_by_location_[location]++;
   monthly_treatment_success_by_location_age_class_[location][age_class]++;
   monthly_treatment_success_by_location_therapy_[location][therapy_id]++;
 }
 
-void ModelDataCollector::update_UTL_vector() {
-  UTL_duration_.push_back(current_utl_duration_);
+void ModelDataCollector::update_utl_vector() {
+  utl_duration_.push_back(current_utl_duration_);
   current_utl_duration_ = 0;
 }
 
-void ModelDataCollector::record_1_TF(const int &location, const bool &by_drug) {
+void ModelDataCollector::record_1_tf(const int &location, const bool &by_drug) {
   if (Model::get_scheduler()->current_time()
       >= Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) {
     // if treatment failure due to drug (both resistance or not clear)
     if (by_drug) {
-      today_TF_by_location_[location] += 1;
-      monthly_number_of_TF_by_location_[location] += 1;
+      today_tf_by_location_[location] += 1;
+      monthly_number_of_tf_by_location_[location] += 1;
     }
   }
 
@@ -839,9 +820,9 @@ void ModelDataCollector::record_1_TF(const int &location, const bool &by_drug) {
                      - Model::get_config()->get_simulation_timeframe().get_start_collect_data_day())
                     / static_cast<double>(Constants::DAYS_IN_YEAR)));
 
-    cumulative_discounted_NTF_by_location_[location] += current_discounted_tf;
-    cumulative_NTF_by_location_[location] += 1;
-    if (by_drug) { cumulative_TF_by_location_[location] += 1; }
+    cumulative_discounted_ntf_by_location_[location] += current_discounted_tf;
+    cumulative_ntf_by_location_[location] += 1;
+    if (by_drug) { cumulative_tf_by_location_[location] += 1; }
   }
 }
 
@@ -850,13 +831,13 @@ void ModelDataCollector::record_1_TF(const int &location, const bool &by_drug) {
  */
 
 void ModelDataCollector::collect_number_of_bites(const int &location, const int &number_of_bites) {
-  if (!recording) { return; }
+  if (!recording_) { return; }
   total_number_of_bites_by_location_[location] += number_of_bites;
   total_number_of_bites_by_location_year_[location] += number_of_bites;
 }
 
 void ModelDataCollector::record_1_infection(const int &location) {
-  if (!recording) { return; }
+  if (!recording_) { return; }
   monthly_number_of_new_infections_by_location_[location]++;
 }
 
@@ -885,7 +866,7 @@ void ModelDataCollector::yearly_update() {
                      ? 0.0
                      : static_cast<double>(total_number_of_bites_by_location_year_[loc])
                            / static_cast<double>(Model::get_population()->size_at(loc));
-      EIR_by_location_year_[loc].push_back(eir);
+      eir_by_location_year_[loc].push_back(eir);
       // spdlog::info("yearly_update: location {} eir {:.8f} =  ({} / ({} x {})) x {}",
       //   loc,eir,
       //   total_number_of_bites_by_location_[loc],
@@ -920,13 +901,13 @@ void ModelDataCollector::update_after_run() {
   calculate_eir();
   calculate_percentage_bites_on_top_20();
 
-  UTL_duration_.push_back(current_utl_duration_);
+  utl_duration_.push_back(current_utl_duration_);
 
   current_utl_duration_ = 0;
-  for (int utl : UTL_duration_) { current_utl_duration_ += utl; }
+  for (int utl : utl_duration_) { current_utl_duration_ += utl; }
 }
 
-void ModelDataCollector::record_AMU_AFU(Person* person, Therapy* therapy,
+void ModelDataCollector::record_amu_afu(Person* person, Therapy* therapy,
                                         ClonalParasitePopulation* clinical_caused_parasite) {
   if (Model::get_scheduler()->current_time()
       >= Model::get_config()->get_simulation_timeframe().get_start_of_comparison_period()) {
@@ -952,18 +933,18 @@ void ModelDataCollector::record_AMU_AFU(Person* person, Therapy* therapy,
 
             auto found_amu = false;
             auto found_afu = false;
-            for (auto j = 0ul; j < parasite_population_size; j++) {
+            for (auto j = 0; j < parasite_population_size; j++) {
               ClonalParasitePopulation* bp = person->get_all_clonal_parasite_populations()->at(j);
               if (bp->resist_to(drug_id) && !bp->resist_to(art_id)) {
                 found_amu = true;
-                AMU_per_parasite_pop_ += sc_therapy->get_max_dosing_day()
+                amu_per_parasite_pop_ += sc_therapy->get_max_dosing_day()
                                          / static_cast<double>(parasite_population_size);
-                discounted_AMU_per_parasite_pop_ += discounted_fraction
+                discounted_amu_per_parasite_pop_ += discounted_fraction
                                                     * sc_therapy->get_max_dosing_day()
                                                     / static_cast<double>(parasite_population_size);
                 if (bp == clinical_caused_parasite) {
-                  AMU_for_clinical_caused_parasite_ += sc_therapy->get_max_dosing_day();
-                  discounted_AMU_for_clinical_caused_parasite_ +=
+                  amu_for_clinical_caused_parasite_ += sc_therapy->get_max_dosing_day();
+                  discounted_amu_for_clinical_caused_parasite_ +=
                       discounted_fraction * sc_therapy->get_max_dosing_day();
                 }
               }
@@ -971,13 +952,13 @@ void ModelDataCollector::record_AMU_AFU(Person* person, Therapy* therapy,
               if (bp->resist_to(drug_id) && bp->resist_to(art_id)) { found_afu = true; }
             }
             if (found_amu) {
-              AMU_per_person_ += sc_therapy->get_max_dosing_day();
-              discounted_AMU_per_person_ += discounted_fraction * sc_therapy->get_max_dosing_day();
+              amu_per_person_ += sc_therapy->get_max_dosing_day();
+              discounted_amu_per_person_ += discounted_fraction * sc_therapy->get_max_dosing_day();
             }
 
             if (found_afu) {
-              AFU_ += sc_therapy->get_max_dosing_day();
-              discounted_AFU_ += discounted_fraction * sc_therapy->get_max_dosing_day();
+              afu_ += sc_therapy->get_max_dosing_day();
+              discounted_afu_ += discounted_fraction * sc_therapy->get_max_dosing_day();
             }
           }
         }
@@ -1050,7 +1031,7 @@ void ModelDataCollector::monthly_update() {
       zero_fill(monthly_treatment_success_by_location_therapy_[loc]);
 
       monthly_number_of_treatment_by_location_[loc] = 0;
-      monthly_number_of_TF_by_location_[loc] = 0;
+      monthly_number_of_tf_by_location_[loc] = 0;
       monthly_number_of_new_infections_by_location_[loc] = 0;
       monthly_number_of_clinical_episode_by_location_[loc] = 0;
       monthly_number_of_mutation_events_by_location_[loc] = 0;
@@ -1115,3 +1096,4 @@ void ModelDataCollector::zero_population_statistics() {
   zero_fill_matrix_2d(popsize_by_location_age_);
   zero_fill_matrix_2d(multiple_of_infection_by_location_);
 }
+

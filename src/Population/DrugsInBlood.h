@@ -1,7 +1,8 @@
 #ifndef DRUGSINBLOOD_H
 #define    DRUGSINBLOOD_H
 
-#include "Utils/TypeDef.hxx"
+#include <map>
+#include <memory>
 
 class Person;
 
@@ -10,6 +11,8 @@ class Drug;
 class Event;
 
 class DrugType;
+
+using DrugPtrMap = std::map<int, std::unique_ptr<Drug>>;
 
 class DrugsInBlood {
   // OBJECTPOOL(DrugsInBlood)
@@ -21,12 +24,12 @@ class DrugsInBlood {
 
  private:
   Person *person_{nullptr};
-  DrugUniquePtrMap drugs_{};
+  DrugPtrMap drugs_{};
 
  public:
   // Iterator type definitions for proxy access
-  using iterator = DrugUniquePtrMap::iterator;
-  using const_iterator = DrugUniquePtrMap::const_iterator;
+  using iterator = DrugPtrMap::iterator;
+  using const_iterator = DrugPtrMap::const_iterator;
 
   // Iterator proxy methods
   iterator begin() { return drugs_.begin(); }

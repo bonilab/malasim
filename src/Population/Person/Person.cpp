@@ -31,6 +31,7 @@
 #include "Population/Population.h"
 #include "Treatment/Therapies/Drug.h"
 #include "Treatment/Therapies/MACTherapy.h"
+#include "Utils/Constants.h"
 
 Person::Person() = default;
 

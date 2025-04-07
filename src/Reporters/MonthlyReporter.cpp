@@ -121,7 +121,7 @@ void MonthlyReporter::after_run() {
   auto sum_ntf = 0.0;
   ul pop_size = 0;
   for (auto location = 0; location < Model::get_config()->number_of_locations(); location++) {
-    sum_ntf += Model::get_mdc()->cumulative_NTF_by_location()[location];
+    sum_ntf += Model::get_mdc()->cumulative_ntf_by_location()[location];
     pop_size += Model::get_mdc()->popsize_by_location()[location];
   }
   ss << (sum_ntf * 100 / static_cast<double>(pop_size)) / total_time_in_years << sep;
@@ -136,11 +136,11 @@ void MonthlyReporter::after_run() {
 
 void MonthlyReporter::print_EIR_PfPR_by_location(std::stringstream &ss) {
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); ++loc) {
-    if (Model::get_mdc()->EIR_by_location_year()[loc].empty()) {
+    if (Model::get_mdc()->eir_by_location_year()[loc].empty()) {
       ss << 0 << sep;
       // spdlog::info("print_EIR_PfPR_by_location {}: EIR_by_location_year is empty", loc);
     } else {
-      ss << Model::get_mdc()->EIR_by_location_year()[loc].back() << sep;
+      ss << Model::get_mdc()->eir_by_location_year()[loc].back() << sep;
       // spdlog::info("print_EIR_PfPR_by_location {}: EIR_by_location_year {:.8f}", loc,
       // Model::get_mdc()->EIR_by_location_year()[loc].back());
     }
