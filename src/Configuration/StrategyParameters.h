@@ -133,9 +133,9 @@ public:
     [[nodiscard]] const YAML::Node& get_node() const { return node_; }
     void set_node(const YAML::Node& value) { node_ = value; }
 
-    IStrategy *read_strategy(const YAML::Node &n, const int &strategy_id) {
+    std::unique_ptr<IStrategy> read_strategy(const YAML::Node &n, const int &strategy_id) {
       const auto s_id = NumberHelpers::number_to_string<int>(strategy_id);
-      auto *result = StrategyBuilder::build(n[s_id], strategy_id);
+      auto result = StrategyBuilder::build(n[s_id], strategy_id);
       // std::cout << result->to_string()<<std::endl;
       spdlog::info("Strategy {}: {}", s_id, result->to_string());
       return result;

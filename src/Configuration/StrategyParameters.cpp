@@ -10,8 +10,8 @@ void StrategyParameters::process_config() {
    * and this will make implementation more flexible.
    */
   for (std::size_t i = 0; i < node_.size(); i++) {
-    auto* s = read_strategy(node_, static_cast<int>(i));
-    Model::get_strategy_db().push_back(std::unique_ptr<IStrategy>(s));
+    auto s = read_strategy(node_, static_cast<int>(i));
+    Model::get_strategy_db().push_back(std::move(s));
   }
   std::vector<MassDrugAdministration::beta_distribution_params>
       prob_individual_present_at_mda_distribution_;

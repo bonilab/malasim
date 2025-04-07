@@ -20,7 +20,7 @@ StrategyBuilder::StrategyBuilder() = default;
 
 StrategyBuilder::~StrategyBuilder() = default;
 
-IStrategy* StrategyBuilder::build(const YAML::Node &ns, const int &strategy_id) {
+std::unique_ptr<IStrategy> StrategyBuilder::build(const YAML::Node &ns, const int &strategy_id) {
   const auto type = IStrategy::StrategyTypeMap[ns["type"].as<std::string>()];
   switch (type) {
     case IStrategy::SFT:
@@ -60,30 +60,32 @@ void StrategyBuilder::add_distributions(const YAML::Node &ns, DoubleVector &dist
   for (const auto &node : ns) { distribution.push_back(node.as<double>()); }
 }
 
-IStrategy* StrategyBuilder::build_sft_strategy(const YAML::Node &ns, const int &strategy_id) {
-  auto* result = new SFTStrategy();
+std::unique_ptr<IStrategy> StrategyBuilder::build_sft_strategy(const YAML::Node &ns,
+                                                               const int &strategy_id) {
+  auto result = std::make_unique<SFTStrategy>();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
   result->add_therapy(Model::get_therapy_db()[ns["therapy_ids"][0].as<int>()].get());
   return result;
 }
 
-IStrategy* StrategyBuilder::build_cycling_strategy(const YAML::Node &ns, const int &strategy_id) {
-  auto* result = new CyclingStrategy();
+std::unique_ptr<IStrategy> StrategyBuilder::build_cycling_strategy(const YAML::Node &ns,
+                                                                   const int &strategy_id) {
+  auto result = std::make_unique<CyclingStrategy>();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
 
   result->cycling_time = ns["cycling_time"].as<int>();
   result->next_switching_day = ns["cycling_time"].as<int>();
 
-  add_therapies(ns, result);
+  add_therapies(ns, result.get());
 
   return result;
 }
 
-IStrategy* StrategyBuilder::build_adaptive_cycling_strategy(const YAML::Node &ns,
-                                                            const int &strategy_id) {
-  auto* result = new AdaptiveCyclingStrategy();
+std::unique_ptr<IStrategy> StrategyBuilder::build_adaptive_cycling_strategy(
+    const YAML::Node &ns, const int &strategy_id) {
+  auto result = std::make_unique<AdaptiveCyclingStrategy>();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
 
@@ -91,23 +93,24 @@ IStrategy* StrategyBuilder::build_adaptive_cycling_strategy(const YAML::Node &ns
   result->delay_until_actual_trigger = ns["delay_until_actual_trigger"].as<int>();
   result->turn_off_days = ns["turn_off_days"].as<int>();
 
-  add_therapies(ns, result);
+  add_therapies(ns, result.get());
   return result;
 }
 
-IStrategy* StrategyBuilder::build_mft_strategy(const YAML::Node &ns, const int &strategy_id) {
-  auto* result = new MFTStrategy();
+std::unique_ptr<IStrategy> StrategyBuilder::build_mft_strategy(const YAML::Node &ns,
+                                                               const int &strategy_id) {
+  auto result = std::make_unique<MFTStrategy>();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
 
   add_distributions(ns["distribution"], result->distribution);
-  add_therapies(ns, result);
+  add_therapies(ns, result.get());
   return result;
 }
 
-IStrategy* StrategyBuilder::build_nested_switching_strategy(const YAML::Node &ns,
-                                                            const int &strategy_id) {
-  auto* result = new NestedMFTStrategy();
+std::unique_ptr<IStrategy> StrategyBuilder::build_nested_switching_strategy(
+    const YAML::Node &ns, const int &strategy_id) {
+  auto result = std::make_unique<NestedMFTStrategy>();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
 
@@ -124,16 +127,16 @@ IStrategy* StrategyBuilder::build_nested_switching_strategy(const YAML::Node &ns
   return result;
 }
 
-IStrategy* StrategyBuilder::build_mft_rebalancing_strategy(const YAML::Node &ns,
-                                                           const int &strategy_id) {
-  auto* result = new MFTRebalancingStrategy();
+std::unique_ptr<IStrategy> StrategyBuilder::build_mft_rebalancing_strategy(const YAML::Node &ns,
+                                                                           const int &strategy_id) {
+  auto result = std::make_unique<MFTRebalancingStrategy>();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
 
   add_distributions(ns["distribution"], result->distribution);
   add_distributions(ns["distribution"], result->next_distribution);
 
-  add_therapies(ns, result);
+  add_therapies(ns, result.get());
 
   result->update_duration_after_rebalancing = ns["update_duration_after_rebalancing"].as<int>();
   result->delay_until_actual_trigger = ns["delay_until_actual_trigger"].as<int>();
@@ -142,9 +145,9 @@ IStrategy* StrategyBuilder::build_mft_rebalancing_strategy(const YAML::Node &ns,
   return result;
 }
 
-IStrategy* StrategyBuilder::build_mft_multi_location_strategy(const YAML::Node &ns,
-                                                              const int &strategy_id) {
-  auto* result = new MFTMultiLocationStrategy();
+std::unique_ptr<IStrategy> StrategyBuilder::build_mft_multi_location_strategy(
+    const YAML::Node &ns, const int &strategy_id) {
+  auto result = std::make_unique<MFTMultiLocationStrategy>();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
 
@@ -184,14 +187,15 @@ IStrategy* StrategyBuilder::build_mft_multi_location_strategy(const YAML::Node &
                       result->peak_distribution[loc]);
   }
 
-  add_therapies(ns, result);
+  add_therapies(ns, result.get());
   result->peak_after = ns["peak_after"].as<int>();
   return result;
 }
 
-IStrategy* StrategyBuilder::build_nested_mft_different_distribution_by_location_strategy(
+std::unique_ptr<IStrategy>
+StrategyBuilder::build_nested_mft_different_distribution_by_location_strategy(
     const YAML::Node &ns, const int &strategy_id) {
-  auto* result = new NestedMFTMultiLocationStrategy();
+  auto result = std::make_unique<NestedMFTMultiLocationStrategy>();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
 
@@ -241,9 +245,9 @@ IStrategy* StrategyBuilder::build_nested_mft_different_distribution_by_location_
   return result;
 }
 
-IStrategy* StrategyBuilder::build_novel_drug_introduction_strategy(const YAML::Node &ns,
-                                                                   const int strategy_id) {
-  auto* result = new NovelDrugIntroductionStrategy();
+std::unique_ptr<IStrategy> StrategyBuilder::build_novel_drug_introduction_strategy(
+    const YAML::Node &ns, const int strategy_id) {
+  auto result = std::make_unique<NovelDrugIntroductionStrategy>();
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
 
@@ -266,11 +270,13 @@ IStrategy* StrategyBuilder::build_novel_drug_introduction_strategy(const YAML::N
   return result;
 }
 
+// TODO: this one need rework
 // Read the YAML and create the DistrictMftStrategy object.
-IStrategy* StrategyBuilder::build_district_mft_strategy(const YAML::Node &node,
-                                                        const int &strategy_id) {
+std::unique_ptr<IStrategy> StrategyBuilder::build_district_mft_strategy(const YAML::Node &node,
+                                                                        const int &strategy_id) {
+  spdlog::warn("This function need to be reworked. Use with caution.");
   // Load the initial parts of the object
-  auto* strategy = new DistrictMftStrategy();
+  auto strategy = std::make_unique<DistrictMftStrategy>();
   strategy->id = strategy_id;
   strategy->name = node["name"].as<std::string>();
 
@@ -378,9 +384,9 @@ IStrategy* StrategyBuilder::build_district_mft_strategy(const YAML::Node &node,
   return strategy;
 }
 
-IStrategy* StrategyBuilder::build_mft_age_based_strategy(const YAML::Node &node,
-                                                         const int &strategy_id) {
-  auto* result = new MFTAgeBasedStrategy();
+std::unique_ptr<IStrategy> StrategyBuilder::build_mft_age_based_strategy(const YAML::Node &node,
+                                                                         const int &strategy_id) {
+  auto result = std::make_unique<MFTAgeBasedStrategy>();
   result->id = strategy_id;
   result->name = node["name"].as<std::string>();
   for (std::size_t i = 0; i < node["therapy_ids"].size(); i++) {

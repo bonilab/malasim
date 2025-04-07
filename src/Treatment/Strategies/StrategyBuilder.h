@@ -33,34 +33,34 @@ public:
   StrategyBuilder &operator=(StrategyBuilder &&) = delete;
   virtual ~StrategyBuilder();
 
-  static IStrategy* build(const YAML::Node &ns, const int &strategy_id);
+  static std::unique_ptr<IStrategy> build(const YAML::Node &ns, const int &strategy_id);
 
   static void add_therapies(const YAML::Node &ns, IStrategy* result);
 
   static void add_distributions(const YAML::Node &ns, DoubleVector &distribution);
 
-  static IStrategy* build_sft_strategy(const YAML::Node &ns, const int &strategy_id);
+  static std::unique_ptr<IStrategy> build_sft_strategy(const YAML::Node &ns, const int &strategy_id);
 
-  static IStrategy* build_cycling_strategy(const YAML::Node &ns, const int &strategy_id);
+  static std::unique_ptr<IStrategy> build_cycling_strategy(const YAML::Node &ns, const int &strategy_id);
 
-  static IStrategy* build_adaptive_cycling_strategy(const YAML::Node &ns, const int &strategy_id);
+  static std::unique_ptr<IStrategy> build_adaptive_cycling_strategy(const YAML::Node &ns, const int &strategy_id);
 
-  static IStrategy* build_mft_strategy(const YAML::Node &ns, const int &strategy_id);
+  static std::unique_ptr<IStrategy> build_mft_strategy(const YAML::Node &ns, const int &strategy_id);
 
-  static IStrategy* build_mft_rebalancing_strategy(const YAML::Node &ns, const int &strategy_id);
+  static std::unique_ptr<IStrategy> build_mft_rebalancing_strategy(const YAML::Node &ns, const int &strategy_id);
 
-  static IStrategy* build_nested_switching_strategy(const YAML::Node &ns, const int &strategy_id);
+  static std::unique_ptr<IStrategy> build_nested_switching_strategy(const YAML::Node &ns, const int &strategy_id);
 
-  static IStrategy* build_mft_multi_location_strategy(const YAML::Node &ns, const int &strategy_id);
+  static std::unique_ptr<IStrategy> build_mft_multi_location_strategy(const YAML::Node &ns, const int &strategy_id);
 
-  static IStrategy* build_nested_mft_different_distribution_by_location_strategy(
+  static std::unique_ptr<IStrategy> build_nested_mft_different_distribution_by_location_strategy(
       const YAML::Node &ns, const int &strategy_id);
 
-  static IStrategy* build_novel_drug_introduction_strategy(const YAML::Node &ns, int strategy_id);
+  static std::unique_ptr<IStrategy> build_novel_drug_introduction_strategy(const YAML::Node &ns, int strategy_id);
 
-  static IStrategy* build_district_mft_strategy(const YAML::Node &node, const int &strategy_id);
+  static std::unique_ptr<IStrategy> build_district_mft_strategy(const YAML::Node &node, const int &strategy_id);
 
-  static IStrategy* build_mft_age_based_strategy(const YAML::Node &node, const int &strategy_id);
+  static std::unique_ptr<IStrategy> build_mft_age_based_strategy(const YAML::Node &node, const int &strategy_id);
 };
 
 #endif /* STRATEGYBUILDER_H */
