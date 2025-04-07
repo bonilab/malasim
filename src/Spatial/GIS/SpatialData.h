@@ -120,32 +120,13 @@ public:
   // Add constant for the new admin boundaries configuration section
   constexpr static const std::string_view ADMIN_BOUNDARIES = "administrative_boundaries";
 
-  // The size of the cells in the raster, the units shouldn't matter, but this
-  // was written when we were using 5x5 km cells
-  float cell_size = 0;
-
-  // First district index, default -1, lazy initialization to actual value
-  // int first_district = -1;
-
-  // Count of district loaded in the map, default zero, lazy initialization to
-  // actual value
-  // int district_count = 0;
-  // int min_district_id = -1;
-  // int max_district_id = -1;
-
-  // Add raster_info as a data member
-  RasterInformation raster_info;
-
-  // true if any raster file has been loaded, false otherwise
-  bool using_raster = false;
-
   // Constructor
   SpatialData();
 
   SpatialData(SpatialData &&) = delete;
   SpatialData &operator=(SpatialData &&) = delete;
   SpatialData(RasterInformation raster_info, std::map<std::string, std::string> admin_rasters)
-      : raster_info(raster_info), admin_rasters_(std::move(admin_rasters)) {}
+      : raster_info_(raster_info), admin_rasters_(std::move(admin_rasters)) {}
   // Deconstructor
   ~SpatialData();
 
@@ -165,7 +146,7 @@ public:
 
   /**
    * @brief Generates location database from a reference raster file
-   * @param raster The raster file to use as a reference for location generation
+   * @param reference The raster file to use as a reference for location generation
    *
    * This function creates location entries for each valid (non-NODATA) cell in
    * the raster. Each location is assigned:
@@ -176,7 +157,7 @@ public:
    * @throws std::runtime_error if no valid raster files are available
    * @throws std::runtime_error if no valid locations are found in the raster
    */
-  void generate_locations(AscFile* raster);
+  void generate_locations(AscFile* reference);
 
   // Load the given raster file into the spatial catalog and assign the given
   // label
@@ -197,12 +178,6 @@ public:
 
   // Not supported by singleton.
   void operator=(SpatialData const &) = delete;
-
-  // Get a reference to the spatial object.
-  static SpatialData &get_instance() {
-    static SpatialData instance;
-    return instance;
-  }
 
   // Return the raster header or the default structure if no raster are loaded
   [[nodiscard]] RasterInformation get_raster_header() const;
@@ -308,13 +283,7 @@ public:
   void initialize_admin_boundaries();
 
   // Get a reference to the AscFile raster, may be a nullptr
-  AscFile* get_raster(SpatialFileType type) { return data_[type].get(); }
-
-  // Reset the singleton instance for testing
-  void reset() {
-    // Reset each unique_ptr individually
-    for (auto &ptr : data_) { ptr.reset(); }
-  }
+  AscFile* get_raster(SpatialFileType type) { return data_.at(type).get(); }
 
   // Add method to validate raster information
   bool validate_raster_info(const RasterInformation &new_info, std::string &errors);
@@ -379,8 +348,17 @@ public:
    */
   void reset_raster_info() {
     spdlog::warn("Reset raster info. All raster data will be lost.");
-    raster_info.reset();
+    raster_info_.reset();
   }
+
+  [[nodiscard]] float get_cell_size() const { return cell_size_; }
+  void set_cell_size(float cell_size) { cell_size_ = cell_size; }
+
+  [[nodiscard]] bool get_using_raster() const { return using_raster_; }
+  void set_using_raster(bool using_raster) { using_raster_ = using_raster; }
+
+  [[nodiscard]] const RasterInformation &get_raster_info() const { return raster_info_; }
+  void set_raster_info(const RasterInformation &raster_info) { raster_info_ = raster_info; }
 
 private:
   std::array<std::unique_ptr<AscFile>, SpatialFileType::COUNT> data_{};
@@ -393,6 +371,15 @@ private:
 
   // Helper method to parse administrative boundaries from YAML
   void load_admin_boundaries(const YAML::Node &node);
+  // The size of the cells in the raster, the units shouldn't matter, but this
+  // was written when we were using 5x5 km cells
+  float cell_size_{0};
+
+  // Add raster_info as a data member
+  RasterInformation raster_info_;
+
+  // true if any raster file has been loaded, false otherwise
+  bool using_raster_{false};
 };
 
 #endif

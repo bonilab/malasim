@@ -42,16 +42,12 @@ protected:
 };
 
 TEST_F(ErrorHandlingTest, MissingFiles) {
-    auto& spatial_data = SpatialData::get_instance();
-    spatial_data.reset();
     auto node = YAML::Node();
     node["district_raster"] = "nonexistent.asc";
     EXPECT_THROW(spatial_data.parse(node), std::runtime_error);
 }
 
 TEST_F(ErrorHandlingTest, InvalidDistrictNumbering) {
-    auto& spatial_data = SpatialData::get_instance();
-    spatial_data.reset();
     create_invalid_district_raster("test_invalid.asc");
     create_population_raster("test_population.asc");
     auto node = createBasicNode();
@@ -62,8 +58,6 @@ TEST_F(ErrorHandlingTest, InvalidDistrictNumbering) {
 }
 
 TEST_F(ErrorHandlingTest, MismatchedRasterDimensions) {
-    auto& spatial_data = SpatialData::get_instance();
-    spatial_data.reset();
     create_district_raster("test_district.asc");
     create_mismatched_raster("test_mismatch.asc");
     auto node = createBasicNode();
@@ -74,7 +68,6 @@ TEST_F(ErrorHandlingTest, MismatchedRasterDimensions) {
 }
 
 TEST_F(ErrorHandlingTest, InvalidLocationAccess) {
-    auto& spatial_data = SpatialData::get_instance();
     EXPECT_THROW(
         {
             [[maybe_unused]] auto district = spatial_data.get_admin_unit("district", 999);

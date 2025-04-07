@@ -4,12 +4,12 @@
 
 #include "Configuration/Config.h"
 #include "Core/Scheduler/Scheduler.h"
-#include "Spatial/GIS/SpatialData.h"
-#include "Utils/Helpers/StringHelpers.h"
 #include "MDC/ModelDataCollector.h"
 #include "Parasites/Genotype.h"
-#include "Simulation/Model.h"
 #include "Population/Population.h"
+#include "Simulation/Model.h"
+#include "Spatial/GIS/SpatialData.h"
+#include "Utils/Helpers/StringHelpers.h"
 
 // Function to populate the 'genotype' table in the database
 void SQLiteDbReporter::populate_genotype_table() {
@@ -34,9 +34,7 @@ void SQLiteDbReporter::populate_genotype_table() {
     std::string query_prefix = "INSERT INTO genotype (id, name) VALUES ";
     batch_insert_query(query_prefix, batch_values);
 
-  } catch (const std::exception &ex) {
-    spdlog::error("{}:\n{}",__FUNCTION__,ex.what());
-  }
+  } catch (const std::exception &ex) { spdlog::error("{}:\n{}", __FUNCTION__, ex.what()); }
 }
 
 // Function to populate the 'admin_level' table in the database
@@ -46,7 +44,7 @@ void SQLiteDbReporter::populate_admin_level_table() {
     db->execute("DELETE FROM admin_level;");
 
     // Get admin level names from SpatialData
-    auto admin_levels = SpatialData::get_instance().get_admin_level_manager()->get_level_names();
+    auto admin_levels = Model::get_spatial_data()->get_admin_level_manager()->get_level_names();
 
     if (admin_levels.empty()) {
       spdlog::warn("No admin levels found. Skipping admin_level table population.");
@@ -68,15 +66,12 @@ void SQLiteDbReporter::populate_admin_level_table() {
     std::string query_prefix = "INSERT INTO admin_level (id, name) VALUES ";
     batch_insert_query(query_prefix, batch_values);
 
-  } catch (const std::exception &ex) {
-    spdlog::error("{}:\n{}",__FUNCTION__,ex.what());
-  }
+  } catch (const std::exception &ex) { spdlog::error("{}:\n{}", __FUNCTION__, ex.what()); }
 }
 
 // Function to create tables for each admin level
 void SQLiteDbReporter::create_all_reporting_tables() {
-  auto admin_levels = SpatialData::get_instance().get_admin_level_manager()->get_level_names();
-
+  auto admin_levels = Model::get_spatial_data()->get_admin_level_manager()->get_level_names();
 
   std::string ageClassColumnDefinitions;
   for (auto ndx = 0; ndx < Model::get_config()->age_structure().size(); ndx++) {
@@ -90,8 +85,7 @@ void SQLiteDbReporter::create_all_reporting_tables() {
   for (auto ndx = 0; ndx < Model::get_config()->age_structure().size(); ndx++) {
     auto agFrom = ndx == 0 ? 0 : Model::get_config()->age_structure()[ndx - 1];
     auto agTo = Model::get_config()->age_structure()[ndx];
-    ageClassColumns +=
-        fmt::format("clinical_episodes_by_age_class_{}_{}, ", agFrom, agTo);
+    ageClassColumns += fmt::format("clinical_episodes_by_age_class_{}_{}, ", agFrom, agTo);
   }
 
   // // Include cell level in the number of levels
@@ -101,14 +95,15 @@ void SQLiteDbReporter::create_all_reporting_tables() {
   // insert_site_query_prefixes_.resize(number_of_levels);
   // insert_genome_query_prefixes_.resize(number_of_levels);
 
-
   // Now create tables for each admin level including cell level
   for (size_t level_id = 0; level_id < admin_levels.size() + 1; level_id++) {
     create_reporting_tables_for_level(level_id, ageClassColumnDefinitions, ageClassColumns);
   }
 }
 
-void SQLiteDbReporter::create_reporting_tables_for_level(int level_id, const std::string& ageClassColumnDefinitions, const std::string& ageClassColumns) {
+void SQLiteDbReporter::create_reporting_tables_for_level(
+    int level_id, const std::string &ageClassColumnDefinitions,
+    const std::string &ageClassColumns) {
   // Generate table names for this level
   std::string site_table_name = get_site_table_name(level_id);
   std::string genome_table_name = get_genome_table_name(level_id);
@@ -117,15 +112,15 @@ void SQLiteDbReporter::create_reporting_tables_for_level(int level_id, const std
   std::string location_id_column = (level_id == CELL_LEVEL_ID) ? "location_id" : "unit_id";
 
   // Create site data table for this level
-  std::string createSiteDataTable =
-    fmt::format(R""""(
+  std::string createSiteDataTable = fmt::format(R""""(
       CREATE TABLE IF NOT EXISTS {} (
           monthly_data_id INTEGER NOT NULL,
           {} INTEGER NOT NULL,
           population INTEGER NOT NULL,
-          clinical_episodes INTEGER NOT NULL, )"""", site_table_name, location_id_column)
-    + ageClassColumnDefinitions +
-    fmt::format(R""""(
+          clinical_episodes INTEGER NOT NULL, )"""",
+                                                site_table_name, location_id_column)
+                                    + ageClassColumnDefinitions
+                                    + fmt::format(R""""(
           treatments INTEGER NOT NULL,
           treatment_failures INTEGER NOT NULL,
           eir REAL NOT NULL,
@@ -139,11 +134,12 @@ void SQLiteDbReporter::create_reporting_tables_for_level(int level_id, const std
           PRIMARY KEY (monthly_data_id, {}),
           FOREIGN KEY (monthly_data_id) REFERENCES monthly_data(id)
       );
-    )"""",location_id_column);
+    )"""",
+                                                  location_id_column);
 
   // Create genome data table for this level
   std::string createGenomeDataTable =
-    fmt::format(R""""(
+      fmt::format(R""""(
       CREATE TABLE IF NOT EXISTS {} (
           monthly_data_id INTEGER NOT NULL,
           {} INTEGER NOT NULL,
@@ -157,15 +153,16 @@ void SQLiteDbReporter::create_reporting_tables_for_level(int level_id, const std
           FOREIGN KEY (genome_id) REFERENCES genotype(id),
           FOREIGN KEY (monthly_data_id) REFERENCES monthly_data(id)
       );
-    )"""", genome_table_name, location_id_column, location_id_column);
+    )"""",
+                  genome_table_name, location_id_column, location_id_column);
   try {
     // Execute the creation queries
     db->execute(createSiteDataTable);
     db->execute(createGenomeDataTable);
 
     // Determine index for query prefixes
-    int prefix_index = (level_id == CELL_LEVEL_ID) ?
-                      insert_site_query_prefixes_.size() - 1 : level_id;
+    int prefix_index =
+        (level_id == CELL_LEVEL_ID) ? insert_site_query_prefixes_.size() - 1 : level_id;
 
     // Create insert query prefixes for this level
     insert_site_query_prefixes_[prefix_index] =
@@ -176,13 +173,14 @@ void SQLiteDbReporter::create_reporting_tables_for_level(int level_id, const std
       " non_treatment, under5_treatment, over5_treatment) VALUES";
 
     insert_genome_query_prefixes_[prefix_index] =
-      fmt::format(R"""(
+        fmt::format(R"""(
         INSERT INTO {}
         (monthly_data_id, {}, genome_id, occurrences,
         clinical_occurrences, occurrences_0to5, occurrences_2to10,
         weighted_occurrences)
         VALUES
-      )""", genome_table_name, location_id_column);
+      )""",
+                    genome_table_name, location_id_column);
   } catch (const std::exception &ex) {
     spdlog::error("Error creating tables for level {}:\n{}", level_id, ex.what());
   }
@@ -194,9 +192,9 @@ void SQLiteDbReporter::populate_location_admin_map_table() {
     // Clear the table
     db->execute("DELETE FROM location_admin_map;");
 
-    auto& spatial_data = SpatialData::get_instance();
-    auto& location_db = Model::get_config()->location_db();
-    auto admin_level_manager = spatial_data.get_admin_level_manager();
+    auto* spatial_data = Model::get_spatial_data();
+    auto &location_db = Model::get_config()->location_db();
+    auto* admin_level_manager = spatial_data->get_admin_level_manager();
 
     // Prepare for batch insertion
     std::vector<std::string> batch_values;
@@ -205,23 +203,23 @@ void SQLiteDbReporter::populate_location_admin_map_table() {
     // For each location in the location database
     for (int location_id = 0; location_id < location_db.size(); location_id++) {
       // For each admin level
-      for (int admin_level_id = 0; admin_level_id < admin_level_manager->get_level_count(); admin_level_id++) {
+      for (int admin_level_id = 0; admin_level_id < admin_level_manager->get_level_count();
+           admin_level_id++) {
         // Get admin unit ID for this location at this admin level
-        auto admin_unit_id = spatial_data.get_admin_unit(admin_level_id, location_id);
+        auto admin_unit_id = spatial_data->get_admin_unit(admin_level_id, location_id);
 
         // Add to batch values
-        batch_values.push_back(fmt::format("({}, {}, {})",
-                              location_id, admin_level_id, admin_unit_id));
+        batch_values.push_back(
+            fmt::format("({}, {}, {})", location_id, admin_level_id, admin_unit_id));
       }
     }
 
     // Insert in batches
-    std::string query_prefix = "INSERT INTO location_admin_map (location_id, admin_level_id, admin_unit_id) VALUES ";
+    std::string query_prefix =
+        "INSERT INTO location_admin_map (location_id, admin_level_id, admin_unit_id) VALUES ";
     batch_insert_query(query_prefix, batch_values);
 
-  } catch (const std::exception &ex) {
-    spdlog::error("{}:\n{}",__FUNCTION__,ex.what());
-  }
+  } catch (const std::exception &ex) { spdlog::error("{}:\n{}", __FUNCTION__, ex.what()); }
 }
 
 // Function to create the database schema
@@ -304,7 +302,8 @@ void SQLiteDbReporter::initialize(int jobNumber, const std::string &path) {
   db = std::make_unique<SQLiteDatabase>(dbPath);
 
   // Get number of admin levels to initialize vectors
-  int admin_level_count = SpatialData::get_instance().get_admin_level_manager()->get_level_names().size();
+  int admin_level_count =
+      Model::get_spatial_data()->get_admin_level_manager()->get_level_names().size();
 
   // Include cell level in the number of levels
   insert_site_query_prefixes_.resize(admin_level_count + 1);
@@ -325,8 +324,7 @@ void SQLiteDbReporter::initialize(int jobNumber, const std::string &path) {
   for (auto ndx = 0; ndx < Model::get_config()->age_structure().size(); ndx++) {
     auto agFrom = ndx == 0 ? 0 : Model::get_config()->age_structure()[ndx - 1];
     auto agTo = Model::get_config()->age_structure()[ndx];
-    ageClassColumns +=
-        fmt::format("clinical_episodes_by_age_class_{}_{}, ", agFrom, agTo);
+    ageClassColumns += fmt::format("clinical_episodes_by_age_class_{}_{}, ", agFrom, agTo);
   }
 }
 
@@ -337,8 +335,7 @@ void SQLiteDbReporter::monthly_report() {
   auto seasonalFactor = Model::get_config()->get_seasonality_settings().get_seasonal_factor(
       Model::get_scheduler()->get_calendar_date(), 0);
 
-  auto monthId = db->insert_data(insert_common_query_, daysElapsed, modelTime,
-                                 seasonalFactor);
+  auto monthId = db->insert_data(insert_common_query_, daysElapsed, modelTime, seasonalFactor);
 
   monthly_report_site_data(monthId);
   if (Model::get_config()->get_model_settings().get_record_genome_db()
@@ -349,7 +346,7 @@ void SQLiteDbReporter::monthly_report() {
 }
 
 void SQLiteDbReporter::batch_insert_query(const std::string &query_prefix,
-                                         const std::vector<std::string> &values) {
+                                          const std::vector<std::string> &values) {
   if (values.empty()) return;
 
   // Process in batches
@@ -358,52 +355,46 @@ void SQLiteDbReporter::batch_insert_query(const std::string &query_prefix,
     std::vector<std::string> batch_values(values.begin() + i, values.begin() + end);
 
     // Create batch query
-    std::string query = query_prefix +
-                      StringHelpers::join(batch_values, ",") + ";";
+    std::string query = query_prefix + StringHelpers::join(batch_values, ",") + ";";
     db->execute(query);
   }
 }
 
 void SQLiteDbReporter::insert_monthly_site_data(int level_id,
-    const std::vector<std::string> &siteData) {
+                                                const std::vector<std::string> &siteData) {
   // Skip if empty
   if (siteData.empty()) return;
 
   // For cell level, use the last index in the query prefix vector
-  int query_index = (level_id == CELL_LEVEL_ID) ?
-                    insert_site_query_prefixes_.size() - 1 : level_id;
+  int query_index = (level_id == CELL_LEVEL_ID) ? insert_site_query_prefixes_.size() - 1 : level_id;
 
   // Insert the site data into the database using batch insertion
   batch_insert_query(insert_site_query_prefixes_[query_index], siteData);
 }
 
 void SQLiteDbReporter::insert_monthly_genome_data(int level_id,
-    const std::vector<std::string> &genomeData) {
+                                                  const std::vector<std::string> &genomeData) {
   // Skip if empty
   if (genomeData.empty()) return;
 
   // For cell level, use the last index in the query prefix vector
-  int query_index = (level_id == CELL_LEVEL_ID) ?
-                    insert_genome_query_prefixes_.size() - 1 : level_id;
+  int query_index =
+      (level_id == CELL_LEVEL_ID) ? insert_genome_query_prefixes_.size() - 1 : level_id;
 
   // Insert the genome data into the database using batch insertion
   batch_insert_query(insert_genome_query_prefixes_[query_index], genomeData);
 }
 
 std::string SQLiteDbReporter::get_site_table_name(int level_id) const {
-  if (level_id == CELL_LEVEL_ID) {
-    return "monthly_site_data_cell";
-  }
-  return "monthly_site_data_" + SpatialData::get_instance().get_admin_level_name(level_id);
+  if (level_id == CELL_LEVEL_ID) { return "monthly_site_data_cell"; }
+  return "monthly_site_data_" + Model::get_spatial_data()->get_admin_level_name(level_id);
 }
 
 std::string SQLiteDbReporter::get_genome_table_name(int level_id) const {
-  if (level_id == CELL_LEVEL_ID) {
-    return "monthly_genome_data_cell";
-  }
-  return "monthly_genome_data_" + SpatialData::get_instance().get_admin_level_name(level_id);
+  if (level_id == CELL_LEVEL_ID) { return "monthly_genome_data_cell"; }
+  return "monthly_genome_data_" + Model::get_spatial_data()->get_admin_level_name(level_id);
 }
 
 const std::string insert_location_admin_map_query_ =
-      "INSERT INTO location_admin_map (location_id, admin_level_id, admin_unit_id) VALUES (?, ?, ?);";
+    "INSERT INTO location_admin_map (location_id, admin_level_id, admin_unit_id) VALUES (?, ?, ?);";
 

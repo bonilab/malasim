@@ -2,7 +2,6 @@
 
 #include "Simulation/Model.h"
 #include "Spatial/GIS/AscFile.h"
-#include "Spatial/Location/Location.h"
 #include "TestHelpers.h"
 
 class AdminManagerBasicOperationsTest : public AdminLevelManagerTestHelper, public ::testing::Test {
@@ -46,15 +45,15 @@ TEST_F(AdminManagerBasicOperationsTest, SetupDistrictBoundary) {
   EXPECT_EQ(district_id, 0);
   EXPECT_TRUE(manager.has_level("district"));
 
-  SpatialData::get_instance().load("test_district.asc", SpatialData::DISTRICTS);
-  SpatialData::get_instance().using_raster = true;
+  Model::get_spatial_data()->load("test_district.asc", SpatialData::DISTRICTS);
+  Model::get_spatial_data()->set_using_raster(true);
   // Check to make sure our data is OK
   std::string errors;
-  if (SpatialData::get_instance().check_catalog(errors)) { throw std::runtime_error(errors); }
-  auto raw_raster = SpatialData::get_instance().get_raster(SpatialData::DISTRICTS);
-  SpatialData::get_instance().generate_locations(raw_raster);
-  SpatialData::get_instance().generate_distances();
-  SpatialData::get_instance().parse_complete();
+  if (Model::get_spatial_data()->check_catalog(errors)) { throw std::runtime_error(errors); }
+  auto raw_raster = Model::get_spatial_data()->get_raster(SpatialData::DISTRICTS);
+  Model::get_spatial_data()->generate_locations(raw_raster);
+  Model::get_spatial_data()->generate_distances();
+  Model::get_spatial_data()->parse_complete();
   EXPECT_NE(raw_raster, nullptr);
   EXPECT_EQ(raw_raster->nrows, 3);
   EXPECT_EQ(raw_raster->ncols, 3);
@@ -80,14 +79,14 @@ TEST_F(AdminManagerBasicOperationsTest, SetupMultipleBoundariesSafely) {
   std::vector<std::vector<int>> district_values = {{1, 1, 2}, {1, 2, 2}, {3, 3, 3}};
   create_custom_raster("test_district.asc", district_values);
 
-  SpatialData::get_instance().load("test_district.asc", SpatialData::DISTRICTS);
-  SpatialData::get_instance().using_raster = true;
+  Model::get_spatial_data()->load("test_district.asc", SpatialData::DISTRICTS);
+  Model::get_spatial_data()->set_using_raster(true);
   // Check to make sure our data is OK
   std::string errors;
-  if (SpatialData::get_instance().check_catalog(errors)) { throw std::runtime_error(errors); }
-  auto district_raster = SpatialData::get_instance().get_raster(SpatialData::DISTRICTS);
-  SpatialData::get_instance().generate_locations(district_raster);
-  SpatialData::get_instance().parse_complete();
+  if (Model::get_spatial_data()->check_catalog(errors)) { throw std::runtime_error(errors); }
+  auto district_raster = Model::get_spatial_data()->get_raster(SpatialData::DISTRICTS);
+  Model::get_spatial_data()->generate_locations(district_raster);
+  Model::get_spatial_data()->parse_complete();
   auto raster = std::make_unique<AscFile>(*district_raster);
   EXPECT_NE(district_raster, nullptr);
   EXPECT_NO_THROW(manager.setup_boundary("district", std::move(raster).get()));
@@ -96,12 +95,12 @@ TEST_F(AdminManagerBasicOperationsTest, SetupMultipleBoundariesSafely) {
   EXPECT_NO_THROW(manager.register_level("province"));
   std::vector<std::vector<int>> province_values = {{1, 1, 1}, {1, 1, 1}, {2, 2, 2}};
   create_custom_raster("test_province.asc", province_values);
-  SpatialData::get_instance().load("test_province.asc", SpatialData::DISTRICTS);
-  SpatialData::get_instance().using_raster = true;
-  if (SpatialData::get_instance().check_catalog(errors)) { throw std::runtime_error(errors); }
-  auto province_raster = SpatialData::get_instance().get_raster(SpatialData::DISTRICTS);
-  SpatialData::get_instance().generate_locations(province_raster);
-  SpatialData::get_instance().parse_complete();
+  Model::get_spatial_data()->load("test_province.asc", SpatialData::DISTRICTS);
+  Model::get_spatial_data()->set_using_raster(true);
+  if (Model::get_spatial_data()->check_catalog(errors)) { throw std::runtime_error(errors); }
+  auto province_raster = Model::get_spatial_data()->get_raster(SpatialData::DISTRICTS);
+  Model::get_spatial_data()->generate_locations(province_raster);
+  Model::get_spatial_data()->parse_complete();
   EXPECT_NE(province_raster, nullptr);
   raster = std::make_unique<AscFile>(*province_raster);
   EXPECT_NO_THROW(manager.setup_boundary("province", std::move(raster).get()));

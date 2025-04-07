@@ -16,7 +16,7 @@ protected:
 };
 
 TEST_F(DistrictOperationsTest, GetDistrictForLocation) {
-  auto& spatial_data = SpatialData::get_instance();
+  // auto& spatial_data = Model::get_spatial_data();
   EXPECT_EQ(spatial_data.get_admin_unit("district", 0), 1);  // First cell, district 1
   EXPECT_EQ(spatial_data.get_admin_unit("district", 2), 2);  // Third cell, district 2
   EXPECT_EQ(spatial_data.get_admin_unit("district", 4), 2);  // Fifth cell, district 2

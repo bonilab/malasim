@@ -13,6 +13,7 @@ class SpatialDataTestHelper {
 protected:
     // Define admin levels to test with, district is always included by default
     std::vector<std::string> additional_admin_levels;
+    SpatialData spatial_data;
 
     void SetUp() {
         // Create test files
@@ -31,8 +32,6 @@ protected:
 
         Model::get_config()->get_spatial_settings().set_number_of_locations(0);
 
-        // Initialize spatial data
-        auto& spatial_data = SpatialData::get_instance();
         auto node = createBasicNode();
         spatial_data.parse(node);
     }
@@ -100,7 +99,7 @@ protected:
 
     void TearDown() {
         cleanup_files();
-        SpatialData::get_instance().reset();
+
         Model::get_config()->get_spatial_settings().set_number_of_locations(0);
         Model::get_config()->location_db().clear();
 

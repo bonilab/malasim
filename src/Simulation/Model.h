@@ -65,6 +65,7 @@ private:
 
   std::unique_ptr<GenotypeDatabase> genotype_db_{nullptr};
   std::unique_ptr<DrugDatabase> drug_db_{nullptr};
+  std::unique_ptr<SpatialData> spatial_data_{nullptr};
 
   IStrategy* treatment_strategy_{nullptr};
 
@@ -103,6 +104,11 @@ public:
   static DrugDatabase* get_drug_db() { return get_instance()->drug_db_.get(); }
   static void set_drug_db(std::unique_ptr<DrugDatabase> value) {
     get_instance()->drug_db_ = std::move(value);
+  }
+
+  static SpatialData* get_spatial_data() { return get_instance()->spatial_data_.get(); }
+  static void set_spatial_data(std::unique_ptr<SpatialData> spatial_data) {
+    get_instance()->spatial_data_ = std::move(spatial_data);
   }
 
   static std::vector<std::unique_ptr<IStrategy>> &get_strategy_db() {

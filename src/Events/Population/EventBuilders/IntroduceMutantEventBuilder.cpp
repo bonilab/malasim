@@ -93,7 +93,7 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_event(
                      std::get<2>(allele));
       }
 
-      auto admin_level_id = SpatialData::get_instance().get_admin_level_id(admin_level_name);
+      auto admin_level_id = Model::get_spatial_data()->get_admin_level_id(admin_level_name);
       // Make sure the GIS data is loaded and the unit id makes
       // sense
       if (unit_id < 0) {
@@ -101,12 +101,12 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_event(
         throw std::invalid_argument("Target unit id must be greater than or equal to zero");
       }
 
-      if (SpatialData::get_instance().get_admin_levels().empty()) {
+      if (Model::get_spatial_data()->get_admin_levels().empty()) {
         spdlog::error("No admin levels found.");
         throw std::invalid_argument("No admin levels found.");
       }
 
-      if (unit_id > SpatialData::get_instance().get_unit_count(admin_level_id)) {
+      if (unit_id > Model::get_spatial_data()->get_unit_count(admin_level_id)) {
         spdlog::error("Target unit id is greater than the unit count.");
         throw std::invalid_argument("Target unit id greater than unit count.");
       }

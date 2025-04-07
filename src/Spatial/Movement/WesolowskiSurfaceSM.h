@@ -1,5 +1,5 @@
 /*
- * WesolowskiSurfaceSM.hxx
+ * WesolowskiSurfaceSM.h
  *
  * Movement model based upon gravity model in
  * https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004267
@@ -53,11 +53,7 @@ public:
 
   ~WesolowskiSurfaceSM() override = default;
 
-  void prepare() override {
-    AscFile* travel_raster =
-        SpatialData::get_instance().get_raster(SpatialData::SpatialFileType::TRAVEL);
-    travel = std::move(prepare_surface(travel_raster, number_of_locations_));
-  }
+  void prepare() override;
 
   [[nodiscard]] DoubleVector get_v_relative_out_movement_to_destination(
       const int &from_location, const int &number_of_locations,

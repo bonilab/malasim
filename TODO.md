@@ -1,5 +1,12 @@
 # Review 
 - genotype_db should be owned by Model???
+- therapy_db owned by Model
+- drug_db owned by Model
+- spatial data owned by Model
+
+-  RandomTest.random_multinomial_DistributionMatchesMultinomial_ChiSquaredTest sometimes failed????
+-  Improve speed for RouletteTest.compare_with_multi_normial
+
 - p_infection_from_infectious_bite biology validation
 - relative_infectivity biology validation
 

@@ -38,7 +38,7 @@ void AgeBandReporter::initialize(int job_number, const std::string &path) {
   // Build district lookup
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
     district_lookup.emplace_back(
-        SpatialData::get_instance().get_admin_unit("district", loc));
+        Model::get_spatial_data()->get_admin_unit("district", loc));
   }
 
   // Log headers
@@ -62,13 +62,13 @@ void AgeBandReporter::monthly_report() {
   if (current_time < start_recording) { return; }
 
   auto age_classes = Model::get_config()->number_of_age_classes();
-  auto districts = SpatialData::get_instance().get_boundary("district")->unit_count;
+  auto districts = Model::get_spatial_data()->get_boundary("district")->unit_count;
 
   std::vector<std::vector<int>> population(districts, std::vector<int>(age_classes));
   std::vector<std::vector<double>> prevalence(districts, std::vector<double>(age_classes));
 
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    auto district = SpatialData::get_instance().get_boundary("district")->min_unit_id == 0
+    auto district = Model::get_spatial_data()->get_boundary("district")->min_unit_id == 0
     ? district_lookup[loc] : district_lookup[loc] - 1;
     for (auto ac = 0; ac < age_classes; ac++) {
       population[district][ac] += Model::get_mdc()->popsize_by_location_age_class()[loc][ac];

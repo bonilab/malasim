@@ -15,7 +15,7 @@
 // Sets up the database and prepares it for data entry
 void SQLiteMonthlyReporter::initialize(int jobNumber,
                                         const std::string &path) {
-  int admin_level_count = SpatialData::get_instance().get_admin_level_manager()->get_level_names().size();
+  int admin_level_count = Model::get_spatial_data()->get_admin_level_manager()->get_level_names().size();
 
   if (admin_level_count == 0) {
     spdlog::info("No admin levels found, cell level reporting will be enabled.");
@@ -38,7 +38,7 @@ void SQLiteMonthlyReporter::initialize(int jobNumber,
 }
 
 void SQLiteMonthlyReporter::count_infections_for_location(int level_id, int location_id) {
-  auto unit_id = (level_id == CELL_LEVEL_ID)? location_id : SpatialData::get_instance().get_admin_unit(level_id, location_id);
+  auto unit_id = (level_id == CELL_LEVEL_ID)? location_id : Model::get_spatial_data()->get_admin_unit(level_id, location_id);
   std::vector<int> ageClasses = Model::get_config()->age_structure();
   auto* index =
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
@@ -67,8 +67,8 @@ void SQLiteMonthlyReporter::calculate_and_build_up_site_data_insert_values(
     max_unit_id = Model::get_config()->number_of_locations() - 1;
   } else {
     // Get the boundary for this admin level
-    const auto* boundary = SpatialData::get_instance().get_admin_level_manager()->get_boundary(
-        SpatialData::get_instance().get_admin_level_manager()->get_level_names()[level_id]);
+    const auto* boundary = Model::get_spatial_data()->get_admin_level_manager()->get_boundary(
+        Model::get_spatial_data()->get_admin_level_manager()->get_level_names()[level_id]);
     
     min_unit_id = boundary->min_unit_id;
     max_unit_id = boundary->max_unit_id;
@@ -148,8 +148,8 @@ void SQLiteMonthlyReporter::monthly_report_site_data(int monthId) {
     if (is_cell_level) {
       vector_size = Model::get_config()->number_of_locations();
     } else {
-      const auto* boundary = SpatialData::get_instance().get_admin_level_manager()->get_boundary(
-        SpatialData::get_instance().get_admin_level_manager()->get_level_names()[level_id]);
+      const auto* boundary = Model::get_spatial_data()->get_admin_level_manager()->get_boundary(
+        Model::get_spatial_data()->get_admin_level_manager()->get_level_names()[level_id]);
       vector_size = boundary->max_unit_id + 1;
     }
 
@@ -174,7 +174,7 @@ void SQLiteMonthlyReporter::monthly_report_site_data(int monthId) {
 
 void SQLiteMonthlyReporter::collect_site_data_for_location(int location_id, int level_id) {
   // Get admin unit for this location at this level
-  auto unit_id = (level_id == CELL_LEVEL_ID)? location_id : SpatialData::get_instance().get_admin_unit(level_id, location_id);
+  auto unit_id = (level_id == CELL_LEVEL_ID)? location_id : Model::get_spatial_data()->get_admin_unit(level_id, location_id);
 
   std::vector<int> ageClasses = Model::get_config()->age_structure();
 
@@ -244,7 +244,7 @@ void SQLiteMonthlyReporter::collect_site_data_for_location(int location_id, int 
 }
 
 void SQLiteMonthlyReporter::collect_genome_data_for_location(size_t location_id, int level_id) {
-  auto unit_id = (level_id == CELL_LEVEL_ID)? location_id : SpatialData::get_instance().get_admin_unit(level_id, location_id);
+  auto unit_id = (level_id == CELL_LEVEL_ID)? location_id : Model::get_spatial_data()->get_admin_unit(level_id, location_id);
   auto* index =
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();
   auto ageClasses = index->vPerson()[0][0].size();
@@ -344,8 +344,8 @@ void SQLiteMonthlyReporter::build_up_genome_data_insert_values(int monthId, int 
     max_unit_id = Model::get_config()->number_of_locations() - 1;
   } else {
     // Get the boundary for this admin level
-    const auto* boundary = SpatialData::get_instance().get_admin_level_manager()->get_boundary(
-        SpatialData::get_instance().get_admin_level_manager()->get_level_names()[level_id]);
+    const auto* boundary = Model::get_spatial_data()->get_admin_level_manager()->get_boundary(
+        Model::get_spatial_data()->get_admin_level_manager()->get_level_names()[level_id]);
     min_unit_id = boundary->min_unit_id;
     max_unit_id = boundary->max_unit_id;
   }
@@ -394,8 +394,8 @@ void SQLiteMonthlyReporter::monthly_report_genome_data(int monthId) {
     if (is_cell_level) {
       vector_size = Model::get_config()->number_of_locations();
     } else {
-      const auto* boundary = SpatialData::get_instance().get_admin_level_manager()->get_boundary(
-        SpatialData::get_instance().get_admin_level_manager()->get_level_names()[level_id]);
+      const auto* boundary = Model::get_spatial_data()->get_admin_level_manager()->get_boundary(
+        Model::get_spatial_data()->get_admin_level_manager()->get_level_names()[level_id]);
       vector_size = boundary->max_unit_id + 1;
     } 
 

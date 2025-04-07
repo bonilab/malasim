@@ -47,7 +47,7 @@ void TravelTrackingReporter::after_run() {
 
   // collect data
 
-  auto number_of_districts = SpatialData::get_instance().min_district_id + 1;
+  auto number_of_districts = Model::get_spatial_data()->min_district_id + 1;
   std::vector<int> population(number_of_districts, 0);
   std::vector<int> traveled_last_30_days(number_of_districts, 0);
   std::vector<int> traveled_last_60_days(number_of_districts, 0);
@@ -61,7 +61,7 @@ void TravelTrackingReporter::after_run() {
   auto* all_person_index =
       Model::get_population()->get_person_index<PersonIndexAll>();
   for (auto* person : all_person_index->vPerson()) {
-    auto district = SpatialData::get_instance().get_district(person->get_location());
+    auto district = Model::get_spatial_data()->get_district(person->get_location());
     population[district]++;
 
     if (person->get_day_that_last_trip_was_initiated() > current_time - 30) {
@@ -100,7 +100,7 @@ void TravelTrackingReporter::after_run() {
   for (auto district = 0; district < number_of_districts; district++) {
     output_file << fmt::format(
         "{},{},{},{},{},{},{},{}\n",
-        SpatialData::get_instance().adjust_simulation_district_to_raster_index(
+        Model::get_spatial_data()->adjust_simulation_district_to_raster_index(
             district),
         population[district],
         population[district] == 0

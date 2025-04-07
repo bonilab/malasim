@@ -5,10 +5,10 @@
 
 #include "IConfigData.h"
 #include "Spatial/Movement/BarabasiSM.hxx"
-#include "Spatial/Movement/BurkinaFasoSM.hxx"
+#include "Spatial/Movement/BurkinaFasoSM.h"
 #include "Spatial/Movement/MarshallSM.hxx"
 #include "Spatial/Movement/WesolowskiSM.hxx"
-#include "Spatial/Movement/WesolowskiSurfaceSM.hxx"
+#include "Spatial/Movement/WesolowskiSurfaceSM.h"
 #include "Utils/MultinomialDistributionGenerator.h"
 #include "spdlog/spdlog.h"
 

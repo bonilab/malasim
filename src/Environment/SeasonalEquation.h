@@ -3,11 +3,14 @@
 
 #include <spdlog/spdlog.h>
 #include <yaml-cpp/yaml.h>
-#include "Utils/TypeDef.hxx"
+
+#include <cstdint>
+
 #include "SeasonalInfo.h"
 #include "Spatial/GIS/SpatialData.h"
 #include "Utils/Constants.h"
 #include "Utils/Helpers/TimeHelpers.h"
+#include "Utils/TypeDef.hxx"
 
 class SeasonalEquation : public ISeasonalInfo {
 public:
@@ -15,7 +18,7 @@ public:
   void build(int number_of_locations);
   double get_seasonal_factor(const date::sys_days &today, const int &location) override;
   void set_from_raster();
-  void set_seasonal_period(unsigned long index);
+  void set_seasonal_period(uint64_t index);
   void update_seasonality(int from, int to);
 
   bool get_raster() const { return raster_; }
@@ -71,4 +74,5 @@ private:
   std::vector<int> reference_phi_;
 };
 
-#endif 
+#endif
+

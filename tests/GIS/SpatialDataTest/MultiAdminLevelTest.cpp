@@ -38,7 +38,6 @@ protected:
 };
 
 TEST_F(AdminBoundaryFixture, AdminLevelsAreProperlyInitialized) {
-    auto& spatial_data = SpatialData::get_instance();
     auto admin_levels = spatial_data.get_admin_levels();
     ASSERT_EQ(admin_levels.size(), 3);
     EXPECT_TRUE(spatial_data.has_admin_level("district"));
@@ -48,7 +47,6 @@ TEST_F(AdminBoundaryFixture, AdminLevelsAreProperlyInitialized) {
 }
 
 TEST_F(AdminBoundaryFixture, AdminUnitQueriesWorkCorrectly) {
-    auto& spatial_data = SpatialData::get_instance();
     EXPECT_EQ(spatial_data.get_admin_units("district"), std::make_pair(1, 2));
     EXPECT_EQ(spatial_data.get_admin_units("province"), std::make_pair(1, 3));
     EXPECT_EQ(spatial_data.get_admin_units("region"), std::make_pair(1, 3));
@@ -59,7 +57,6 @@ TEST_F(AdminBoundaryFixture, AdminUnitQueriesWorkCorrectly) {
 }
 
 TEST_F(AdminBoundaryFixture, LocationToAdminUnitMappingWorksCorrectly) {
-    auto& spatial_data = SpatialData::get_instance();
     ASSERT_EQ(Model::get_config()->number_of_locations(), 8);
 
     EXPECT_EQ(spatial_data.get_admin_unit("district", 0), 1);
@@ -82,8 +79,6 @@ TEST_F(AdminBoundaryFixture, LocationToAdminUnitMappingWorksCorrectly) {
 }
 
 TEST_F(AdminBoundaryFixture, AdminUnitToLocationsMappingWorksCorrectly) {
-    auto& spatial_data = SpatialData::get_instance();
-
     EXPECT_THAT(spatial_data.get_locations_in_unit("district", 1),
                 ::testing::UnorderedElementsAre(0, 1, 3));
     EXPECT_THAT(spatial_data.get_locations_in_unit("district", 2),
@@ -98,8 +93,6 @@ TEST_F(AdminBoundaryFixture, AdminUnitToLocationsMappingWorksCorrectly) {
 }
 
 TEST_F(AdminBoundaryFixture, ErrorHandlingWorksCorrectly) {
-    auto& spatial_data = SpatialData::get_instance();
-
     EXPECT_THROW(
         {
             [[maybe_unused]] auto district = spatial_data.get_admin_unit("nonexistent", 0);
@@ -122,7 +115,6 @@ TEST_F(AdminBoundaryFixture, ErrorHandlingWorksCorrectly) {
 }
 
 TEST_F(CustomAdminLevelFixture, CustomAdminLevelsWorkCorrectly) {
-    auto& spatial_data = SpatialData::get_instance();
     auto admin_levels = spatial_data.get_admin_levels();
     ASSERT_EQ(admin_levels.size(), 3);
     EXPECT_TRUE(spatial_data.has_admin_level("district"));
@@ -131,8 +123,6 @@ TEST_F(CustomAdminLevelFixture, CustomAdminLevelsWorkCorrectly) {
 }
 
 TEST_F(AdminBoundaryFixture, BoundaryDataAccessWorksCorrectly) {
-    auto& spatial_data = SpatialData::get_instance();
-
     const auto* district_boundary = spatial_data.get_boundary("district");
     const auto* province_boundary = spatial_data.get_boundary("province");
     const auto* region_boundary = spatial_data.get_boundary("region");
@@ -156,7 +146,6 @@ TEST_F(AdminBoundaryFixture, BoundaryDataAccessWorksCorrectly) {
 }
 
 TEST_F(DistrictOnlyFixture, DistrictOnlyModeWorksCorrectly) {
-    auto& spatial_data = SpatialData::get_instance();
     auto admin_levels = spatial_data.get_admin_levels();
 
     ASSERT_EQ(admin_levels.size(), 1);

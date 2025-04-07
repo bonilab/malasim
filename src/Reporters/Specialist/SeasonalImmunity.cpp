@@ -134,7 +134,7 @@ void SeasonalImmunity::monthly_report() {
 void SeasonalImmunity::build_lookup() {
   // Get the raster data and make sure it is valid
   AscFile* raster =
-      SpatialData::get_instance().get_raster(SpatialData::SpatialFileType::ECOCLIMATIC);
+      Model::get_spatial_data()->get_raster(SpatialData::SpatialFileType::ECOCLIMATIC);
   if (raster == nullptr) {
     spdlog::error(
         " The Seasonal Immunity reporter cannot be run without an "

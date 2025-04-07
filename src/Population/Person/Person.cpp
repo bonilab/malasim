@@ -606,8 +606,8 @@ void Person::randomly_choose_target_location() {
   day_that_last_trip_was_initiated_ = Model::get_scheduler()->current_time() + 1;
 
   // Check for district raster data availability for spatial analysis.
-  if (SpatialData::get_instance().has_raster(SpatialData::SpatialFileType::Districts)) {
-    auto &spatial_data = SpatialData::get_instance();
+  if (Model::get_spatial_data()->has_raster(SpatialData::SpatialFileType::Districts)) {
+    auto &spatial_data = Model::get_spatial_data();
 
     // Determine the source and destination districts for the current trip.
     int source_district = spatial_data.get_district(location_);

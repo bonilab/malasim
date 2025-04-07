@@ -17,15 +17,15 @@ protected:
     std::vector<std::vector<int>> district_values = {{1, 1, 2}, {1, 1, 2}, {3, 3, 3}};
     create_custom_raster("test_district.asc", district_values);
 
-    SpatialData::get_instance().reset_raster_info();
-    SpatialData::get_instance().load("test_district.asc", SpatialData::DISTRICTS);
-    SpatialData::get_instance().using_raster = true;
+    Model::get_spatial_data()->reset_raster_info();
+    Model::get_spatial_data()->load("test_district.asc", SpatialData::DISTRICTS);
+    Model::get_spatial_data()->set_using_raster(true);
     // Check to make sure our data is OK
     std::string errors;
-    if (SpatialData::get_instance().check_catalog(errors)) { throw std::runtime_error(errors); }
-    auto district_raster = SpatialData::get_instance().get_raster(SpatialData::DISTRICTS);
-    SpatialData::get_instance().generate_locations(district_raster);
-    SpatialData::get_instance().parse_complete();
+    if (Model::get_spatial_data()->check_catalog(errors)) { throw std::runtime_error(errors); }
+    auto district_raster = Model::get_spatial_data()->get_raster(SpatialData::DISTRICTS);
+    Model::get_spatial_data()->generate_locations(district_raster);
+    Model::get_spatial_data()->parse_complete();
     auto raster = std::make_unique<AscFile>(*district_raster);
     EXPECT_NO_THROW(manager.register_level("district"));
     EXPECT_NO_THROW(manager.setup_boundary("district", std::move(raster).get()));

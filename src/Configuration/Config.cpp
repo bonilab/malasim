@@ -135,7 +135,7 @@ bool Config::load(const std::string &filename) {
     population_demographic_.process_config();
     spatial_settings_.process_config();
     seasonality_settings_.process_config_using_number_of_locations(
-        &SpatialData::get_instance(), get_spatial_settings().get_number_of_locations());
+        Model::get_spatial_data(), get_spatial_settings().get_number_of_locations());
     movement_settings_.process_config_using_spatial_settings(
         get_spatial_settings().get_spatial_distance_matrix(),
         get_spatial_settings().get_number_of_locations());

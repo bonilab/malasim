@@ -6,6 +6,10 @@
 
 #include "SeasonalEquation.h"
 
+#include <cstdint>
+
+#include "Simulation/Model.h"
+
 SeasonalEquation::SeasonalEquation() = default;
 
 void SeasonalEquation::build(int number_of_locations) {
@@ -14,7 +18,7 @@ void SeasonalEquation::build(int number_of_locations) {
     spdlog::info("Only {} seasonal equation settings provided, but {} are needed for all locations",
                  A_.size(), number_of_locations);
   }
-  for (auto i = 0ul; i < number_of_locations; i++) {
+  for (auto i = 0; i < number_of_locations; i++) {
     auto input_loc = A_.size() < number_of_locations ? 0 : i;
     set_seasonal_period(input_loc);
   }
@@ -32,8 +36,8 @@ double SeasonalEquation::get_seasonal_factor(const date::sys_days &today, const 
 
 void SeasonalEquation::set_from_raster() {
   AscFile* raster =
-      SpatialData::get_instance().get_raster(SpatialData::SpatialFileType::ECOCLIMATIC);
-  if (!raster) { throw std::invalid_argument("Ecoclimatic raster not found."); }
+      Model::get_spatial_data()->get_raster(SpatialData::SpatialFileType::ECOCLIMATIC);
+  if (raster == nullptr) { throw std::invalid_argument("Ecoclimatic raster not found."); }
   spdlog::info("Setting seasonal equation using raster data.");
   auto size = A_.size();
   for (int row = 0; row < raster->nrows; row++) {
@@ -46,7 +50,7 @@ void SeasonalEquation::set_from_raster() {
   }
 }
 
-void SeasonalEquation::set_seasonal_period(unsigned long index) {
+void SeasonalEquation::set_seasonal_period(uint64_t index) {
   base_.push_back(raster_base_[index]);
   A_.push_back(raster_A_[index]);
   B_.push_back(raster_B_[index]);
