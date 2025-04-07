@@ -9,9 +9,9 @@
 #ifndef ASCFILE_H
 #define ASCFILE_H
 
+#include <memory>
 #include <string>
 #include <vector>
-
 // The ASC file either as read, or to be written. Note that since the
 // specification does not provide a header indicating if the data is floating
 // point or integer, the data is presumed to be floating point.
@@ -23,29 +23,29 @@ struct AscFile {
   inline static const std::string CRLF = "\r\n";
 
   // Number of rows
-  int NROWS = NOT_SET;
+  int nrows = NOT_SET;
 
   // Number of columns
-  int NCOLS = NOT_SET;
+  int ncols = NOT_SET;
 
   // X-center coordinate
-  double XLLCENTER = NOT_SET;
+  double xllcenter = NOT_SET;
 
   // Y-center coordinate
-  double YLLCENTER = NOT_SET;
+  double yllcenter = NOT_SET;
 
   // X-lower left corner coordinate
-  double XLLCORNER = NOT_SET;
+  double xllcorner = NOT_SET;
 
   // X-lower left corner coordinate
-  double YLLCORNER = NOT_SET;
+  double yllcorner = NOT_SET;
 
   // Size of a cell, in units of projection
-  double CELLSIZE = NOT_SET;
+  double cellsize = NOT_SET;
 
   // Representation of a cell with no data, default value is zero at time of
   // initialization
-  double NODATA_VALUE = 0;
+  double nodata_value = 0;
 
   // The data stored in the file
   std::vector<std::vector<float>> data;
@@ -56,12 +56,14 @@ private:
   static const int HEADER_WIDTH = 14;
 
   // Static class, no need to instantiate.
-  AscFileManager() {}
+  AscFileManager() = default;
 
 public:
-  static bool checkAscFile(AscFile* file, std::string* errors);
-  static AscFile* read(const std::string &fileName);
-  static void write(AscFile* file, const std::string &fileName);
+  // Returns an empty string if the file is valid, otherwise returns a string
+  // describing the errors.
+  static std::string check_asc_file(const AscFile* file);
+  static std::unique_ptr<AscFile> read(const std::string &file_name);
+  static void write(AscFile* file, const std::string &file_name);
 };
 
 #endif

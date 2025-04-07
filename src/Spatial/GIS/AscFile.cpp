@@ -14,97 +14,84 @@
 
 // Check that the contents fo the ASC file are correct. Returns TRUE if any
 // errors are found, which are enumerated in the string provided.
-bool AscFileManager::checkAscFile(AscFile* file, std::string* errors) {
+std::string AscFileManager::check_asc_file(const AscFile* file) {
+  std::string errors;
   // Check values that must be set
-  if (file->NCOLS == AscFile::NOT_SET) {
-    *errors += "number of columns is not set;";
-  }
-  if (file->NROWS == AscFile::NOT_SET) {
-    *errors += "number of rows is not set;";
-  }
-  if (file->CELLSIZE == AscFile::NOT_SET) {
-    *errors += "cell size is not set;";
-  }
+  if (file->ncols == AscFile::NOT_SET) { errors += "number of columns is not set;"; }
+  if (file->nrows == AscFile::NOT_SET) { errors += "number of rows is not set;"; }
+  if (file->cellsize == AscFile::NOT_SET) { errors += "cell size is not set;"; }
 
   // The coordinate to fix the raster should either be the lower-left, or the
   // center
-  if (file->XLLCENTER == AscFile::NOT_SET && file->YLLCENTER == AscFile::NOT_SET
-      && file->XLLCORNER == AscFile::NOT_SET
-      && file->YLLCORNER == AscFile::NOT_SET) {
-    *errors += "no location provided for raster coordinate;";
+  if (file->xllcenter == AscFile::NOT_SET && file->yllcenter == AscFile::NOT_SET
+      && file->xllcorner == AscFile::NOT_SET && file->yllcorner == AscFile::NOT_SET) {
+    errors += "no location provided for raster coordinate;";
   }
-  if (file->XLLCENTER != AscFile::NOT_SET && file->YLLCENTER != AscFile::NOT_SET
-      && file->XLLCORNER != AscFile::NOT_SET
-      && file->YLLCORNER != AscFile::NOT_SET) {
-    *errors += "conflicting raster coordinates;";
+  if (file->xllcenter != AscFile::NOT_SET && file->yllcenter != AscFile::NOT_SET
+      && file->xllcorner != AscFile::NOT_SET && file->yllcorner != AscFile::NOT_SET) {
+    errors += "conflicting raster coordinates;";
   }
 
   // Return true if errors were found
-  return (!errors->empty());
+  return errors;
 }
 
 // Read the indicated file from disk, caller is responsible for checking if
 // data is integer or floating point.
-AscFile* AscFileManager::read(const std::string &fileName) {
+std::unique_ptr<AscFile> AscFileManager::read(const std::string &file_name) {
   // Treat the struct as POD
-  auto* results = new AscFile();
+  auto results = std::make_unique<AscFile>();
 
   // Open the file and verify it
-  std::string field, value;
-  std::ifstream in(fileName);
+  std::string field;
+  std::string value;
+  std::ifstream in(file_name);
 
-  if (!in.good()) {
-    throw std::runtime_error("Error opening ASC file: " + fileName);
-  }
+  if (!in.good()) { throw std::runtime_error("Error opening ASC file: " + file_name); }
   if (in.peek() == std::ifstream::traits_type::eof()) {
-    throw std::runtime_error("EOF encountered at start of the file: "
-                             + fileName);
+    throw std::runtime_error("EOF encountered at start of the file: " + file_name);
   }
 
   // Read the first six lines of the header
   for (auto ndx = 0; ndx < 6; ndx++) {
     // Read the field and value, cast to upper case
     in >> field >> value;
-    std::transform(field.begin(), field.end(), field.begin(), ::toupper);
+    std::ranges::transform(field, field.begin(), ::toupper);
 
     // Store the values
     if (field == "NCOLS") {
-      results->NCOLS = std::stoi(value);
+      results->ncols = std::stoi(value);
     } else if (field == "NROWS") {
-      results->NROWS = std::stoi(value);
+      results->nrows = std::stoi(value);
     } else if (field == "XLLCENTER") {
-      results->XLLCENTER = std::stod(value);
+      results->xllcenter = std::stod(value);
     } else if (field == "YLLCENTER") {
-      results->YLLCENTER = std::stod(value);
+      results->yllcenter = std::stod(value);
     } else if (field == "XLLCORNER") {
-      results->XLLCORNER = std::stod(value);
+      results->xllcorner = std::stod(value);
     } else if (field == "YLLCORNER") {
-      results->YLLCORNER = std::stod(value);
+      results->yllcorner = std::stod(value);
     } else if (field == "CELLSIZE") {
-      results->CELLSIZE = std::stod(value);
+      results->cellsize = std::stod(value);
     } else if (field == "NODATA_VALUE") {
-      results->NODATA_VALUE = std::stod(value);
+      results->nodata_value = std::stod(value);
     }
   }
 
   // Check the header to make sure it is valid
-  auto* errors = new std::string();
-  if (checkAscFile(results, errors)) { throw std::runtime_error(*errors); }
-  delete errors;
+  std::string errors = check_asc_file(results.get());
+  if (!errors.empty()) { throw std::runtime_error(errors); }
 
   // Allocate the memory and read the remainder of the actual raster data
   // Allocate the memory using vectors
-  results->data.resize(results->NROWS);
-  for (auto& row : results->data) {
-    row.resize(results->NCOLS);
-  }
+  results->data.resize(results->nrows);
+  for (auto &row : results->data) { row.resize(results->ncols); }
 
   // Remainder of the file is the actual raster data
-  for (auto ndx = 0; ndx < results->NROWS; ndx++) {
-    for (auto ndy = 0; ndy < results->NCOLS; ndy++) {
+  for (auto ndx = 0; ndx < results->nrows; ndx++) {
+    for (auto ndy = 0; ndy < results->ncols; ndy++) {
       if (in.eof()) {
-        throw std::runtime_error("EOF encountered while reading data from: "
-                                 + fileName);
+        throw std::runtime_error("EOF encountered while reading data from: " + file_name);
       }
       in >> value;
       results->data[ndx][ndy] = std::stof(value);
@@ -116,23 +103,21 @@ AscFile* AscFileManager::read(const std::string &fileName) {
 }
 
 // Write the contents of the AscFile to disk.
-void AscFileManager::write(AscFile* file, const std::string &fileName) {
+void AscFileManager::write(AscFile* file, const std::string &file_name) {
   // Open the file for writing
-  std::ofstream out(fileName);
+  std::ofstream out(file_name);
 
   // Write the header
-  out << std::setprecision(16) << std::left << std::setw(HEADER_WIDTH)
-      << "ncols" << file->NCOLS << AscFile::CRLF << std::setw(HEADER_WIDTH)
-      << "nrows" << file->NROWS << AscFile::CRLF << std::setw(HEADER_WIDTH)
-      << "xllcorner" << file->XLLCORNER << AscFile::CRLF
-      << std::setw(HEADER_WIDTH) << "yllcorner" << file->YLLCORNER
-      << AscFile::CRLF << std::setw(HEADER_WIDTH) << "cellsize"
-      << file->CELLSIZE << AscFile::CRLF << std::setw(HEADER_WIDTH)
-      << "NODATA_value" << file->NODATA_VALUE << AscFile::CRLF;
+  out << std::setprecision(16) << std::left << std::setw(HEADER_WIDTH) << "ncols" << file->ncols
+      << AscFile::CRLF << std::setw(HEADER_WIDTH) << "nrows" << file->nrows << AscFile::CRLF
+      << std::setw(HEADER_WIDTH) << "xllcorner" << file->xllcorner << AscFile::CRLF
+      << std::setw(HEADER_WIDTH) << "yllcorner" << file->yllcorner << AscFile::CRLF
+      << std::setw(HEADER_WIDTH) << "cellsize" << file->cellsize << AscFile::CRLF
+      << std::setw(HEADER_WIDTH) << "NODATA_value" << file->nodata_value << AscFile::CRLF;
 
   // Write the raster data
-  for (auto ndx = 0; ndx < file->NROWS; ndx++) {
-    for (auto ndy = 0; ndy < file->NCOLS; ndy++) {
+  for (auto ndx = 0; ndx < file->nrows; ndx++) {
+    for (auto ndy = 0; ndy < file->ncols; ndy++) {
       out << std::setprecision(8) << file->data[ndx][ndy] << " ";
     }
     out << AscFile::CRLF;

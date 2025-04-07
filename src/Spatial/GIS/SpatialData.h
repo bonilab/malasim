@@ -10,43 +10,43 @@
 #include <spdlog/spdlog.h>
 #include <yaml-cpp/yaml.h>
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
-#include "AscFile.h"
 #include "AdminLevelManager.h"
+#include "AscFile.h"
 
 class SpatialData {
 public:
-  enum SpatialFileType {
+  enum SpatialFileType : uint8_t {
     // Only use the data to define the model's location listing
-    Locations,
+    LOCATIONS = 0,
 
     // Population data
-    Population,
+    POPULATION,
 
     // Transmission intensity, linked to the Entomological Inoculation Rates
     // (EIR)
-    Beta,
+    BETA,
 
     // District location
-    Districts,
+    DISTRICTS,
 
     // Travel time data
-    Travel,
+    TRAVEL,
 
     // Eco-climatic zones that are used for seasonal variation
-    Ecoclimatic,
+    ECOCLIMATIC,
 
     // Probability of treatment, under 5
-    PrTreatmentUnder5,
+    PR_TREATMENT_UNDER5,
 
     // Probability of treatment, over 5
-    PrTreatmentOver5,
+    PR_TREATMENT_OVER5,
 
     // Number of sequential items in the type
-    Count
+    COUNT
   };
 
   struct RasterInformation {
@@ -71,21 +71,17 @@ public:
     double no_data_value = NOT_SET;
 
     // Validate if the raster information matches another instance
-    bool matches(const RasterInformation &other) const {
-      return number_columns == other.number_columns
-             && number_rows == other.number_rows
+    [[nodiscard]] bool matches(const RasterInformation &other) const {
+      return number_columns == other.number_columns && number_rows == other.number_rows
              && x_lower_left_corner == other.x_lower_left_corner
-             && y_lower_left_corner == other.y_lower_left_corner
-             && cellsize == other.cellsize
+             && y_lower_left_corner == other.y_lower_left_corner && cellsize == other.cellsize
              && no_data_value == other.no_data_value;
     }
 
     // Check if the raster information has been initialized
-    bool is_initialized() const {
-      return number_columns != NOT_SET && number_rows != NOT_SET
-             && x_lower_left_corner != NOT_SET && y_lower_left_corner != NOT_SET
-             && cellsize != NOT_SET
-             && no_data_value != NOT_SET;
+    [[nodiscard]] bool is_initialized() const {
+      return number_columns != NOT_SET && number_rows != NOT_SET && x_lower_left_corner != NOT_SET
+             && y_lower_left_corner != NOT_SET && cellsize != NOT_SET && no_data_value != NOT_SET;
     }
 
     /* For testing only */
@@ -112,17 +108,17 @@ public:
    * simulation, facilitating efficient spatial queries and analyses.
    */
 
-  const std::string BETA_RASTER = "beta_raster";
-  const std::string DISTRICT_RASTER = "district_raster";
-  const std::string LOCATION_RASTER = "location_raster";
-  const std::string POPULATION_RASTER = "population_raster";
-  const std::string TRAVEL_RASTER = "travel_raster";
-  const std::string ECOCLIMATIC_RASTER = "ecoclimatic_raster";
-  const std::string TREATMENT_RATE_UNDER5 = "p_treatment_under_5_raster";
-  const std::string TREATMENT_RATE_OVER5 = "p_treatment_over_5_raster";
+  constexpr static const std::string_view BETA_RASTER = "beta_raster";
+  constexpr static const std::string_view DISTRICT_RASTER = "district_raster";
+  constexpr static const std::string_view LOCATION_RASTER = "location_raster";
+  constexpr static const std::string_view POPULATION_RASTER = "population_raster";
+  constexpr static const std::string_view TRAVEL_RASTER = "travel_raster";
+  constexpr static const std::string_view ECOCLIMATIC_RASTER = "ecoclimatic_raster";
+  constexpr static const std::string_view TREATMENT_RATE_UNDER5 = "p_treatment_under_5_raster";
+  constexpr static const std::string_view TREATMENT_RATE_OVER5 = "p_treatment_over_5_raster";
 
   // Add constant for the new admin boundaries configuration section
-  const std::string ADMIN_BOUNDARIES = "administrative_boundaries";
+  constexpr static const std::string_view ADMIN_BOUNDARIES = "administrative_boundaries";
 
   // The size of the cells in the raster, the units shouldn't matter, but this
   // was written when we were using 5x5 km cells
@@ -143,16 +139,16 @@ public:
   // true if any raster file has been loaded, false otherwise
   bool using_raster = false;
 
-  // Add AdminLevelManager as a member
-  std::unique_ptr<AdminLevelManager> admin_manager_{ new AdminLevelManager()};
-
   // Constructor
   SpatialData();
 
+  SpatialData(SpatialData &&) = delete;
+  SpatialData &operator=(SpatialData &&) = delete;
+  SpatialData(RasterInformation raster_info, std::map<std::string, std::string> admin_rasters)
+      : raster_info(raster_info), admin_rasters_(std::move(admin_rasters)) {}
   // Deconstructor
   ~SpatialData();
 
-public:
   /**
    * @brief Parses spatial configuration from YAML and initializes the spatial
    * system, all reaster files must be defined in raster_db node for the check_catalog to work
@@ -209,14 +205,12 @@ public:
   }
 
   // Return the raster header or the default structure if no raster are loaded
-  RasterInformation get_raster_header();
+  [[nodiscard]] RasterInformation get_raster_header() const;
 
   // Generate the Euclidean distances for the location_db
   void generate_distances() const;
 
-  AdminLevelManager* get_admin_level_manager() const{
-    return admin_manager_.get();
-  }
+  [[nodiscard]] AdminLevelManager* get_admin_level_manager() const { return admin_manager_.get(); }
 
   /**
    * @brief Retrieves the administrative unit ID for a given location
@@ -226,7 +220,7 @@ public:
    * @throws std::out_of_range if location is invalid
    * @throws std::runtime_error if admin level is not initialized
    */
-  int get_admin_unit(const std::string& level_name, int location) const {
+  [[nodiscard]] int get_admin_unit(const std::string &level_name, int location) const {
     return admin_manager_->get_admin_unit(level_name, location);
   }
 
@@ -238,15 +232,15 @@ public:
    * @throws std::out_of_range if location is invalid
    * @throws std::runtime_error if admin level is not initialized
    */
-  int get_admin_unit(int level_id, int location) const {
+  [[nodiscard]] int get_admin_unit(int level_id, int location) const {
     return admin_manager_->get_admin_unit(level_id, location);
   }
 
-  int get_admin_level_id(const std::string& level_name) const {
+  [[nodiscard]] int get_admin_level_id(const std::string &level_name) const {
     return admin_manager_->get_admin_level_id(level_name);
   }
 
-  const std::string& get_admin_level_name(int level_id) const {
+  [[nodiscard]] const std::string &get_admin_level_name(int level_id) const {
     return admin_manager_->get_level_names()[level_id];
   }
 
@@ -257,14 +251,14 @@ public:
    * @return Const reference to vector of location IDs in the administrative unit
    * @throws std::runtime_error if admin level is not initialized
    */
-  const std::vector<int>& get_locations_in_unit(const std::string& level_name, int unit_id) const {
+  [[nodiscard]] const std::vector<int> &get_locations_in_unit(const std::string &level_name,
+                                                              int unit_id) const {
     return admin_manager_->get_locations_in_unit(level_name, unit_id);
   }
 
-  const std::vector<int>& get_locations_in_unit(int level_id, int unit_id) const {
+  [[nodiscard]] const std::vector<int> &get_locations_in_unit(int level_id, int unit_id) const {
     return admin_manager_->get_locations_in_unit(level_id, unit_id);
   }
-
 
   /**
    * @brief Returns the number of units in the specified administrative level
@@ -272,7 +266,7 @@ public:
    * @return The number of units in the administrative level
    * @throws std::runtime_error if admin level is not initialized
    */
-  int get_unit_count(int level_id) const {
+  [[nodiscard]] int get_unit_count(int level_id) const {
     return admin_manager_->get_unit_count(level_id);
   }
 
@@ -282,17 +276,13 @@ public:
    * @return The number of units in the administrative level
    * @throws std::runtime_error if admin level is not initialized
    */
-  int get_unit_count(const std::string& level_name) const {
-    if (admin_manager_ == nullptr) {
-      return -1;
-    }
+  [[nodiscard]] int get_unit_count(const std::string &level_name) const {
+    if (admin_manager_ == nullptr) { return -1; }
     return admin_manager_->get_unit_count(level_name);
   }
 
-  const BoundaryData* get_boundary(const std::string& level_name) const {
-    if (admin_manager_ == nullptr) {
-      return nullptr;
-    }
+  [[nodiscard]] const BoundaryData* get_boundary(const std::string &level_name) const {
+    if (admin_manager_ == nullptr) { return nullptr; }
     return admin_manager_->get_boundary(level_name);
   }
 
@@ -317,110 +307,8 @@ public:
    */
   void initialize_admin_boundaries();
 
-  /**
-   * @brief Retrieves the district ID as defined in raster files, corresponding
-   * to a given location ID.
-   *
-   * This function maps a location ID to its corresponding district ID, as
-   * defined within the raster files used by the simulation. This mapping is
-   * crucial for spatial analyses and operations that require understanding the
-   * geographical district a specific location belongs to.
-   *
-   * @param location The location ID for which the district ID is requested.
-   * @return The district ID matching the location ID, as defined in the raster
-   * files.
-   */
-  // int get_raster_district(int location);
-
-  /**
-   * @brief Retrieves the 0-based district ID in the simulation, corresponding
-   * to a given location ID.
-   *
-   * This function translates a location ID into a simulation-internal, 0-based
-   * district ID. It is used primarily for internal simulation operations where
-   * districts are handled with 0-based indexing.
-   *
-   * @param location The location ID for which the 0-based district ID is
-   * requested.
-   * @return The 0-based district ID corresponding to the given location ID.
-   */
-  // int get_district(int location);
-
-  /**
-   * @brief Returns a vector of location IDs that belong to the specified district.
-   * Uses a pre-computed mapping for efficient lookups.
-   *
-   * @param district The district ID (matches IDs from the raster file, can be 0-based or 1-based)
-   * @return const reference to vector of location IDs in the district
-   * @throws std::runtime_error if districts are not loaded
-   * @throws std::out_of_range if district ID is invalid
-   */
-  // const std::vector<int>& get_district_locations(int district) const;
-
-  /**
-   * @brief Returns the adjusted district index matching the definition in
-   * raster files, for external storage.
-   *
-   * This function adjusts an internal simulation district index to match the
-   * district indexing as defined in the raster files. The adjusted index is
-   * suitable for external references, such as database entries, ensuring
-   * consistency between the simulation's internal data representation and
-   * external data stores.
-   *
-   * @param simulationDistrict The internal simulation district index that needs
-   * adjustment for external use.
-   * @return The adjusted district index that matches the raster file
-   * definitions, suitable for external references.
-   */
-  // int adjust_simulation_district_to_raster_index(int simulationDistrict) {
-  //   // Assuming get_first_district() returns the necessary adjustment. Adjust as
-  //   // per your actual logic.
-  //   return simulationDistrict + get_first_district();
-  // }
-
-  // Get the locations that are within the given district, throws an error if
-  // not districts are loaded
-  // std::vector<int> get_district_locations(int district);
-
-  // Returns the index of the first district.
-  // Note that the index may be one (ArcGIS default) or zero; however, a
-  // delayed error is generated if the value is not one of the two.
-  // int get_first_district();
-
   // Get a reference to the AscFile raster, may be a nullptr
   AscFile* get_raster(SpatialFileType type) { return data_[type].get(); }
-
-  /**
-   * @brief Populates dependent data structures after input data and raster
-   * files have been processed.
-   *
-   * This function is designed to run once all necessary input data and raster
-   * files have been read and processed. It performs the crucial step of
-   * populating several dependent data structures that are essential for the
-   * simulation's operation. These include caching the total count of districts,
-   * determining the first district index based on the spatial data, and
-   * creating the district lookup table. The function ensures that these
-   * components are correctly initialized before the simulation proceeds,
-   * guaranteeing that spatial queries and operations can be conducted
-   * efficiently.
-   *
-   * @note This function should be called after all input and raster data have
-   * been fully processed but before the simulation begins to ensure that all
-   * dependent data structures are accurately populated. Failure to call this
-   * function in the correct sequence may result in uninitialized or incorrect
-   * data being used in the simulation, leading to potential errors or
-   * inaccurate results.
-   *
-   * @pre Raster files and input data must be loaded and processed. This
-   * includes loading spatial data such as district boundaries and population
-   * distributions from raster files.
-   *
-   * @post The total district count is cached, the first district index is
-   * determined, and the district lookup table is created and populated. These
-   * actions prepare the system for efficient spatial operations and
-   * simulations.
-   */
-  // void populate_dependent_data();
 
   // Reset the singleton instance for testing
   void reset() {
@@ -429,17 +317,16 @@ public:
   }
 
   // Add method to validate raster information
-  bool validate_raster_info(const RasterInformation &new_info,
-                            std::string &errors);
+  bool validate_raster_info(const RasterInformation &new_info, std::string &errors);
 
   /**
    * @brief Returns a list of all available administrative levels
    * @return Vector of administrative level names
    */
-  const std::vector<std::string>& get_admin_levels() const {
+  [[nodiscard]] const std::vector<std::string> &get_admin_levels() const {
     if (admin_manager_ == nullptr) {
-      static const std::vector<std::string> empty_vector;
-      return empty_vector;
+      static const std::vector<std::string> EMPTY_VECTOR;
+      return EMPTY_VECTOR;
     }
     return admin_manager_->get_level_names();
   }
@@ -449,10 +336,8 @@ public:
    * @param level_name The administrative level name to check
    * @return true if the level exists, false otherwise
    */
-  bool has_admin_level(const std::string& level_name) const {
-    if (admin_manager_ == nullptr) {
-      return false;
-    }
+  [[nodiscard]] bool has_admin_level(const std::string &level_name) const {
+    if (admin_manager_ == nullptr) { return false; }
     return admin_manager_->has_level(level_name);
   }
 
@@ -462,10 +347,10 @@ public:
    * @return Pair of min and max unit IDs for the requested level
    * @throws std::runtime_error if admin level does not exist
    */
-  const std::pair<int,int> get_admin_units(const std::string& level_name) const {
+  [[nodiscard]] std::pair<int, int> get_admin_units(const std::string &level_name) const {
     if (admin_manager_ == nullptr) {
       // return an invalid pair
-      return {-1,-1};
+      return {-1, -1};
     }
     return admin_manager_->get_units(level_name);
   }
@@ -489,20 +374,6 @@ public:
    */
   void load_location_data(const YAML::Node &node);
 
-
-    /**
-   * @brief Retrieves the district ID from the district raster file for a given location.
-   *
-   * This is an internal method used during initialization to build the district lookup table.
-   * It performs coordinate-based lookups in the district raster file.
-   *
-   * @param location The location ID for which the district ID is requested.
-   * @return The district ID from the raster file for the given location.
-   * @throws std::out_of_range if location or coordinates are invalid
-   * @throws std::runtime_error if district data is not loaded or coordinates are null
-   */
-  // int get_district_from_raster(int location);
-
   /*
    * Reset the raster information, clearing all raster data.
    */
@@ -512,31 +383,13 @@ public:
   }
 
 private:
-  /**
-  * @brief This property holds a pre-populated map from location to district ID
-  * as defined in the GIS raster file.
-  *
-  * The vector contains district IDs where each element represents a specific
-  * location, and the value at each index corresponds to the actual district ID
-  * from the raster file. The district IDs can be either 0-based or 1-based,
-  * depending on how they are defined in the input GIS raster file. This mapping
-  * is essential for quickly determining the district of any given location
-  * within the simulation. It is assumed that the mapping is set up during the
-  * initialization phase (in SpatialData::parse()) and remains constant
-  * throughout the simulation, facilitating efficient spatial queries and
-  * analyses.
-  */
-  std::vector<int> location_to_district_;
-
-  // Maps district IDs to their corresponding location IDs
-  // Index is 0 to max_district_id+1 to handle both 0-based and 1-based IDs
-  std::vector<std::vector<int>> district_to_locations_;
-
-  // Initialize array with nullptr
-  std::array<std::unique_ptr<AscFile>, SpatialFileType::Count> data_{};
+  std::array<std::unique_ptr<AscFile>, SpatialFileType::COUNT> data_{};
 
   // Map of admin level names to their corresponding raster paths
-  std::map<std::string, std::string> admin_rasters;
+  std::map<std::string, std::string> admin_rasters_;
+
+  // Add AdminLevelManager as a member
+  std::unique_ptr<AdminLevelManager> admin_manager_{new AdminLevelManager()};
 
   // Helper method to parse administrative boundaries from YAML
   void load_admin_boundaries(const YAML::Node &node);

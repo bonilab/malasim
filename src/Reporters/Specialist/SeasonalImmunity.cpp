@@ -9,14 +9,14 @@
 
 #include "Configuration/Config.h"
 #include "Core/Scheduler/Scheduler.h"
-#include "Spatial/GIS/SpatialData.h"
-#include "Utils/Helpers/RunningMedian.hxx"
 #include "MDC/ModelDataCollector.h"
 #include "Parasites/Genotype.h"
-#include "Simulation/Model.h"
 #include "Population/ImmuneSystem/ImmuneSystem.h"
 #include "Population/Person/Person.h"
 #include "Population/Population.h"
+#include "Simulation/Model.h"
+#include "Spatial/GIS/SpatialData.h"
+#include "Utils/Helpers/RunningMedian.hxx"
 #include "Utils/Index/PersonIndexByLocationStateAgeClass.h"
 #include "spdlog/sinks/basic_file_sink.h"
 
@@ -26,7 +26,8 @@ void SeasonalImmunity::initialize(int job_number, const std::string &path) {
 
   spdlog::info("SeasonalImmunityReporter initialized with job number {}", job_number);
 
-  auto monthly_filename = fmt::format("{}seasonal_immunity_monthly_data_{}.{}", path, job_number, Csv::extension);
+  auto monthly_filename =
+      fmt::format("{}seasonal_immunity_monthly_data_{}.{}", path, job_number, Csv::extension);
 
   // Create console logger
   auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
@@ -46,13 +47,11 @@ void SeasonalImmunity::initialize(int job_number, const std::string &path) {
   spdlog::set_default_logger(console_logger);
 
   // Log the seasonal headers
-  ss << "DaysElapsed" << Csv::sep << "ClimaticZone" << Csv::sep << "Population"
-     << Csv::sep << "MedianTheta" << Csv::sep << "MeanTheta" << Csv::sep
-     << "InfectedIndividuals" << Csv::sep << "ClinicalIndividuals" << Csv::sep
-     << "NewInfections" << Csv::sep << "Treatments" << Csv::sep
-     << "NonTreatment" << Csv::sep << "TreatmentFailure" << Csv::sep
-     << "ParasiteClones" << Csv::sep << "Multiclonal" << Csv::sep
-     << "580yWeighted" << Csv::sep << "580yUnweighted" << Csv::sep
+  ss << "DaysElapsed" << Csv::sep << "ClimaticZone" << Csv::sep << "Population" << Csv::sep
+     << "MedianTheta" << Csv::sep << "MeanTheta" << Csv::sep << "InfectedIndividuals" << Csv::sep
+     << "ClinicalIndividuals" << Csv::sep << "NewInfections" << Csv::sep << "Treatments" << Csv::sep
+     << "NonTreatment" << Csv::sep << "TreatmentFailure" << Csv::sep << "ParasiteClones" << Csv::sep
+     << "Multiclonal" << Csv::sep << "580yWeighted" << Csv::sep << "580yUnweighted" << Csv::sep
      << "580yMulticlonal" << Csv::sep << Csv::end_line;
   spdlog::get("monthly_reporter")->info(ss.str());
   ss.str("");
@@ -84,11 +83,13 @@ void SeasonalImmunity::monthly_report() {
 
   for (auto location = 0; location < index->vPerson().size(); location++) {
     auto zone = lookup[location];
-    new_infections[zone] += Model::get_mdc()->monthly_number_of_new_infections_by_location()[location];
+    new_infections[zone] +=
+        Model::get_mdc()->monthly_number_of_new_infections_by_location()[location];
     treatments[zone] += Model::get_mdc()->monthly_number_of_treatment_by_location()[location];
     nontreatment[zone] += Model::get_mdc()->monthly_nontreatment_by_location()[location];
     treatment_failure[zone] += Model::get_mdc()->monthly_treatment_failure_by_location()[location];
-    clinical_individuals[zone] += Model::get_mdc()->monthly_number_of_clinical_episode_by_location()[location];
+    clinical_individuals[zone] +=
+        Model::get_mdc()->monthly_number_of_clinical_episode_by_location()[location];
 
     for (auto hs = 0; hs < Person::NUMBER_OF_STATE - 1; hs++) {
       for (unsigned int ac = 0; ac < age_classes; ac++) {
@@ -97,7 +98,7 @@ void SeasonalImmunity::monthly_report() {
           auto theta = person->get_immune_system()->get_current_value();
           mean_theta[zone] += theta;
           median_theta[zone].push(theta);
-          auto& parasites = *person->get_all_clonal_parasite_populations();
+          auto &parasites = *person->get_all_clonal_parasite_populations();
           if (parasites.empty()) { continue; }
           auto size = static_cast<int>(parasites.size());
           infected_individuals[zone]++;
@@ -117,15 +118,14 @@ void SeasonalImmunity::monthly_report() {
   }
 
   for (int zone = 0; zone < lookup_allocation; zone++) {
-    ss << Model::get_scheduler()->current_time() << Csv::sep << zone << Csv::sep
-       << population[zone] << Csv::sep << median_theta[zone].getMedian()
-       << Csv::sep << mean_theta[zone] / population[zone] << Csv::sep
-       << infected_individuals[zone] << Csv::sep << clinical_individuals[zone]
-       << Csv::sep << new_infections[zone] << Csv::sep << treatments[zone]
-       << Csv::sep << nontreatment[zone] << Csv::sep << treatment_failure[zone]
-       << Csv::sep << parasite_clones[zone] << Csv::sep << multiclonal[zone]
-       << Csv::sep << weighted_580y[zone] << Csv::sep << unweighted_580y[zone]
-       << Csv::sep << multiclonal_580y[zone] << Csv::sep << Csv::end_line;
+    ss << Model::get_scheduler()->current_time() << Csv::sep << zone << Csv::sep << population[zone]
+       << Csv::sep << median_theta[zone].getMedian() << Csv::sep
+       << mean_theta[zone] / population[zone] << Csv::sep << infected_individuals[zone] << Csv::sep
+       << clinical_individuals[zone] << Csv::sep << new_infections[zone] << Csv::sep
+       << treatments[zone] << Csv::sep << nontreatment[zone] << Csv::sep << treatment_failure[zone]
+       << Csv::sep << parasite_clones[zone] << Csv::sep << multiclonal[zone] << Csv::sep
+       << weighted_580y[zone] << Csv::sep << unweighted_580y[zone] << Csv::sep
+       << multiclonal_580y[zone] << Csv::sep << Csv::end_line;
   }
   spdlog::get("monthly_reporter")->info(ss.str());
   ss.str("");
@@ -133,27 +133,28 @@ void SeasonalImmunity::monthly_report() {
 
 void SeasonalImmunity::build_lookup() {
   // Get the raster data and make sure it is valid
-  AscFile* raster = SpatialData::get_instance().get_raster(
-      SpatialData::SpatialFileType::Ecoclimatic);
+  AscFile* raster =
+      SpatialData::get_instance().get_raster(SpatialData::SpatialFileType::ECOCLIMATIC);
   if (raster == nullptr) {
-    spdlog::error(" The Seasonal Immunity reporter cannot be run without an "
-                  "associated climate raster.");
+    spdlog::error(
+        " The Seasonal Immunity reporter cannot be run without an "
+        "associated climate raster.");
     throw std::runtime_error(
         "SeasonalImmunity reporter without underlying raster is not "
         "supported.");
   }
 
   // Load the value into the lookup based on the raster
-  for (int row = 0; row < raster->NROWS; row++) {
-    for (int col = 0; col < raster->NCOLS; col++) {
+  for (int row = 0; row < raster->nrows; row++) {
+    for (int col = 0; col < raster->ncols; col++) {
       // Pass if we have no data
-      if (raster->data[row][col] == raster->NODATA_VALUE) { continue; }
+      if (raster->data[row][col] == raster->nodata_value) { continue; }
 
       // Verify the zone
       auto zone = static_cast<int>(raster->data[row][col]);
       if (zone < 0) {
-        throw std::out_of_range(fmt::format(
-            "Raster value at row: {}, col: {} is less than zero.", row, col));
+        throw std::out_of_range(
+            fmt::format("Raster value at row: {}, col: {} is less than zero.", row, col));
       }
 
       // Set the value
@@ -165,3 +166,4 @@ void SeasonalImmunity::build_lookup() {
   // Update the lookup allocation by one to account for indexing
   lookup_allocation++;
 }
+

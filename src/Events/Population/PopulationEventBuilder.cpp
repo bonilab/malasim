@@ -8,6 +8,7 @@
 #include "PopulationEventBuilder.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <iostream>
 #include <vector>
 
@@ -45,9 +46,8 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_introduce_parasite_events(const YAML::Node &node,
-                                                        Config* config) {
+std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_parasite_events(
+    const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &entry : node) {
     auto location = entry["location"].as<int>();
@@ -55,15 +55,13 @@ PopulationEventBuilder::build_introduce_parasite_events(const YAML::Node &node,
       for (std::size_t j = 0; j < entry["parasite_info"].size(); j++) {
         auto genotype_aa_sequence =
             entry["parasite_info"][j]["genotype_aa_sequence"].as<std::string>();
-        auto genotype_id = Model::get_genotype_db()->get_genotype(genotype_aa_sequence)
-                               ->genotype_id();
+        auto genotype_id =
+            Model::get_genotype_db()->get_genotype(genotype_aa_sequence)->genotype_id();
         auto num = entry["parasite_info"][j]["number_of_cases"].as<int>();
 
-        const auto starting_date =
-            entry["parasite_info"][j]["date"].as<date::year_month_day>();
+        const auto starting_date = entry["parasite_info"][j]["date"].as<date::year_month_day>();
         auto time = (date::sys_days{starting_date}
-                     - date::sys_days{config->get_simulation_timeframe()
-                                          .get_starting_date()})
+                     - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                         .count();
 
         auto* event = new ImportationEvent(location, time, genotype_id, num);
@@ -74,17 +72,15 @@ PopulationEventBuilder::build_introduce_parasite_events(const YAML::Node &node,
   return events;
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_introduce_parasites_periodically_events(
+std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_parasites_periodically_events(
     const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
 
   for (const auto &entry : node) {
-    const auto location = entry["location"].as<unsigned long>();
-    const unsigned long location_from = location;
+    const auto location = entry["location"].as<uint64_t>();
+    const uint64_t location_from = location;
     const auto location_to =
-        std::min(location + 1,
-                 static_cast<unsigned long>(config->number_of_locations()));
+        std::min(location + 1, static_cast<uint64_t>(config->number_of_locations()));
 
     for (auto loc = location_from; loc < location_to; ++loc) {
       for (std::size_t j = 0; j < entry["parasite_info"].size(); j++) {
@@ -92,8 +88,8 @@ PopulationEventBuilder::build_introduce_parasites_periodically_events(
         //            ipi.location = location;
         auto genotype_aa_sequence =
             entry["parasite_info"][j]["genotype_aa_sequence"].as<std::string>();
-        auto genotype_id = Model::get_genotype_db()->get_genotype(genotype_aa_sequence)
-                               ->genotype_id();
+        auto genotype_id =
+            Model::get_genotype_db()->get_genotype(genotype_aa_sequence)->genotype_id();
         // TODO: implement new importation parasite genotype based on allele
         // distribution
 
@@ -103,12 +99,11 @@ PopulationEventBuilder::build_introduce_parasites_periodically_events(
         const auto starting_date =
             entry["parasite_info"][j]["start_date"].as<date::year_month_day>();
         auto time = (date::sys_days{starting_date}
-                     - date::sys_days{config->get_simulation_timeframe()
-                                          .get_starting_date()})
+                     - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                         .count();
 
-        auto* event = new ImportationPeriodicallyEvent(
-            static_cast<int>(loc), dur, genotype_id, num, time);
+        auto* event =
+            new ImportationPeriodicallyEvent(static_cast<int>(loc), dur, genotype_id, num, time);
         events.push_back(event);
       }
     }
@@ -116,43 +111,37 @@ PopulationEventBuilder::build_introduce_parasites_periodically_events(
   return events;
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_introduce_parasites_periodically_events_v2(
+std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_parasites_periodically_events_v2(
     const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &event_node : node) {
-    const auto location = event_node["location"].as<unsigned long>();
+    const auto location = event_node["location"].as<uint64_t>();
     const auto location_from = location == -1 ? 0 : location;
     const auto location_to =
         location == -1
             ? config->number_of_locations()
-            : std::min(location + 1, static_cast<unsigned long>(
-                                         config->number_of_locations()));
+            : std::min(location + 1, static_cast<uint64_t>(config->number_of_locations()));
 
     for (auto loc = location_from; loc < location_to; ++loc) {
       for (auto j = 0; j < event_node["parasite_info"].size(); j++) {
         const auto dur = event_node["parasite_info"][j]["duration"].as<int>();
-        const auto num =
-            event_node["parasite_info"][j]["number_of_cases"].as<int>();
+        const auto num = event_node["parasite_info"][j]["number_of_cases"].as<int>();
 
-        const auto starting_date = event_node["parasite_info"][j]["start_date"]
-                                       .as<date::year_month_day>();
+        const auto starting_date =
+            event_node["parasite_info"][j]["start_date"].as<date::year_month_day>();
 
         date::year_month_day end_date =
             Model::get_config()->get_simulation_timeframe().get_ending_date();
 
         if (event_node["parasite_info"][j]["end_date"]) {
-          end_date = event_node["parasite_info"][j]["end_date"]
-                         .as<date::year_month_day>();
+          end_date = event_node["parasite_info"][j]["end_date"].as<date::year_month_day>();
         }
 
         auto time = (date::sys_days{starting_date}
-                     - date::sys_days{config->get_simulation_timeframe()
-                                          .get_starting_date()})
+                     - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                         .count();
         auto end_time = (date::sys_days{end_date}
-                         - date::sys_days{config->get_simulation_timeframe()
-                                              .get_starting_date()})
+                         - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                             .count();
 
         // TODO: rework this with new genotype implementation
@@ -190,8 +179,7 @@ PopulationEventBuilder::build_introduce_parasites_periodically_events_v2(
   return events;
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_change_treatment_coverage_event(
+std::vector<WorldEvent*> PopulationEventBuilder::build_change_treatment_coverage_event(
     const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &entry : node) {
@@ -202,23 +190,20 @@ PopulationEventBuilder::build_change_treatment_coverage_event(
   return events;
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_change_treatment_strategy_event(
+std::vector<WorldEvent*> PopulationEventBuilder::build_change_treatment_strategy_event(
     const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &entry : node) {
     const auto starting_date = entry["date"].as<date::year_month_day>();
     auto time = (date::sys_days{starting_date}
-                 - date::sys_days{config->get_simulation_timeframe()
-                                      .get_starting_date()})
+                 - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                     .count();
     auto strategy_id = entry["strategy_id"].as<int>();
 
     // Verify that the strategy id is valid, if not fail
     if (strategy_id >= Model::get_strategy_db().size()) {
-      spdlog::error(
-          "Invalid strategy_id! {} supplied, but strategy_db size is {}",
-          strategy_id, Model::get_strategy_db().size());
+      spdlog::error("Invalid strategy_id! {} supplied, but strategy_db size is {}", strategy_id,
+                    Model::get_strategy_db().size());
       exit(-1);
     }
 
@@ -235,36 +220,30 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_single_round_mda_event(
   for (const auto &entry : node) {
     const auto starting_date = entry["date"].as<date::year_month_day>();
     auto time = (date::sys_days{starting_date}
-                 - date::sys_days{config->get_simulation_timeframe()
-                                      .get_starting_date()})
+                 - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                     .count();
     auto* e = new SingleRoundMDAEvent(time);
     for (std::size_t loc = 0; loc < config->number_of_locations(); loc++) {
-      auto input_loc = entry["fraction_population_targeted"].size()
-                               < config->number_of_locations()
-                           ? 0
-                           : loc;
+      auto input_loc =
+          entry["fraction_population_targeted"].size() < config->number_of_locations() ? 0 : loc;
       e->fraction_population_targeted.push_back(
           entry["fraction_population_targeted"][input_loc].as<double>());
     }
 
-    e->days_to_complete_all_treatments =
-        entry["days_to_complete_all_treatments"].as<int>();
+    e->days_to_complete_all_treatments = entry["days_to_complete_all_treatments"].as<int>();
     events.push_back(e);
   }
 
   return events;
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_modify_nested_mft_strategy_event(
+std::vector<WorldEvent*> PopulationEventBuilder::build_modify_nested_mft_strategy_event(
     const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &entry : node) {
     const auto starting_date = entry["date"].as<date::year_month_day>();
     auto time = (date::sys_days{starting_date}
-                 - date::sys_days{config->get_simulation_timeframe()
-                                      .get_starting_date()})
+                 - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                     .count();
     auto strategy_id = entry["strategy_id"].as<int>();
 
@@ -275,8 +254,7 @@ PopulationEventBuilder::build_modify_nested_mft_strategy_event(
   return events;
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_introduce_plas2_parasite_events(
+std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_plas2_parasite_events(
     const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &entry : node) {
@@ -286,12 +264,10 @@ PopulationEventBuilder::build_introduce_plas2_parasite_events(
 
       const auto starting_date = entry["date"].as<date::year_month_day>();
       auto time = (date::sys_days{starting_date}
-                   - date::sys_days{config->get_simulation_timeframe()
-                                        .get_starting_date()})
+                   - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                       .count();
 
-      auto* event =
-          new IntroducePlas2CopyParasiteEvent(location, time, fraction);
+      auto* event = new IntroducePlas2CopyParasiteEvent(location, time, fraction);
       events.push_back(event);
     }
   }
@@ -304,15 +280,12 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_turn_on_mutation_event(
   for (const auto &event_node : node) {
     const auto starting_date = event_node["date"].as<date::year_month_day>();
     auto time = (date::sys_days{starting_date}
-                 - date::sys_days{config->get_simulation_timeframe()
-                                      .get_starting_date()})
+                 - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                     .count();
     double mutation_probability =
         event_node["mutation_probability"]
             ? event_node["mutation_probability"].as<double>()
-            : Model::get_config()
-                  ->get_genotype_parameters()
-                  .get_mutation_probability_per_locus();
+            : Model::get_config()->get_genotype_parameters().get_mutation_probability_per_locus();
 
     auto* e = new TurnOnMutationEvent(time, mutation_probability);
     events.push_back(e);
@@ -327,8 +300,7 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_turn_off_mutation_event(
   for (const auto &event_node : node) {
     const auto starting_date = event_node["date"].as<date::year_month_day>();
     auto time = (date::sys_days{starting_date}
-                 - date::sys_days{config->get_simulation_timeframe()
-                                      .get_starting_date()})
+                 - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                     .count();
     auto* e = new TurnOffMutationEvent(time);
     events.push_back(e);
@@ -337,8 +309,7 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_turn_off_mutation_event(
   return events;
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_change_interrupted_feeding_rate_event(
+std::vector<WorldEvent*> PopulationEventBuilder::build_change_interrupted_feeding_rate_event(
     const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &event_node : node) {
@@ -346,8 +317,7 @@ PopulationEventBuilder::build_change_interrupted_feeding_rate_event(
     if (location < config->number_of_locations()) {
       const auto starting_date = event_node["date"].as<date::year_month_day>();
       auto time = (date::sys_days{starting_date}
-                   - date::sys_days{config->get_simulation_timeframe()
-                                        .get_starting_date()})
+                   - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                       .count();
       auto ifr = event_node["interrupted_feeding_rate"].as<double>();
       auto* event = new ChangeInterruptedFeedingRateEvent(location, ifr, time);
@@ -357,34 +327,30 @@ PopulationEventBuilder::build_change_interrupted_feeding_rate_event(
   return events;
 }
 
-std::vector<WorldEvent*> PopulationEventBuilder::
-    build_change_within_host_induced_free_recombination_events(
-        const YAML::Node node, Config* config) {
+std::vector<WorldEvent*>
+PopulationEventBuilder::build_change_within_host_induced_free_recombination_events(
+    const YAML::Node node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &event_node : node) {
     const auto starting_date = event_node["date"].as<date::year_month_day>();
     auto time = (date::sys_days{starting_date}
-                 - date::sys_days{config->get_simulation_timeframe()
-                                      .get_starting_date()})
+                 - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                     .count();
     auto value = event_node["value"].as<bool>();
-    auto* event =
-        new ChangeWithinHostInducedFreeRecombinationEvent(value, time);
+    auto* event = new ChangeWithinHostInducedFreeRecombinationEvent(value, time);
     events.push_back(event);
   }
 
   return events;
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_change_mutation_probability_per_locus_events(
+std::vector<WorldEvent*> PopulationEventBuilder::build_change_mutation_probability_per_locus_events(
     const YAML::Node node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &event_node : node) {
     const auto starting_date = event_node["date"].as<date::year_month_day>();
     auto time = (date::sys_days{starting_date}
-                 - date::sys_days{config->get_simulation_timeframe()
-                                      .get_starting_date()})
+                 - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                     .count();
     auto value = event_node["mutation_probability_per_locus"].as<double>();
     auto* event = new ChangeMutationProbabilityPerLocusEvent(value, time);
@@ -394,8 +360,7 @@ PopulationEventBuilder::build_change_mutation_probability_per_locus_events(
   return events;
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_introduce_amodiaquine_mutant_parasite_events(
+std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_amodiaquine_mutant_parasite_events(
     const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &entry : node) {
@@ -405,27 +370,23 @@ PopulationEventBuilder::build_introduce_amodiaquine_mutant_parasite_events(
 
       const auto starting_date = entry["date"].as<date::year_month_day>();
       auto time = (date::sys_days{starting_date}
-                   - date::sys_days{config->get_simulation_timeframe()
-                                        .get_starting_date()})
+                   - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                       .count();
       std::vector<std::tuple<int, int, char>> alleles;
       for (const auto &allele_node : entry["alleles"]) {
         if (allele_node["allele"].as<std::string>().size() > 1) {
-          spdlog::error("Allele {} should be 1 character",
-                        allele_node["allele"].as<std::string>());
+          spdlog::error("Allele {} should be 1 character", allele_node["allele"].as<std::string>());
         } else {
-          alleles.push_back(
-              std::tuple(allele_node["chromosome"].as<int>(),
-                         allele_node["locus"].as<int>(),
-                         allele_node["allele"].as<std::string>().front()));
+          alleles.push_back(std::tuple(allele_node["chromosome"].as<int>(),
+                                       allele_node["locus"].as<int>(),
+                                       allele_node["allele"].as<std::string>().front()));
         }
       }
       for (auto &allele : alleles) {
-        spdlog::info("Mutation at {}:{} {}", std::get<0>(allele),
-                     std::get<1>(allele), std::get<2>(allele));
+        spdlog::info("Mutation at {}:{} {}", std::get<0>(allele), std::get<1>(allele),
+                     std::get<2>(allele));
       }
-      auto* event = new IntroduceAmodiaquineMutantEvent(location, time,
-                                                        fraction, alleles);
+      auto* event = new IntroduceAmodiaquineMutantEvent(location, time, fraction, alleles);
       events.push_back(event);
     }
   }
@@ -433,8 +394,8 @@ PopulationEventBuilder::build_introduce_amodiaquine_mutant_parasite_events(
 }
 
 std::vector<WorldEvent*>
-PopulationEventBuilder::build_introduce_lumefantrine_mutant_parasite_events(
-    const YAML::Node &node, Config* config) {
+PopulationEventBuilder::build_introduce_lumefantrine_mutant_parasite_events(const YAML::Node &node,
+                                                                            Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &entry : node) {
     int location = entry["location"].as<int>();
@@ -443,36 +404,31 @@ PopulationEventBuilder::build_introduce_lumefantrine_mutant_parasite_events(
 
       const auto starting_date = entry["date"].as<date::year_month_day>();
       auto time = (date::sys_days{starting_date}
-                   - date::sys_days{config->get_simulation_timeframe()
-                                        .get_starting_date()})
+                   - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                       .count();
 
       std::vector<std::tuple<int, int, char>> alleles;
       for (const auto &allele_node : entry["alleles"]) {
         if (allele_node["allele"].as<std::string>().size() > 1) {
-          spdlog::error("Allele {} should be 1 character",
-                        allele_node["allele"].as<std::string>());
+          spdlog::error("Allele {} should be 1 character", allele_node["allele"].as<std::string>());
         } else {
-          alleles.push_back(
-              std::tuple(allele_node["chromosome"].as<int>(),
-                         allele_node["locus"].as<int>(),
-                         allele_node["allele"].as<std::string>().front()));
+          alleles.push_back(std::tuple(allele_node["chromosome"].as<int>(),
+                                       allele_node["locus"].as<int>(),
+                                       allele_node["allele"].as<std::string>().front()));
         }
       }
       for (auto &allele : alleles) {
-        spdlog::info("Mutation at {}:{} {}", std::get<0>(allele),
-                     std::get<1>(allele), std::get<2>(allele));
+        spdlog::info("Mutation at {}:{} {}", std::get<0>(allele), std::get<1>(allele),
+                     std::get<2>(allele));
       }
-      auto* event = new IntroduceLumefantrineMutantEvent(location, time,
-                                                         fraction, alleles);
+      auto* event = new IntroduceLumefantrineMutantEvent(location, time, fraction, alleles);
       events.push_back(event);
     }
   }
   return events;
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_introduce_580Y_mutant_events(
+std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_580Y_mutant_events(
     const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &event_node : node) {
@@ -482,28 +438,24 @@ PopulationEventBuilder::build_introduce_580Y_mutant_events(
 
       const auto starting_date = event_node["date"].as<date::year_month_day>();
       auto time = (date::sys_days{starting_date}
-                   - date::sys_days{config->get_simulation_timeframe()
-                                        .get_starting_date()})
+                   - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                       .count();
 
       std::vector<std::tuple<int, int, char>> alleles;
       for (const auto &allele_node : event_node["alleles"]) {
         if (allele_node["allele"].as<std::string>().size() > 1) {
-          spdlog::error("Allele {} should be 1 character",
-                        allele_node["allele"].as<std::string>());
+          spdlog::error("Allele {} should be 1 character", allele_node["allele"].as<std::string>());
         } else {
-          alleles.push_back(
-              std::tuple(allele_node["chromosome"].as<int>(),
-                         allele_node["locus"].as<int>(),
-                         allele_node["allele"].as<std::string>().front()));
+          alleles.push_back(std::tuple(allele_node["chromosome"].as<int>(),
+                                       allele_node["locus"].as<int>(),
+                                       allele_node["allele"].as<std::string>().front()));
         }
       }
       for (auto &allele : alleles) {
-        spdlog::info("Mutation at {}:{} {}", std::get<0>(allele),
-                     std::get<1>(allele), std::get<2>(allele));
+        spdlog::info("Mutation at {}:{} {}", std::get<0>(allele), std::get<1>(allele),
+                     std::get<2>(allele));
       }
-      auto* event =
-          new Introduce580YMutantEvent(location, time, fraction, alleles);
+      auto* event = new Introduce580YMutantEvent(location, time, fraction, alleles);
       events.push_back(event);
     }
   }
@@ -511,8 +463,8 @@ PopulationEventBuilder::build_introduce_580Y_mutant_events(
 }
 
 std::vector<WorldEvent*>
-PopulationEventBuilder::build_introduce_triple_mutant_to_dpm_parasite_events(
-    const YAML::Node &node, Config* config) {
+PopulationEventBuilder::build_introduce_triple_mutant_to_dpm_parasite_events(const YAML::Node &node,
+                                                                             Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &event_node : node) {
     auto location = event_node["location"].as<int>();
@@ -521,36 +473,31 @@ PopulationEventBuilder::build_introduce_triple_mutant_to_dpm_parasite_events(
 
       const auto starting_date = event_node["date"].as<date::year_month_day>();
       auto time = (date::sys_days{starting_date}
-                   - date::sys_days{config->get_simulation_timeframe()
-                                        .get_starting_date()})
+                   - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                       .count();
 
       std::vector<std::tuple<int, int, char>> alleles;
       for (const auto &allele_node : event_node["alleles"]) {
         if (allele_node["allele"].as<std::string>().size() > 1) {
-          spdlog::error("Allele {} should be 1 character",
-                        allele_node["allele"].as<std::string>());
+          spdlog::error("Allele {} should be 1 character", allele_node["allele"].as<std::string>());
         } else {
-          alleles.push_back(
-              std::tuple(allele_node["chromosome"].as<int>(),
-                         allele_node["locus"].as<int>(),
-                         allele_node["allele"].as<std::string>().front()));
+          alleles.push_back(std::tuple(allele_node["chromosome"].as<int>(),
+                                       allele_node["locus"].as<int>(),
+                                       allele_node["allele"].as<std::string>().front()));
         }
       }
       for (auto &allele : alleles) {
-        spdlog::info("Mutation at {}:{} {}", std::get<0>(allele),
-                     std::get<1>(allele), std::get<2>(allele));
+        spdlog::info("Mutation at {}:{} {}", std::get<0>(allele), std::get<1>(allele),
+                     std::get<2>(allele));
       }
-      auto* event = new IntroduceTrippleMutantToDPMEvent(location, time,
-                                                         fraction, alleles);
+      auto* event = new IntroduceTrippleMutantToDPMEvent(location, time, fraction, alleles);
       events.push_back(event);
     }
   }
   return events;
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_rotate_treatment_strategy_event(
+std::vector<WorldEvent*> PopulationEventBuilder::build_rotate_treatment_strategy_event(
     const YAML::Node &node, Config* config) {
   try {
     std::vector<WorldEvent*> events;
@@ -558,8 +505,7 @@ PopulationEventBuilder::build_rotate_treatment_strategy_event(
       // Load the values
       auto start_date = entry["date"].as<date::year_month_day>();
       auto time = (date::sys_days{start_date}
-                   - date::sys_days{config->get_simulation_timeframe()
-                                        .get_starting_date()})
+                   - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                       .count();
       auto years = entry["years"].as<int>();
       auto first_strategy_id = entry["first_strategy_id"].as<int>();
@@ -585,18 +531,16 @@ PopulationEventBuilder::build_rotate_treatment_strategy_event(
         spdlog::error(
             "Strategy id should be less than the total number of "
             "strategies (zero-indexing) for RotateStrategyEvent");
-        throw std::invalid_argument(
-            "Strategy id greater than strategy_db size");
+        throw std::invalid_argument("Strategy id greater than strategy_db size");
       }
 
       // Log and add the event to the queue
-      auto* event = new RotateStrategyEvent(time, years, first_strategy_id,
-                                            second_strategy_id);
+      auto* event = new RotateStrategyEvent(time, years, first_strategy_id, second_strategy_id);
       spdlog::debug(
           "Adding {} start: {}, rotation schedule: {}, initial strategy: {}, "
           "next strategy: {}",
-          event->name(), StringHelpers::date_as_string(start_date), years,
-          first_strategy_id, second_strategy_id);
+          event->name(), StringHelpers::date_as_string(start_date), years, first_strategy_id,
+          second_strategy_id);
       events.push_back(event);
     }
     return events;
@@ -621,8 +565,7 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_annual_beta_update_event(
     auto start_date = node[0]["date"].as<date::year_month_day>();
     auto rate = node[0]["rate"].as<float>();
     auto time = (date::sys_days{start_date}
-                 - date::sys_days{config->get_simulation_timeframe()
-                                      .get_starting_date()})
+                 - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                     .count();
     auto* event = new AnnualBetaUpdateEvent(rate, time);
 
@@ -644,8 +587,7 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_annual_beta_update_event(
 // Generate a new annual event that adjusts the coverage at each location within
 // the model, assumes that the YAML node contains a rate of change and start
 // date.
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_annual_coverage_update_event(
+std::vector<WorldEvent*> PopulationEventBuilder::build_annual_coverage_update_event(
     const YAML::Node &node, Config* config) {
   try {
     // Check the node size
@@ -655,8 +597,7 @@ PopulationEventBuilder::build_annual_coverage_update_event(
     auto start_date = node[0]["date"].as<date::year_month_day>();
     auto rate = node[0]["rate"].as<float>();
     auto time = (date::sys_days{start_date}
-                 - date::sys_days{config->get_simulation_timeframe()
-                                      .get_starting_date()})
+                 - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                     .count();
     auto* event = new AnnualCoverageUpdateEvent(rate, time);
 
@@ -675,8 +616,7 @@ PopulationEventBuilder::build_annual_coverage_update_event(
   }
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_change_circulation_percent_event(
+std::vector<WorldEvent*> PopulationEventBuilder::build_change_circulation_percent_event(
     const YAML::Node &node, Config* config) {
   try {
     std::vector<WorldEvent*> events;
@@ -684,8 +624,7 @@ PopulationEventBuilder::build_change_circulation_percent_event(
       // Load the values
       auto start_date = entry["date"].as<date::year_month_day>();
       auto time = (date::sys_days{start_date}
-                   - date::sys_days{config->get_simulation_timeframe()
-                                        .get_starting_date()})
+                   - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                       .count();
       auto rate = entry["circulation_percent"].as<float>();
 
@@ -695,16 +634,14 @@ PopulationEventBuilder::build_change_circulation_percent_event(
             "The daily population circulation percentage must be "
             "greater than zero for {}",
             ChangeCirculationPercentEvent::EventName);
-        throw std::invalid_argument(
-            "Population circulation percentage must be greater than zero");
+        throw std::invalid_argument("Population circulation percentage must be greater than zero");
       }
       if (rate > 1.0) {
         spdlog::error(
             "The daily population circulation percentage must be "
             "less than one (i.e., 100%) for ",
             ChangeCirculationPercentEvent::EventName);
-        throw std::invalid_argument(
-            "Population circulation percentage must be less than one");
+        throw std::invalid_argument("Population circulation percentage must be less than one");
       }
 
       // Log and add the event to the queue
@@ -726,8 +663,7 @@ PopulationEventBuilder::build_change_circulation_percent_event(
 // Generate a new importation periodically random event that uses a weighted
 // random selection to add a new malaria infection with a specific genotype
 // to the model.
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_importation_periodically_random_event(
+std::vector<WorldEvent*> PopulationEventBuilder::build_importation_periodically_random_event(
     const YAML::Node &node, Config* config) {
   try {
     std::vector<WorldEvent*> events;
@@ -735,8 +671,7 @@ PopulationEventBuilder::build_importation_periodically_random_event(
       // Load the values
       auto start_date = entry["date"].as<date::year_month_day>();
       auto time = (date::sys_days{start_date}
-                   - date::sys_days{config->get_simulation_timeframe()
-                                        .get_starting_date()})
+                   - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                       .count();
       auto genotype_id = entry["genotype_id"].as<int>();
       auto count = entry["count"].as<int>();
@@ -746,8 +681,7 @@ PopulationEventBuilder::build_importation_periodically_random_event(
       if (start_date.day() != date::day{1}) {
         spdlog::error("The event must start on the first of the month for {} ",
                       ImportationPeriodicallyRandomEvent::EventName);
-        throw std::invalid_argument(
-            "Event must start on the first of the month");
+        throw std::invalid_argument("Event must start on the first of the month");
       }
 
       // Double check that the genotype id is valid
@@ -763,8 +697,7 @@ PopulationEventBuilder::build_importation_periodically_random_event(
             "Invalid genotype id supplied for {} genotype id cannot be greater "
             "than genotype_db size",
             ImportationPeriodicallyRandomEvent::EventName);
-        throw std::invalid_argument(
-            "Genotype id cannot be greater than genotype_db size");
+        throw std::invalid_argument("Genotype id cannot be greater than genotype_db size");
       }
 
       // Make sure the count makes sense
@@ -784,13 +717,13 @@ PopulationEventBuilder::build_importation_periodically_random_event(
       }
 
       // Log and add the event to the queue
-      auto* event = new ImportationPeriodicallyRandomEvent(
-          genotype_id, time, count, log_parasite_density);
+      auto* event =
+          new ImportationPeriodicallyRandomEvent(genotype_id, time, count, log_parasite_density);
       spdlog::debug(
           "Adding {} start: {}, genotype_id: {}, count: {}, "
           "log_parasite_density: {}",
-          event->name(), StringHelpers::date_as_string(start_date), genotype_id,
-          count, log_parasite_density);
+          event->name(), StringHelpers::date_as_string(start_date), genotype_id, count,
+          log_parasite_density);
       events.push_back(event);
     }
     return events;
@@ -811,8 +744,7 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_update_beta_raster_event(
       // Load the values
       auto start_date = entry["date"].as<date::year_month_day>();
       auto time = (date::sys_days{start_date}
-                   - date::sys_days{config->get_simulation_timeframe()
-                                        .get_starting_date()})
+                   - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                       .count();
       auto filename = entry["beta_raster"].as<std::string>();
 
@@ -823,9 +755,8 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_update_beta_raster_event(
         spdlog::error(
             "The file indicated, {}, cannot be found for "
             "{} event. Please check the file path.",
-            filename, UpdateBetaRasterEvent::EventName);
-        throw std::invalid_argument("File for "
-                                    + UpdateBetaRasterEvent::EventName
+            filename, UpdateBetaRasterEvent::EVENT_NAME);
+        throw std::invalid_argument("File for " + UpdateBetaRasterEvent::EVENT_NAME
                                     + " does not appear to exist.");
       } else {
         file.close();
@@ -842,13 +773,12 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_update_beta_raster_event(
     spdlog::error(
         "Unrecoverable error parsing YAML value in "
         "{} node: {}",
-        UpdateBetaRasterEvent::EventName, error.msg);
+        UpdateBetaRasterEvent::EVENT_NAME, error.msg);
     exit(EXIT_FAILURE);
   }
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_import_district_mutant_daily_events(
+std::vector<WorldEvent*> PopulationEventBuilder::build_import_district_mutant_daily_events(
     const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &entry : node) {
@@ -857,39 +787,34 @@ PopulationEventBuilder::build_import_district_mutant_daily_events(
     std::vector<std::tuple<int, int, char>> alleles;
     for (const auto &allele_node : entry["alleles"]) {
       if (allele_node["allele"].as<std::string>().size() > 1) {
-        spdlog::error("Allele {} should be 1 character",
-                      allele_node["allele"].as<std::string>());
+        spdlog::error("Allele {} should be 1 character", allele_node["allele"].as<std::string>());
       } else {
-        alleles.push_back(std::tuple(
-            allele_node["chromosome"].as<int>(), allele_node["locus"].as<int>(),
-            allele_node["allele"].as<std::string>().front()));
+        alleles.push_back(std::tuple(allele_node["chromosome"].as<int>(),
+                                     allele_node["locus"].as<int>(),
+                                     allele_node["allele"].as<std::string>().front()));
       }
     }
     for (auto &allele : alleles) {
-      spdlog::info("Mutation at {}:{} {}", std::get<0>(allele),
-                   std::get<1>(allele), std::get<2>(allele));
+      spdlog::info("Mutation at {}:{} {}", std::get<0>(allele), std::get<1>(allele),
+                   std::get<2>(allele));
     }
     auto start_date = entry["start_date"].as<date::year_month_day>();
     auto start_day = (date::sys_days{start_date}
-                      - date::sys_days{config->get_simulation_timeframe()
-                                           .get_starting_date()})
+                      - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                          .count();
-    auto* event = new DistrictImportationDailyEvent(district, daily_rate,
-                                                    start_day, alleles);
+    auto* event = new DistrictImportationDailyEvent(district, daily_rate, start_day, alleles);
     events.push_back(event);
   }
   return events;
 }
 
-std::vector<WorldEvent*>
-PopulationEventBuilder::build_change_mutation_mask_events(
+std::vector<WorldEvent*> PopulationEventBuilder::build_change_mutation_mask_events(
     const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &event_node : node) {
     const auto starting_date = event_node["date"].as<date::year_month_day>();
     auto time = (date::sys_days{starting_date}
-                 - date::sys_days{config->get_simulation_timeframe()
-                                      .get_starting_date()})
+                 - date::sys_days{config->get_simulation_timeframe().get_starting_date()})
                     .count();
     auto mutation_mask = event_node["mutation_mask"].as<std::string>();
 
@@ -910,12 +835,10 @@ std::vector<WorldEvent*> PopulationEventBuilder::build(const YAML::Node &node) {
     events = build_introduce_parasite_events(node["info"], config);
   }
   if (name == "introduce_parasites_periodically") {
-    events =
-        build_introduce_parasites_periodically_events(node["info"], config);
+    events = build_introduce_parasites_periodically_events(node["info"], config);
   }
   if (name == "introduce_parasites_periodically_v2") {
-    events =
-        build_introduce_parasites_periodically_events_v2(node["info"], config);
+    events = build_introduce_parasites_periodically_events_v2(node["info"], config);
   }
   if (name == "change_treatment_coverage") {
     events = build_change_treatment_coverage_event(node["info"], config);
@@ -923,9 +846,7 @@ std::vector<WorldEvent*> PopulationEventBuilder::build(const YAML::Node &node) {
   if (name == "change_treatment_strategy") {
     events = build_change_treatment_strategy_event(node["info"], config);
   }
-  if (name == "single_round_MDA") {
-    events = build_single_round_mda_event(node["info"], config);
-  }
+  if (name == "single_round_MDA") { events = build_single_round_mda_event(node["info"], config); }
   if (name == "modify_nested_mft_strategy") {
     events = build_modify_nested_mft_strategy_event(node["info"], config);
   }
@@ -933,36 +854,27 @@ std::vector<WorldEvent*> PopulationEventBuilder::build(const YAML::Node &node) {
     events = build_introduce_plas2_parasite_events(node["info"], config);
   }
   if (name == "introduce_amodiaquine_mutant_parasites") {
-    events = build_introduce_amodiaquine_mutant_parasite_events(node["info"],
-                                                                config);
+    events = build_introduce_amodiaquine_mutant_parasite_events(node["info"], config);
   }
   if (name == "introduce_lumefantrine_mutant_parasites") {
-    events = build_introduce_lumefantrine_mutant_parasite_events(node["info"],
-                                                                 config);
+    events = build_introduce_lumefantrine_mutant_parasite_events(node["info"], config);
   }
   if (name == "introduce_580Y_parasites") {
     events = build_introduce_580Y_mutant_events(node["info"], config);
   }
-  if (name == "turn_on_mutation") {
-    events = build_turn_on_mutation_event(node["info"], config);
-  }
-  if (name == "turn_off_mutation") {
-    events = build_turn_off_mutation_event(node["info"], config);
-  }
+  if (name == "turn_on_mutation") { events = build_turn_on_mutation_event(node["info"], config); }
+  if (name == "turn_off_mutation") { events = build_turn_off_mutation_event(node["info"], config); }
   if (name == "change_within_host_induced_free_recombination") {
-    events = build_change_within_host_induced_free_recombination_events(
-        node["info"], config);
+    events = build_change_within_host_induced_free_recombination_events(node["info"], config);
   }
   if (name == "change_mutation_probability_per_locus") {
-    events = build_change_mutation_probability_per_locus_events(node["info"],
-                                                                config);
+    events = build_change_mutation_probability_per_locus_events(node["info"], config);
   }
   if (name == "change_interrupted_feeding_rate") {
     events = build_change_interrupted_feeding_rate_event(node["info"], config);
   }
   if (name == "introduce_triple_mutant_to_dpm_parasites") {
-    events = build_introduce_triple_mutant_to_dpm_parasite_events(node["info"],
-                                                                  config);
+    events = build_introduce_triple_mutant_to_dpm_parasite_events(node["info"], config);
   }
 
   if (name == AnnualBetaUpdateEvent::EventName) {
@@ -979,13 +891,12 @@ std::vector<WorldEvent*> PopulationEventBuilder::build(const YAML::Node &node) {
   }
   if (name == IntroduceMutantEvent::EVENT_NAME) {
     auto admin_level_name = node["admin_level"].as<std::string>();
-    events =
-        build_introduce_mutant_event(node["info"], config, admin_level_name);
+    events = build_introduce_mutant_event(node["info"], config, admin_level_name);
   }
   if (name == IntroduceMutantRasterEvent::EventName) {
     events = build_introduce_mutant_raster_event(node["info"], config);
   }
-  if (name == UpdateBetaRasterEvent::EventName) {
+  if (name == UpdateBetaRasterEvent::EVENT_NAME) {
     events = build_update_beta_raster_event(node["info"], config);
   }
   if (name == RotateStrategyEvent::EventName) {
@@ -1000,11 +911,9 @@ std::vector<WorldEvent*> PopulationEventBuilder::build(const YAML::Node &node) {
   return events;
 }
 
-void PopulationEventBuilder::verify_single_node(const YAML::Node &node,
-                                                const std::string &name) {
+void PopulationEventBuilder::verify_single_node(const YAML::Node &node, const std::string &name) {
   if (node.size() > 1) {
-    spdlog::error("More than one sub node found for " + name
-                  + " in the configuration file");
+    spdlog::error("More than one sub node found for " + name + " in the configuration file");
   }
 }
 

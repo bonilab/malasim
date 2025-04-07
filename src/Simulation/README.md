@@ -50,32 +50,57 @@ The Simulation module provides:
 ### Model Structure
 ```cpp
 class Model {
-    // Core functionality
-    void initialize();
+public:
+    // Singleton access
+    static Model* get_instance();
+
+    // Initialization
+    bool initialize();
+
+    // Simulation control
+    void before_run();
     void run();
-    void step();
+    void after_run();
+    void begin_time_step();
+    void end_time_step();
+    void daily_update();
+
+    // Configuration and component access (static getters/setters)
+    static Config* get_config();
+    static void set_config(Config* config);
+    // ... other getters/setters ...
+
+private:
+    // Private constructor for singleton
+    Model() = default;
     
-    // State management
-    void update_state();
-    void handle_events();
+    // ... private members ...
 };
 ```
 
 ## Usage
 
 ```cpp
+// Get the model instance
+auto model = Model::get_instance();
+
+// Assume 'config' is loaded elsewhere
+// Model::set_config(config); // Configuration might be set during initialization steps
+
 // Initialize model
-auto model = new Model(config);
 model->initialize();
 
-// Run simulation
+// Run the full simulation
 model->run();
 
-// Step-by-step execution
-while (!model->is_finished()) {
-    model->step();
-    model->update_state();
-}
+// Note: Step-by-step execution is typically managed externally, 
+// potentially calling methods like model->begin_time_step(), 
+// model->daily_update(), model->end_time_step() in a loop.
+
+// this step is optional, but it you want to re-used the model instance for another run
+// or expirement,... run release to reset the model class
+model->release();
+
 ```
 
 ## Key Systems

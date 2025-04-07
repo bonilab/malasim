@@ -20,6 +20,8 @@ struct BoundaryData {
     // Maps location ID to its administrative unit ID for this level
     std::vector<int> location_to_unit;
     // Maps unit ID to all locations within that unit
+    // each element is a vector of location ID
+    // the index is the unit ID
     std::vector<std::vector<int>> unit_to_locations;
 
     int min_unit_id{-1};                ///< Minimum unit ID in this level

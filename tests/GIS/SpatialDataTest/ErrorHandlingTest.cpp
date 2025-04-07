@@ -75,5 +75,9 @@ TEST_F(ErrorHandlingTest, MismatchedRasterDimensions) {
 
 TEST_F(ErrorHandlingTest, InvalidLocationAccess) {
     auto& spatial_data = SpatialData::get_instance();
-    EXPECT_THROW(spatial_data.get_admin_unit("district", 999), std::out_of_range);
+    EXPECT_THROW(
+        {
+            [[maybe_unused]] auto district = spatial_data.get_admin_unit("district", 999);
+        },
+        std::out_of_range);
 }

@@ -100,10 +100,25 @@ TEST_F(AdminBoundaryFixture, AdminUnitToLocationsMappingWorksCorrectly) {
 TEST_F(AdminBoundaryFixture, ErrorHandlingWorksCorrectly) {
     auto& spatial_data = SpatialData::get_instance();
 
-    EXPECT_THROW(spatial_data.get_admin_unit("nonexistent", 0), std::runtime_error);
-    EXPECT_THROW(spatial_data.get_locations_in_unit("nonexistent", 1), std::runtime_error);
-    EXPECT_THROW(spatial_data.get_locations_in_unit("district", 999), std::out_of_range);
-    EXPECT_THROW(spatial_data.get_admin_unit("district", 999), std::out_of_range);
+    EXPECT_THROW(
+        {
+            [[maybe_unused]] auto district = spatial_data.get_admin_unit("nonexistent", 0);
+        },
+        std::runtime_error);
+    EXPECT_THROW(
+        {
+            [[maybe_unused]] auto locations = spatial_data.get_locations_in_unit("nonexistent", 1);
+        },
+        std::runtime_error);
+    EXPECT_THROW(
+        {
+            [[maybe_unused]] auto locations = spatial_data.get_locations_in_unit("district", 999);
+        },
+        std::out_of_range);
+    EXPECT_THROW(
+        {
+            [[maybe_unused]] auto district = spatial_data.get_admin_unit("district", 999);
+        }, std::out_of_range);
 }
 
 TEST_F(CustomAdminLevelFixture, CustomAdminLevelsWorkCorrectly) {

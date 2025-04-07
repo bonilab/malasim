@@ -7,13 +7,14 @@
 #ifndef UPDATEBETARASTEREVENT_H
 #define UPDATEBETARASTEREVENT_H
 
+#include <spdlog/spdlog.h>
+
 #include <utility>
 
 #include "Configuration/Config.h"
 #include "Events/Event.h"
-#include "Spatial/GIS/AscFile.h"
 #include "Simulation/Model.h"
-#include <spdlog/spdlog.h>
+#include "Spatial/GIS/AscFile.h"
 
 class UpdateBetaRasterEvent : public WorldEvent {
 private:
@@ -22,7 +23,7 @@ private:
   // Execute the event to replace all beta values
   void do_execute() override {
     // Read the raster file
-    AscFile* raster = AscFileManager::read(filename_);
+    auto raster = AscFileManager::read(filename_);
 
     // Grab a reference to the location_db to work with, note the location count
     auto &location_db = Model::get_config()->location_db();
@@ -30,10 +31,10 @@ private:
 
     // Iterate though and update the betas
     auto id = 0;
-    for (auto row = 0; row < raster->NROWS; row++) {
-      for (auto col = 0; col < raster->NCOLS; col++) {
+    for (auto row = 0; row < raster->nrows; row++) {
+      for (auto col = 0; col < raster->ncols; col++) {
         // Check for no data, press on if so
-        if (raster->data[row][col] == raster->NODATA_VALUE) { continue; }
+        if (raster->data[row][col] == raster->nodata_value) { continue; }
 
         // Check for raster misalignment
         if (id > count) {
@@ -49,20 +50,23 @@ private:
     }
 
     // Work complete, log it as info
-    spdlog::info("Updated beta values based upon raster file: {}",filename_);
+    spdlog::info("Updated beta values based upon raster file: {}", filename_);
   }
 
 public:
-  inline static const std::string EventName = "update_beta_raster_event";
+  inline static const std::string EVENT_NAME = "update_beta_raster_event";
 
-  UpdateBetaRasterEvent(std::string filename, int start)
-      : filename_(std::move(filename)) {
+  UpdateBetaRasterEvent(const UpdateBetaRasterEvent &) = delete;
+  UpdateBetaRasterEvent(UpdateBetaRasterEvent &&) = delete;
+  UpdateBetaRasterEvent &operator=(const UpdateBetaRasterEvent &) = delete;
+  UpdateBetaRasterEvent &operator=(UpdateBetaRasterEvent &&) = delete;
+  UpdateBetaRasterEvent(std::string filename, int start) : filename_(std::move(filename)) {
     set_time(start);
   }
 
   ~UpdateBetaRasterEvent() override = default;
 
-  const std::string name() const override { return EventName; }
+  [[nodiscard]] const std::string name() const override { return "update_beta_raster_event"; }
 };
 
 #endif

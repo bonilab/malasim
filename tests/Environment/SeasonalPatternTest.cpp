@@ -21,7 +21,7 @@ public:
         fake_spatial_data->get_admin_level_manager()->register_level("district");
         auto boundary = BoundaryData();
         boundary.location_to_unit = {1, 2};
-        boundary.unit_to_locations = {{1, {1}}, {2, {2}}};
+        boundary.unit_to_locations = {{1, 2}, {3, 4}};
         boundary.min_unit_id = 1;
         boundary.max_unit_id = 2;
         boundary.unit_count = 2;
