@@ -72,40 +72,40 @@ population_demographic:
   # When receiving treatment, this rate drops by a factor of 10 in the code
   mortality_when_treatment_fail_by_age_class: [0.040, 0.020, 0.020, 0.020, 0.020, 0.004, 0.004, 0.004, 0.004, 0.004, 0.004, 0.001, 0.001, 0.001, 0.001]
   # Scaling factor for the population in the model (based on data)
-  artificial_rescaling_of_population_size: 0.25
+  artificial_rescaling_of_population_size: 1
 
 # ---------------------------------------------------------------
 # 5. Raster and Geographic Settings
 # ---------------------------------------------------------------
 spatial_settings:
   mode: "grid_based" # or "location_based"
-#  mode: "location_based" # or "location_based"
+  # mode: "location_based" # or "location_based"
   grid_based:
     # Approximate national age distribution (to be updated with specific country data)
     age_distribution_by_location:
-     - [0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0]
+      - [0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0]
 
     # Adjusted population raster to account for burn-in up to 2009 start
-#    population_raster: "../../sample_inputs/kag_init_pop.asc"
+    #    population_raster: "../../sample_inputs/kag_init_pop.asc"
     population_raster: "../../sample_inputs/dev_init_pop.asc"
 
     # Raster files defining the country districts
-#    district_raster: "../../sample_inputs/kag_district.asc"
-#    district_raster: "../../sample_inputs/dev_district.asc"
+    #    district_raster: "../../sample_inputs/kag_district.asc"
+    #    district_raster: "../../sample_inputs/dev_district.asc"
 
     administrative_boundaries:
-     - name: "district"    # First admin level
-#       raster: "../../sample_inputs/kag_district.asc"
-       raster: "../../sample_inputs/dev_district.asc"
+      - name: "district" # First admin level
+        #       raster: "../../sample_inputs/kag_district.asc"
+        raster: "../../sample_inputs/dev_district.asc"
 
     # Raster files defining treatment probabilities (comment these out for beta calibration)
-#    p_treatment_under_5_raster: "../../sample_inputs/kag_treatment.asc"
-#    p_treatment_over_5_raster: "../../sample_inputs/kag_treatment.asc"
+    #    p_treatment_under_5_raster: "../../sample_inputs/kag_treatment.asc"
+    #    p_treatment_over_5_raster: "../../sample_inputs/kag_treatment.asc"
     p_treatment_under_5_raster: "../../sample_inputs/dev_treatment.asc"
     p_treatment_over_5_raster: "../../sample_inputs/dev_treatment.asc"
 
     # Raster file containing the calibrated beta value
-#    beta_raster: "../../sample_inputs/kag_beta_r1.asc"
+    #    beta_raster: "../../sample_inputs/kag_beta_r1.asc"
     beta_raster: "../../sample_inputs/dev_beta.asc"
 
     # Raster file containing the seasonal values,
@@ -121,7 +121,7 @@ spatial_settings:
   location_based:
     # Approximate national age distribution (to be updated with specific country data)
     age_distribution_by_location:
-     - [0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0]
+      - [0.0378, 0.0378, 0.0378, 0.0378, 0.0282, 0.0282, 0.0282, 0.0282, 0.0282, 0.029, 0.029, 0.029, 0.029, 0.029, 0.169, 0.134, 0.106, 0.066, 0.053, 0.035, 0.0]
 
     #id, latitude, longitude
     location_info:
@@ -138,7 +138,7 @@ spatial_settings:
     beta_by_location: [0.05]
 
     #if the number of values less than number of locations, the first value will be applied for all locations
-    population_size_by_location: [1000]
+    population_size_by_location: [10]
 
 # ---------------------------------------------------------------
 # 6. Seasonality Settings
@@ -158,10 +158,10 @@ seasonality_settings:
     # If raster is enabled, make sure to include
     # ecoclimatic_raster in spatial_settings
     raster: true
-    base: [ 0.4]
-    a:    [ 0.6]
-    b:    [ 2.5]
-    phi:  [ 146]
+    base: [0.4]
+    a: [0.6]
+    b: [2.5]
+    phi: [146]
 
 # ---------------------------------------------------------------
 # 7. Movement and Spatial Model
@@ -711,8 +711,8 @@ therapy_parameters:
     #this is a MAC Therapy
     14:
       name: "MAC DHAPPQ"
-      therapy_ids: [0,0]
-      regimen: [1,7]
+      therapy_ids: [0, 0]
+      regimen: [1, 7]
 
 recurrence_therapy_id: 7
 
@@ -812,9 +812,9 @@ strategy_parameters:
     16:
       name: NovelDrugIntroductionStrategy
       type: NovelDrugIntroduction
-      strategy_ids: [0,3]
-      start_distribution: [0.7,0.3]
-      peak_distribution: [0.7,0.3]
+      strategy_ids: [0, 3]
+      start_distribution: [0.7, 0.3]
+      peak_distribution: [0.7, 0.3]
       peak_after: 0
       newly_introduced_strategy_id: 4
       tf_threshold: 0.1
@@ -937,14 +937,14 @@ mosquito_parameters:
 # 16. Population Events (all events are optional)
 # ---------------------------------------------------------------
 population_events:
-#  - name: change_within_host_induced_free_recombination
-#    info:
-#      - date: 2000/1/1
-#        value: false
+  #  - name: change_within_host_induced_free_recombination
+  #    info:
+  #      - date: 2000/1/1
+  #        value: false
 
-#  - name: turn_off_mutation
-#    info:
-#      - date: 2001/1/1
+  #  - name: turn_off_mutation
+  #    info:
+  #      - date: 2001/1/1
 
   - name: turn_on_mutation
     info:
@@ -1125,7 +1125,7 @@ population_events:
 #        date: 2004/12/20
 #        fraction: 0.04
 
-  # TODO: change this event to match new genotype format
+# TODO: change this event to match new genotype format
 #  - name: introduce_parasites_periodically_v2
 #    info:
 #      - location: 0
