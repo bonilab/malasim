@@ -8,26 +8,26 @@ protected:
 
     void SetUp() override {
         // Initialize default SeasonalitySettings object using setters
-        SeasonalEquation* equation = new SeasonalEquation();
+        auto equation = std::make_unique<SeasonalEquation>();
         equation->set_raster_base(std::vector<double>{2.5});
         equation->set_raster_A(std::vector<double>{0.4});
         equation->set_raster_B(std::vector<double>{0.6});
         equation->set_raster_phi(std::vector<int>{146});
         equation->set_raster(true);
 
-        SeasonalRainfall* rainfall = new SeasonalRainfall();
+        auto rainfall = std::make_unique<SeasonalRainfall>();
         rainfall->set_filename("../../sample_inputs/dev_seasonality.csv");
         rainfall->set_period(365);
 
-        SeasonalPattern* pattern = new SeasonalPattern();
+        auto pattern = std::make_unique<SeasonalPattern>();
         pattern->set_filename("../../sample_inputs/dev_seasonality_pattern.csv");
         pattern->set_period(365);
 
         default_settings.set_enable(true);
         default_settings.set_mode("pattern");
-        default_settings.set_seasonal_rainfall(rainfall);
-        default_settings.set_seasonal_equation(equation);
-        default_settings.set_seasonal_pattern(pattern);
+        default_settings.set_seasonal_rainfall(std::move(rainfall));
+        default_settings.set_seasonal_equation(std::move(equation));
+        default_settings.set_seasonal_pattern(std::move(pattern));
 
     }
 };
