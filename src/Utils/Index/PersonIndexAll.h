@@ -1,9 +1,14 @@
 #ifndef PERSONINDEXALL_H
 #define PERSONINDEXALL_H
 
-#include "PersonIndex.h"
+#include <memory>
+#include <vector>
 
-class PersonIndexAll : public PersonIndex {
+#include "Population/Person/Person.h"
+
+using PersonUniquePtrVector = std::vector<std::unique_ptr<Person>>;
+
+class PersonIndexAll {
 public:
   // disallow copy and assign
   PersonIndexAll(const PersonIndexAll &) = delete;
@@ -12,24 +17,22 @@ public:
   PersonIndexAll &operator=(PersonIndexAll &&) = delete;
 
   PersonIndexAll();
-  explicit PersonIndexAll(PersonPtrVector v_person) : v_person_(std::move(v_person)) {}
-  ~PersonIndexAll() override;
-  PersonPtrVector &v_person() { return v_person_; }
-  void set_v_person(const PersonPtrVector &value) { v_person_ = value; }
+  ~PersonIndexAll();
 
-  void add(Person* person) override;
+  PersonUniquePtrVector &v_person() { return v_person_; }
 
-  void remove(Person* person) override;
+  void add(std::unique_ptr<Person> person);
 
-  [[nodiscard]] std::size_t size() const override;
+  void remove(Person* person);
 
-  void update() override;
+  void clear();
 
-  void notify_change(Person* person, const Person::Property &property, const void* old_value,
-                     const void* new_value) override;
+  [[nodiscard]] std::size_t size() const;
+
+  void update();
 
 private:
-  PersonPtrVector v_person_;
+  PersonUniquePtrVector v_person_;
 };
 
 #endif /* PERSONINDEXALL_H */

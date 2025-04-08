@@ -119,7 +119,7 @@ void MonthlyReporter::after_run() {
       / static_cast<double>(Constants::DAYS_IN_YEAR);
 
   auto sum_ntf = 0.0;
-  ul pop_size = 0;
+  uint64_t pop_size = 0;
   for (auto location = 0; location < Model::get_config()->number_of_locations(); location++) {
     sum_ntf += Model::get_mdc()->cumulative_ntf_by_location()[location];
     pop_size += Model::get_mdc()->popsize_by_location()[location];

@@ -33,18 +33,19 @@
 #include "Treatment/Therapies/MACTherapy.h"
 #include "Utils/Constants.h"
 
-Person::Person() = default;
+Person::Person() {
+  immune_system_ = std::make_unique<ImmuneSystem>(this);
+  drugs_in_blood_ = std::make_unique<DrugsInBlood>(this);
+  all_clonal_parasite_populations_ = std::make_unique<SingleHostClonalParasitePopulations>(this);
+};
 
 Person::~Person() = default;
 
 void Person::initialize() {
   event_manager_.initialize();
-  immune_system_ = std::make_unique<ImmuneSystem>(this);
 
-  all_clonal_parasite_populations_ = std::make_unique<SingleHostClonalParasitePopulations>(this);
   all_clonal_parasite_populations_->init();
 
-  drugs_in_blood_ = std::make_unique<DrugsInBlood>(this);
   drugs_in_blood_->init();
 
   today_infections_ = std::vector<int>();
@@ -82,7 +83,7 @@ void Person::set_host_state(const HostStates &value) {
       all_clonal_parasite_populations_->clear();
       // TODO: remove all events
       Model::get_mdc()->record_1_death(location_, birthday_, number_of_times_bitten_, age_class_,
-                                       age_);
+                                       static_cast<int>(age_));
     }
 
     host_state_ = value;

@@ -1,9 +1,14 @@
 #ifndef POPULATION_H
 #define POPULATION_H
 
+#include <cstddef>
+#include <list>
+#include <memory>
 #include <vector>
 
 #include "Person/Person.h"
+
+using PersonIndexPtrList = std::list<std::unique_ptr<PersonIndex>>;
 
 class Model;
 class PersonIndexAll;
@@ -26,7 +31,7 @@ public:
   // void update(int current_time);
   //
   // // Add a person to the population
-  void add_person(Person* person);
+  void add_person(std::unique_ptr<Person> person);
   //
   // // Remove a person from the population
   void remove_person(Person* person);
@@ -106,12 +111,8 @@ public:
   // the destination location
   void notify_movement(int source, int destination);
 
-  PersonIndexPtrList* person_index_list() { return person_index_list_; }
-  void set_person_index_list(PersonIndexPtrList* person_index_list) {
-    person_index_list_ = person_index_list;
-  }
-  PersonIndexAll* all_persons() { return all_persons_; }
-  void set_all_persons(PersonIndexAll* all_persons) { all_persons_ = all_persons; }
+  PersonIndexPtrList* person_index_list() { return person_index_list_.get(); }
+  PersonIndexAll* all_persons() { return all_persons_.get(); }
 
   template <typename T>
   T* get_person_index();
@@ -155,8 +156,8 @@ public:
 
 private:
   // std::vector<Person*> persons_;
-  PersonIndexPtrList* person_index_list_;
-  PersonIndexAll* all_persons_;
+  std::unique_ptr<PersonIndexPtrList> person_index_list_{nullptr};
+  std::unique_ptr<PersonIndexAll> all_persons_{nullptr};
   IntVector popsize_by_location_;
 
   std::vector<std::vector<double>> individual_foi_by_location_;
@@ -173,11 +174,9 @@ private:
 
 template <typename T>
 T* Population::get_person_index() {
-  for (PersonIndex* person_index : *person_index_list_) {
-    if (dynamic_cast<T*>(person_index) != nullptr) {
-      T* pi = dynamic_cast<T*>(person_index);
-      return pi;
-    }
+  for (auto &person_index_ptr : *person_index_list_) {
+    T* pi = dynamic_cast<T*>(person_index_ptr.get());
+    if (pi != nullptr) { return pi; }
   }
   return nullptr;
 }

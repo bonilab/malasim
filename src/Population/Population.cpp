@@ -27,57 +27,136 @@
 #include "Utils/Index/PersonIndexByLocationStateAgeClass.h"
 
 Population::Population() {
-  person_index_list_ = new PersonIndexPtrList();
-  all_persons_ = new PersonIndexAll();
+  person_index_list_ = std::make_unique<PersonIndexPtrList>();
 
-  // person_index_list_->push_back(all_persons_);
+  all_persons_ = std::make_unique<PersonIndexAll>();
 }
 
 Population::~Population() {
   // persons_.clear();
   // release memory for all persons
   if (all_persons_ != nullptr) {
-    for (auto &person : all_persons_->v_person()) { ObjectHelpers::delete_pointer<Person>(person); }
-    all_persons_->v_person().clear();
-    all_persons_ = nullptr;
+    all_persons_->clear();
+    all_persons_.reset();
   }
 
   // release person_indexes
   if (person_index_list_ != nullptr) {
-    for (PersonIndex* person_index : *person_index_list_) {
-      ObjectHelpers::delete_pointer<PersonIndex>(person_index);
-    }
-
     person_index_list_->clear();
-    ObjectHelpers::delete_pointer<PersonIndexPtrList>(person_index_list_);
+    person_index_list_.reset();
   }
 }
 
-void Population::add_person(Person* person) {
+void Population::initialize() {
+  if (Model::get_instance() != nullptr) {
+    all_persons_->clear();
+    // those vector will be used in the initial infection
+    const auto number_of_locations = Model::get_config()->number_of_locations();
+
+    // Prepare the population size vector
+    popsize_by_location_ = IntVector(number_of_locations, 0);
+
+    individual_relative_biting_by_location_ =
+        std::vector<std::vector<double>>(number_of_locations, std::vector<double>());
+    individual_relative_moving_by_location_ =
+        std::vector<std::vector<double>>(number_of_locations, std::vector<double>());
+    individual_foi_by_location_ =
+        std::vector<std::vector<double>>(number_of_locations, std::vector<double>());
+
+    all_alive_persons_by_location_ =
+        std::vector<std::vector<Person*>>(number_of_locations, std::vector<Person*>());
+
+    sum_relative_biting_by_location_ = std::vector<double>(number_of_locations, 0);
+    sum_relative_moving_by_location_ = std::vector<double>(number_of_locations, 0);
+
+    current_force_of_infection_by_location_ = std::vector<double>(number_of_locations, 0);
+
+    force_of_infection_for_n_days_by_location_ =
+        std::vector<std::vector<double>>(Model::get_config()->number_of_tracking_days(),
+                                         std::vector<double>(number_of_locations, 0));
+
+    // initalize other person index
+    initialize_person_indices();
+
+    // Initialize population
+    auto &location_db = Model::get_config()->get_spatial_settings().location_db;
+    for (auto loc = 0; loc < number_of_locations; loc++) {
+      // spdlog::info("Cell {}, population {}", loc,
+      //                         location_db[loc].population_size);
+
+      const auto popsize_by_location =
+          static_cast<int>(location_db[loc].population_size
+                           * Model::get_config()
+                                 ->get_population_demographic()
+                                 .get_artificial_rescaling_of_population_size());
+      auto temp_sum = 0;
+      for (auto age_class = 0;
+           age_class
+           < Model::get_config()->get_population_demographic().get_initial_age_structure().size();
+           age_class++) {
+        auto number_of_individual_by_loc_ageclass = 0;
+        if (age_class
+            == Model::get_config()->get_population_demographic().get_initial_age_structure().size()
+                   - 1) {
+          number_of_individual_by_loc_ageclass = popsize_by_location - temp_sum;
+        } else {
+          number_of_individual_by_loc_ageclass =
+              static_cast<int>(popsize_by_location * location_db[loc].age_distribution[age_class]);
+          temp_sum += number_of_individual_by_loc_ageclass;
+        }
+        for (int i = 0; i < number_of_individual_by_loc_ageclass; i++) {
+          generate_individual(loc, age_class);
+        }
+      }
+      // spdlog::info("individual_relative_moving_by_location[{}] size: {} sum: {}",loc,
+      //              individual_relative_moving_by_location[loc].size(),
+      //              sum_relative_moving_by_location[loc]);
+    }
+  }
+}
+
+void Population::initialize_person_indices() {
+  const int number_of_location = Model::get_config()->number_of_locations();
+  const int number_of_host_states = Person::NUMBER_OF_STATE;
+  const int number_of_age_classes = Model::get_config()->number_of_age_classes();
+
+  auto p_index_by_l_s_a = std::make_unique<PersonIndexByLocationStateAgeClass>(
+      number_of_location, number_of_host_states, number_of_age_classes);
+  person_index_list_->push_back(std::move(p_index_by_l_s_a));
+
+  auto p_index_location_moving_level = std::make_unique<PersonIndexByLocationMovingLevel>(
+      number_of_location, Model::get_config()
+                              ->get_movement_settings()
+                              .get_circulation_info()
+                              .get_number_of_moving_levels());
+  person_index_list_->push_back(std::move(p_index_location_moving_level));
+}
+
+void Population::add_person(std::unique_ptr<Person> person) {
   // persons_.push_back(person);
-  for (PersonIndex* person_index : *person_index_list_) { person_index->add(person); }
   person->set_population(this);
+  for (auto &person_index : *person_index_list_) { person_index->add(person.get()); }
 
   // Update the count at the location
   popsize_by_location_[person->get_location()]++;
+  // all_persons will take ownership
+  all_persons_->add(std::move(person));
 }
 
 void Population::remove_dead_person(Person* person) {
   remove_person(person);
-  ObjectHelpers::delete_pointer<Person>(person);
 }
 
 void Population::remove_person(Person* person) {
   // persons_.erase(std::ranges::remove(persons_, person).begin(), persons_.end());
-  for (PersonIndex* person_index : *person_index_list_) { person_index->remove(person); }
-  person->set_population(nullptr);
   popsize_by_location_[person->get_location()]--;
-  assert(popsize_by_location_[person->get_location()] >= 0);
+  for (auto &person_index : *person_index_list_) { person_index->remove(person); }
+  all_persons_->remove(person);
 }
 
 void Population::notify_change(Person* person, const Person::Property &property,
                                const void* old_value, const void* new_value) {
-  for (PersonIndex* person_index : *person_index_list_) {
+  for (auto &person_index : *person_index_list_) {
     person_index->notify_change(person, property, old_value, new_value);
   }
 }
@@ -237,75 +316,8 @@ void Population::perform_infection_event() {
   today_infections.clear();
 }
 
-void Population::initialize() {
-  if (Model::get_instance() != nullptr) {
-    // those vector will be used in the initial infection
-    const auto number_of_locations = Model::get_config()->number_of_locations();
-
-    // Prepare the population size vector
-    popsize_by_location_ = IntVector(number_of_locations, 0);
-
-    individual_relative_biting_by_location_ =
-        std::vector<std::vector<double>>(number_of_locations, std::vector<double>());
-    individual_relative_moving_by_location_ =
-        std::vector<std::vector<double>>(number_of_locations, std::vector<double>());
-    individual_foi_by_location_ =
-        std::vector<std::vector<double>>(number_of_locations, std::vector<double>());
-
-    all_alive_persons_by_location_ =
-        std::vector<std::vector<Person*>>(number_of_locations, std::vector<Person*>());
-
-    sum_relative_biting_by_location_ = std::vector<double>(number_of_locations, 0);
-    sum_relative_moving_by_location_ = std::vector<double>(number_of_locations, 0);
-
-    current_force_of_infection_by_location_ = std::vector<double>(number_of_locations, 0);
-
-    force_of_infection_for_n_days_by_location_ =
-        std::vector<std::vector<double>>(Model::get_config()->number_of_tracking_days(),
-                                         std::vector<double>(number_of_locations, 0));
-
-    // initalize other person index
-    initialize_person_indices();
-
-    // Initialize population
-    auto &location_db = Model::get_config()->get_spatial_settings().location_db;
-    for (auto loc = 0; loc < number_of_locations; loc++) {
-      // spdlog::info("Cell {}, population {}", loc,
-      //                         location_db[loc].population_size);
-
-      const auto popsize_by_location =
-          static_cast<int>(location_db[loc].population_size
-                           * Model::get_config()
-                                 ->get_population_demographic()
-                                 .get_artificial_rescaling_of_population_size());
-      auto temp_sum = 0;
-      for (auto age_class = 0;
-           age_class
-           < Model::get_config()->get_population_demographic().get_initial_age_structure().size();
-           age_class++) {
-        auto number_of_individual_by_loc_ageclass = 0;
-        if (age_class
-            == Model::get_config()->get_population_demographic().get_initial_age_structure().size()
-                   - 1) {
-          number_of_individual_by_loc_ageclass = popsize_by_location - temp_sum;
-        } else {
-          number_of_individual_by_loc_ageclass =
-              static_cast<int>(popsize_by_location * location_db[loc].age_distribution[age_class]);
-          temp_sum += number_of_individual_by_loc_ageclass;
-        }
-        for (int i = 0; i < number_of_individual_by_loc_ageclass; i++) {
-          generate_individual(loc, age_class);
-        }
-      }
-      // spdlog::info("individual_relative_moving_by_location[{}] size: {} sum: {}",loc,
-      //              individual_relative_moving_by_location[loc].size(),
-      //              sum_relative_moving_by_location[loc]);
-    }
-  }
-}
-
 void Population::generate_individual(int location, int age_class) {
-  auto* person = new Person();
+  auto person = std::make_unique<Person>();
   person->initialize();
 
   person->set_location(location);
@@ -374,7 +386,6 @@ void Population::generate_individual(int location, int age_class) {
              + 1;
   person->generate_prob_present_at_mda_by_age();
 
-  add_person(person);
   // spdlog::info("Population::initialize: person {} age {} location {} moving level {}",
   //   i, p->get_age(), loc, p->get_moving_level());
 
@@ -391,24 +402,8 @@ void Population::generate_individual(int location, int age_class) {
           ->get_movement_settings()
           .get_v_moving_level_value()[person->get_moving_level()];
 
-  all_alive_persons_by_location_[location].push_back(person);
-}
-
-void Population::initialize_person_indices() {
-  const int number_of_location = Model::get_config()->number_of_locations();
-  const int number_of_host_states = Person::NUMBER_OF_STATE;
-  const int number_of_age_classes = Model::get_config()->number_of_age_classes();
-
-  auto* p_index_by_l_s_a = new PersonIndexByLocationStateAgeClass(
-      number_of_location, number_of_host_states, number_of_age_classes);
-  person_index_list_->push_back(p_index_by_l_s_a);
-
-  auto* p_index_location_moving_level =
-      new PersonIndexByLocationMovingLevel(number_of_location, Model::get_config()
-                                                                   ->get_movement_settings()
-                                                                   .get_circulation_info()
-                                                                   .get_number_of_moving_levels());
-  person_index_list_->push_back(p_index_location_moving_level);
+  all_alive_persons_by_location_[location].push_back(person.get());
+  add_person(std::move(person));
 }
 
 void Population::introduce_initial_cases() {
@@ -511,7 +506,7 @@ void Population::perform_birth_event() {
 }
 
 void Population::give_1_birth(const int &location) {
-  auto person = new Person();
+  auto person = std::make_unique<Person>();
   person->initialize();
   person->set_age(0);
   person->set_host_state(Person::SUSCEPTIBLE);
@@ -545,7 +540,7 @@ void Population::give_1_birth(const int &location) {
   //    Global::startTreatmentDay : Global::scheduler->currentTime;
   person->generate_prob_present_at_mda_by_age();
 
-  add_person(person);
+  add_person(std::move(person));
 }
 
 void Population::perform_death_event() {
@@ -710,21 +705,36 @@ bool Population::has_0_case() {
 
 void Population::update_all_individuals() {
   // update all individuals
-  auto* pi = get_person_index<PersonIndexByLocationStateAgeClass>();
-  for (int loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    for (int hs = 0; hs < Person::DEAD; hs++) {
-      for (int ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
-        for (auto* person : pi->vPerson()[loc][hs][ac]) { person->update(); }
-      }
+  // auto* pi = get_person_index<PersonIndexByLocationStateAgeClass>();
+  // for (int loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+  //   for (int hs = 0; hs < Person::DEAD; hs++) {
+  //     for (int ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
+  //       for (auto* person : pi->vPerson()[loc][hs][ac]) { person->update(); }
+  //     }
+  //   }
+  // }
+  if (all_persons_ == nullptr) {
+    throw std::runtime_error("PersonIndexAll not found in Population::update_all_individuals");
+  }
+  for (auto &person_ptr : all_persons_->v_person()) {
+    if (person_ptr) {
+      if (person_ptr->get_host_state() == Person::DEAD) { continue; }
+      person_ptr->update();
     }
   }
 }
 
 // TODO: it should be called "execute_all_individual_events" for an input time
 void Population::update_all_individual_events() {
-  auto* all_persons_index = get_person_index<PersonIndexAll>();
-  for (auto* person : all_persons_index->v_person()) {
-    person->update_events(Model::get_scheduler()->current_time());
+  if (all_persons_ == nullptr) {
+    throw std::runtime_error(
+        "PersonIndexAll not found in Population::update_all_individual_events");
+  }
+  for (auto &person_ptr : all_persons_->v_person()) {
+    if (person_ptr) {  // Optional check for the unique_ptr itself
+      if (person_ptr->get_host_state() == Person::DEAD) { continue; }
+      person_ptr->update_events(Model::get_scheduler()->current_time());
+    }
   }
 }
 

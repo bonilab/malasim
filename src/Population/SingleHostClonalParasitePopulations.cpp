@@ -86,7 +86,12 @@ void SingleHostClonalParasitePopulations::change_all_parasite_update_function(
 }
 
 void SingleHostClonalParasitePopulations::update() {
-  for (auto &bp : parasites_) { bp->update(); }
+  for (auto &bp : parasites_) {
+    if (bp == nullptr) {
+      throw std::runtime_error("Parasite is nullptr in SingleHostClonalParasitePopulations::update");
+    }
+    bp->update();
+  }
 }
 
 void SingleHostClonalParasitePopulations::clear_cured_parasites(double cured_threshold) {

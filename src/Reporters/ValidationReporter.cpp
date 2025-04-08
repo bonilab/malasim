@@ -352,7 +352,7 @@ void ValidationReporter::after_run() {
        - Model::get_config()->get_simulation_timeframe().get_start_of_comparison_period())
       / static_cast<double>(Constants::DAYS_IN_YEAR);
   auto sum_ntf = 0.0;
-  ul pop_size = 0;
+  uint64_t pop_size = 0;
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
     sum_ntf += Model::get_mdc()->cumulative_ntf_by_location()[loc];
     pop_size += Model::get_mdc()->popsize_by_location()[loc];

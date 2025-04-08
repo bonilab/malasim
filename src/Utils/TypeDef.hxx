@@ -1,10 +1,8 @@
 #ifndef TYPEDEF_H
 #define TYPEDEF_H
 
-#include <array>
-#include <list>
+#include <cstdint>
 #include <map>
-#include <ostream>
 #include <string>
 #include <vector>
 
@@ -22,40 +20,37 @@ class IStrategy;
 
 class Therapy;
 
-typedef unsigned long ul;
+using Ul = uint64_t;
 
-typedef std::vector<double> DoubleVector;
-typedef std::vector<DoubleVector> DoubleVector2;
-typedef std::vector<DoubleVector2> DoubleVector3;
-typedef std::vector<int> IntVector;
-typedef std::vector<IntVector> IntVector2;
-typedef std::vector<IntVector2> IntVector3;
-typedef std::vector<IntVector *> IntVectorPtrVector;
-typedef std::vector<IntVector> *IntVector2Ptr;
-typedef std::vector<unsigned int> UIntVector;
+using DoubleVector = std::vector<double>;
+using DoubleVector2 = std::vector<DoubleVector>;
+using DoubleVector3 = std::vector<DoubleVector2>;
+using IntVector = std::vector<int>;
+using IntVector2 = std::vector<IntVector>;
+using IntVector3 = std::vector<IntVector2>;
+using IntVectorPtrVector = std::vector<IntVector*>;
+using IntVector2Ptr = std::vector<IntVector>*;
+using UIntVector = std::vector<unsigned int>;
 
-typedef std::vector<ul> LongVector;
-typedef std::vector<LongVector> LongVector2;
-typedef std::vector<LongVector2> LongVector3;
+using LongVector = std::vector<Ul>;
+using LongVector2 = std::vector<LongVector>;
+using LongVector3 = std::vector<LongVector2>;
 
-typedef std::vector<std::string> StringVector;
-typedef std::vector<StringVector> StringVector2;
+using StringVector = std::vector<std::string>;
+using StringVector2 = std::vector<StringVector>;
 
-typedef std::map<int, int> IntIntMap;
+using IntIntMap = std::map<int, int>;
 
-typedef std::vector<Person *> PersonPtrVector;
-typedef PersonPtrVector::iterator PersonPtrVectorIterator;
+using PersonPtrVector = std::vector<Person*>;
+using PersonPtrVectorIterator = PersonPtrVector::iterator;
 
-typedef std::vector<PersonPtrVector> PersonPtrVector2;
-typedef std::vector<PersonPtrVector2> PersonPtrVector3;
-typedef std::vector<PersonPtrVector3> PersonPtrVector4;
+using PersonPtrVector2 = std::vector<PersonPtrVector>;
+using PersonPtrVector3 = std::vector<PersonPtrVector2>;
+using PersonPtrVector4 = std::vector<PersonPtrVector3>;
 
-typedef std::vector<Event *> EventPtrVector;
-typedef std::vector<EventPtrVector> EventPtrVector2;
+using EventPtrVector = std::vector<Event*>;
+using EventPtrVector2 = std::vector<EventPtrVector>;
 
-typedef std::vector<Reporter *> ReporterPtrVector;
-
-typedef std::list<PersonIndex *> PersonIndexPtrList;
-
+using ReporterPtrVector = std::vector<Reporter*>;
 
 #endif /* TYPEDEF_H */

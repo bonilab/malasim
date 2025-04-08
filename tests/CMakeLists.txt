@@ -17,6 +17,7 @@ file(GLOB_RECURSE MALASIM_TEST_SOURCES
   "GIS/SpatialDataTest/*.cpp"
   "Population/*.cpp"
   "Population/Person/*.cpp"
+  "Utils/*.cpp"
 )
 
 # Add test executable
