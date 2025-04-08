@@ -4,6 +4,9 @@
 -  RandomTest.random_multinomial_DistributionMatchesMultinomial_ChiSquaredTest sometimes failed????
 -  Improve speed for RouletteTest.compare_with_multi_normial
 
+- ImmuneSystem unique pointer
+- Person in Population to unique ptr
+
 - p_infection_from_infectious_bite biology validation
 - relative_infectivity biology validation
 

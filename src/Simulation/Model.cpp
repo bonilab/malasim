@@ -17,8 +17,8 @@
 bool Model::initialize() {
   config_ = std::make_unique<Config>();
   random_ = std::make_unique<utils::Random>(nullptr, -1);
-  scheduler_ = std::make_unique<Scheduler>(this);
-  population_ = std::make_unique<Population>(this);
+  scheduler_ = std::make_unique<Scheduler>();
+  population_ = std::make_unique<Population>();
   mdc_ = std::make_unique<ModelDataCollector>(this);
   mosquito_ = std::make_unique<Mosquito>(this);
 
@@ -206,7 +206,7 @@ void Model::daily_update() {
                                        tracking_index);
 
   // this function must be called after mosquito infect new cohort in prmc
-  population_->persist_current_force_of_infection_to_use_N_days_later();
+  population_->persist_current_force_of_infection_to_use_n_days_later();
 }
 
 void Model::monthly_update() {

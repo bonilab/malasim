@@ -7,7 +7,7 @@
 #include "Utils/Helpers/TimeHelpers.h"
 #include "spdlog/spdlog.h"
 
-Scheduler::Scheduler(Model* model) : current_time_(-1), model_(model), is_force_stop_(false) {}
+Scheduler::Scheduler() = default;
 
 Scheduler::~Scheduler() = default;
 
@@ -33,16 +33,16 @@ void Scheduler::run() {
 }
 
 void Scheduler::begin_time_step() {
-  if (model_ != nullptr) { model_->begin_time_step(); }
+  if (Model::get_instance() != nullptr) { Model::get_instance()->begin_time_step(); }
 }
 
 void Scheduler::daily_update() {
-  if (model_ != nullptr) {
-    model_->daily_update();
+  if (Model::get_instance() != nullptr) {
+    Model::get_instance()->daily_update();
 
-    if (is_today_first_day_of_month()) { model_->monthly_update(); }
+    if (is_today_first_day_of_month()) { Model::get_instance()->monthly_update(); }
 
-    if (is_today_first_day_of_year()) { model_->yearly_update(); }
+    if (is_today_first_day_of_year()) { Model::get_instance()->yearly_update(); }
 
     // Execute world/population events
     world_events_.execute_events(current_time_);
@@ -53,7 +53,7 @@ void Scheduler::daily_update() {
 }
 
 void Scheduler::end_time_step() {
-  if (model_ != nullptr) { model_->end_time_step(); }
+  if (Model::get_instance() != nullptr) { Model::get_instance()->end_time_step(); }
 }
 
 bool Scheduler::can_stop() {

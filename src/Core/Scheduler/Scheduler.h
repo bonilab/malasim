@@ -18,24 +18,12 @@ public:
   Scheduler(Scheduler &&) = delete;
   Scheduler &operator=(Scheduler &&) = delete;
 
-private:
-  int current_time_;
-  Model* model_;
-  bool is_force_stop_;
-  date::sys_days calendar_date_;
-  EventManager<WorldEvent> world_events_;  // Use EventManager for world/population events
-
-public:
-  explicit Scheduler(Model* model = nullptr);
+  explicit Scheduler();
   virtual ~Scheduler();
 
   // Getter and Setter for current_time
   [[nodiscard]] int current_time() const { return current_time_; }
   void set_current_time(int time) { current_time_ = time; }
-
-  // Getter and Setter for model
-  [[nodiscard]] Model* model() const { return model_; }
-  void set_model(Model* model) { model_ = model; }
 
   // Getter and Setter for is_force_stop
   [[nodiscard]] bool is_force_stop() const { return is_force_stop_; }
@@ -86,7 +74,15 @@ public:
   }
   // Access to event manager
   EventManager<WorldEvent> &get_world_events() { return world_events_; }
-  const EventManager<WorldEvent> &get_world_events() const { return world_events_; }
+  [[nodiscard]] const EventManager<WorldEvent> &get_world_events() const { return world_events_; }
+
+private:
+  int current_time_{-1};
+  bool is_force_stop_{false};
+  date::sys_days calendar_date_;
+  EventManager<WorldEvent> world_events_;  // Use EventManager for world/population events
+
+public:
 };
 
 #endif /* SCHEDULER_H */

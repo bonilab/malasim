@@ -116,8 +116,8 @@ public:
 
   [[nodiscard]] Person::HostStates get_host_state() const { return host_state_; }
 
-  void set_age(const int &value);
-  [[nodiscard]] int get_age() const { return age_; }
+  void set_age(const uint &value);
+  [[nodiscard]] uint get_age() const { return age_; }
 
   [[nodiscard]] int get_age_class() const { return age_class_; }
 
@@ -156,10 +156,10 @@ public:
   void set_last_therapy_id(int last_therapy_id) { last_therapy_id_ = last_therapy_id; }
 
   [[nodiscard]] std::map<int, double> get_starting_drug_values_for_mac() const {
-    return starting_drug_values_for_MAC_;
+    return starting_drug_values_for_mac_;
   }
   void set_starting_drug_values_for_mac(const std::map<int, double> &starting_drug_values_for_mac) {
-    starting_drug_values_for_MAC_ = starting_drug_values_for_mac;
+    starting_drug_values_for_mac_ = starting_drug_values_for_mac;
   }
 
   [[nodiscard]] double get_innate_relative_biting_rate() const {
@@ -299,7 +299,7 @@ public:
   static int calculate_future_time(int days_from_now);
 
 private:
-  int age_{0};
+  uint age_{0};
   Population* population_{nullptr};
   int location_{0};
   int residence_location_{0};
@@ -314,7 +314,7 @@ private:
   int number_of_times_bitten_{0};
   int number_of_trips_taken_{0};
   int last_therapy_id_{-1};
-  std::map<int, double> starting_drug_values_for_MAC_;
+  std::map<int, double> starting_drug_values_for_mac_;
   double innate_relative_biting_rate_{0};
   double current_relative_biting_rate_{0};
   std::unique_ptr<ImmuneSystem> immune_system_{nullptr};

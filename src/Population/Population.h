@@ -2,9 +2,6 @@
 #define POPULATION_H
 
 #include <vector>
-#include <memory>
-#include <string>
-#include "Core/Scheduler/EventManager.h"
 
 #include "Person/Person.h"
 
@@ -14,11 +11,13 @@ class PersonIndexByLocationStateAgeClass;
 class PersonIndexByLocationBitingLevel;
 class Population {
 public:
+  Population(Population &&) = delete;
+  Population &operator=(Population &&) = delete;
   // Disable copy and assignment
-  Population(const Population&) = delete;
-  void operator=(const Population&) = delete;
+  Population(const Population &) = delete;
+  void operator=(const Population &) = delete;
 
-  Population(Model* model);
+  Population();
 
   virtual ~Population();
 
@@ -37,7 +36,7 @@ public:
    * This will also delete the @person out of memory
    * @param person
    */
-  virtual void remove_dead_person(Person *person);
+  virtual void remove_dead_person(Person* person);
 
   // /** Return the total number of individuals in the simulation. */
   // virtual std::size_t size();
@@ -50,7 +49,7 @@ public:
    * If the input location is -1, return total size
    * @param location
    */
-  virtual std::size_t size(const int &location = -1, const int &age_class = -1);
+  std::size_t size(const int &location = -1, const int &age_class = -1);
 
   virtual std::size_t size(const int &location, const Person::HostStates &hs, const int &age_class);
 
@@ -63,17 +62,19 @@ public:
    * @param oldValue
    * @param newValue
    */
-  virtual void notify_change(Person *p, const Person::Property &property, const void *oldValue, const void *newValue);
+  virtual void notify_change(Person* person, const Person::Property &property,
+                             const void* old_value, const void* new_value);
 
   virtual void perform_infection_event();
 
   void introduce_initial_cases();
   //
-  void introduce_parasite(const int &location, Genotype *parasite_type, const int &num_of_infections);
+  void introduce_parasite(const int &location, Genotype* parasite_type,
+                          const int &num_of_infections);
 
-  void initial_infection(Person *person, Genotype *parasite_type) const;
+  void initial_infection(Person* person, Genotype* parasite_type) const;
 
-  void persist_current_force_of_infection_to_use_N_days_later();
+  void persist_current_force_of_infection_to_use_n_days_later();
 
   void perform_birth_event();
 
@@ -88,7 +89,8 @@ public:
   void perform_circulation_event();
 
   void perform_circulation_for_1_location(const int &from_location, const int &target_location,
-  const int &number_of_circulations, std::vector<Person *> &today_circulations);
+                                          const int &number_of_circulations,
+                                          std::vector<Person*> &today_circulations);
 
   bool has_0_case();
 
@@ -104,54 +106,69 @@ public:
   // the destination location
   void notify_movement(int source, int destination);
 
-private:
-  // std::vector<Person*> persons_;
-  Model *model_;
-  PersonIndexPtrList *person_index_list_;
-  PersonIndexAll* all_persons_;
-  IntVector popsize_by_location_;
-
-public:
-  Model* get_model() {
-    return model_;
-  }
-  void set_model(Model* model) {
-    model_ = model;
-  }
-  PersonIndexPtrList* person_index_list() {
-      return person_index_list_;
-  }
+  PersonIndexPtrList* person_index_list() { return person_index_list_; }
   void set_person_index_list(PersonIndexPtrList* person_index_list) {
-      person_index_list_ = person_index_list;
+    person_index_list_ = person_index_list;
   }
-  PersonIndexAll* all_persons() {
-      return all_persons_;
-  }
-  void set_all_persons(PersonIndexAll* all_persons) {
-      all_persons_ = all_persons;
-  }
-
-public:
-  std::vector<std::vector<double>> individual_foi_by_location;
-  std::vector<std::vector<double>> individual_relative_biting_by_location;
-  std::vector<std::vector<double>> individual_relative_moving_by_location;
-
-  std::vector<double> sum_relative_biting_by_location;
-  std::vector<double> sum_relative_moving_by_location;
-
-  std::vector<double> current_force_of_infection_by_location;
-  std::vector<std::vector<double>> force_of_infection_for_N_days_by_location;
-  std::vector<std::vector<Person *>> all_alive_persons_by_location;
+  PersonIndexAll* all_persons() { return all_persons_; }
+  void set_all_persons(PersonIndexAll* all_persons) { all_persons_ = all_persons; }
 
   template <typename T>
   T* get_person_index();
 
-  IntVector get_popsize_by_location() {
-    return popsize_by_location_;
-  }
+  IntVector get_popsize_by_location() { return popsize_by_location_; }
   void set_popsize_by_location(const IntVector &popsize_by_location) {
     popsize_by_location_ = popsize_by_location;
   }
+
+  [[nodiscard]] std::vector<std::vector<double>> &individual_foi_by_location() {
+    return individual_foi_by_location_;
+  }
+
+  [[nodiscard]] std::vector<std::vector<double>> &individual_relative_biting_by_location() {
+    return individual_relative_biting_by_location_;
+  }
+
+  [[nodiscard]] std::vector<std::vector<double>> &individual_relative_moving_by_location() {
+    return individual_relative_moving_by_location_;
+  }
+
+  [[nodiscard]] std::vector<double> &sum_relative_biting_by_location() {
+    return sum_relative_biting_by_location_;
+  }
+
+  [[nodiscard]] std::vector<double> &sum_relative_moving_by_location() {
+    return sum_relative_moving_by_location_;
+  }
+
+  [[nodiscard]] std::vector<double> &current_force_of_infection_by_location() {
+    return current_force_of_infection_by_location_;
+  }
+
+  [[nodiscard]] std::vector<std::vector<double>> &force_of_infection_for_n_days_by_location() {
+    return force_of_infection_for_n_days_by_location_;
+  }
+
+  [[nodiscard]] std::vector<std::vector<Person*>> &all_alive_persons_by_location() {
+    return all_alive_persons_by_location_;
+  }
+
+private:
+  // std::vector<Person*> persons_;
+  PersonIndexPtrList* person_index_list_;
+  PersonIndexAll* all_persons_;
+  IntVector popsize_by_location_;
+
+  std::vector<std::vector<double>> individual_foi_by_location_;
+  std::vector<std::vector<double>> individual_relative_biting_by_location_;
+  std::vector<std::vector<double>> individual_relative_moving_by_location_;
+
+  std::vector<double> sum_relative_biting_by_location_;
+  std::vector<double> sum_relative_moving_by_location_;
+
+  std::vector<double> current_force_of_infection_by_location_;
+  std::vector<std::vector<double>> force_of_infection_for_n_days_by_location_;
+  std::vector<std::vector<Person*>> all_alive_persons_by_location_;
 };
 
 template <typename T>
@@ -164,4 +181,5 @@ T* Population::get_person_index() {
   }
   return nullptr;
 }
-#endif //POPULATION_H
+#endif  // POPULATION_H
+

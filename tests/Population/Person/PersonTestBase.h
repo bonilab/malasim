@@ -50,13 +50,13 @@ public:
 
 class MockScheduler : public Scheduler {
 public:
-  explicit MockScheduler(Model* model) : Scheduler(model) {}
+  explicit MockScheduler() : Scheduler() {}
   MOCK_METHOD(void, schedule_population_event, (WorldEvent*));
 };
 
 class MockPopulation : public Population {
 public:
-  explicit MockPopulation(Model* model) : Population(model) {}
+  explicit MockPopulation() : Population() {}
   MOCK_METHOD(void, notify_change,
               (Person*, const Person::Property &, const void*, const void*));
 };
@@ -94,13 +94,13 @@ protected:
     original_model_->set_config(new MockConfig()); 
     mock_config_ = static_cast<MockConfig*>(original_model_->get_config()); 
 
-    original_model_->set_scheduler(new MockScheduler(original_model_));
+    original_model_->set_scheduler(new MockScheduler());
     mock_scheduler_ = static_cast<MockScheduler*>(original_model_->get_scheduler());
 
     original_model_->set_random(new MockRandom());
     mock_random_ = static_cast<MockRandom*>(original_model_->get_random());
 
-    original_model_->set_population(new MockPopulation(original_model_));
+    original_model_->set_population(new MockPopulation());
     mock_population_ = static_cast<MockPopulation*>(original_model_->get_population());
 
     // Create person instance and initialize it (it should use the correctly configured mocks)

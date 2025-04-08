@@ -50,7 +50,7 @@ void Person::initialize() {
   today_infections_ = std::vector<int>();
   today_target_locations_ = std::vector<int>();
 
-  starting_drug_values_for_MAC_ = std::map<int, double>();
+  starting_drug_values_for_mac_ = std::map<int, double>();
   innate_relative_biting_rate_ = 0;
   current_relative_biting_rate_ = 0;
 }
@@ -89,7 +89,7 @@ void Person::set_host_state(const HostStates &value) {
   }
 }
 
-void Person::set_age(const int &value) {
+void Person::set_age(const uint &value) {
   if (age_ != value) {
     // TODO::if age access the limit of age structure i.e. 100, remove person???
 
@@ -245,7 +245,7 @@ void Person::receive_therapy(Therapy* therapy, ClonalParasitePopulation* clinica
     auto* mac_therapy = dynamic_cast<MACTherapy*>(therapy);
     assert(mac_therapy != nullptr);
 
-    starting_drug_values_for_MAC_.clear();
+    starting_drug_values_for_mac_.clear();
     for (std::size_t i = 0; i < mac_therapy->get_therapy_ids().size(); i++) {
       const auto therapy_id = mac_therapy->get_therapy_ids()[i];
       const auto start_day = mac_therapy->get_start_at_days()[i];
@@ -308,12 +308,12 @@ void Person::add_drug_to_blood(DrugType* dt, const int &dosing_days, bool is_par
     if (drugs_in_blood_->contains(dt->id())) {
       // Long half-life drugs are already present in the blood
       drug_level = drugs_in_blood_->at(dt->id())->starting_value();
-    } else if (starting_drug_values_for_MAC_.contains(dt->id())) {
+    } else if (starting_drug_values_for_mac_.contains(dt->id())) {
       // Short half-life drugs that were taken, but cleared the blood already
-      drug_level = starting_drug_values_for_MAC_[dt->id()];
+      drug_level = starting_drug_values_for_mac_[dt->id()];
     }
     // Note the value for future use
-    starting_drug_values_for_MAC_[dt->id()] = drug_level;
+    starting_drug_values_for_mac_[dt->id()] = drug_level;
   }
 
   // Set the starting level for this course of treatment
