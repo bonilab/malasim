@@ -5,6 +5,7 @@
 #include <spdlog/spdlog.h>
 
 #include <cfloat>
+#include <memory>
 
 #include "ClinicalUpdateFunction.h"
 #include "Configuration/Config.h"
@@ -343,13 +344,13 @@ void Population::generate_individual(int location, int age_class) {
   // set immune component at 6 months
   if (simulation_time_birthday + Constants::DAYS_IN_YEAR / 2 >= 0) {
     if (person->get_age() > 0) { spdlog::error("Error in calculating simulation_time_birthday"); }
-    person->get_immune_system()->set_immune_component(new InfantImmuneComponent());
+    person->get_immune_system()->set_immune_component(std::make_unique<InfantImmuneComponent>());
     // schedule for switch
     person->schedule_switch_immune_component_event(simulation_time_birthday
                                                    + (Constants::DAYS_IN_YEAR / 2));
   } else {
     // LOG(INFO) << "Adult: " << p->age() << " - " << simulation_time_birthday;
-    person->get_immune_system()->set_immune_component(new NonInfantImmuneComponent());
+    person->get_immune_system()->set_immune_component(std::make_unique<NonInfantImmuneComponent>());
   }
 
   auto immune_value = Model::get_random()->random_beta(
@@ -517,7 +518,7 @@ void Population::give_1_birth(const int &location) {
   person->set_age_class(0);
   person->set_location(location);
   person->set_residence_location(location);
-  person->get_immune_system()->set_immune_component(new InfantImmuneComponent());
+  person->get_immune_system()->set_immune_component(std::make_unique<InfantImmuneComponent>());
   person->get_immune_system()->set_latest_immune_value(1.0);
   person->get_immune_system()->set_increase(false);
 
