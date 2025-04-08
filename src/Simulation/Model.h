@@ -163,7 +163,7 @@ public:
   void build_initial_treatment_coverage();
   void monthly_report();
   void report_begin_of_time_step();
-  void add_reporter(Reporter* reporter);
+  void add_reporter(std::unique_ptr<Reporter> reporter);
 };
 
 #endif  // MODEL_H

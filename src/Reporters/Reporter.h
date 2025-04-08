@@ -84,7 +84,7 @@ public:
 
   virtual void monthly_report() = 0;
 
-  static Reporter *MakeReport(ReportType report_type);
+  static std::unique_ptr<Reporter> MakeReport(ReportType report_type);
 
  private:
 

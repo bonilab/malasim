@@ -114,10 +114,10 @@ bool Model::initialize() {
 
     if (utils::Cli::get_instance().get_record_movement()) {
       // Generate a movement reporter
-      Reporter* reporter = Reporter::MakeReport(Reporter::ReportType::MOVEMENT_REPORTER);
-      add_reporter(reporter);
+      auto reporter = Reporter::MakeReport(Reporter::ReportType::MOVEMENT_REPORTER);
       reporter->initialize(utils::Cli::get_instance().get_job_number(),
                            utils::Cli::get_instance().get_output_path());
+      add_reporter(std::move(reporter));
     }
     is_initialized_ = true;
   } else {
@@ -241,9 +241,9 @@ void Model::report_begin_of_time_step() {
   for (auto &reporter : reporters_) { reporter->begin_time_step(); }
 }
 
-void Model::add_reporter(Reporter* reporter) {
+void Model::add_reporter(std::unique_ptr<Reporter> reporter) {
   reporter->set_model(this);
-  reporters_.push_back(std::unique_ptr<Reporter>(reporter));
+  reporters_.push_back(std::move(reporter));
 }
 
 IStrategy* Model::get_treatment_strategy() { return get_instance()->treatment_strategy_; }

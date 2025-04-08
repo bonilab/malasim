@@ -367,7 +367,7 @@ private:
   std::map<std::string, std::string> admin_rasters_;
 
   // Add AdminLevelManager as a member
-  std::unique_ptr<AdminLevelManager> admin_manager_{new AdminLevelManager()};
+  std::unique_ptr<AdminLevelManager> admin_manager_{std::make_unique<AdminLevelManager>()};
 
   // Helper method to parse administrative boundaries from YAML
   void load_admin_boundaries(const YAML::Node &node);

@@ -803,15 +803,3 @@ void Population::update_current_foi() {
     //                all_alive_persons_by_location[location].size());
   }
 }
-
-/*
- * NEW KIEN
- */
-
-// void Population::update(int current_time) {
-//   for (const auto& person : persons_) {
-//     // spdlog::info("Updating person {} with events {}", person->get_id(),
-//     person->event_queue.size()); person->update(current_time);
-//   }
-// }
-

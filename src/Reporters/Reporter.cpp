@@ -36,37 +36,37 @@ Reporter::Reporter() : model_(nullptr) {
 
 Reporter::~Reporter() = default;
 
-Reporter* Reporter::MakeReport(ReportType report_type) {
+std::unique_ptr<Reporter> Reporter::MakeReport(ReportType report_type) {
   switch (report_type) {
   case CONSOLE:
-    return new ConsoleReporter();
+    return std::make_unique<ConsoleReporter>();
   case MONTHLY_REPORTER:
-    return new MonthlyReporter();
+    return std::make_unique<MonthlyReporter>();
   case MMC_REPORTER:
-    return new MMCReporter();
+    return std::make_unique<MMCReporter>();
   case TACT_REPORTER:
-    return new TACTReporter();
+    return std::make_unique<TACTReporter>();
   case NOVEL_DRUG_REPOTER:
-    return new NovelDrugReporter();
+    return std::make_unique<NovelDrugReporter>();
   case VALIDATION_REPORTER:
-    return new ValidationReporter();
+    return std::make_unique<ValidationReporter>();
   case POPULATION_REPORTER:
-    return new PopulationReporter();
+    return std::make_unique<PopulationReporter>();
   case CELLULAR_REPORTER:
-    return new CellularReporter();
+    return std::make_unique<CellularReporter>();
   case SEASONAL_IMMUNITY:
-    return new SeasonalImmunity();
+    return std::make_unique<SeasonalImmunity>();
   case AGE_BAND_REPORTER:
-    return new AgeBandReporter();
+    return std::make_unique<AgeBandReporter>();
   case SQLITE_MONTHLY_REPORTER: {
     auto cell_level_reporting = Model::get_config()->get_model_settings().get_cell_level_reporting();
-    return new SQLiteMonthlyReporter(cell_level_reporting);
+    return std::make_unique<SQLiteMonthlyReporter>(cell_level_reporting);
   }
 #ifdef ENABLE_TRAVEL_TRACKING
     case TRAVEL_TRACKING_REPORTER:
-      return new TravelTrackingReporter();
+      return std::make_unique<TravelTrackingReporter>();
 #endif
   default:
-    return new MonthlyReporter();
+    return std::make_unique<MonthlyReporter>();
   }
 }

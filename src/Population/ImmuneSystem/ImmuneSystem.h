@@ -55,7 +55,7 @@ public:
 
 private:
   Person* person_{nullptr};
-  std::unique_ptr<ImmuneComponent> immune_component_;
+  std::unique_ptr<ImmuneComponent> immune_component_{nullptr};
   bool increase_{false};
 
   //    virtual void clear();

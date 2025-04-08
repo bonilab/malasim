@@ -8,9 +8,7 @@
 #include "Population/Person/Person.h"
 #include "Simulation/Model.h"
 
-ImmuneSystem::ImmuneSystem(Person* person) : person_(person), immune_component_(nullptr) {
-  //    immune_components_ = new ImmuneComponentPtrVector();
-}
+ImmuneSystem::ImmuneSystem(Person* person) : person_(person), immune_component_(nullptr) {}
 
 ImmuneSystem::~ImmuneSystem() { person_ = nullptr; }
 
