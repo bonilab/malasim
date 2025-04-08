@@ -740,9 +740,9 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate population events
   ----------------------------*/
-  PopulationEvents population_events = population_events_;
+  // PopulationEvents population_events = population_events_;
   // Loop through all events
-  for (const auto &population_event : population_events.get_events_raw()) {
+  for (const auto &population_event : population_events_.get_events_raw()) {
     // Check if name is provided
     if (population_event.get_name().empty()) {
       throw std::invalid_argument("Name should be provided for all population events");

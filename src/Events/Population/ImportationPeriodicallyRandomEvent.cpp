@@ -72,9 +72,9 @@ void ImportationPeriodicallyRandomEvent::do_execute() {
   }
 
   // Generate and schedule the event
-  auto* event = new ImportationPeriodicallyRandomEvent(
+  auto event = std::make_unique<ImportationPeriodicallyRandomEvent>(
       genotypeId_, time, count_, log_parasite_density_);
-  Model::get_scheduler()->schedule_population_event(event);
+  Model::get_scheduler()->schedule_population_event(std::move(event));
 }
 
 // The following is based upon a fitness proportionate selection (roulette wheel

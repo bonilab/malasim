@@ -34,8 +34,8 @@ public:
   // Event management methods
   void clear_all_events() { world_events_.get_events().clear(); }
 
-  virtual void schedule_population_event(WorldEvent* event) {
-    if (event != nullptr) { world_events_.schedule_event(std::unique_ptr<WorldEvent>(event)); }
+  virtual void schedule_population_event(std::unique_ptr<WorldEvent> event) {
+    if (event != nullptr) { world_events_.schedule_event(std::move(event)); }
   }
 
   virtual void cancel(WorldEvent* event) {

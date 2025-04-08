@@ -101,9 +101,15 @@ bool Model::initialize() {
     population_->introduce_initial_cases();
     spdlog::info("Model initialized initial cases.");
 
-    for (auto* event : config_->get_population_events().get_events()) {
-      spdlog::info("Model initialized population event: " + event->name());
-      scheduler_->schedule_population_event(event);
+    // Take ownership of the events from the config
+    auto population_events = config_->get_population_events().release_events();
+    for (auto& event : population_events) {
+      if (event) { // Check if the pointer is valid before using
+        spdlog::info("Scheduling population event: {} at {}", event->name(), event->get_time());
+        scheduler_->schedule_population_event(std::move(event));
+      } else {
+        spdlog::warn("Encountered a null event pointer during initialization.");
+      }
     }
 
     if (utils::Cli::get_instance().get_record_movement()) {

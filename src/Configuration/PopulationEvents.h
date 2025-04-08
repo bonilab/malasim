@@ -40,12 +40,17 @@ public:
     [[nodiscard]] const std::vector<PopulationEvent>& get_events_raw() const { return events_raw_; }
     void set_events_raw(const std::vector<PopulationEvent>& value) { events_raw_ = value; }
 
-    [[nodiscard]] const std::vector<WorldEvent*>& get_events() { return events_; }
-    void set_events(const std::vector<WorldEvent*>& value) { events_ = value; }
+    [[nodiscard]] const std::vector<std::unique_ptr<WorldEvent>>& get_events() { return events_; }
+    void set_events(std::vector<std::unique_ptr<WorldEvent>>&& value) { events_ = std::move(value); }
+
+    // Method to transfer ownership of the events vector
+    [[nodiscard]] std::vector<std::unique_ptr<WorldEvent>> release_events() {
+      return std::move(events_);
+    }
 
 private:
     std::vector<PopulationEvent> events_raw_;
-    std::vector<WorldEvent*> events_;
+    std::vector<std::unique_ptr<WorldEvent>> events_;
 };
 
 // Conversion functions inside namespace YAML
@@ -102,27 +107,30 @@ struct convert<PopulationEvents> {
     static bool decode(const Node& node, PopulationEvents& rhs) {
         spdlog::info("Decoding PopulationEvents");
         std::vector<PopulationEvents::PopulationEvent> events_raw;
-        std::vector<WorldEvent*> events;
+        std::vector<std::unique_ptr<WorldEvent>> events_unique;
         for (const auto &eventNode : node) {
             PopulationEvents::PopulationEvent event;
             convert<PopulationEvents::PopulationEvent>::decode(eventNode, event);
             events_raw.push_back(event);
             spdlog::info("Parsing event: {}", eventNode["name"].as<std::string>());
-            // Attempt to add a population event
-            auto built_events = PopulationEventBuilder::build(eventNode);
-            if (!built_events.empty()) {
-              events.insert(events.end(), built_events.begin(), built_events.end());
-              continue;
+
+            auto built_events_pop = PopulationEventBuilder::build(eventNode);
+            if (!built_events_pop.empty()) {
+                for (auto& event_ptr : built_events_pop) {
+                    events_unique.push_back(std::move(event_ptr));
+                }
+                continue;
             }
 
-            // Attempt to add an enviornment event
-            built_events = EnvironmentEventBuilder::build(eventNode);
-            if (!built_events.empty()) {
-              events.insert(events.end(), built_events.begin(), built_events.end());
+            auto built_events_env = EnvironmentEventBuilder::build(eventNode);
+            if (!built_events_env.empty()) {
+                for (auto& event_ptr : built_events_env) {
+                    events_unique.push_back(std::move(event_ptr));
+                }
             }
         }
         rhs.set_events_raw(events_raw);
-        rhs.set_events(events);
+        rhs.set_events(std::move(events_unique));
 
         return true;
     }

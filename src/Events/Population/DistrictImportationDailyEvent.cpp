@@ -18,11 +18,11 @@ DistrictImportationDailyEvent::DistrictImportationDailyEvent(
 
 void DistrictImportationDailyEvent::do_execute() {
   // schedule importation for the next day
-  auto* event = new DistrictImportationDailyEvent(district_,
+  auto event = std::make_unique<DistrictImportationDailyEvent>(district_,
                                                  daily_rate_,
                                                  Model::get_scheduler()->current_time() + 1,
                                                  alleles_);
-  Model::get_scheduler()->schedule_population_event(event);
+  Model::get_scheduler()->schedule_population_event(std::move(event));
 
   // schedule_event(Model::get_scheduler(), district_,
   //                daily_rate_, Model::get_scheduler()->current_time() + 1,alleles_);

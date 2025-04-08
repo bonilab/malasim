@@ -26,10 +26,10 @@ void ImportationPeriodicallyEvent::do_execute() {
   // std::cout << date::year_month_day{ Model::get_scheduler()->calendar_date }
   // << ":import periodically event" << std::endl; schedule importation for the
   // next day
-  auto* event = new ImportationPeriodicallyEvent(
+  auto event = std::make_unique<ImportationPeriodicallyEvent>(
       location_, duration_, genotype_id_, number_of_cases_,
       Model::get_scheduler()->current_time() + 1);
-  Model::get_scheduler()->schedule_population_event(event);
+  Model::get_scheduler()->schedule_population_event(std::move(event));
 
   const auto number_of_importation_cases = Model::get_random()->random_poisson(
       static_cast<double>(number_of_cases_) / duration_);

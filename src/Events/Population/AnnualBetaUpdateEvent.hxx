@@ -33,8 +33,8 @@ private:
 
     // Schedule for one year from now
     auto time = Model::get_scheduler()->get_days_to_next_year();
-    AnnualBetaUpdateEvent* event = new AnnualBetaUpdateEvent(rate_, time);
-    Model::get_scheduler()->schedule_population_event(event);
+    auto event = std::make_unique<AnnualBetaUpdateEvent>(rate_, time);
+    Model::get_scheduler()->schedule_population_event(std::move(event));
 
     // Log on demand
     spdlog::debug(

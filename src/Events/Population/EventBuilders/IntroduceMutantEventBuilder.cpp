@@ -66,11 +66,11 @@ std::vector<int> get_locations_from_raster(const std::string &filename) {
   return locations;
 }
 
-std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_event(
+std::vector<std::unique_ptr<WorldEvent>> PopulationEventBuilder::build_introduce_mutant_event(
     const YAML::Node &node, Config* config, const std::string &admin_level_name) {
   try {
     // TODO: fix it with smart pointer
-    std::vector<WorldEvent*> events;
+    std::vector<std::unique_ptr<WorldEvent>> events;
     for (const auto &entry : node) {
       // Load the values
       auto start_date = entry["day"].as<date::year_month_day>();
@@ -112,12 +112,12 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_event(
       }
 
       // Log and add the event to the queue
-      auto* event = new IntroduceMutantEvent(time, unit_id, admin_level_id, fraction, alleles);
+      auto event = std::make_unique<IntroduceMutantEvent>(time, unit_id, admin_level_id, fraction, alleles);
       for (auto &allele : alleles) {
         spdlog::info("Mutation at {}:{} {}", std::get<0>(allele), std::get<1>(allele),
                      std::get<2>(allele));
       }
-      events.push_back(event);
+      events.push_back(std::move(event));
     }
     return events;
   } catch (YAML::BadConversion &error) {
@@ -127,10 +127,10 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_event(
   }
 }
 
-std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_raster_event(
+std::vector<std::unique_ptr<WorldEvent>> PopulationEventBuilder::build_introduce_mutant_raster_event(
     const YAML::Node &node, Config* config) {
   try {
-    std::vector<WorldEvent*> events;
+    std::vector<std::unique_ptr<WorldEvent>> events;
     for (const auto &entry : node) {
       // Load the values
       auto start_date = entry["date"].as<date::year_month_day>();
@@ -162,10 +162,10 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_introduce_mutant_raster_e
 
       // Load the locations from the file, then add the new event to the queue
       auto locations = get_locations_from_raster(filename);
-      auto* event = new IntroduceMutantRasterEvent(time, locations, fraction, alleles);
+      auto event = std::make_unique<IntroduceMutantRasterEvent>(time, locations, fraction, alleles);
       spdlog::debug("Adding event {} start date: {} with {} locations fraction: {}", event->name(),
                     StringHelpers::date_as_string(start_date), locations.size(), fraction);
-      events.push_back(event);
+      events.push_back(std::move(event));
     }
     return events;
   } catch (YAML::BadConversion &error) {

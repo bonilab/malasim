@@ -36,12 +36,12 @@ void IntroduceParasitesPeriodicallyEventV2::do_execute() {
   // std::cout << date::year_month_day{ Model::get_scheduler()->calendar_date } << ":import periodically event" << std::endl;
   //schedule importation for the next day
   if (Model::get_scheduler()->current_time() < end_day) {
-    auto* event = new IntroduceParasitesPeriodicallyEventV2(allele_distributions,
+    auto event = std::make_unique<IntroduceParasitesPeriodicallyEventV2>(allele_distributions,
                                                             location_,
                                                             duration_,
                                                             number_of_cases_,
                                                             Model::get_scheduler()->current_time() + 1);
-    Model::get_scheduler()->schedule_population_event(event);
+    Model::get_scheduler()->schedule_population_event(std::move(event));
     // schedule_event(Model::get_scheduler(), this);
   }
 //  else {

@@ -10,10 +10,9 @@
 #include "Configuration/Config.h"
 #include "UpdateEcozoneEvent.hxx"
 #include "Utils/Helpers/StringHelpers.h"
-#include "yaml-cpp/yaml.h"
 
-std::vector<WorldEvent*> EnvironmentEventBuilder::build(const YAML::Node &node) {
-  std::vector<WorldEvent*> events;
+std::vector<std::unique_ptr<WorldEvent>> EnvironmentEventBuilder::build(const YAML::Node &node) {
+  std::vector<std::unique_ptr<WorldEvent>> events;
   const auto name = node["name"].as<std::string>();
 
   if (name == UpdateEcozoneEvent::EVENT_NAME) {
@@ -23,10 +22,10 @@ std::vector<WorldEvent*> EnvironmentEventBuilder::build(const YAML::Node &node) 
   return events;
 }
 
-std::vector<WorldEvent*> EnvironmentEventBuilder::build_update_ecozone_event(const YAML::Node &node,
-                                                                             Config* config) {
+std::vector<std::unique_ptr<WorldEvent>> EnvironmentEventBuilder::build_update_ecozone_event(
+    const YAML::Node &node, Config* config) {
   try {
-    std::vector<WorldEvent*> events;
+    std::vector<std::unique_ptr<WorldEvent>> events;
     for (const auto &ndx : node) {
       // Load the values
       auto start_date = ndx["day"].as<date::year_month_day>();
@@ -53,10 +52,10 @@ std::vector<WorldEvent*> EnvironmentEventBuilder::build_update_ecozone_event(con
       }
 
       // Log and add the event to the queue
-      auto* event = new UpdateEcozoneEvent(from, to, time);
+      auto event = std::make_unique<UpdateEcozoneEvent>(from, to, time);
       spdlog::debug("Adding event {} start date: {} from: {} to: {}", event->name(),
                     StringHelpers::date_as_string(start_date), from, to);
-      events.push_back(event);
+      events.push_back(std::move(event));
     }
     return events;
 
