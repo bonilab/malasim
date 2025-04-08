@@ -80,9 +80,6 @@ void Population::initialize() {
     // Initialize population
     auto &location_db = Model::get_config()->get_spatial_settings().location_db;
     for (auto loc = 0; loc < number_of_locations; loc++) {
-      // spdlog::info("Cell {}, population {}", loc,
-      //                         location_db[loc].population_size);
-
       const auto popsize_by_location =
           static_cast<int>(location_db[loc].population_size
                            * Model::get_config()
@@ -103,6 +100,8 @@ void Population::initialize() {
               static_cast<int>(popsize_by_location * location_db[loc].age_distribution[age_class]);
           temp_sum += number_of_individual_by_loc_ageclass;
         }
+        // spdlog::info("generate {} individuals for age class {}",
+        //              number_of_individual_by_loc_ageclass, age_class);
         for (int i = 0; i < number_of_individual_by_loc_ageclass; i++) {
           generate_individual(loc, age_class);
         }
@@ -372,32 +371,28 @@ void Population::generate_individual(int location, int age_class) {
       Person::draw_random_relative_biting_rate(Model::get_random(), Model::get_config()));
   person->update_relative_biting_rate();
 
+  // Cache the moving level to avoid repeated lookups
+  const auto& movement_settings = Model::get_config()->get_movement_settings();
   person->set_moving_level(
-      Model::get_config()->get_movement_settings().get_moving_level_generator().draw_random_level(
-          Model::get_random()));
+      movement_settings.get_moving_level_generator().draw_random_level(Model::get_random()));
 
   person->set_latest_update_time(0);
 
-  int time = static_cast<int>(Model::get_random()->random_uniform(
-                 Model::get_config()->get_epidemiological_parameters().get_update_frequency()))
-             + 1;
   person->generate_prob_present_at_mda_by_age();
 
   // spdlog::info("Population::initialize: person {} age {} location {} moving level {}",
   //   i, p->get_age(), loc, p->get_moving_level());
 
-  individual_relative_biting_by_location_[location].push_back(
-      person->get_current_relative_biting_rate());
-  individual_relative_moving_by_location_[location].push_back(
-      Model::get_config()
-          ->get_movement_settings()
-          .get_v_moving_level_value()[person->get_moving_level()]);
+  // Get current values once to avoid repeated calls
+  const auto current_relative_biting_rate = person->get_current_relative_biting_rate();
+  const auto moving_level = person->get_moving_level();
+  const auto& moving_level_value = movement_settings.get_v_moving_level_value()[moving_level];
 
-  sum_relative_biting_by_location_[location] += person->get_current_relative_biting_rate();
-  sum_relative_moving_by_location_[location] +=
-      Model::get_config()
-          ->get_movement_settings()
-          .get_v_moving_level_value()[person->get_moving_level()];
+  individual_relative_biting_by_location_[location].push_back(current_relative_biting_rate);
+  individual_relative_moving_by_location_[location].push_back(moving_level_value);
+
+  sum_relative_biting_by_location_[location] += current_relative_biting_rate;
+  sum_relative_moving_by_location_[location] += moving_level_value;
 
   all_alive_persons_by_location_[location].push_back(person.get());
   add_person(std::move(person));
@@ -533,8 +528,6 @@ void Population::give_1_birth(const int &location) {
   // schedule for switch
   person->schedule_switch_immune_component_event(Constants::DAYS_IN_YEAR / 2);
 
-  //    p->startLivingTime = (Global::startTreatmentDay > Global::scheduler->currentTime) ?
-  //    Global::startTreatmentDay : Global::scheduler->currentTime;
   person->generate_prob_present_at_mda_by_age();
 
   add_person(std::move(person));
