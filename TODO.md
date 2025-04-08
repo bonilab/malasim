@@ -1,5 +1,6 @@
 # Review 
-
+- Note: PersonEvent derived class should not have person_ member, use get_person() instead
+- Check why Population initialize takes soo long.
 -  RandomTest.random_multinomial_DistributionMatchesMultinomial_ChiSquaredTest sometimes failed????
 -  Improve speed for RouletteTest.compare_with_multi_normial
 

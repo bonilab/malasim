@@ -2,30 +2,29 @@
 #define SWITCH_IMMUNE_COMPONENT_EVENT_H
 
 #include "Event.h"
-//#include "Core/ObjectPool.h"
+// #include "Core/ObjectPool.h"
 
 class Scheduler;
 
 class Person;
 
 class SwitchImmuneComponentEvent : public PersonEvent {
-// OBJECTPOOL(SwitchImmuneComponentEvent)
+  // OBJECTPOOL(SwitchImmuneComponentEvent)
+public:
+  SwitchImmuneComponentEvent(const SwitchImmuneComponentEvent &) = delete;
+  SwitchImmuneComponentEvent(SwitchImmuneComponentEvent &&) = delete;
+  SwitchImmuneComponentEvent &operator=(const SwitchImmuneComponentEvent &) = delete;
+  SwitchImmuneComponentEvent &operator=(SwitchImmuneComponentEvent &&) = delete;
 
- public:
-  SwitchImmuneComponentEvent(Person* person);
+  explicit SwitchImmuneComponentEvent(Person* person);
 
   ~SwitchImmuneComponentEvent() override;
 
-  const std::string name() const override {
-    return "SwitchImmuneComponentEvent";
-  }
+  [[nodiscard]] const std::string name() const override { return "SwitchImmuneComponentEvent"; }
 
- protected:
+protected:
   void do_execute() override;
-
- private:
-  Person* person_;  // Store direct reference to person
 };
 
-#endif    /* SWITCH_IMMUNE_COMPONENT_EVENT_H */
+#endif /* SWITCH_IMMUNE_COMPONENT_EVENT_H */
 

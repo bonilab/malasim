@@ -9,14 +9,21 @@
 
 SwitchImmuneComponentEvent::SwitchImmuneComponentEvent(Person* person) 
     : PersonEvent(person) {
-    assert(person != nullptr);
+    if (person == nullptr) {
+        spdlog::error("SwitchImmuneComponentEvent::SwitchImmuneComponentEvent, person is nullptr");
+        throw std::invalid_argument("SwitchImmuneComponentEvent::SwitchImmuneComponentEvent, person is nullptr");
+    }
 }
 
 SwitchImmuneComponentEvent::~SwitchImmuneComponentEvent() = default;
 
 void SwitchImmuneComponentEvent::do_execute() {
-    assert(person_ != nullptr);
-    person_->get_immune_system()->set_immune_component(new NonInfantImmuneComponent());
+    auto person = get_person();
+    if (person == nullptr) {
+        spdlog::error("SwitchImmuneComponentEvent::do_execute, person is nullptr");
+        throw std::invalid_argument("SwitchImmuneComponentEvent::do_execute, person is nullptr");
+    }
+    person->get_immune_system()->set_immune_component(new NonInfantImmuneComponent());
 }
 
 

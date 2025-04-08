@@ -420,6 +420,7 @@ void SpatialData::load_location_data(const YAML::Node &node) {
     for (auto loc = 0; loc < number_of_locations; loc++) {
       auto input_loc = node["population_size_by_location"].size() < number_of_locations ? 0 : loc;
       location_db[loc].population_size = node["population_size_by_location"][input_loc].as<int>();
+      spdlog::info("Location: {}, Population: {}", loc, location_db[loc].population_size);
     }
   }
 }

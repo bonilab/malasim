@@ -6,34 +6,35 @@
 #ifndef CIRCULATETOTARGETLOCATIONNEXTDAYEVENT_H
 #define CIRCULATETOTARGETLOCATIONNEXTDAYEVENT_H
 
-//#include "Core/ObjectPool.h"
+// #include "Core/ObjectPool.h"
 #include "Event.h"
 
 class Person;
 class Scheduler;
 
 class CirculateToTargetLocationNextDayEvent : public PersonEvent {
+  //  OBJECTPOOL(CirculateToTargetLocationNextDayEvent)
 public:
-   //disallow copy and move
-  CirculateToTargetLocationNextDayEvent(const CirculateToTargetLocationNextDayEvent&) = delete;
-  CirculateToTargetLocationNextDayEvent& operator=(const CirculateToTargetLocationNextDayEvent&) = delete;
-  CirculateToTargetLocationNextDayEvent(CirculateToTargetLocationNextDayEvent&&) = delete;
-  CirculateToTargetLocationNextDayEvent& operator=(CirculateToTargetLocationNextDayEvent&&) = delete;
+  // disallow copy and move
+  CirculateToTargetLocationNextDayEvent(const CirculateToTargetLocationNextDayEvent &) = delete;
+  CirculateToTargetLocationNextDayEvent &operator=(const CirculateToTargetLocationNextDayEvent &) =
+      delete;
+  CirculateToTargetLocationNextDayEvent(CirculateToTargetLocationNextDayEvent &&) = delete;
+  CirculateToTargetLocationNextDayEvent &operator=(CirculateToTargetLocationNextDayEvent &&) =
+      delete;
 
-//  OBJECTPOOL(CirculateToTargetLocationNextDayEvent)
-private:
-  int target_location_;
-public:
-  int target_location() const { return target_location_; }
-  void set_target_location(int value) { target_location_ = value; }
-
-public:
-  CirculateToTargetLocationNextDayEvent(Person* person) : PersonEvent(person), target_location_(0) {}
+  explicit CirculateToTargetLocationNextDayEvent(Person* person) : PersonEvent(person) {}
   ~CirculateToTargetLocationNextDayEvent() override = default;
 
-  const std::string name() const override { return "CirculateToTargetLocationNextDayEvent"; }
+  [[nodiscard]] int target_location() const { return target_location_; }
+  void set_target_location(int value) { target_location_ = value; }
+
+  [[nodiscard]] const std::string name() const override {
+    return "CirculateToTargetLocationNextDayEvent";
+  }
 
 private:
+  int target_location_{0};
   void do_execute() override;
 };
 

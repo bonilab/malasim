@@ -483,6 +483,8 @@ void Person::determine_clinical_or_not(ClonalParasitePopulation* clinical_caused
 }
 
 void Person::update() {
+  // spdlog::info("Time: {}, Person::update, person age: {}",
+  //              Model::get_scheduler()->current_time(), get_age());
   if (host_state_ == DEAD) {
     // throw an error
     spdlog::error("Person::update: Person is dead");
@@ -771,12 +773,15 @@ void Person::schedule_basic_event(std::unique_ptr<PersonEvent> event) {
     throw std::invalid_argument("Event time is less than current time");
   }
 
-  if (event->get_time() > Model::get_config()->get_simulation_timeframe().get_total_time()) {
-    spdlog::warn("Event time is greater than total time, event will not be scheduled");
-    // delete the event
-    event.release();
-    return;
-  }
+  // if (event->get_time() > Model::get_config()->get_simulation_timeframe().get_total_time()) {
+  //   spdlog::warn("Event time is greater than total time, event will not be scheduled. Event name:
+  //   {}", event->name());
+  //   // delete the event
+  //   event.release();
+  //   return;
+  // }
+
+  // Simply allow event to be scheduled even if it's time is greater than total time
 
   // schedule and transfer ownership of the event to the event_manager
   event_manager_.schedule_event(std::move(event));
@@ -863,7 +868,7 @@ void Person::schedule_receive_therapy_event(ClonalParasitePopulation* parasite, 
   event->set_time(calculate_future_time(days_delay));
   event->set_clinical_caused_parasite(parasite);
   event->set_received_therapy(therapy);
-  event->is_part_of_MAC_therapy = is_part_of_mac_therapy;
+  event->set_is_part_of_mac_therapy(is_part_of_mac_therapy);
   schedule_basic_event(std::move(event));
 }
 

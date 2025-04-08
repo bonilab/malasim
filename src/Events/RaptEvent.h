@@ -11,11 +11,10 @@ public:
   RaptEvent(RaptEvent &&) = delete;
   RaptEvent &operator=(RaptEvent &&) = delete;
 
-public:
-  RaptEvent(Person* person) : PersonEvent(person) {}
+  explicit RaptEvent(Person* person) : PersonEvent(person) {}
   ~RaptEvent() override = default;
 
-  const std::string name() const override { return "RAPT Event"; }
+  [[nodiscard]] const std::string name() const override { return "RAPT Event"; }
 
 private:
   void do_execute() override;

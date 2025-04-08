@@ -1,27 +1,25 @@
 #ifndef RETURNTORESIDENCEEVENT_H
 #define RETURNTORESIDENCEEVENT_H
 
-//#include "Core/ObjectPool.h"
+// #include "Core/ObjectPool.h"
 #include "Event.h"
 
 class Person;
 class Scheduler;
 
 class ReturnToResidenceEvent : public PersonEvent {
+  //  OBJECTPOOL(ReturnToResidenceEvent)
 public:
-  //disallow copy and move
-  ReturnToResidenceEvent(const ReturnToResidenceEvent&) = delete;
-  ReturnToResidenceEvent(ReturnToResidenceEvent&&) = delete;
+  ReturnToResidenceEvent &operator=(const ReturnToResidenceEvent &) = delete;
+  ReturnToResidenceEvent &operator=(ReturnToResidenceEvent &&) = delete;
+  // disallow copy and move
+  ReturnToResidenceEvent(const ReturnToResidenceEvent &) = delete;
+  ReturnToResidenceEvent(ReturnToResidenceEvent &&) = delete;
 
-//  DELETE_COPY_AND_MOVE(ReturnToResidenceEvent)
+  explicit ReturnToResidenceEvent(Person* person) : PersonEvent(person) {}
+  ~ReturnToResidenceEvent() override = default;
 
-//  OBJECTPOOL(ReturnToResidenceEvent)
-
-public:
-  ReturnToResidenceEvent(Person* person) : PersonEvent(person) {}
-  virtual ~ReturnToResidenceEvent() = default;
-
-  const std::string name() const override { return "ReturnToResidenceEvent"; }
+  [[nodiscard]] const std::string name() const override { return "ReturnToResidenceEvent"; }
 
 private:
   void do_execute() override;
