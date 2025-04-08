@@ -8,7 +8,6 @@
 #include "EventManager.h"
 
 #include "Events/Event.h"
-#include "Utils/Helpers/ObjectHelpers.h"
 #include "spdlog/spdlog.h"
 #include "Simulation/Model.h"
 

@@ -20,7 +20,6 @@
 #include "Parasites/Genotype.h"
 #include "Person/Person.h"
 #include "Utils/Constants.h"
-#include "Utils/Helpers/ObjectHelpers.h"
 #include "Utils/Index/PersonIndex.h"
 #include "Utils/Index/PersonIndexAll.h"
 #include "Utils/Index/PersonIndexByLocationMovingLevel.h"
@@ -143,9 +142,7 @@ void Population::add_person(std::unique_ptr<Person> person) {
   all_persons_->add(std::move(person));
 }
 
-void Population::remove_dead_person(Person* person) {
-  remove_person(person);
-}
+void Population::remove_dead_person(Person* person) { remove_person(person); }
 
 void Population::remove_person(Person* person) {
   // persons_.erase(std::ranges::remove(persons_, person).begin(), persons_.end());

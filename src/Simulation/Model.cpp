@@ -11,6 +11,7 @@
 #include "MDC/ModelDataCollector.h"
 #include "Mosquito/Mosquito.h"
 #include "Reporters/Reporter.h"
+#include "Treatment/LinearTCM.h"
 #include "Treatment/SteadyTCM.h"
 #include "Utils/Cli.hxx"
 
@@ -250,15 +251,19 @@ ITreatmentCoverageModel* Model::get_treatment_coverage() {
   return get_instance()->treatment_coverage_.get();
 }
 
-void Model::set_treatment_coverage(ITreatmentCoverageModel* tcm) {
-  if (treatment_coverage_.get() != tcm) {
+void Model::set_treatment_coverage(std::unique_ptr<ITreatmentCoverageModel> tcm) {
+  if (treatment_coverage_.get() != tcm.get()) {
     if (tcm->p_treatment_under_5.empty() || tcm->p_treatment_over_5.empty()) {
       // copy current value
       tcm->p_treatment_under_5 = treatment_coverage_->p_treatment_under_5;
       tcm->p_treatment_over_5 = treatment_coverage_->p_treatment_over_5;
     }
+
+    if (auto* linear_tcm = dynamic_cast<LinearTCM*>(tcm.get())) {
+      linear_tcm->update_rate_of_change();
+    }
   }
-  treatment_coverage_.reset(tcm);
+  treatment_coverage_ = std::move(tcm);
 }
 
 void Model::build_initial_treatment_coverage() {
@@ -267,6 +272,6 @@ void Model::build_initial_treatment_coverage() {
     tcm_ptr->p_treatment_under_5.push_back(location.p_treatment_under_5);
     tcm_ptr->p_treatment_over_5.push_back(location.p_treatment_over_5);
   }
-  set_treatment_coverage(tcm_ptr.release());
+  set_treatment_coverage(std::move(tcm_ptr));
 }
 

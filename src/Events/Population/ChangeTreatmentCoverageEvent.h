@@ -1,18 +1,24 @@
 #ifndef CHANGETREATMENTCOVERAGEEVENT_H
 #define CHANGETREATMENTCOVERAGEEVENT_H
 
+#include <memory>
+
 #include "Events/Event.h"
 #include "Treatment/ITreatmentCoverageModel.h"
 
 class ChangeTreatmentCoverageEvent : public WorldEvent {
 public:
-  ITreatmentCoverageModel* treatment_coverage_model;
+  std::unique_ptr<ITreatmentCoverageModel> treatment_coverage_model;
 
-  explicit ChangeTreatmentCoverageEvent(ITreatmentCoverageModel* tcm);
+  ChangeTreatmentCoverageEvent(const ChangeTreatmentCoverageEvent &) = delete;
+  ChangeTreatmentCoverageEvent(ChangeTreatmentCoverageEvent &&) = delete;
+  ChangeTreatmentCoverageEvent &operator=(const ChangeTreatmentCoverageEvent &) = delete;
+  ChangeTreatmentCoverageEvent &operator=(ChangeTreatmentCoverageEvent &&) = delete;
+  explicit ChangeTreatmentCoverageEvent(std::unique_ptr<ITreatmentCoverageModel> tcm);
 
-  virtual ~ChangeTreatmentCoverageEvent();
+  ~ChangeTreatmentCoverageEvent() override;
 
-  const std::string name() const override { return "ChangeTreatmentCoverageEvent"; }
+  [[nodiscard]] const std::string name() const override { return "ChangeTreatmentCoverageEvent"; }
 
 private:
   void do_execute() override;

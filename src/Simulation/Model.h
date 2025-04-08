@@ -60,7 +60,6 @@ private:
   std::unique_ptr<ImmunityClearanceUpdateFunction> clinical_update_function_{nullptr};
   std::unique_ptr<ITreatmentCoverageModel> treatment_coverage_{nullptr};
 
-
   std::unique_ptr<GenotypeDatabase> genotype_db_{nullptr};
   std::unique_ptr<DrugDatabase> drug_db_{nullptr};
   std::unique_ptr<SpatialData> spatial_data_{nullptr};
@@ -156,7 +155,7 @@ public:
   }
 
   static ITreatmentCoverageModel* get_treatment_coverage();
-  void set_treatment_coverage(ITreatmentCoverageModel* tcm);
+  void set_treatment_coverage(std::unique_ptr<ITreatmentCoverageModel> tcm);
 
   static IStrategy* get_treatment_strategy();
   void set_treatment_strategy(const int &strategy_id);

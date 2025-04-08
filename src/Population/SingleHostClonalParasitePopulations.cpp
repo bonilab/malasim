@@ -12,9 +12,6 @@
 #include "Population/Person/Person.h"
 #include "Simulation/Model.h"
 #include "Treatment/Therapies/Drug.h"
-// #include "Utils/Helpers/NumberHelpers.hxx"
-// #include "Utils/Helpers/ObjectHelpers.h"
-// #include "Utils/Random.h"
 
 using std::ranges::any_of;
 
@@ -88,7 +85,8 @@ void SingleHostClonalParasitePopulations::change_all_parasite_update_function(
 void SingleHostClonalParasitePopulations::update() {
   for (auto &bp : parasites_) {
     if (bp == nullptr) {
-      throw std::runtime_error("Parasite is nullptr in SingleHostClonalParasitePopulations::update");
+      throw std::runtime_error(
+          "Parasite is nullptr in SingleHostClonalParasitePopulations::update");
     }
     bp->update();
   }

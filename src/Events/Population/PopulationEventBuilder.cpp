@@ -183,9 +183,9 @@ std::vector<WorldEvent*> PopulationEventBuilder::build_change_treatment_coverage
     const YAML::Node &node, Config* config) {
   std::vector<WorldEvent*> events;
   for (const auto &entry : node) {
-    auto* tcm = ITreatmentCoverageModel::build(entry, config);
-    auto* e = new ChangeTreatmentCoverageEvent(tcm);
-    events.push_back(e);
+    auto tcm = ITreatmentCoverageModel::build(entry, config);
+    auto* event = new ChangeTreatmentCoverageEvent(std::move(tcm));
+    events.push_back(event);
   }
   return events;
 }
