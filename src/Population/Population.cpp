@@ -322,13 +322,15 @@ void Population::generate_individual(int location, int age_class) {
   p->set_age(static_cast<int>(Model::get_random()->random_uniform<int>(age_from, age_to + 1)));
 
   auto days_to_next_birthday =
-      static_cast<int>(Model::get_random()->random_uniform((Constants::DAYS_IN_YEAR)));
+      static_cast<int>(Model::get_random()->random_uniform((Constants::DAYS_IN_YEAR)))+1;
 
   // this will get the birthday in simulation time
   auto ymd = Model::get_scheduler()->get_ymd_after_days(days_to_next_birthday)
              - date::years(p->get_age() + 1);
   auto simulation_time_birthday = Model::get_scheduler()->get_days_to_ymd(ymd);
 
+  // spdlog::info(" age: {}, simulation_time_birthday: {}, days_to_next_birthday: {}", p->get_age(),
+  //              simulation_time_birthday, days_to_next_birthday);
   p->set_birthday(simulation_time_birthday);
 
   if (simulation_time_birthday > 0) {
