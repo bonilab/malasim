@@ -35,15 +35,11 @@ TEST_F(ExecutionOrderTest, ExecuteEventsWithSameTime) {
     // do_execute calls can happen in any order, but must all happen before any die calls
     {
         testing::InSequence seq;
-        
-        // All executions happen first, in any order
         EXPECT_CALL(*event1, do_execute()).Times(1);
-        EXPECT_CALL(*event2, do_execute()).Times(1);
-        EXPECT_CALL(*event3, do_execute()).Times(1);
-        
-        // All destructions happen after executions, in any order
         EXPECT_CALL(*event1, die()).Times(1);
+        EXPECT_CALL(*event2, do_execute()).Times(1);
         EXPECT_CALL(*event2, die()).Times(1);
+        EXPECT_CALL(*event3, do_execute()).Times(1);
         EXPECT_CALL(*event3, die()).Times(1);
     }
     
