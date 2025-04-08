@@ -1,43 +1,36 @@
 #ifndef PERSONINDEXALL_H
-#define    PERSONINDEXALL_H
+#define PERSONINDEXALL_H
 
 #include "PersonIndex.h"
 
 class PersonIndexAll : public PersonIndex {
 public:
-  //disallow copy and assign
+  // disallow copy and assign
   PersonIndexAll(const PersonIndexAll &) = delete;
   void operator=(const PersonIndexAll &) = delete;
+  PersonIndexAll(PersonIndexAll &&) = delete;
+  PersonIndexAll &operator=(PersonIndexAll &&) = delete;
 
-public:
-  PersonPtrVector &vPerson() {
-   return vPerson_;
-  }
-  void set_vPerson(const PersonPtrVector &value) {
-    vPerson_ = value;
-  }
+  PersonIndexAll();
+  explicit PersonIndexAll(PersonPtrVector v_person) : v_person_(std::move(v_person)) {}
+  ~PersonIndexAll() override;
+  PersonPtrVector &v_person() { return v_person_; }
+  void set_v_person(const PersonPtrVector &value) { v_person_ = value; }
+
+  void add(Person* person) override;
+
+  void remove(Person* person) override;
+
+  [[nodiscard]] std::size_t size() const override;
+
+  void update() override;
+
+  void notify_change(Person* person, const Person::Property &property, const void* old_value,
+                     const void* new_value) override;
 
 private:
-  PersonPtrVector vPerson_;
-
- public:
-  PersonIndexAll();
-
-  virtual ~PersonIndexAll();
-
-  virtual void add(Person *p);
-
-  virtual void remove(Person *p);
-
-  virtual std::size_t size() const;
-
-  virtual void update();
-
-  virtual void notify_change(Person *p, const Person::Property &property, const void *oldValue, const void *newValue);
-
- private:
-
+  PersonPtrVector v_person_;
 };
 
-#endif    /* PERSONINDEXALL_H */
+#endif /* PERSONINDEXALL_H */
 

@@ -30,15 +30,15 @@ Population::Population() {
   person_index_list_ = new PersonIndexPtrList();
   all_persons_ = new PersonIndexAll();
 
-  person_index_list_->push_back(all_persons_);
+  // person_index_list_->push_back(all_persons_);
 }
 
 Population::~Population() {
   // persons_.clear();
   // release memory for all persons
   if (all_persons_ != nullptr) {
-    for (auto &person : all_persons_->vPerson()) { ObjectHelpers::delete_pointer<Person>(person); }
-    all_persons_->vPerson().clear();
+    for (auto &person : all_persons_->v_person()) { ObjectHelpers::delete_pointer<Person>(person); }
+    all_persons_->v_person().clear();
     all_persons_ = nullptr;
   }
 
@@ -723,7 +723,7 @@ void Population::update_all_individuals() {
 // TODO: it should be called "execute_all_individual_events" for an input time
 void Population::update_all_individual_events() {
   auto* all_persons_index = get_person_index<PersonIndexAll>();
-  for (auto* person : all_persons_index->vPerson()) {
+  for (auto* person : all_persons_index->v_person()) {
     person->update_events(Model::get_scheduler()->current_time());
   }
 }

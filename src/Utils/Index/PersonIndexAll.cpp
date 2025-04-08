@@ -1,34 +1,27 @@
-#include <vector>
 #include "PersonIndexAll.h"
 
 PersonIndexAll::PersonIndexAll() = default;
 
-PersonIndexAll::~PersonIndexAll() {
-  vPerson_.clear();
+PersonIndexAll::~PersonIndexAll() { v_person_.clear(); }
+
+void PersonIndexAll::add(Person* person) {
+  v_person_.push_back(person);
+  person->PersonIndexAllHandler::set_index(v_person_.size() - 1);
 }
 
-void PersonIndexAll::add(Person *p) {
-  vPerson_.push_back(p);
-  p->PersonIndexAllHandler::set_index(vPerson_.size() - 1);
-}
-
-void PersonIndexAll::remove(Person *p) {
-  //move the last element to current position and remove the last holder
-  vPerson_.back()->PersonIndexAllHandler::set_index(p->PersonIndexAllHandler::get_index());
-  vPerson_[p->PersonIndexAllHandler::get_index()] = vPerson_.back();
-  vPerson_.pop_back();
-  p->PersonIndexAllHandler::set_index(-1);
+void PersonIndexAll::remove(Person* person) {
+  // move the last element to current position and remove the last holder
+  v_person_.back()->PersonIndexAllHandler::set_index(person->PersonIndexAllHandler::get_index());
+  v_person_[person->PersonIndexAllHandler::get_index()] = v_person_.back();
+  v_person_.pop_back();
+  person->PersonIndexAllHandler::set_index(-1);
   //    delete p;
   //    p = nullptr;
 }
 
-std::size_t PersonIndexAll::size() const {
-  return vPerson_.size();
-}
+std::size_t PersonIndexAll::size() const { return v_person_.size(); }
 
-void PersonIndexAll::notify_change(Person *p, const Person::Property &property, const void *oldValue,
-                                   const void *newValue) {}
+void PersonIndexAll::notify_change(Person* person, const Person::Property &property,
+                                   const void* old_value, const void* new_value) {}
 
-void PersonIndexAll::update() {
-  vPerson_.shrink_to_fit();
-}
+void PersonIndexAll::update() { v_person_.shrink_to_fit(); }
