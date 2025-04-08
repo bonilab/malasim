@@ -91,23 +91,23 @@ protected:
     original_model_ = Model::get_instance();
     original_model_->initialize();
 
-    original_model_->set_config(new MockConfig()); 
+    original_model_->set_config(std::make_unique<MockConfig>()); 
     mock_config_ = static_cast<MockConfig*>(original_model_->get_config()); 
 
-    original_model_->set_scheduler(new MockScheduler());
+    original_model_->set_scheduler(std::make_unique<MockScheduler>());
     mock_scheduler_ = static_cast<MockScheduler*>(original_model_->get_scheduler());
 
-    original_model_->set_random(new MockRandom());
+    original_model_->set_random(std::make_unique<MockRandom>());
     mock_random_ = static_cast<MockRandom*>(original_model_->get_random());
 
-    original_model_->set_population(new MockPopulation());
+    original_model_->set_population(std::make_unique<MockPopulation>());
     mock_population_ = static_cast<MockPopulation*>(original_model_->get_population());
 
     // Create person instance and initialize it (it should use the correctly configured mocks)
     person_ = std::make_unique<Person>();
     person_->set_population(mock_population_); 
     person_->initialize(); 
-    person_->set_immune_system(new MockImmuneSystem(person_.get()));
+    person_->set_immune_system(std::make_unique<MockImmuneSystem>(person_.get()));
     mock_immune_system_ = static_cast<MockImmuneSystem*>(person_->get_immune_system());
   }
 

@@ -99,8 +99,8 @@ public:
 
   ImmuneSystem* get_immune_system() { return immune_system_.get(); }
 
-  // set and take ownership of immune system
-  void set_immune_system(ImmuneSystem* value);
+  // take ownership of immune system
+  void set_immune_system(std::unique_ptr<ImmuneSystem> value);
 
   SingleHostClonalParasitePopulations* get_all_clonal_parasite_populations() {
     return all_clonal_parasite_populations_.get();

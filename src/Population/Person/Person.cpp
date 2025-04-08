@@ -124,8 +124,8 @@ void Person::set_moving_level(const int &value) {
   }
 }
 
-void Person::set_immune_system(ImmuneSystem* value) {
-  immune_system_ = std::unique_ptr<ImmuneSystem>(value);
+void Person::set_immune_system(std::unique_ptr<ImmuneSystem> value) {
+  immune_system_ = std::move(value);
 }
 
 ClonalParasitePopulation* Person::add_new_parasite_to_blood(Genotype* parasite_type) const {

@@ -9,18 +9,15 @@ protected:
     void SetUp() override {
         r.set_seed(-1);
         for (int i = 0; i < n_person; ++i) {
-            auto *p = new Person();
+            auto p = std::make_unique<Person>();
             p->set_last_therapy_id(i);
-            all_person.push_back(p);
+            all_person.push_back(std::move(p));
+            all_person_ptr.push_back(all_person.back().get());
             distribution.push_back(r.random_uniform());
         }
     }
 
     void TearDown() override {
-        for (auto *p: all_person) {
-            delete p;
-        }
-
         all_person.clear();
         distribution.clear();
     }
@@ -29,12 +26,13 @@ protected:
     int n_sample{10};
     int n_person{1000};
 
-    std::vector<Person *> all_person;
+    std::vector<std::unique_ptr<Person>> all_person;
+    std::vector<Person*> all_person_ptr;
     std::vector<double> distribution;
 };
 
 TEST_F(RouletteTest, Sampling_with_sum_distribution_0) {
-    auto results = r.roulette_sampling<Person>(n_sample, distribution, all_person, false, 0);
+    auto results = r.roulette_sampling<Person>(n_sample, distribution, all_person_ptr, false, 0);
 
     EXPECT_EQ(results.size(), n_sample);
     EXPECT_EQ(results[0], nullptr);
@@ -48,7 +46,7 @@ TEST_F(RouletteTest, Sampling_with_no_sum_distribution) {
         foi_distribution[i] = 0;
     }
     for (int n = 0; n < 10; ++n) {
-        auto results = r.roulette_sampling<Person>(n_sample, foi_distribution, all_person, false);
+        auto results = r.roulette_sampling<Person>(n_sample, foi_distribution, all_person_ptr, false);
 
         EXPECT_EQ(results.size(), n_sample);
 
@@ -67,7 +65,7 @@ TEST_F(RouletteTest, Sampling_with_one_in_all) {
     foi_distribution[n_person - 1] = 1;
 
     for (int n = 0; n < 10; ++n) {
-        auto results = r.roulette_sampling<Person>(n_sample, foi_distribution, all_person, false, 1);
+        auto results = r.roulette_sampling<Person>(n_sample, foi_distribution, all_person_ptr, false, 1);
 
         EXPECT_EQ(results.size(), n_sample);
 
@@ -89,7 +87,7 @@ TEST_F(RouletteTest, Sampling_with_2_in_all) {
     auto count{0}, n_repeat{10};
 
     for (int n = 0; n < n_repeat; ++n) {
-        auto results = r.roulette_sampling<Person>(n_sample, foi_distribution, all_person, true);
+        auto results = r.roulette_sampling<Person>(n_sample, foi_distribution, all_person_ptr, true);
 
         EXPECT_EQ(results.size(), n_sample);
 
@@ -129,7 +127,7 @@ TEST_F(RouletteTest, Sampling_with_4_in_all) {
     };
 
     for (int n = 0; n < n_repeat; ++n) {
-        auto results = r.roulette_sampling<Person>(n_sample, foi_distribution, all_person, true, 2.5);
+        auto results = r.roulette_sampling<Person>(n_sample, foi_distribution, all_person_ptr, true, 2.5);
 
         EXPECT_EQ(results.size(), n_sample);
 
@@ -152,14 +150,17 @@ TEST_F(RouletteTest, Sampling_with_4_in_all) {
 
 TEST_F(RouletteTest, compare_with_multi_normial) {
     const auto size = 10000;
-    std::vector<Person *> population;
+    std::vector<std::unique_ptr<Person>> population;
+    std::vector<Person*> population_ptr;
     population.reserve(size);
+    population_ptr.reserve(size);
     std::vector<double> foi_distribution;
     foi_distribution.reserve(size);
     for (int i = 0; i < size; ++i) {
-        auto *p = new Person();
+        auto p = std::make_unique<Person>();
         p->set_last_therapy_id(i);
-        population.push_back(p);
+        population.push_back(std::move(p));
+        population_ptr.push_back(population.back().get());
         foi_distribution.push_back(r.random_uniform());
     }
 
@@ -176,7 +177,7 @@ TEST_F(RouletteTest, compare_with_multi_normial) {
     // ==================== roulette sampling ===========================
     auto start = std::chrono::high_resolution_clock::now();
     for (int n = 0; n < n_repeat; ++n) {
-        auto results = r.roulette_sampling<Person>(samples, foi_distribution, population, true);
+        auto results = r.roulette_sampling<Person>(samples, foi_distribution, population_ptr, true);
 
         EXPECT_EQ(results.size(), samples);
 
@@ -197,7 +198,7 @@ TEST_F(RouletteTest, compare_with_multi_normial) {
     start = std::chrono::high_resolution_clock::now();
     foi_distribution.resize(100);
     for (int n = 0; n < n_repeat; ++n) {
-        auto results = r.multinomial_sampling<Person>(samples, foi_distribution, population, true, sum);
+        auto results = r.multinomial_sampling<Person>(samples, foi_distribution, population_ptr, true, sum);
 
         EXPECT_EQ(results.size(), samples);
 
@@ -214,10 +215,8 @@ TEST_F(RouletteTest, compare_with_multi_normial) {
     stop = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
-    for (auto &p: population) {
-        delete p;
-    }
-
+    population.clear();
+    population_ptr.clear();
     std::cout << fmt::format("Multinomial Sampling times: {}ms", duration.count()) << std::endl;
 
 }

@@ -29,14 +29,16 @@ TEST_F(MosquitoTest, PrmcSample) {
       foi_distribution[i] = 0;
     }
 
-    std::vector<Person*> all_person;
+    std::vector<std::unique_ptr<Person>> all_person;
+    std::vector<Person*> all_person_ptr;
     for (int i = 0; i < pop_size; ++i) {
-      auto* p = new Person();
+      auto p = std::make_unique<Person>();
       p->set_last_therapy_id(i);
-      all_person.push_back(p);
+      all_person.push_back(std::move(p));
+      all_person_ptr.push_back(all_person.back().get());
     }
 
-    auto samples = r.multinomial_sampling<Person>(prmc_size, foi_distribution, all_person, true);
+    auto samples = r.multinomial_sampling<Person>(prmc_size, foi_distribution, all_person_ptr, true);
 
     EXPECT_EQ(samples.size(), prmc_size);
 
@@ -45,11 +47,8 @@ TEST_F(MosquitoTest, PrmcSample) {
           << fmt::format("failed with p_id: {}", samples[i]->get_last_therapy_id());
     }
 
-    for (auto* p : all_person) {
-      delete p;
-    }
-
     all_person.clear();
+    all_person_ptr.clear();
   }
 }
 
@@ -65,24 +64,23 @@ TEST_F(MosquitoTest, PrmcSampleWhenThereIsNoFOI) {
   for (int n = 0; n < 1; ++n) {
     std::vector<double> foi_distribution(pop_size, 0);
 
-    std::vector<Person*> all_person;
+    std::vector<std::unique_ptr<Person>> all_person;
+    std::vector<Person*> all_person_ptr;
     for (int i = 0; i < pop_size; ++i) {
-      auto* p = new Person();
+      auto p = std::make_unique<Person>();
       p->set_last_therapy_id(i);
-      all_person.push_back(p);
+      all_person.push_back(std::move(p));
+      all_person_ptr.push_back(all_person.back().get());
     }
 
-    auto samples = r.multinomial_sampling<Person>(prmc_size, foi_distribution, all_person, true);
+    auto samples = r.multinomial_sampling<Person>(prmc_size, foi_distribution, all_person_ptr, true);
     EXPECT_EQ(samples.size(), prmc_size);
 
     for (int i = 0; i < prmc_size; ++i) {
       EXPECT_EQ(samples[i], nullptr);
     }
 
-    for (auto* p : all_person) {
-      delete p;
-    }
-
     all_person.clear();
+    all_person_ptr.clear();
   }
 }

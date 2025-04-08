@@ -82,19 +82,19 @@ public:
   void release();
 
   static Config* get_config() { return get_instance()->config_.get(); }
-  static void set_config(Config* config) { get_instance()->config_.reset(config); }
+  static void set_config(std::unique_ptr<Config> config) { get_instance()->config_ = std::move(config); }
 
   static Scheduler* get_scheduler() { return get_instance()->scheduler_.get(); }
 
-  static void set_scheduler(Scheduler* scheduler) { get_instance()->scheduler_.reset(scheduler); }
+  static void set_scheduler(std::unique_ptr<Scheduler> scheduler) { get_instance()->scheduler_ = std::move(scheduler); }
 
   static utils::Random* get_random() { return get_instance()->random_.get(); }
 
-  static void set_random(utils::Random* random) { get_instance()->random_.reset(random); }
+  static void set_random(std::unique_ptr<utils::Random> random) { get_instance()->random_ = std::move(random); }
 
   static Population* get_population() { return get_instance()->population_.get(); }
-  static void set_population(Population* population) {
-    get_instance()->population_.reset(population);
+  static void set_population(std::unique_ptr<Population> population) {
+    get_instance()->population_ = std::move(population);
   }
 
   static GenotypeDatabase* get_genotype_db() { return get_instance()->genotype_db_.get(); }

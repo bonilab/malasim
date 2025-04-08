@@ -22,26 +22,26 @@ public:
 class ClonalParasitePopulationTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    genotype = new Genotype("abcdef");
-    parasite_population = new MockSingleHostClonalParasitePopulations();
-    cpp = new ClonalParasitePopulation(genotype);
-    cpp->set_parasite_population(parasite_population);
+    genotype = std::make_unique<Genotype>("abcdef");
+    parasite_population = std::make_unique<MockSingleHostClonalParasitePopulations>();
+    cpp = std::make_unique<ClonalParasitePopulation>(genotype.get());
+    cpp->set_parasite_population(parasite_population.get());
   }
 
   void TearDown() override {
-    delete cpp;
-    delete genotype;
-    delete parasite_population;
+    cpp.reset();
+    genotype.reset();
+    parasite_population.reset();
   }
 
-  Genotype* genotype;
-  SingleHostClonalParasitePopulations* parasite_population;
-  ClonalParasitePopulation* cpp;
+  std::unique_ptr<Genotype> genotype;
+  std::unique_ptr<MockSingleHostClonalParasitePopulations> parasite_population;
+  std::unique_ptr<ClonalParasitePopulation> cpp;
 };
 
 TEST_F(ClonalParasitePopulationTest, Initialization) {
-  EXPECT_EQ(cpp->genotype(), genotype);
-  EXPECT_EQ(cpp->parasite_population(), parasite_population);
+  EXPECT_EQ(cpp->genotype(), genotype.get());
+  EXPECT_EQ(cpp->parasite_population(), parasite_population.get());
   EXPECT_EQ(cpp->last_update_log10_parasite_density(),
             ClonalParasitePopulation::LOG_ZERO_PARASITE_DENSITY);
   EXPECT_EQ(cpp->gametocyte_level(), 0.0);
@@ -98,23 +98,22 @@ TEST_F(ClonalParasitePopulationTest, PerformDrugAction) {
 }
 
 TEST_F(ClonalParasitePopulationTest, UpdateFunction) {
-  auto update_function = new MockParasiteDensityUpdateFunction();
-  cpp->set_update_function(update_function);
-  EXPECT_EQ(cpp->update_function(), update_function);
-  delete update_function;
+  auto update_function = std::make_unique<MockParasiteDensityUpdateFunction>();
+  cpp->set_update_function(update_function.get());
+  EXPECT_EQ(cpp->update_function(), update_function.get());
 }
 
 TEST_F(ClonalParasitePopulationTest, GetCurrentParasiteDensityWithUpdateFunction) {
   // test case: duration is 5
-  auto update_function = new MockParasiteDensityUpdateFunction();
-  cpp->set_update_function(update_function);
+  auto update_function = std::make_unique<MockParasiteDensityUpdateFunction>();
+  cpp->set_update_function(update_function.get());
 
   // Set up expectations
-  EXPECT_CALL(*static_cast<MockSingleHostClonalParasitePopulations*>(parasite_population),
+  EXPECT_CALL(*static_cast<MockSingleHostClonalParasitePopulations*>(parasite_population.get()),
               latest_update_time())
       .WillOnce(testing::Return(6));
 
-  EXPECT_CALL(*update_function, get_current_parasite_density(cpp, 5))
+  EXPECT_CALL(*update_function.get(), get_current_parasite_density(cpp.get(), 5))
       .WillOnce(testing::Return(3.0));
 
   // Set initial values
@@ -125,7 +124,6 @@ TEST_F(ClonalParasitePopulationTest, GetCurrentParasiteDensityWithUpdateFunction
   // expect the result is 3.0 which is the return value of the update function
   EXPECT_DOUBLE_EQ(result, 3.0);
 
-  delete update_function;
 }
 
 TEST_F(ClonalParasitePopulationTest, GetCurrentParasiteDensityWithoutUpdateFunction) {
@@ -136,34 +134,32 @@ TEST_F(ClonalParasitePopulationTest, GetCurrentParasiteDensityWithoutUpdateFunct
 
 TEST_F(ClonalParasitePopulationTest, GetCurrentParasiteDensityZeroDuration) {
   // test case: duration is 0
-  auto update_function = new MockParasiteDensityUpdateFunction();
-  cpp->set_update_function(update_function);
+  auto update_function = std::make_unique<MockParasiteDensityUpdateFunction>();
+  cpp->set_update_function(update_function.get());
   cpp->set_last_update_log10_parasite_density(2.0);
 
   // Set up expectations
-  EXPECT_CALL(*static_cast<MockSingleHostClonalParasitePopulations*>(parasite_population),
+  EXPECT_CALL(*static_cast<MockSingleHostClonalParasitePopulations*>(parasite_population.get()),
               latest_update_time())
       .WillOnce(testing::Return(5));
 
   double result = cpp->get_current_parasite_density(5);
   EXPECT_DOUBLE_EQ(result, 2.0);
-  delete update_function;
 }
 
 // Edge case tests
 TEST_F(ClonalParasitePopulationTest, GetCurrentParasiteDensityNegativeDuration) {
-  auto update_function = new MockParasiteDensityUpdateFunction();
-  cpp->set_update_function(update_function);
+  auto update_function = std::make_unique<MockParasiteDensityUpdateFunction>();
+  cpp->set_update_function(update_function.get());
   cpp->set_last_update_log10_parasite_density(2.0);
 
   // Set up expectations for negative duration
-  EXPECT_CALL(*static_cast<MockSingleHostClonalParasitePopulations*>(parasite_population),
+  EXPECT_CALL(*static_cast<MockSingleHostClonalParasitePopulations*>(parasite_population.get()),
               latest_update_time())
       .WillOnce(testing::Return(10));
 
   // expected to throw an exception
   EXPECT_THROW(cpp->get_current_parasite_density(5), std::invalid_argument);
-  delete update_function;
 }
 
 TEST_F(ClonalParasitePopulationTest, GetLog10InfectiousDensityEdgeCases) {

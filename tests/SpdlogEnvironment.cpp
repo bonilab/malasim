@@ -13,7 +13,7 @@ public:
   void TearDown() override { spdlog::shutdown(); }
 };
 
-// Register the test environment
+// Register the test environment Gtest will take the ownership of the environment
 ::testing::Environment* const global_env =
     ::testing::AddGlobalTestEnvironment(new SpdlogEnvironment());
 

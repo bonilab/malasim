@@ -9,15 +9,15 @@
 
 class TestSeasonalPattern : public SeasonalPattern {
 public:
-    static SeasonalPattern* build(const YAML::Node &node, SpatialData* spatial_data) {
-        SeasonalPattern* pattern = new SeasonalPattern();
-        YAML::convert<SeasonalPattern*>::decode(node["pattern"], pattern);
+    static std::unique_ptr<SeasonalPattern> build(const YAML::Node &node, SpatialData* spatial_data) {
+        auto pattern = std::make_unique<SeasonalPattern>();
+        YAML::convert<SeasonalPattern*>::decode(node["pattern"], pattern.get());
         pattern->build(spatial_data);
         return pattern;
     }
-    static SpatialData* create_fake_spatial_data() {
+    static std::unique_ptr<SpatialData> create_fake_spatial_data() {
         std::cout << "Creating fake spatial data" << std::endl;
-        auto fake_spatial_data = new SpatialData();
+        auto fake_spatial_data = std::make_unique<SpatialData>();
         fake_spatial_data->get_admin_level_manager()->register_level("district");
         auto boundary = BoundaryData();
         boundary.location_to_unit = {1, 2};

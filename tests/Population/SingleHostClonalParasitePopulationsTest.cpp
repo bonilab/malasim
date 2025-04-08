@@ -20,21 +20,21 @@ public:
 class SingleHostClonalParasitePopulationsTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    person = new MockPerson();
-    populations = new SingleHostClonalParasitePopulations(person);
-    genotype = new Genotype("abcdef");
+    person = std::make_unique<MockPerson>();
+    populations = std::make_unique<SingleHostClonalParasitePopulations>(person.get());
+    genotype = std::make_unique<Genotype>("abcdef");
     destroyed_parasites_.clear();
   }
 
   void TearDown() override {
-    delete populations;
-    delete person;
-    delete genotype;
+    populations.reset();
+    person.reset();
+    genotype.reset();
   }
 
-  MockPerson* person;
-  SingleHostClonalParasitePopulations* populations;
-  Genotype* genotype;
+  std::unique_ptr<MockPerson> person;
+  std::unique_ptr<SingleHostClonalParasitePopulations> populations;
+  std::unique_ptr<Genotype> genotype;
   static std::set<int> destroyed_parasites_;
 
   // Helper class to track parasite destruction
@@ -68,13 +68,13 @@ std::set<int> SingleHostClonalParasitePopulationsTest::destroyed_parasites_;
 TEST_F(SingleHostClonalParasitePopulationsTest, Initialization) {
   EXPECT_EQ(populations->size(), 0);
   EXPECT_TRUE(populations->empty());
-  EXPECT_EQ(populations->person(), person);
+  EXPECT_EQ(populations->person(), person.get());
   EXPECT_EQ(populations->log10_total_infectious_density(),
             SingleHostClonalParasitePopulations::DEFAULT_LOG_DENSITY);
 }
 
 TEST_F(SingleHostClonalParasitePopulationsTest, AddAndRemoveParasite) {
-  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite_ptr = parasite.get();
   // Add parasite
   populations->add(std::move(parasite));
@@ -91,8 +91,8 @@ TEST_F(SingleHostClonalParasitePopulationsTest, AddAndRemoveParasite) {
 }
 
 TEST_F(SingleHostClonalParasitePopulationsTest, RemoveByIndex) {
-  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype);
-  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype.get());
+  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite2_ptr = parasite2.get();
 
   // Add two parasites
@@ -115,15 +115,15 @@ TEST_F(SingleHostClonalParasitePopulationsTest, RemoveByIndexEdgeCases) {
   EXPECT_THROW(populations->remove(-1), std::out_of_range);
 
   // Test removing with index beyond size
-  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype.get());
   populations->add(std::move(parasite));
   EXPECT_THROW(populations->remove(1), std::out_of_range);
 }
 
 TEST_F(SingleHostClonalParasitePopulationsTest, ContainParasite) {
-  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite_ptr = parasite.get();
-  auto other_parasite = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto other_parasite = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto other_parasite_ptr = other_parasite.get();
 
   populations->add(std::move(parasite));
@@ -134,11 +134,11 @@ TEST_F(SingleHostClonalParasitePopulationsTest, ContainParasite) {
 }
 
 TEST_F(SingleHostClonalParasitePopulationsTest, ClearCuredParasites) {
-  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite1_ptr = parasite1.get();
-  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite2_ptr = parasite2.get();
-  auto parasite3 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite3 = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite3_ptr = parasite3.get();
 
   // Set up parasites with different densities
@@ -163,8 +163,8 @@ TEST_F(SingleHostClonalParasitePopulationsTest, ClearCuredParasitesEdgeCases) {
   EXPECT_EQ(populations->size(), 0);
 
   // Test with all cured parasites
-  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype);
-  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype.get());
+  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype.get());
 
   parasite1->set_last_update_log10_parasite_density(-1111.0);
   parasite2->set_last_update_log10_parasite_density(-1111.0);
@@ -177,7 +177,7 @@ TEST_F(SingleHostClonalParasitePopulationsTest, ClearCuredParasitesEdgeCases) {
 }
 
 TEST_F(SingleHostClonalParasitePopulationsTest, HasDetectableParasite) {
-  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite_ptr = parasite.get();
 
   // Test with undetectable parasite
@@ -195,7 +195,7 @@ TEST_F(SingleHostClonalParasitePopulationsTest, HasDetectableParasite) {
 }
 
 TEST_F(SingleHostClonalParasitePopulationsTest, IsGametocytaemic) {
-  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite_ptr = parasite.get();
   // Test with no gametocytes
   parasite_ptr->set_gametocyte_level(0.0);
@@ -212,7 +212,7 @@ TEST_F(SingleHostClonalParasitePopulationsTest, IsGametocytaemic) {
 }
 
 TEST_F(SingleHostClonalParasitePopulationsTest, UpdateByDrugs) {
-  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite_ptr = parasite.get();
   auto drugs_in_blood = std::make_unique<DrugsInBlood>();
 
@@ -231,7 +231,7 @@ TEST_F(SingleHostClonalParasitePopulationsTest, UpdateByDrugsEdgeCases) {
   std::cout << "Test with empty population" << std::endl;
 
   // Test with null drugs_in_blood
-  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite_ptr = parasite.get();
   populations->add(std::move(parasite));
   parasite_ptr->set_last_update_log10_parasite_density(5.0);
@@ -240,7 +240,7 @@ TEST_F(SingleHostClonalParasitePopulationsTest, UpdateByDrugsEdgeCases) {
 }
 
 TEST_F(SingleHostClonalParasitePopulationsTest, Clear) {
-  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype.get());
 
   populations->add(std::move(parasite));
   EXPECT_EQ(populations->size(), 1);
@@ -265,8 +265,8 @@ TEST_F(SingleHostClonalParasitePopulationsTest, LatestUpdateTime) {
 }
 
 TEST_F(SingleHostClonalParasitePopulationsTest, IteratorAccess) {
-  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype);
-  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype.get());
+  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite1_ptr = parasite1.get();
   auto parasite2_ptr = parasite2.get();
 
@@ -280,7 +280,7 @@ TEST_F(SingleHostClonalParasitePopulationsTest, IteratorAccess) {
   EXPECT_EQ((*it).get(), parasite2_ptr);
 
   // Test const iterator access
-  const auto* const_populations = populations;
+  const auto* const_populations = populations.get();
   auto const_it = const_populations->begin();
   EXPECT_EQ((*const_it).get(), parasite1_ptr);
   ++const_it;
@@ -292,7 +292,7 @@ TEST_F(SingleHostClonalParasitePopulationsTest, IteratorEdgeCases) {
   EXPECT_EQ(populations->begin(), populations->end());
 
   // Test iterator increment beyond end
-  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite = std::make_unique<ClonalParasitePopulation>(genotype.get());
   populations->add(std::move(parasite));
   auto it = populations->begin();
   ++it;
@@ -300,9 +300,9 @@ TEST_F(SingleHostClonalParasitePopulationsTest, IteratorEdgeCases) {
 }
 
 TEST_F(SingleHostClonalParasitePopulationsTest, MultipleParasitesWithDifferentDensities) {
-  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype);
-  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype);
-  auto parasite3 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype.get());
+  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype.get());
+  auto parasite3 = std::make_unique<ClonalParasitePopulation>(genotype.get());
 
   parasite1->set_last_update_log10_parasite_density(5.0);
   parasite1->set_gametocyte_level(1.0);
@@ -321,11 +321,11 @@ TEST_F(SingleHostClonalParasitePopulationsTest, MultipleParasitesWithDifferentDe
 }
 
 TEST_F(SingleHostClonalParasitePopulationsTest, ParasiteIndexManagement) {
-  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite1_ptr = parasite1.get();
-  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite2_ptr = parasite2.get();
-  auto parasite3 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite3 = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite3_ptr = parasite3.get();
 
   populations->add(std::move(parasite1));
@@ -343,11 +343,11 @@ TEST_F(SingleHostClonalParasitePopulationsTest, ParasiteIndexManagement) {
 }
 
 TEST_F(SingleHostClonalParasitePopulationsTest, RemoveByParasitePtrIndex) {
-  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite1 = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite1_ptr = parasite1.get();
-  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite2 = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite2_ptr = parasite2.get();
-  auto parasite3 = std::make_unique<ClonalParasitePopulation>(genotype);
+  auto parasite3 = std::make_unique<ClonalParasitePopulation>(genotype.get());
   auto parasite3_ptr = parasite3.get();
 
   populations->add(std::move(parasite1));
@@ -412,7 +412,7 @@ TEST_F(SingleHostClonalParasitePopulationsTest, MemoryManagementDestructor) {
   const int tracking_id2 = 104;
 
   {
-    auto local_populations = std::make_unique<SingleHostClonalParasitePopulations>(person);
+    auto local_populations = std::make_unique<SingleHostClonalParasitePopulations>(person.get());
     auto parasite1 = create_tracked_parasite(tracking_id1);
     auto parasite2 = create_tracked_parasite(tracking_id2);
     local_populations->add(std::move(parasite1));

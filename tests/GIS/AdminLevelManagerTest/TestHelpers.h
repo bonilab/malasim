@@ -21,7 +21,7 @@ protected:
         cleanup_files();
         
         if (Model::get_config() == nullptr) {
-            Model::get_instance()->set_config(new Config());
+            Model::get_instance()->set_config(std::make_unique<Config>());
             
             // Set up minimal location database
             Model::get_config()->get_spatial_settings().set_number_of_locations(9);  // 3x3 grid
