@@ -382,45 +382,44 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate movement settings
   ----------------------------*/
-  MovementSettings movement_settings = movement_settings_;
   // Check if Barabasi parameters are valid
-  if (movement_settings.get_spatial_model_settings().get_name() == "Barabasi") {
+  if (movement_settings_.get_spatial_model_settings().get_name() == "Barabasi") {
     MovementSettings::BarabasiSM barabasi =
-        movement_settings.get_spatial_model_settings().get_barabasi_sm();
+        movement_settings_.get_spatial_model_settings().get_barabasi_sm();
     if (barabasi.get_r_g_0() <= 0 || barabasi.get_beta_r() <= 0 || barabasi.get_kappa() <= 0) {
       throw std::invalid_argument("Barabasi parameters should be positive numbers");
     }
   }
   // Check if Wesolowski parameters are valid
-  if (movement_settings.get_spatial_model_settings().get_name() == "Wesolowski") {
+  if (movement_settings_.get_spatial_model_settings().get_name() == "Wesolowski") {
     MovementSettings::WesolowskiSM wesolowski =
-        movement_settings.get_spatial_model_settings().get_wesolowski_sm();
+        movement_settings_.get_spatial_model_settings().get_wesolowski_sm();
     if (wesolowski.get_alpha() <= 0 || wesolowski.get_beta() <= 0 || wesolowski.get_gamma() <= 0
         || wesolowski.get_kappa() <= 0) {
       throw std::invalid_argument("Wesolowski parameters should be positive numbers");
     }
   }
   // Check if WesolowskiSurface parameters are valid
-  if (movement_settings.get_spatial_model_settings().get_name() == "WesolowskiSurface") {
+  if (movement_settings_.get_spatial_model_settings().get_name() == "WesolowskiSurface") {
     MovementSettings::WesolowskiSurfaceSM wesolowski_surface =
-        movement_settings.get_spatial_model_settings().get_wesolowski_surface_sm();
+        movement_settings_.get_spatial_model_settings().get_wesolowski_surface_sm();
     if (wesolowski_surface.get_alpha() <= 0 || wesolowski_surface.get_beta() <= 0
         || wesolowski_surface.get_gamma() <= 0 || wesolowski_surface.get_kappa() <= 0) {
       throw std::invalid_argument("WesolowskiSurface parameters should be positive numbers");
     }
   }
   // Check if Marshall parameters are valid
-  if (movement_settings.get_spatial_model_settings().get_name() == "Marshall") {
+  if (movement_settings_.get_spatial_model_settings().get_name() == "Marshall") {
     MovementSettings::MarshallSM marshall =
-        movement_settings.get_spatial_model_settings().get_marshall_sm();
+        movement_settings_.get_spatial_model_settings().get_marshall_sm();
     if (marshall.get_alpha() <= 0 || marshall.get_log_rho() <= 0 || marshall.get_tau() <= 0) {
       throw std::invalid_argument("Marshall parameters should be positive numbers");
     }
   }
   // Check if BurkinaFaso parameters are valid
-  if (movement_settings.get_spatial_model_settings().get_name() == "BurkinaFaso") {
+  if (movement_settings_.get_spatial_model_settings().get_name() == "BurkinaFaso") {
     MovementSettings::BurkinaFasoSM burkina_faso =
-        movement_settings.get_spatial_model_settings().get_burkina_faso_sm();
+        movement_settings_.get_spatial_model_settings().get_burkina_faso_sm();
     if (burkina_faso.get_alpha() <= 0 || burkina_faso.get_tau() <= 0
         || burkina_faso.get_log_rho() <= 0 || burkina_faso.get_capital() <= 0
         || burkina_faso.get_penalty() <= 0) {
@@ -429,7 +428,7 @@ void Config::validate_all_cross_field_validations() {
   }
   // Check if circular parameters are valid
   const MovementSettings::CirculationInfo &circulation_info =
-      movement_settings.get_circulation_info();
+      movement_settings_.get_circulation_info();
   if (circulation_info.get_max_relative_moving_value() < 0
       || circulation_info.get_number_of_moving_levels() <= 0) {
     throw std::invalid_argument(

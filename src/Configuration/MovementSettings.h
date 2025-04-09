@@ -293,8 +293,7 @@ public:
     spatial_model_settings_ = value;
   }
 
-  [[nodiscard]] Spatial::SpatialModel* get_spatial_model() const { return spatial_model_; }
-  void set_spatial_model(Spatial::SpatialModel* value) { spatial_model_ = value; }
+  [[nodiscard]] Spatial::SpatialModel* get_spatial_model() const { return spatial_model_.get(); }
 
   [[nodiscard]] const CirculationInfo &get_circulation_info() const { return circulation_info_; }
   void set_circulation_info(const CirculationInfo &value) { circulation_info_ = value; }
@@ -333,40 +332,40 @@ public:
     spdlog::info("Processing MovementSettings");
     if (spatial_model_settings_.get_name() == "Barabasi") {
       spdlog::info("Processing BarabasiSM");
-      spatial_model_ =
-          new Spatial::BarabasiSM(spatial_model_settings_.get_barabasi_sm().get_r_g_0(),
-                                  spatial_model_settings_.get_barabasi_sm().get_beta_r(),
-                                  spatial_model_settings_.get_barabasi_sm().get_kappa());
+      spatial_model_ = std::make_unique<Spatial::BarabasiSM>(
+          spatial_model_settings_.get_barabasi_sm().get_r_g_0(),
+          spatial_model_settings_.get_barabasi_sm().get_beta_r(),
+          spatial_model_settings_.get_barabasi_sm().get_kappa());
     } else if (spatial_model_settings_.get_name() == "Wesolowski") {
       spdlog::info("Processing WesolowskiSM");
-      spatial_model_ =
-          new Spatial::WesolowskiSM(spatial_model_settings_.get_wesolowski_sm().get_kappa(),
-                                    spatial_model_settings_.get_wesolowski_sm().get_alpha(),
-                                    spatial_model_settings_.get_wesolowski_sm().get_beta(),
-                                    spatial_model_settings_.get_wesolowski_sm().get_gamma());
+      spatial_model_ = std::make_unique<Spatial::WesolowskiSM>(
+          spatial_model_settings_.get_wesolowski_sm().get_kappa(),
+          spatial_model_settings_.get_wesolowski_sm().get_alpha(),
+          spatial_model_settings_.get_wesolowski_sm().get_beta(),
+          spatial_model_settings_.get_wesolowski_sm().get_gamma());
     } else if (spatial_model_settings_.get_name() == "WesolowskiSurface") {
       spdlog::info("Processing WesolowskiSurfaceSM");
-      spatial_model_ = new Spatial::WesolowskiSurfaceSM(
+      spatial_model_ = std::make_unique<Spatial::WesolowskiSurfaceSM>(
           spatial_model_settings_.get_wesolowski_surface_sm().get_kappa(),
           spatial_model_settings_.get_wesolowski_surface_sm().get_alpha(),
           spatial_model_settings_.get_wesolowski_surface_sm().get_beta(),
           spatial_model_settings_.get_wesolowski_surface_sm().get_gamma(), number_of_locations);
     } else if (spatial_model_settings_.get_name() == "Marshall") {
       spdlog::info("Processing MarshallSM");
-      spatial_model_ =
-          new Spatial::MarshallSM(spatial_model_settings_.get_marshall_sm().get_tau(),
-                                  spatial_model_settings_.get_marshall_sm().get_alpha(),
-                                  spatial_model_settings_.get_marshall_sm().get_log_rho(),
-                                  number_of_locations, spatial_distance_matrix);
+      spatial_model_ = std::make_unique<Spatial::MarshallSM>(
+          spatial_model_settings_.get_marshall_sm().get_tau(),
+          spatial_model_settings_.get_marshall_sm().get_alpha(),
+          spatial_model_settings_.get_marshall_sm().get_log_rho(), number_of_locations,
+          spatial_distance_matrix);
     } else if (spatial_model_settings_.get_name() == "BurkinaFaso") {
       spdlog::info("Processing BurkinaFasoSM");
-      spatial_model_ =
-          new Spatial::BurkinaFasoSM(spatial_model_settings_.get_burkina_faso_sm().get_tau(),
-                                     spatial_model_settings_.get_burkina_faso_sm().get_alpha(),
-                                     spatial_model_settings_.get_burkina_faso_sm().get_log_rho(),
-                                     spatial_model_settings_.get_burkina_faso_sm().get_capital(),
-                                     spatial_model_settings_.get_burkina_faso_sm().get_penalty(),
-                                     number_of_locations, spatial_distance_matrix);
+      spatial_model_ = std::make_unique<Spatial::BurkinaFasoSM>(
+          spatial_model_settings_.get_burkina_faso_sm().get_tau(),
+          spatial_model_settings_.get_burkina_faso_sm().get_alpha(),
+          spatial_model_settings_.get_burkina_faso_sm().get_log_rho(),
+          spatial_model_settings_.get_burkina_faso_sm().get_capital(),
+          spatial_model_settings_.get_burkina_faso_sm().get_penalty(), number_of_locations,
+          spatial_distance_matrix);
     }
     // Circulation Info
     // calculate density and level value here
@@ -430,7 +429,7 @@ public:
 
 private:
   SpatialModelSettings spatial_model_settings_;
-  Spatial::SpatialModel* spatial_model_{};
+  std::unique_ptr<Spatial::SpatialModel> spatial_model_{nullptr};
   CirculationInfo circulation_info_;
   DoubleVector v_moving_level_value_;
   DoubleVector v_moving_level_density_;
@@ -446,10 +445,6 @@ namespace YAML {
 // BarabasiSM YAML conversion
 template <>
 struct convert<MovementSettings::BarabasiSM> {
-  convert(const convert &) = default;
-  convert(convert &&) = default;
-  convert &operator=(const convert &) = default;
-  convert &operator=(convert &&) = default;
   static Node encode(const MovementSettings::BarabasiSM &rhs) {
     Node node;
     node["r_g_0"] = rhs.get_r_g_0();
