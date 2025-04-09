@@ -117,7 +117,7 @@ void Person::set_age_class(const int &value) {
   }
 }
 
-void Person::set_moving_level(const int &value) {
+void Person::set_moving_level(int value) {
   if (moving_level_ != value) {
     notify_change(MOVING_LEVEL, &moving_level_, &value);
     moving_level_ = value;

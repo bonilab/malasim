@@ -372,7 +372,7 @@ void Population::generate_individual(int location, int age_class) {
   person->update_relative_biting_rate();
 
   // Cache the moving level to avoid repeated lookups
-  const auto& movement_settings = Model::get_config()->get_movement_settings();
+  auto &movement_settings = Model::get_config()->get_movement_settings();
   person->set_moving_level(
       movement_settings.get_moving_level_generator().draw_random_level(Model::get_random()));
 
@@ -386,7 +386,7 @@ void Population::generate_individual(int location, int age_class) {
   // Get current values once to avoid repeated calls
   const auto current_relative_biting_rate = person->get_current_relative_biting_rate();
   const auto moving_level = person->get_moving_level();
-  const auto& moving_level_value = movement_settings.get_v_moving_level_value()[moving_level];
+  const auto &moving_level_value = movement_settings.get_v_moving_level_value()[moving_level];
 
   individual_relative_biting_by_location_[location].push_back(current_relative_biting_rate);
   individual_relative_moving_by_location_[location].push_back(moving_level_value);

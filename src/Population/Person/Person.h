@@ -95,7 +95,7 @@ public:
 
   void set_age_class(const int &value);
 
-  void set_moving_level(const int &value);
+  void set_moving_level(int value);
 
   ImmuneSystem* get_immune_system() { return immune_system_.get(); }
 

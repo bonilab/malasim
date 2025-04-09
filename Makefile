@@ -58,7 +58,9 @@ generate-ninja gn:
 coverage:
 	./build/bin/malasim_test
 	xcrun llvm-profdata merge -sparse default.profraw -o coverage.profdata
+	xcrun llvm-cov show ./build/bin/malasim_test -instr-profile=coverage.profdata -format=html -output-dir=coverage-html --path-equivalence=/Users/neo/Projects/temple/malasim,.
 	xcrun llvm-cov report  ./build/bin/malasim_test -instr-profile=coverage.profdata
+
 
 format:
 	find src tests -name '*.cpp' -o -name '*.h' | xargs clang-format -i --style=file
