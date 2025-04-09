@@ -400,7 +400,7 @@ void Population::generate_individual(int location, int age_class) {
 
 void Population::introduce_initial_cases() {
   if (Model::get_instance() != nullptr) {
-    // update current foi
+    // Reset and calculate FOI based on the current population state (pre-infection introduction).
     update_current_foi();
     // std::cout << Model::CONFIG->initial_parasite_info().size() << std::endl;
     for (const auto p_info :
@@ -416,7 +416,7 @@ void Population::introduce_initial_cases() {
       //           num_of_infections, p_info.location);
       introduce_parasite(p_info.location, genotype, num_of_infections);
     }
-    // update current foi
+    // Recalculate FOI to account for newly introduced infections.
     update_current_foi();
 
     // update force of infection for N days
@@ -433,22 +433,19 @@ void Population::introduce_initial_cases() {
 
 void Population::introduce_parasite(const int &location, Genotype* parasite_type,
                                     const int &num_of_infections) {
-  if (Model::get_instance() != nullptr) {
-    if (Model::get_population()->all_alive_persons_by_location_[location].empty()) {
-      // spdlog::debug("introduce_parasite all_alive_persons_by_location location {} is empty",
-      // location);
-      return;
-    }
-    auto persons_bitten_today = Model::get_random()->roulette_sampling<Person>(
-        num_of_infections,
-        Model::get_population()->individual_relative_biting_by_location_[location],
-        Model::get_population()->all_alive_persons_by_location_[location], false);
-
-    for (auto* person : persons_bitten_today) { initial_infection(person, parasite_type); }
+  if (all_alive_persons_by_location_[location].empty()) {
+    // spdlog::debug("introduce_parasite all_alive_persons_by_location location {} is empty",
+    // location);
+    return;
   }
+  auto persons_bitten_today = Model::get_random()->roulette_sampling<Person>(
+      num_of_infections, individual_relative_biting_by_location_[location],
+      all_alive_persons_by_location_[location], false);
+
+  for (auto* person : persons_bitten_today) { setup_initial_infection(person, parasite_type); }
 }
 
-void Population::initial_infection(Person* person, Genotype* parasite_type) const {
+void Population::setup_initial_infection(Person* person, Genotype* parasite_type) {
   person->get_immune_system()->set_increase(true);
   person->set_host_state(Person::ASYMPTOMATIC);
 
@@ -695,27 +692,27 @@ bool Population::has_0_case() {
 
 void Population::update_all_individuals() {
   // update all individuals
-  // auto* pi = get_person_index<PersonIndexByLocationStateAgeClass>();
-  // for (int loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-  //   for (int hs = 0; hs < Person::DEAD; hs++) {
-  //     for (int ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
-  //       for (auto* person : pi->vPerson()[loc][hs][ac]) { person->update(); }
-  //     }
-  //   }
-  // }
-  if (all_persons_ == nullptr) {
-    throw std::runtime_error("PersonIndexAll not found in Population::update_all_individuals");
-  }
-  for (auto &person_ptr : all_persons_->v_person()) {
-    if (person_ptr) {
-      if (person_ptr->get_host_state() == Person::DEAD) { continue; }
-      person_ptr->update();
+  auto* pi = get_person_index<PersonIndexByLocationStateAgeClass>();
+  for (int loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (int hs = 0; hs < Person::DEAD; hs++) {
+      for (int ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
+        for (auto* person : pi->vPerson()[loc][hs][ac]) { person->update(); }
+      }
     }
   }
+  // if (all_persons_ == nullptr) {
+  //   throw std::runtime_error("PersonIndexAll not found in Population::update_all_individuals");
+  // }
+  // for (auto &person_ptr : all_persons_->v_person()) {
+  //   if (person_ptr) {
+  //     if (person_ptr->get_host_state() == Person::DEAD) { continue; }
+  //     person_ptr->update();
+  //   }
+  // }
 }
 
 // TODO: it should be called "execute_all_individual_events" for an input time
-void Population::update_all_individual_events() {
+void Population::execute_all_individual_events(int up_to_time) {
   if (all_persons_ == nullptr) {
     throw std::runtime_error(
         "PersonIndexAll not found in Population::update_all_individual_events");
@@ -723,7 +720,7 @@ void Population::update_all_individual_events() {
   for (auto &person_ptr : all_persons_->v_person()) {
     if (person_ptr) {  // Optional check for the unique_ptr itself
       if (person_ptr->get_host_state() == Person::DEAD) { continue; }
-      person_ptr->update_events(Model::get_scheduler()->current_time());
+      person_ptr->update_events(up_to_time);
     }
   }
 }
@@ -760,26 +757,23 @@ void Population::update_current_foi() {
         for (auto* person : (pi->vPerson()[location][hs][ac])) {
           double log_10_total_infectious_density =
               person->get_all_clonal_parasite_populations()->log10_total_infectious_density();
-
+          const auto person_relative_biting_rate = person->get_current_relative_biting_rate();
           auto individual_foi =
               log_10_total_infectious_density == ClonalParasitePopulation::LOG_ZERO_PARASITE_DENSITY
                   ? 0.0
-                  : person->get_current_relative_biting_rate()
+                  : person_relative_biting_rate
                         * Person::relative_infectivity(log_10_total_infectious_density);
 
           individual_foi_by_location_[location].push_back(individual_foi);
-          individual_relative_biting_by_location_[location].push_back(
-              person->get_current_relative_biting_rate());
-          individual_relative_moving_by_location_[location].push_back(
-              Model::get_config()
-                  ->get_movement_settings()
-                  .get_v_moving_level_value()[person->get_moving_level()]);
-
-          sum_relative_biting_by_location_[location] += person->get_current_relative_biting_rate();
-          sum_relative_moving_by_location_[location] +=
+          individual_relative_biting_by_location_[location].push_back(person_relative_biting_rate);
+          const auto &moving_level_value =
               Model::get_config()
                   ->get_movement_settings()
                   .get_v_moving_level_value()[person->get_moving_level()];
+          individual_relative_moving_by_location_[location].push_back(moving_level_value);
+
+          sum_relative_biting_by_location_[location] += person_relative_biting_rate;
+          sum_relative_moving_by_location_[location] += moving_level_value;
           current_force_of_infection_by_location_[location] += individual_foi;
           all_alive_persons_by_location_[location].push_back(person);
           // spdlog::info("person {} individual_relative_biting_by_location[{}]

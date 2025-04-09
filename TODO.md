@@ -2,6 +2,8 @@
 # Review 
 - Check why Population initialize takes soo long.
 -  RandomTest.random_multinomial_DistributionMatchesMultinomial_ChiSquaredTest sometimes failed????
+
+- Write test for approx_norm_cdf to compare with GSL version
 -  Improve speed for RouletteTest.compare_with_multi_normial
 - location_based settings is not working yet
 

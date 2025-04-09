@@ -77,7 +77,7 @@ public:
   void introduce_parasite(const int &location, Genotype* parasite_type,
                           const int &num_of_infections);
 
-  void initial_infection(Person* person, Genotype* parasite_type) const;
+  static void setup_initial_infection(Person* person, Genotype* parasite_type);
 
   void persist_current_force_of_infection_to_use_n_days_later();
 
@@ -103,7 +103,7 @@ public:
 
   void update_all_individuals();
 
-  void update_all_individual_events();
+  void execute_all_individual_events(int up_to_time);
 
   void update_current_foi();
 

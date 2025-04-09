@@ -145,19 +145,20 @@ ClonalParasitePopulation* Person::add_new_parasite_to_blood(Genotype* parasite_t
 double Person::relative_infectivity(const double &log10_parasite_density) {
   if (log10_parasite_density == ClonalParasitePopulation::LOG_ZERO_PARASITE_DENSITY) return 0.0;
 
+  // Fetch relative infectivity settings once
+  const auto &relative_infectivity_settings =
+      Model::get_config()->get_epidemiological_parameters().get_relative_infectivity();
+
+  // Define baseline infectivity
+  const double baseline_infectivity = 0.01;
+
   // this sigma has already taken 'ln' and 'log10' into account
-  const auto d_n = (log10_parasite_density
-                    * Model::get_config()
-                          ->get_epidemiological_parameters()
-                          .get_relative_infectivity()
-                          .get_sigma())
-                   + Model::get_config()
-                         ->get_epidemiological_parameters()
-                         .get_relative_infectivity()
-                         .get_ro_star();
+  const auto d_n = (log10_parasite_density * relative_infectivity_settings.get_sigma())
+                   + relative_infectivity_settings.get_ro_star();
+
   const auto prob = Model::get_random()->cdf_standard_normal_distribution(d_n);
 
-  auto result = (prob * prob) + 0.01;
+  auto result = (prob * prob) + baseline_infectivity;
   return result > 1.0 ? 1.0 : result;
 }
 

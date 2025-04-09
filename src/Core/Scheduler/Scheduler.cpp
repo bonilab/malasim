@@ -48,7 +48,7 @@ void Scheduler::daily_update() {
     world_events_.execute_events(current_time_);
 
     // Update individual events through the population
-    Model::get_population()->update_all_individual_events();
+    Model::get_population()->execute_all_individual_events(current_time_);
   }
 }
 
