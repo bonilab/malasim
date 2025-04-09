@@ -5,7 +5,7 @@
 #include "spdlog/spdlog.h"
 
 int main(int argc, char** argv) {
-  Logger::Instance().Initialize(spdlog::level::info);
+  Logger::initialize(spdlog::level::info);
   utils::Cli::get_instance().parse(argc, argv);
   if (Model::get_instance()->initialize()) {
     Model::get_instance()->run();

@@ -8,7 +8,7 @@
 // Define a test environment to initialize spdlog•¶
 class SpdlogEnvironment : public ::testing::Environment {
 public:
-  void SetUp() override { Logger::Instance().Initialize(spdlog::level::info); }
+  void SetUp() override { Logger::instance().initialize(spdlog::level::info); }
 
   void TearDown() override { spdlog::shutdown(); }
 };
