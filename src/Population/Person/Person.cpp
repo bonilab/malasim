@@ -48,10 +48,10 @@ void Person::initialize() {
 
   drugs_in_blood_->init();
 
-  today_infections_ = std::vector<int>();
-  today_target_locations_ = std::vector<int>();
+  today_infections_.clear();
+  today_target_locations_.clear();
+  starting_drug_values_for_mac_.clear();
 
-  starting_drug_values_for_mac_ = std::map<int, double>();
   innate_relative_biting_rate_ = 0;
   current_relative_biting_rate_ = 0;
 }

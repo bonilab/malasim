@@ -9,8 +9,8 @@
 #define MARSHALLSM_HXX
 
 #include "Spatial/SpatialModel.hxx"
-#include "Utils/Helpers/NumberHelpers.hxx"
-#include "Utils/TypeDef.hxx"
+#include "Utils/Helpers/NumberHelpers.h"
+#include "Utils/TypeDef.h"
 
 namespace Spatial {
 class MarshallSM : public SpatialModel {

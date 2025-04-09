@@ -6,7 +6,7 @@
 #include <spdlog/spdlog.h>
 
 #include "IConfigData.h"
-#include "Utils/YamlFile.hxx"
+#include "Utils/YamlFile.h"
 #include "Utils/Random.h"
 
 class ModelSettings : public IConfigData {

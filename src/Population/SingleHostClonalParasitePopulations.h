@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "Population/ClonalParasitePopulation.h"
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 class ClonalParasitePopulation;
 
 class Person;

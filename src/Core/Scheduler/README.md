@@ -56,7 +56,7 @@ scheduler.run();
 
 - Requires a `Model` instance for simulation context
 - Uses the `date` library for calendar operations
-- Relies on event-related types defined in `Utils/TypeDef.hxx`
+- Relies on event-related types defined in `Utils/TypeDef.h`
 
 ## Notes
 

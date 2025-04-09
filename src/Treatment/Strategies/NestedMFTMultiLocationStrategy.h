@@ -2,7 +2,7 @@
 #define POMS_NESTEDSWITCHINGDIFFERENTDISTRIBUTIONBYLOCATION_H
 
 #include "IStrategy.h"
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 class Config;
 

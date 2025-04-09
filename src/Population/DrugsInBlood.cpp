@@ -4,7 +4,7 @@
 #include "Population/Person/Person.h"
 #include "Treatment/Therapies/Drug.h"
 #include "Treatment/Therapies/DrugType.h"
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 #ifndef DRUG_CUT_OFF_VALUE
 #define DRUG_CUT_OFF_VALUE 0.1

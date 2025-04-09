@@ -6,7 +6,7 @@
 #include <filesystem>
 
 #include "Simulation/Model.h"
-#include "Utils/Cli.hxx"
+#include "Utils/Cli.h"
 
 int inline get_pipe_count(const std::string &str) {
   int pipe_count = 0;

@@ -16,7 +16,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 class IStrategy;
 

@@ -3,7 +3,7 @@
 
 #include "ParasiteDensity/ParasiteDensityUpdateFunction.h"
 #include "Treatment/Therapies/DrugType.h"
-#include "Utils/Index/Indexer.hxx"
+#include "Utils/Index/Indexer.h"
 
 class Therapy;
 

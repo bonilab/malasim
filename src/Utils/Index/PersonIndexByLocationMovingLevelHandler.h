@@ -8,7 +8,7 @@
 #ifndef PERSONINDEXBYLOCATIONMOVINGLEVELHANDLER_H
 #define    PERSONINDEXBYLOCATIONMOVINGLEVELHANDLER_H
 
-#include "Utils/Index/Indexer.hxx"
+#include "Utils/Index/Indexer.h"
 
 class PersonIndexByLocationMovingLevelHandler : public utils::Indexer {
   //disable copy and assign

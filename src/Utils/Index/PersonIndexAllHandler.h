@@ -2,7 +2,7 @@
 #ifndef PERSONINDEXALLHANDLER_H
 #define    PERSONINDEXALLHANDLER_H
 
-#include "Indexer.hxx"
+#include "Indexer.h"
 
 class PersonIndexAllHandler : public utils::Indexer {
 public:

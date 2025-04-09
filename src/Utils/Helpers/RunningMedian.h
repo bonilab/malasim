@@ -1,5 +1,5 @@
 /**
- * RunningMedian.hxx
+ * RunningMedian.h
  *
  * This template implements a running median using two priority queues. When
  * calculating the median for a large block of values (e.g., across the

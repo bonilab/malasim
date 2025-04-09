@@ -1,6 +1,6 @@
 #include "Core/Scheduler/Scheduler.h"
 #include "Simulation/Model.h"
-#include "Utils/Cli.hxx"
+#include "Utils/Cli.h"
 #include "Utils/Logger.h"
 #include "spdlog/spdlog.h"
 

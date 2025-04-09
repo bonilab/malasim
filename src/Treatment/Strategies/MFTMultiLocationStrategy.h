@@ -2,7 +2,7 @@
 #define POMS_MFTDIFFERENTDISTRIBUTIONBYLOCATIONSTRATEGY_H
 
 #include "IStrategy.h"
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 class MFTMultiLocationStrategy : public IStrategy {
   //disallow copy and assign and move

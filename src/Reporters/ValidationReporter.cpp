@@ -14,7 +14,7 @@
 #include "Simulation/Model.h"
 #include "Treatment/ITreatmentCoverageModel.h"
 #include "Utility/ReporterUtils.h"
-#include "Utils/Cli.hxx"
+#include "Utils/Cli.h"
 #include "Utils/Constants.h"
 #include "Utils/Index/PersonIndexByLocationStateAgeClass.h"
 #include "Utils/Random.h"

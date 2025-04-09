@@ -1,7 +1,7 @@
 #ifndef DRUGTYPE_H
 #define DRUGTYPE_H
 
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 struct ResistantAALocation {
   int chromosome_id { -1 };

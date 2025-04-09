@@ -9,7 +9,7 @@
 #include "Population/Person/Person.h"
 #include "Population/SingleHostClonalParasitePopulations.h"
 
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 Model::get_config()->number_of_locations()
 

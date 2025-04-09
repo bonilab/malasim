@@ -1,7 +1,7 @@
 #ifndef PERSONINDEXBYLOCATIONSTATEAGECLASS_H
 #define    PERSONINDEXBYLOCATIONSTATEAGECLASS_H
 
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 #include "Population/Person/Person.h"
 #include "PersonIndex.h"
 

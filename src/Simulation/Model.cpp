@@ -13,7 +13,7 @@
 #include "Reporters/Reporter.h"
 #include "Treatment/LinearTCM.h"
 #include "Treatment/SteadyTCM.h"
-#include "Utils/Cli.hxx"
+#include "Utils/Cli.h"
 
 bool Model::initialize() {
   config_ = std::make_unique<Config>();

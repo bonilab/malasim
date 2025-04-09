@@ -10,7 +10,7 @@
 #include "Population/SingleHostClonalParasitePopulations.h"
 #include "Simulation/Model.h"
 #include "Utils/Random.h"
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 Mosquito::Mosquito(Model* model) : model{model} {}
 

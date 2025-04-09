@@ -12,8 +12,8 @@
 #include <cmath>
 
 #include "Spatial/SpatialModel.hxx"
-#include "Utils/Helpers/NumberHelpers.hxx"
-#include "Utils/TypeDef.hxx"
+#include "Utils/Helpers/NumberHelpers.h"
+#include "Utils/TypeDef.h"
 
 namespace Spatial {
 class WesolowskiSurfaceSM : public SpatialModel {

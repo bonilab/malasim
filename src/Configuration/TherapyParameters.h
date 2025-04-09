@@ -9,7 +9,7 @@
 #include "IConfigData.h"
 #include "Treatment/Therapies/SCTherapy.h"
 #include "Treatment/Therapies/TherapyBuilder.h"
-#include "Utils/Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.h"
 
 class TherapyParameters: public IConfigData {
 public:

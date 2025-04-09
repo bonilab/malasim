@@ -7,7 +7,7 @@
 #include "Parasites/Genotype.h"
 #include "Simulation/Model.h"
 #include "SingleHostClonalParasitePopulations.h"
-#include "Utils/Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.h"
 
 ClonalParasitePopulation::ClonalParasitePopulation(Genotype* genotype) : genotype_(genotype) {}
 

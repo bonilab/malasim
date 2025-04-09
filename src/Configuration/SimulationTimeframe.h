@@ -5,7 +5,7 @@
 #include <spdlog/spdlog.h>
 
 #include "IConfigData.h"
-#include "Utils/YamlFile.hxx"
+#include "Utils/YamlFile.h"
 
 // Class to hold the simulation timeframe data
 class SimulationTimeframe : public IConfigData{

@@ -5,7 +5,7 @@
 #include "Configuration/Config.h"
 #include "Genotype.h"
 #include "Simulation/Model.h"
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 // Define the default constructor here
 GenotypeDatabase::GenotypeDatabase() = default;

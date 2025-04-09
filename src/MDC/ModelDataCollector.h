@@ -8,7 +8,7 @@
 #ifndef MODELDATACOLLECTOR_H
 #define MODELDATACOLLECTOR_H
 
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 class Model;
 

@@ -1,7 +1,7 @@
 #ifndef MULTINOMIALDISTRIBUTIONGENERATOR_H
 #define MULTINOMIALDISTRIBUTIONGENERATOR_H
 
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 namespace utils {
 class Random;

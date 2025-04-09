@@ -6,7 +6,7 @@
 #include "Core/Scheduler/Scheduler.h"
 #include "Simulation/Model.h"
 #include "Treatment/Therapies/DrugDatabase.h"
-#include "Utils/Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.h"
 
 Genotype::Genotype(const std::string &in_aa_sequence) : aa_sequence{in_aa_sequence} {
   // create aa structure

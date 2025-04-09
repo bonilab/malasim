@@ -10,7 +10,7 @@
 #include <spdlog/spdlog.h>
 
 #include "Spatial/GIS/AscFile.h"
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 namespace Spatial {
 class SpatialModel {

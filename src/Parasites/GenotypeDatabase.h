@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 class Genotype;
 class Config;

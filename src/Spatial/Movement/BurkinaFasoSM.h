@@ -13,7 +13,7 @@
 #include <utility>
 
 #include "Spatial/SpatialModel.hxx"
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 
 namespace Spatial {
 class BurkinaFasoSM : public SpatialModel {

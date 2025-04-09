@@ -1,7 +1,7 @@
 #ifndef PERSONINDEXBYLOCATIONMOVINGLEVEL_H
 #define    PERSONINDEXBYLOCATIONMOVINGLEVEL_H
 
-#include "Utils/TypeDef.hxx"
+#include "Utils/TypeDef.h"
 #include "Population/Person/Person.h"
 #include "PersonIndex.h"
 

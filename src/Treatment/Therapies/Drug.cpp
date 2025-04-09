@@ -5,7 +5,7 @@
 #include "Configuration/Config.h"
 #include "Utils/Random.h"
 #include "Core/Scheduler/Scheduler.h"
-#include "Utils/Helpers/NumberHelpers.hxx"
+#include "Utils/Helpers/NumberHelpers.h"
 #include "Parasites/Genotype.h"
 #include "Simulation/Model.h"
 #include "Population/Person/Person.h"

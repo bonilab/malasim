@@ -16,7 +16,7 @@
 #include "Population/Population.h"
 #include "Simulation/Model.h"
 #include "Spatial/GIS/SpatialData.h"
-#include "Utils/Helpers/RunningMedian.hxx"
+#include "Utils/Helpers/RunningMedian.h"
 #include "Utils/Index/PersonIndexByLocationStateAgeClass.h"
 #include "spdlog/sinks/basic_file_sink.h"
 

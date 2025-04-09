@@ -6,7 +6,8 @@
 
 #include "Population/Person/Person.h"
 
-using PersonUniquePtrVector = std::vector<std::unique_ptr<Person>>;
+using PersonUniquePtr = std::unique_ptr<Person>;
+using PersonUniquePtrVector = std::vector<PersonUniquePtr>;
 
 class PersonIndexAll {
 public:
@@ -21,7 +22,7 @@ public:
 
   PersonUniquePtrVector &v_person() { return v_person_; }
 
-  void add(std::unique_ptr<Person> person);
+  void add(PersonUniquePtr person);
 
   void remove(Person* person);
 

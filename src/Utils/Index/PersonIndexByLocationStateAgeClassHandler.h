@@ -8,7 +8,7 @@
 #ifndef PERSONINDEXBYLOCATIONSTATEAGECLASSHANDLER_H
 #define    PERSONINDEXBYLOCATIONSTATEAGECLASSHANDLER_H
 
-#include "Indexer.hxx"
+#include "Indexer.h"
 
 class PersonIndexByLocationStateAgeClassHandler : public utils::Indexer {
   //disable copy and assign

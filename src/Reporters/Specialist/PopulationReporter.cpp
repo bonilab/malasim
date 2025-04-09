@@ -10,7 +10,7 @@
 #include "Configuration/Config.h"
 #include "Core/Scheduler/Scheduler.h"
 #include "Spatial/GIS/SpatialData.h"
-#include "Utils/Helpers/RunningMedian.hxx"
+#include "Utils/Helpers/RunningMedian.h"
 #include "MDC/ModelDataCollector.h"
 #include "Simulation/Model.h"
 #include "Population/ImmuneSystem/ImmuneSystem.h"

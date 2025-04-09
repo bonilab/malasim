@@ -12,7 +12,7 @@
 #include "Treatment/ITreatmentCoverageModel.h"
 #include "Treatment/Strategies/IStrategy.h"
 #include "Utility/ReporterUtils.h"
-#include "Utils/Cli.hxx"
+#include "Utils/Cli.h"
 #include "Utils/Constants.h"
 #include "Utils/Index/PersonIndexByLocationStateAgeClass.h"
 #include "Utils/Random.h"

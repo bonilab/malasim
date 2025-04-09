@@ -155,9 +155,9 @@ public:
   }
 
 private:
-  // std::vector<Person*> persons_;
-  std::unique_ptr<PersonIndexPtrList> person_index_list_{nullptr};
   std::unique_ptr<PersonIndexAll> all_persons_{nullptr};
+
+  std::unique_ptr<PersonIndexPtrList> person_index_list_{nullptr};
   IntVector popsize_by_location_;
 
   std::vector<std::vector<double>> individual_foi_by_location_;

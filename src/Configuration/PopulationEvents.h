@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include "date/date.h"
-#include "Utils/YamlFile.hxx"
+#include "Utils/YamlFile.h"
 #include <stdexcept>
 #include "Events/Environment/EnvironmentEventBuilder.h"
 #include "Events/Population/PopulationEventBuilder.h"
