@@ -23,9 +23,6 @@ compile_commands.json
 # Ignore test binaries
 tests/runTests
 
-# Ignore documentation output
-docs/html/
-
 # Ignore the backups of diagrams
 documentation/diagrams/*.~vsdx
 

@@ -56,6 +56,7 @@ generate-ninja gn:
 	cp $(PWD)build/compile_commands.json $(PWD)
 
 coverage:
+	rm -rf coverage-html
 	./build/bin/malasim_test
 	xcrun llvm-profdata merge -sparse default.profraw -o coverage.profdata
 	xcrun llvm-cov show ./build/bin/malasim_test -instr-profile=coverage.profdata -format=html -output-dir=coverage-html --path-equivalence=/Users/neo/Projects/temple/malasim,.
