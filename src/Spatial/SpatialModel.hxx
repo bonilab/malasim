@@ -14,6 +14,7 @@
 
 namespace Spatial {
 class SpatialModel {
+public:
   SpatialModel(SpatialModel const &) = delete;
   void operator=(SpatialModel const &) = delete;
   SpatialModel(SpatialModel &&) = delete;

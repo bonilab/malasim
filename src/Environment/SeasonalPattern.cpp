@@ -6,6 +6,10 @@
 #include "Spatial/GIS/SpatialData.h"
 
 void SeasonalPattern::build(SpatialData* spatial_data) {
+  if (Model::get_config()->get_spatial_settings().get_mode() == SpatialSettings::LOCATION_BASED_MODE) {
+    spdlog::error("Seasonal pattern is not supported for location-based mode.");
+    throw std::runtime_error("Seasonal pattern is not supported for location-based mode.");
+  }
   admin_level_id = spatial_data->get_admin_level_id(admin_level);
   if (admin_level_id == -1) {
     throw std::invalid_argument("The admin level parameter is invalid.");

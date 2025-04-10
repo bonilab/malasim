@@ -1,7 +1,5 @@
 #include "Mosquito.h"
 
-#include <algorithm>
-
 #include "Configuration/Config.h"
 #include "Core/Scheduler/Scheduler.h"
 #include "MDC/ModelDataCollector.h"
@@ -109,14 +107,14 @@ void Mosquito::infect_new_cohort_in_PRMC(Config* config, utils::Random* random,
         }
 
         // TODO: review if condition?
-        if (interrupted_feeding_indices[if_index]) {
+        if (interrupted_feeding_indices[if_index] != 0U) {
           // if second person is the same as first person, re-select second person until it is
           // different from first. this is to avoid recombination between the same person because in
           // this case the interrupted feeding is true, this is worst case scenario
           auto temp_if = if_index;
           int same_person_counter = 0;
           while (second_sampling[temp_if] == first_sampling[if_index]) {
-            temp_if = random->random_uniform(second_sampling.size());
+            temp_if = static_cast<int>(random->random_uniform(second_sampling.size()));
             if (second_sampling[temp_if] == first_sampling[if_index]) { same_person_counter++; }
             if (same_person_counter > 10) {
               spdlog::trace(
@@ -144,13 +142,13 @@ void Mosquito::infect_new_cohort_in_PRMC(Config* config, utils::Random* random,
 
         std::tuple<Genotype*, double> second_genotype = std::make_tuple(nullptr, 0.0);
 
-        if (interrupted_feeding_indices[if_index]) {
+        if (interrupted_feeding_indices[if_index] != 0U) {
           // if second person is the same as first person, re-select second person until it is
           // different from first. this is to avoid recombination between the same person because in
           // this case the interrupted feeding is true, this is worst case scenario
           auto temp_if = if_index;
           while (second_sampling[temp_if] == first_sampling[if_index]) {
-            temp_if = random->random_uniform(second_sampling.size());
+            temp_if = static_cast<int>(random->random_uniform(second_sampling.size()));
           }
           sampled_genotypes.clear();
           relative_infectivity_each_pp.clear();
@@ -227,6 +225,9 @@ std::vector<unsigned int> Mosquito::build_interrupted_feeding_indices(
   std::vector<unsigned int> all_interrupted_feeding(number_of_interrupted_feeding, 1);
   all_interrupted_feeding.resize(prmc_size, 0);
 
+  // spdlog::info("Number of interrupted feeding: {}", number_of_interrupted_feeding);
+  // spdlog::info("Interrupted feeding rate: {}", interrupted_feeding_rate);
+  // spdlog::info("PRMC size: {}", prmc_size);
   random->shuffle(all_interrupted_feeding);
   return all_interrupted_feeding;
 }
@@ -271,7 +272,7 @@ std::vector<std::string> Mosquito::split_string(std::string str, char delimiter)
 std::string Mosquito::get_old_genotype_string(std::string new_genotype) {
   std::vector<std::string> pattern_chr = split_string(new_genotype, '|');
   std::string old_chr_7 = pattern_chr[6].substr(0, 7);
-  std::string old_chr_5 = pattern_chr[4];
+  const std::string &old_chr_5 = pattern_chr[4];
   std::string old_chr_13 = pattern_chr[12].substr(0, 13);
   std::string old_chr_14 = pattern_chr[13].substr(0, 1);
   std::string old_chr_x = pattern_chr[6].substr(6, 1);
@@ -281,7 +282,7 @@ std::string Mosquito::get_old_genotype_string(std::string new_genotype) {
 std::string Mosquito::get_old_genotype_string2(std::string new_genotype) {
   std::vector<std::string> pattern_chr = split_string(new_genotype, '|');
   std::string old_chr_7 = pattern_chr[6].substr(0, 7);
-  std::string old_chr_5 = pattern_chr[4];
+  const std::string &old_chr_5 = pattern_chr[4];
   std::string old_chr_13 = pattern_chr[12].substr(0, 13);
   std::string old_chr_14 = pattern_chr[13].substr(0, 1);
   std::string old_chr_x = pattern_chr[6].substr(6, 1);

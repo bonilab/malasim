@@ -88,7 +88,7 @@ public:
   }
 
   void process_config() override {}
-  void process_config_using_locations(std::vector<Spatial::Location> locations);
+  void process_config_using_locations(std::vector<Spatial::Location>& locations);
 
 private:
   MosquitoConfig mosquito_config_;

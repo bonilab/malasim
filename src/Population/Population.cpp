@@ -590,6 +590,7 @@ void Population::perform_circulation_event() {
   //  get number of circulations based on size * circulation_percent
   //  distributes that number into others location based of other location size
   //  for each number in that list select an individual, and schedule a movement event on next day
+  // if (Model::get_config()->number_of_locations() == 1) { return; }
   PersonPtrVector today_circulations;
 
   std::vector<int> v_number_of_residents_by_location(Model::get_config()->number_of_locations(), 0);

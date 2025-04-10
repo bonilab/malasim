@@ -6,6 +6,11 @@
 - Write test for approx_norm_cdf to compare with GSL version
 -  Improve speed for RouletteTest.compare_with_multi_normial
 - location_based settings is not working yet
+- need rework on spatial data and the order of parsing method
+- review void MosquitoParameters::process_config_using_locations(std::vector<Spatial::Location>& locations)
+
+- need rework on BurkinaFasoSM or other SM to support single location / location based
+
 
 - p_infection_from_infectious_bite biology validation
 - relative_infectivity biology validation

@@ -52,22 +52,7 @@ private:
   std::vector<std::vector<double>> kernel_;
 
   // Precompute the kernel function for the movement model
-  void prepare_kernel() {
-    // Prepare the kernel object
-    kernel_.resize(number_of_locations_);
-
-    // Iterate through all the locations and calculate the kernel
-    for (auto source = 0UL; source < number_of_locations_; source++) {
-      kernel_[source].resize(number_of_locations_);
-      for (auto destination = 0UL; destination < number_of_locations_; destination++) {
-        // spdlog::info(
-        //     "Calculating kernel for source {} and destination {} spatial_distance {}",
-        //     source, destination, spatial_distance_matrix_[source][destination]);
-        kernel_[source][destination] =
-            std::pow(1 + (spatial_distance_matrix_[source][destination] / rho_), (-alpha_));
-      }
-    }
-  }
+  void prepare_kernel();
 
 public:
   explicit BurkinaFasoSM(double tau, double alpha, double rho, double capital, double penalty,

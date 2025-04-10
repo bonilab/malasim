@@ -2,9 +2,10 @@
 
 #include "Simulation/Model.h"
 
-void MosquitoParameters::process_config_using_locations(std::vector<Spatial::Location> locations) {
+void MosquitoParameters::process_config_using_locations(std::vector<Spatial::Location>& locations) {
   spdlog::info("Processing MosquitoParameters");
-  if (get_mosquito_config().get_mode() == "grid_based") {
+  if (get_mosquito_config().get_mode() == SpatialSettings::GRID_BASED_MODE) {
+    spdlog::info("Processing MosquitoParameters using grid based mode");
     AscFile* raster =
         Model::get_spatial_data()->get_raster(SpatialData::SpatialFileType::ECOCLIMATIC);
     if (raster == nullptr) {
@@ -26,7 +27,8 @@ void MosquitoParameters::process_config_using_locations(std::vector<Spatial::Loc
       }
     }
   }
-  if (get_mosquito_config().get_mode() == "location_based") {
+  if (get_mosquito_config().get_mode() == SpatialSettings::LOCATION_BASED_MODE) {
+    spdlog::info("Processing MosquitoParameters using location based mode");
     LocationBased location_based = get_mosquito_config().get_location_based();
     if (location_based.get_interrupted_feeding_rate().size() == 1) {
       spdlog::info("1 IFR value provided, distributing equally to all locations");
