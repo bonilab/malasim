@@ -98,9 +98,9 @@ public:
 private:
   bool enable_ = false;
   std::string mode_;
-  std::unique_ptr<SeasonalEquation> seasonal_equation_;
-  std::unique_ptr<SeasonalRainfall> seasonal_rainfall_;
-  std::unique_ptr<SeasonalPattern> seasonal_pattern_;
+  std::unique_ptr<SeasonalEquation> seasonal_equation_{nullptr};
+  std::unique_ptr<SeasonalRainfall> seasonal_rainfall_{nullptr};
+  std::unique_ptr<SeasonalPattern> seasonal_pattern_{nullptr};
 };
 
 namespace YAML {

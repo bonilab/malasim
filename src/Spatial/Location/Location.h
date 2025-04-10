@@ -1,7 +1,6 @@
 #ifndef SPATIAL_LOCATION_H
 #define SPATIAL_LOCATION_H
 
-#include <memory>
 #include <ostream>
 #include <vector>
 
@@ -15,27 +14,17 @@ namespace Spatial {
  * the data
  */
 
-class Location {
+struct Location {
 public:
-  int id;
-  int population_size;
-  float beta;
-  float p_treatment_under_5;
-  float p_treatment_over_5;
-  int mosquito_size;
-  double mosquito_ifr;
-  std::unique_ptr<Coordinate> coordinate;
+  int id{0};
+  int population_size{0};
+  float beta{0};
+  float p_treatment_under_5{0};
+  float p_treatment_over_5{0};
+  int mosquito_size{0};
+  double mosquito_ifr{0};
+  Coordinate coordinate{.latitude = 0, .longitude = 0};
   std::vector<double> age_distribution;
-
-public:
-  Location();
-
-  Location(int id, float latitude, float longitude, int population_size);
-
-  virtual ~Location();
-
-  Location(const Location &org);
-  Location &operator=(const Location &other);
 
   friend std::ostream &operator<<(std::ostream &os, const Location &location);
 };

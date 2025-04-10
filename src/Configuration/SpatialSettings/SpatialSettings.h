@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "IConfigData.h"
+#include "Configuration/IConfigData.h"
 #include "Spatial/Location/Location.h"
 
 // Class for SpatialSettings
@@ -154,14 +154,6 @@ public:
     int number_of_locations_ = 0;
   };
 
-  void set_age_distribution_by_location(const std::vector<std::vector<double>> &value) {
-    age_distribution_by_location_ = value;
-  }
-
-  [[nodiscard]] const std::vector<std::vector<double>> &get_age_distribution_by_location() const {
-    return age_distribution_by_location_;
-  }
-
   // Getters and Setters for mode
   [[nodiscard]] const std::string &get_mode() const { return mode_; }
   void set_mode(const std::string &value) { mode_ = value; }
@@ -192,16 +184,20 @@ public:
 
   void process_config() override;
 
-  std::vector<Spatial::Location> location_db;
+  [[nodiscard]] std::vector<Spatial::Location> &location_db() { return location_db_; }
+
+  static constexpr std::string GRID_BASED_MODE = "grid_based";
+  static constexpr std::string LOCATION_BASED_MODE = "location_based";
 
 private:
   std::string mode_;  // "grid_based" or "location_based"
   GridBased grid_based_;
   LocationBased location_based_;
-  std::vector<std::vector<double>> spatial_distance_matrix_;
-  std::vector<std::vector<double>> age_distribution_by_location_;
-  int number_of_location_ = 0;
   YAML::Node node_;
+
+  std::vector<std::vector<double>> spatial_distance_matrix_;
+  int number_of_location_ = 0;
+  std::vector<Spatial::Location> location_db_;
 };
 
 namespace YAML {
@@ -261,8 +257,8 @@ struct convert<Spatial::Location> {
   static Node encode(const Spatial::Location &rhs) {
     Node node;
     node.push_back(rhs.id);
-    node.push_back(rhs.coordinate->latitude);
-    node.push_back(rhs.coordinate->longitude);
+    node.push_back(rhs.coordinate.latitude);
+    node.push_back(rhs.coordinate.longitude);
     return node;
   }
 
@@ -271,8 +267,7 @@ struct convert<Spatial::Location> {
       throw std::runtime_error("Invalid location info.");
     }
     rhs.id = node[0].as<int>();
-    rhs.coordinate =
-        std::make_unique<Spatial::Coordinate>(node[1].as<float>(), node[2].as<float>());
+    rhs.coordinate = Spatial::Coordinate(node[1].as<float>(), node[2].as<float>());
     return true;
   }
 };
@@ -307,6 +302,7 @@ struct convert<SpatialSettings::LocationBased> {
         node["p_treatment_over_5_by_location"].as<std::vector<double>>());
     rhs.set_beta_by_location(node["beta_by_location"].as<std::vector<double>>());
     rhs.set_population_size_by_location(node["population_size_by_location"].as<std::vector<int>>());
+    spdlog::info("Location based settings decoded successfully");
     return true;
   }
 };
@@ -325,7 +321,8 @@ struct convert<SpatialSettings> {
   static bool decode(const Node &node, SpatialSettings &rhs) {
     if (!node["mode"]) { throw std::runtime_error("Missing 'mode' field."); }
 
-    rhs.set_mode(node["mode"].as<std::string>());
+    auto mode = node["mode"].as<std::string>();
+    rhs.set_mode(mode);
 
     /* Here the configuration for spatial settings are parsed based on mode
      * The GridBased and LocationBased classes are used to store the configuration
@@ -333,18 +330,20 @@ struct convert<SpatialSettings> {
      * SpatialData class for GridBased. For LocationBased, the processing is done
      * in the process_config method of SpatialSettings class.
      */
-    if (rhs.get_mode() == "grid_based") {
-      if (!node["grid_based"]) { throw std::runtime_error("Missing 'grid_based' settings."); }
-      rhs.set_grid_based(node["grid_based"].as<SpatialSettings::GridBased>());
-      rhs.set_node(node["grid_based"]);
-    } else if (rhs.get_mode() == "location_based") {
-      if (!node["location_based"]) {
+    if (mode != SpatialSettings::GRID_BASED_MODE && mode != SpatialSettings::LOCATION_BASED_MODE) {
+      throw std::runtime_error("Unknown mode in 'spatial_settings'.");
+    }
+
+    if (mode == SpatialSettings::GRID_BASED_MODE) {
+      if (!node[SpatialSettings::GRID_BASED_MODE]) { throw std::runtime_error("Missing 'grid_based' settings."); }
+      rhs.set_grid_based(node[SpatialSettings::GRID_BASED_MODE].as<SpatialSettings::GridBased>());
+      rhs.set_node(node[SpatialSettings::GRID_BASED_MODE]);
+    } else if (mode == SpatialSettings::LOCATION_BASED_MODE) {
+      if (!node[SpatialSettings::LOCATION_BASED_MODE]) {
         throw std::runtime_error("Missing 'location_based' settings.");
       }
-      rhs.set_location_based(node["location_based"].as<SpatialSettings::LocationBased>());
-      rhs.set_node(node["location_based"]);
-    } else {
-      throw std::runtime_error("Unknown mode in 'spatial_settings'.");
+      rhs.set_location_based(node[SpatialSettings::LOCATION_BASED_MODE].as<SpatialSettings::LocationBased>());
+      rhs.set_node(node[SpatialSettings::LOCATION_BASED_MODE]);
     }
 
     return true;

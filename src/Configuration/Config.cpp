@@ -152,7 +152,7 @@ bool Config::load(const std::string &filename) {
     genotype_parameters_.process_config_with_number_of_locations(
         get_spatial_settings().get_number_of_locations());
     epidemiological_parameters_.process_config();
-    mosquito_parameters_.process_config_using_locations(get_spatial_settings().location_db);
+    mosquito_parameters_.process_config_using_locations(location_db());
     rapt_settings_.process_config_with_starting_date(
         get_simulation_timeframe().get_starting_date());
 
@@ -187,7 +187,7 @@ const std::vector<int> &Config::age_structure() const {
   return population_demographic_.get_age_structure();
 }
 
-std::vector<Spatial::Location> &Config::location_db() { return spatial_settings_.location_db; }
+std::vector<Spatial::Location> &Config::location_db() { return spatial_settings_.location_db(); }
 
 // std::vector<IStrategy *>& Config::strategy_db() {
 //   return strategy_parameters_.strategy_db;
@@ -294,15 +294,14 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate spatial settings
   ----------------------------*/
-  SpatialSettings spatial_settings = spatial_settings_;
   // Check if mode is either grid_based or location_based
-  if (spatial_settings.get_mode() != "grid_based"
-      && spatial_settings.get_mode() != "location_based") {
+  if (spatial_settings_.get_mode() != "grid_based"
+      && spatial_settings_.get_mode() != "location_based") {
     throw std::invalid_argument("Spatial mode should be either grid_based or location_based");
   }
   // If mode is grid_based, check if all raster file paths are provided
-  if (spatial_settings.get_mode() == "grid_based") {
-    const SpatialSettings::GridBased &grid_based = spatial_settings.get_grid_based();
+  if (spatial_settings_.get_mode() == "grid_based") {
+    const SpatialSettings::GridBased &grid_based = spatial_settings_.get_grid_based();
     if (grid_based.get_population_raster().empty() || grid_based.get_beta_raster().empty()
         || grid_based.get_p_treatment_over_5_raster().empty()
         || grid_based.get_p_treatment_under_5_raster().empty()) {
@@ -322,8 +321,8 @@ void Config::validate_all_cross_field_validations() {
     }
   }
   // Location based
-  if (spatial_settings.get_mode() == "location_based") {
-    const SpatialSettings::LocationBased &location_based = spatial_settings.get_location_based();
+  if (spatial_settings_.get_mode() == "location_based") {
+    const SpatialSettings::LocationBased &location_based = spatial_settings_.get_location_based();
     if (location_based.get_population_size_by_location().empty()
         || location_based.get_location_info().empty()
         || location_based.get_age_distribution_by_location().empty()
@@ -347,10 +346,16 @@ void Config::validate_all_cross_field_validations() {
       throw std::invalid_argument("All location sizes should be equal");
     }
     // Check if age_distribution_by_location size matched initial_age_structure size
-    if (location_based.get_age_distribution_by_location().size()
-        != population_demographic.get_initial_age_structure().size()) {
-      throw std::invalid_argument(
-          "Age distribution by location size should match initial age structure size");
+    for (auto i = 0; i < location_based.get_age_distribution_by_location().size(); i++) {
+      if (location_based.get_age_distribution_by_location()[i].size()
+          != population_demographic.get_initial_age_structure().size()) {
+        spdlog::error("Age distribution by location size: {}",
+                      location_based.get_age_distribution_by_location().size());
+        spdlog::error("Initial age structure size: {}",
+                      population_demographic.get_initial_age_structure().size());
+        throw std::invalid_argument(
+            "Age distribution by location size should match initial age structure size");
+      }
     }
   }
 
@@ -727,7 +732,7 @@ void Config::validate_all_cross_field_validations() {
     }
     // Check if all location sizes are equal
     const SpatialSettings::LocationBased &spatial_location_based =
-        spatial_settings.get_location_based();
+        spatial_settings_.get_location_based();
     if (location_based.get_interrupted_feeding_rate().size()
             != location_based.get_prmc_size().size()
         && location_based.get_interrupted_feeding_rate().size()
@@ -739,7 +744,6 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate population events
   ----------------------------*/
-  // PopulationEvents population_events = population_events_;
   // Loop through all events
   for (const auto &population_event : population_events_.get_events_raw()) {
     // Check if name is provided

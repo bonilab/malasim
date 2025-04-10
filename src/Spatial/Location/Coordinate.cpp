@@ -10,30 +10,22 @@
 
 namespace Spatial {
 
-Coordinate::Coordinate(float latitude, float longitude)
-    : latitude{latitude}, longitude{longitude} {}
-
-Coordinate::~Coordinate() {}
-
-double Coordinate::calculate_distance_in_km(const Coordinate &from,
-                                            const Coordinate &to) {
+double Coordinate::calculate_distance_in_km(const Coordinate &from, const Coordinate &to) {
   // using Haversine
-  double p = M_PI / 180;
-  int R = 6371;  // Radius of the Earth in km
-  double dLat = p * (from.latitude - to.latitude);
-  double dLon = p * (from.longitude - to.longitude);
-  double a = sin(dLat / 2) * sin(dLat / 2)
-             + cos(from.latitude * p) * cos(to.latitude * p) * sin(dLon / 2)
-                   * sin(dLon / 2);
-  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-  double result = R * c;
+  double pi = M_PI / 180;
+  int earth_radius = 6371;  // Radius of the Earth in km
+  double d_lat = pi * (from.latitude - to.latitude);
+  double d_lon = pi * (from.longitude - to.longitude);
+  double aa = (sin(d_lat / 2) * sin(d_lat / 2))
+              + (cos(from.latitude * pi) * cos(to.latitude * pi) * sin(d_lon / 2) * sin(d_lon / 2));
+  double cc = 2 * atan2(sqrt(aa), sqrt(1 - aa));
+  double result = earth_radius * cc;
 
   return result;
 }
 
 std::ostream &operator<<(std::ostream &os, const Coordinate &coordinate) {
-  os << "[latitude: " << coordinate.latitude
-     << " - longitude: " << coordinate.longitude << "]";
+  os << "[latitude: " << coordinate.latitude << " - longitude: " << coordinate.longitude << "]";
   return os;
 }
 }  // namespace Spatial

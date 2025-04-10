@@ -1,22 +1,21 @@
 #ifndef TRANSMISSION_SETTINGS_H
 #define TRANSMISSION_SETTINGS_H
 
-#include "IConfigData.h"
+#include <spdlog/spdlog.h>
 #include <yaml-cpp/yaml.h>
+
 #include <stdexcept>
+
+#include "IConfigData.h"
 
 class TransmissionSettings : public IConfigData {
 public:
   // Getter for transmission_parameter
-  [[nodiscard]] double get_transmission_parameter() const {
-    return transmission_parameter_;
-  }
+  [[nodiscard]] double get_transmission_parameter() const { return transmission_parameter_; }
 
   // Setter for transmission_parameter with validation
   void set_transmission_parameter(const double value) {
-    if (value <= 0)
-      throw std::invalid_argument(
-          "transmission_parameter must be greater than 0");
+    if (value <= 0) throw std::invalid_argument("transmission_parameter must be greater than 0");
     transmission_parameter_ = value;
   }
 
@@ -28,12 +27,11 @@ public:
   // Setter for p_infection_from_an_infectious_bite with validation
   void set_p_infection_from_an_infectious_bite(const double value) {
     if (value < 0 || value > 1)
-      throw std::invalid_argument(
-          "p_infection_from_an_infectious_bite must be between 0 and 1");
+      throw std::invalid_argument("p_infection_from_an_infectious_bite must be between 0 and 1");
     p_infection_from_an_infectious_bite_ = value;
   }
 
-  void process_config() override{
+  void process_config() override {
     spdlog::info("Processing TransmissionSettings");
     if (get_transmission_parameter() > 0.0) {
       spdlog::info("Using transmission_parameter: {}", get_transmission_parameter());
@@ -50,8 +48,7 @@ struct YAML::convert<TransmissionSettings> {
   static Node encode(const TransmissionSettings &rhs) {
     Node node;
     node["transmission_parameter"] = rhs.get_transmission_parameter();
-    node["p_infection_from_an_infectious_bite"] =
-        rhs.get_p_infection_from_an_infectious_bite();
+    node["p_infection_from_an_infectious_bite"] = rhs.get_p_infection_from_an_infectious_bite();
     return node;
   }
 
@@ -60,8 +57,7 @@ struct YAML::convert<TransmissionSettings> {
       throw std::runtime_error("Missing 'transmission_parameter' field.");
     }
     if (!node["p_infection_from_an_infectious_bite"]) {
-      throw std::runtime_error(
-          "Missing 'p_infection_from_an_infectious_bite' field.");
+      throw std::runtime_error("Missing 'p_infection_from_an_infectious_bite' field.");
     }
 
     rhs.set_transmission_parameter(node["transmission_parameter"].as<double>());

@@ -61,7 +61,12 @@ TEST_F(AdminManagerBasicOperationsTest, SetupDistrictBoundary) {
   EXPECT_NE(Model::get_config(), nullptr);
   EXPECT_EQ(Model::get_config()->number_of_locations(), 9);
   EXPECT_EQ(Model::get_config()->location_db().size(), 9);
-  EXPECT_NE(Model::get_config()->location_db()[0].coordinate, nullptr);
+
+  // coordinate is follow row and column
+  for (int i = 0; i < Model::get_config()->location_db().size(); i++) {
+    EXPECT_EQ(Model::get_config()->location_db()[i].coordinate.latitude, float(i / 3));
+    EXPECT_EQ(Model::get_config()->location_db()[i].coordinate.longitude, float(i % 3));
+  }
 
   auto raster = std::make_unique<AscFile>(*raw_raster);
   manager.setup_boundary("district", std::move(raster).get());

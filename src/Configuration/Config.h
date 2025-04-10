@@ -17,7 +17,7 @@
 #include "RaptSettings.h"
 #include "SeasonalitySettings.h"
 #include "SimulationTimeframe.h"
-#include "SpatialSettings.h"
+#include "SpatialSettings/SpatialSettings.h"
 #include "StrategyParameters.h"
 #include "TherapyParameters.h"
 #include "TransmissionSettings.h"

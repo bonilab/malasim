@@ -74,11 +74,11 @@ void Population::initialize() {
         std::vector<std::vector<double>>(Model::get_config()->number_of_tracking_days(),
                                          std::vector<double>(number_of_locations, 0));
 
-    // initalize other person index
+    // initalize person indexes
     initialize_person_indices();
 
     // Initialize population
-    auto &location_db = Model::get_config()->get_spatial_settings().location_db;
+    auto &location_db = Model::get_config()->location_db();
     for (auto loc = 0; loc < number_of_locations; loc++) {
       const auto popsize_by_location =
           static_cast<int>(location_db[loc].population_size
@@ -224,7 +224,7 @@ void Population::perform_infection_event() {
     const auto force_of_infection = force_of_infection_for_n_days_by_location_[tracking_index][loc];
     if (force_of_infection <= DBL_EPSILON) continue;
 
-    const auto new_beta = Model::get_config()->get_spatial_settings().location_db[loc].beta
+    const auto new_beta = Model::get_config()->location_db()[loc].beta
                           * Model::get_config()->get_seasonality_settings().get_seasonal_factor(
                               Model::get_scheduler()->get_calendar_date(), loc);
 

@@ -103,8 +103,8 @@ bool Model::initialize() {
 
     // Take ownership of the events from the config
     auto population_events = config_->get_population_events().release_events();
-    for (auto& event : population_events) {
-      if (event) { // Check if the pointer is valid before using
+    for (auto &event : population_events) {
+      if (event) {  // Check if the pointer is valid before using
         spdlog::info("Scheduling population event: {} at {}", event->name(), event->get_time());
         scheduler_->schedule_population_event(std::move(event));
       } else {
@@ -274,7 +274,7 @@ void Model::set_treatment_coverage(std::unique_ptr<ITreatmentCoverageModel> tcm)
 
 void Model::build_initial_treatment_coverage() {
   auto tcm_ptr = std::make_unique<SteadyTCM>();
-  for (const auto &location : config_->get_spatial_settings().location_db) {
+  for (const auto &location : config_->location_db()) {
     tcm_ptr->p_treatment_under_5.push_back(location.p_treatment_under_5);
     tcm_ptr->p_treatment_over_5.push_back(location.p_treatment_over_5);
   }

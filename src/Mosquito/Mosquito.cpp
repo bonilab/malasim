@@ -22,19 +22,19 @@ void Mosquito::initialize(Config* config) {
       std::vector<std::vector<Genotype*>>(config->number_of_locations(),
                                           std::vector<Genotype*>(100, nullptr)));
 
-  for (auto loc_index = 0; loc_index < config->get_spatial_settings().location_db.size();
-       ++loc_index) {
+  auto &location_db = config->location_db();
+  for (auto loc_index = 0; loc_index < location_db.size(); ++loc_index) {
     if (Model::get_population()->all_alive_persons_by_location()[loc_index].empty()) continue;
     for (auto day = 0; day < config->number_of_tracking_days(); ++day) {
-      genotypes_table[day][loc_index] = std::vector<Genotype*>(
-          config->get_spatial_settings().location_db[loc_index].mosquito_size, nullptr);
+      genotypes_table[day][loc_index] =
+          std::vector<Genotype*>(location_db[loc_index].mosquito_size, nullptr);
     }
   }
 }
 
 void Mosquito::infect_new_cohort_in_PRMC(Config* config, utils::Random* random,
                                          Population* population, const int &tracking_index) {
-  auto &location_db = config->get_spatial_settings().location_db;
+  auto &location_db = config->location_db();
   // for each location fill prmc at tracking_index row with sampling genotypes
   for (int loc = 0; loc < config->number_of_locations(); loc++) {
     if (!Model::get_population()->all_alive_persons_by_location()[loc].empty()) {

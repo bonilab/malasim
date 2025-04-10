@@ -42,8 +42,14 @@ TEST_F(LookupOperationsTest, GetAdminUnitForLocation) {
 }
 
 TEST_F(LookupOperationsTest, InvalidLocationHandling) {
-  EXPECT_THROW(manager.get_admin_unit("district", -1), std::out_of_range);
-  EXPECT_THROW(manager.get_admin_unit("district", 999), std::out_of_range);
+  EXPECT_THROW(
+    {
+      auto admin_unit = manager.get_admin_unit("district", -1);
+    }, std::out_of_range);
+  EXPECT_THROW(
+    {
+      auto admin_unit = manager.get_admin_unit("district", 999);
+    }, std::out_of_range);
 }
 
 TEST_F(LookupOperationsTest, GetLocationsInAdminUnit) {
@@ -58,7 +64,10 @@ TEST_F(LookupOperationsTest, GetLocationsInAdminUnit) {
 }
 
 TEST_F(LookupOperationsTest, InvalidAdminUnitHandling) {
-  EXPECT_THROW(manager.get_locations_in_unit("district", 999), std::out_of_range);
+  EXPECT_THROW(
+    {
+      auto locations = manager.get_locations_in_unit("district", 999);
+    }, std::out_of_range);
 }
 
 TEST_F(LookupOperationsTest, GetBoundaryData) {
@@ -71,6 +80,9 @@ TEST_F(LookupOperationsTest, GetUnitCount) { EXPECT_EQ(manager.get_unit_count("d
 
 TEST_F(LookupOperationsTest, InvalidBoundaryAccess) {
   EXPECT_EQ(manager.get_boundary("nonexistent"), nullptr);
-  EXPECT_THROW(manager.get_unit_count("nonexistent"), std::runtime_error);
+  EXPECT_THROW(
+    {
+      auto unit_count = manager.get_unit_count("nonexistent");
+    }, std::runtime_error);
 }
 

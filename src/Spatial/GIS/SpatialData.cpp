@@ -13,7 +13,6 @@
 #include <stdexcept>
 
 #include "Configuration/Config.h"
-#include "Configuration/SpatialSettings.h"
 #include "Simulation/Model.h"
 #include "Utils/Helpers/StringHelpers.h"
 
@@ -159,8 +158,8 @@ void SpatialData::generate_distances() const {
     distances[from].resize(static_cast<uint64_t>(locations));
     for (std::size_t to = 0; to < locations; to++) {
       distances[from][to] = std::sqrt(
-          std::pow(cell_size_ * (db[from].coordinate->latitude - db[to].coordinate->latitude), 2)
-          + std::pow(cell_size_ * (db[from].coordinate->longitude - db[to].coordinate->longitude),
+          std::pow(cell_size_ * (db[from].coordinate.latitude - db[to].coordinate.latitude), 2)
+          + std::pow(cell_size_ * (db[from].coordinate.longitude - db[to].coordinate.longitude),
                      2));
     }
   }
@@ -195,7 +194,10 @@ void SpatialData::generate_locations(AscFile* reference) {
   for (int row = 0; row < raster_info_.number_rows; ++row) {
     for (int col = 0; col < raster_info_.number_columns; ++col) {
       if (reference->data[row][col] == no_data) { continue; }
-      db.emplace_back(location_id++, row, col, 0);
+      db.emplace_back(Spatial::Location{.id = location_id++,
+                                        .population_size = 0,
+                                        .coordinate = {.latitude = static_cast<float>(row),
+                                                       .longitude = static_cast<float>(col)}});
     }
   }
 
