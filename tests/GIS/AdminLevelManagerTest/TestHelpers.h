@@ -20,10 +20,12 @@ protected:
         // Set up any necessary test environment
         cleanup_files();
         
+        Model::get_instance()->release();
         if (Model::get_config() == nullptr) {
             Model::get_instance()->set_config(std::make_unique<Config>());
             
-            // Set up minimal location database
+            Model::get_config()->get_spatial_settings().set_spatial_data(std::make_unique<SpatialData>( 
+                &Model::get_config()->get_spatial_settings()));
             Model::get_config()->get_spatial_settings().set_number_of_locations(9);  // 3x3 grid
             auto& db = Model::get_config()->location_db();
             db.clear();

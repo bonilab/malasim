@@ -11,6 +11,7 @@
 
 - need rework on BurkinaFasoSM or other SM to support single location / location based
 
+- consider move age_distribution back to population demographics settings as normally we do not have very detail data up to 5x5 km.
 
 - p_infection_from_infectious_bite biology validation
 - relative_infectivity biology validation

@@ -38,94 +38,94 @@ protected:
 };
 
 TEST_F(AdminBoundaryFixture, AdminLevelsAreProperlyInitialized) {
-    auto admin_levels = spatial_data.get_admin_levels();
+    auto admin_levels = spatial_data->get_admin_levels();
     ASSERT_EQ(admin_levels.size(), 3);
-    EXPECT_TRUE(spatial_data.has_admin_level("district"));
-    EXPECT_TRUE(spatial_data.has_admin_level("province"));
-    EXPECT_TRUE(spatial_data.has_admin_level("region"));
-    EXPECT_FALSE(spatial_data.has_admin_level("nonexistent"));
+    EXPECT_TRUE(spatial_data->has_admin_level("district"));
+    EXPECT_TRUE(spatial_data->has_admin_level("province"));
+    EXPECT_TRUE(spatial_data->has_admin_level("region"));
+    EXPECT_FALSE(spatial_data->has_admin_level("nonexistent"));
 }
 
 TEST_F(AdminBoundaryFixture, AdminUnitQueriesWorkCorrectly) {
-    EXPECT_EQ(spatial_data.get_admin_units("district"), std::make_pair(1, 2));
-    EXPECT_EQ(spatial_data.get_admin_units("province"), std::make_pair(1, 3));
-    EXPECT_EQ(spatial_data.get_admin_units("region"), std::make_pair(1, 3));
+    EXPECT_EQ(spatial_data->get_admin_units("district"), std::make_pair(1, 2));
+    EXPECT_EQ(spatial_data->get_admin_units("province"), std::make_pair(1, 3));
+    EXPECT_EQ(spatial_data->get_admin_units("region"), std::make_pair(1, 3));
 
-    EXPECT_EQ(spatial_data.get_unit_count("district"), 2);
-    EXPECT_EQ(spatial_data.get_unit_count("province"), 3);
-    EXPECT_EQ(spatial_data.get_unit_count("region"), 3);
+    EXPECT_EQ(spatial_data->get_unit_count("district"), 2);
+    EXPECT_EQ(spatial_data->get_unit_count("province"), 3);
+    EXPECT_EQ(spatial_data->get_unit_count("region"), 3);
 }
 
 TEST_F(AdminBoundaryFixture, LocationToAdminUnitMappingWorksCorrectly) {
     ASSERT_EQ(Model::get_config()->number_of_locations(), 8);
 
-    EXPECT_EQ(spatial_data.get_admin_unit("district", 0), 1);
-    EXPECT_EQ(spatial_data.get_admin_unit("district", 1), 1);
-    EXPECT_EQ(spatial_data.get_admin_unit("district", 2), 2);
-    EXPECT_EQ(spatial_data.get_admin_unit("district", 3), 1);
-    EXPECT_EQ(spatial_data.get_admin_unit("district", 4), 2);
-    EXPECT_EQ(spatial_data.get_admin_unit("district", 5), 2);
-    EXPECT_EQ(spatial_data.get_admin_unit("district", 6), 2);
-    EXPECT_EQ(spatial_data.get_admin_unit("district", 7), 2);
+    EXPECT_EQ(spatial_data->get_admin_unit("district", 0), 1);
+    EXPECT_EQ(spatial_data->get_admin_unit("district", 1), 1);
+    EXPECT_EQ(spatial_data->get_admin_unit("district", 2), 2);
+    EXPECT_EQ(spatial_data->get_admin_unit("district", 3), 1);
+    EXPECT_EQ(spatial_data->get_admin_unit("district", 4), 2);
+    EXPECT_EQ(spatial_data->get_admin_unit("district", 5), 2);
+    EXPECT_EQ(spatial_data->get_admin_unit("district", 6), 2);
+    EXPECT_EQ(spatial_data->get_admin_unit("district", 7), 2);
 
-    EXPECT_EQ(spatial_data.get_admin_unit("province", 0), 1);
-    EXPECT_EQ(spatial_data.get_admin_unit("province", 1), 2);
-    EXPECT_EQ(spatial_data.get_admin_unit("province", 2), 2);
-    EXPECT_EQ(spatial_data.get_admin_unit("province", 3), 1);
-    EXPECT_EQ(spatial_data.get_admin_unit("province", 4), 1);
-    EXPECT_EQ(spatial_data.get_admin_unit("province", 5), 3);
-    EXPECT_EQ(spatial_data.get_admin_unit("province", 6), 3);
-    EXPECT_EQ(spatial_data.get_admin_unit("province", 7), 3);
+    EXPECT_EQ(spatial_data->get_admin_unit("province", 0), 1);
+    EXPECT_EQ(spatial_data->get_admin_unit("province", 1), 2);
+    EXPECT_EQ(spatial_data->get_admin_unit("province", 2), 2);
+    EXPECT_EQ(spatial_data->get_admin_unit("province", 3), 1);
+    EXPECT_EQ(spatial_data->get_admin_unit("province", 4), 1);
+    EXPECT_EQ(spatial_data->get_admin_unit("province", 5), 3);
+    EXPECT_EQ(spatial_data->get_admin_unit("province", 6), 3);
+    EXPECT_EQ(spatial_data->get_admin_unit("province", 7), 3);
 }
 
 TEST_F(AdminBoundaryFixture, AdminUnitToLocationsMappingWorksCorrectly) {
-    EXPECT_THAT(spatial_data.get_locations_in_unit("district", 1),
+    EXPECT_THAT(spatial_data->get_locations_in_unit("district", 1),
                 ::testing::UnorderedElementsAre(0, 1, 3));
-    EXPECT_THAT(spatial_data.get_locations_in_unit("district", 2),
+    EXPECT_THAT(spatial_data->get_locations_in_unit("district", 2),
                 ::testing::UnorderedElementsAre(2, 4, 5, 6, 7));
 
-    EXPECT_THAT(spatial_data.get_locations_in_unit("province", 1),
+    EXPECT_THAT(spatial_data->get_locations_in_unit("province", 1),
                 ::testing::UnorderedElementsAre(0, 3, 4));
-    EXPECT_THAT(spatial_data.get_locations_in_unit("province", 2),
+    EXPECT_THAT(spatial_data->get_locations_in_unit("province", 2),
                 ::testing::UnorderedElementsAre(1, 2));
-    EXPECT_THAT(spatial_data.get_locations_in_unit("province", 3),
+    EXPECT_THAT(spatial_data->get_locations_in_unit("province", 3),
                 ::testing::UnorderedElementsAre(5, 6, 7));
 }
 
 TEST_F(AdminBoundaryFixture, ErrorHandlingWorksCorrectly) {
     EXPECT_THROW(
         {
-            [[maybe_unused]] auto district = spatial_data.get_admin_unit("nonexistent", 0);
+            [[maybe_unused]] auto district = spatial_data->get_admin_unit("nonexistent", 0);
         },
         std::runtime_error);
     EXPECT_THROW(
         {
-            [[maybe_unused]] auto locations = spatial_data.get_locations_in_unit("nonexistent", 1);
+            [[maybe_unused]] auto locations = spatial_data->get_locations_in_unit("nonexistent", 1);
         },
         std::runtime_error);
     EXPECT_THROW(
         {
-            [[maybe_unused]] auto locations = spatial_data.get_locations_in_unit("district", 999);
+            [[maybe_unused]] auto locations = spatial_data->get_locations_in_unit("district", 999);
         },
         std::out_of_range);
     EXPECT_THROW(
         {
-            [[maybe_unused]] auto district = spatial_data.get_admin_unit("district", 999);
+            [[maybe_unused]] auto district = spatial_data->get_admin_unit("district", 999);
         }, std::out_of_range);
 }
 
 TEST_F(CustomAdminLevelFixture, CustomAdminLevelsWorkCorrectly) {
-    auto admin_levels = spatial_data.get_admin_levels();
+    auto admin_levels = spatial_data->get_admin_levels();
     ASSERT_EQ(admin_levels.size(), 3);
-    EXPECT_TRUE(spatial_data.has_admin_level("district"));
-    EXPECT_TRUE(spatial_data.has_admin_level("zone"));
-    EXPECT_TRUE(spatial_data.has_admin_level("country"));
+    EXPECT_TRUE(spatial_data->has_admin_level("district"));
+    EXPECT_TRUE(spatial_data->has_admin_level("zone"));
+    EXPECT_TRUE(spatial_data->has_admin_level("country"));
 }
 
 TEST_F(AdminBoundaryFixture, BoundaryDataAccessWorksCorrectly) {
-    const auto* district_boundary = spatial_data.get_boundary("district");
-    const auto* province_boundary = spatial_data.get_boundary("province");
-    const auto* region_boundary = spatial_data.get_boundary("region");
+    const auto* district_boundary = spatial_data->get_boundary("district");
+    const auto* province_boundary = spatial_data->get_boundary("province");
+    const auto* region_boundary = spatial_data->get_boundary("region");
 
     ASSERT_NE(district_boundary, nullptr);
     ASSERT_NE(province_boundary, nullptr);
@@ -146,16 +146,16 @@ TEST_F(AdminBoundaryFixture, BoundaryDataAccessWorksCorrectly) {
 }
 
 TEST_F(DistrictOnlyFixture, DistrictOnlyModeWorksCorrectly) {
-    auto admin_levels = spatial_data.get_admin_levels();
+    auto admin_levels = spatial_data->get_admin_levels();
 
     ASSERT_EQ(admin_levels.size(), 1);
     EXPECT_EQ(admin_levels[0], "district");
-    EXPECT_TRUE(spatial_data.has_admin_level("district"));
-    EXPECT_EQ(spatial_data.get_unit_count("district"), 2);
+    EXPECT_TRUE(spatial_data->has_admin_level("district"));
+    EXPECT_EQ(spatial_data->get_unit_count("district"), 2);
 
-    EXPECT_EQ(spatial_data.get_admin_unit("district", 0), 1);
-    EXPECT_EQ(spatial_data.get_admin_unit("district", 2), 2);
+    EXPECT_EQ(spatial_data->get_admin_unit("district", 0), 1);
+    EXPECT_EQ(spatial_data->get_admin_unit("district", 2), 2);
 
-    EXPECT_THAT(spatial_data.get_locations_in_unit("district", 2),
+    EXPECT_THAT(spatial_data->get_locations_in_unit("district", 2),
                 ::testing::UnorderedElementsAre(2, 4, 5, 6, 7));
 }

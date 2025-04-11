@@ -17,6 +17,8 @@
 #include "AdminLevelManager.h"
 #include "AscFile.h"
 
+class SpatialSettings;
+
 class SpatialData {
 public:
   enum SpatialFileType : uint8_t {
@@ -120,13 +122,10 @@ public:
   // Add constant for the new admin boundaries configuration section
   constexpr static const std::string_view ADMIN_BOUNDARIES = "administrative_boundaries";
 
-  // Constructor
-  SpatialData();
-
   SpatialData(SpatialData &&) = delete;
   SpatialData &operator=(SpatialData &&) = delete;
-  SpatialData(RasterInformation raster_info, std::map<std::string, std::string> admin_rasters)
-      : raster_info_(raster_info), admin_rasters_(std::move(admin_rasters)) {}
+
+  explicit SpatialData(SpatialSettings* spatial_settings);
   // Deconstructor
   ~SpatialData();
 
@@ -138,7 +137,7 @@ public:
    * @return true if parsing was successful
    * @throws std::runtime_error if required configuration is missing or invalid
    */
-  bool parse(const YAML::Node &node);
+  bool process_config(const YAML::Node &node);
 
   // Check the loaded spatial catalog for errors, returns true if there are
   // errors
@@ -168,7 +167,7 @@ public:
 
   // copy the raster to the location_db; works with betas and probability of
   // treatment
-  void copy_raster_to_location_db(SpatialFileType type);
+  void populate_raster_data_to_location_db(SpatialFileType type);
 
   // Perform any clean-up operations after parsing the YAML file is complete
   void parse_complete();
@@ -361,6 +360,7 @@ public:
   void set_raster_info(const RasterInformation &raster_info) { raster_info_ = raster_info; }
 
 private:
+  SpatialSettings* spatial_settings_;
   std::array<std::unique_ptr<AscFile>, SpatialFileType::COUNT> data_{};
 
   // Map of admin level names to their corresponding raster paths

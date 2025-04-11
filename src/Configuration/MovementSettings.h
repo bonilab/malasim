@@ -328,7 +328,7 @@ public:
 
   void process_config_using_spatial_settings(
       const std::vector<std::vector<double>> &spatial_distance_matrix,
-      const int number_of_locations) {
+      const size_t number_of_locations) {
     spdlog::info("Processing MovementSettings");
     if (spatial_model_settings_.get_name() == "Barabasi") {
       spdlog::info("Processing BarabasiSM");

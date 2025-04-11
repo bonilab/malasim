@@ -103,7 +103,7 @@ public:
   [[nodiscard]] RaptSettings &get_rapt_settings() { return rapt_settings_; }
 
   // Make relevant getters virtual for mocking
-  [[nodiscard]] int number_of_locations() const;
+  [[nodiscard]] size_t number_of_locations() const;
   [[nodiscard]] int number_of_age_classes() const;
   static size_t number_of_parasite_types();
   [[nodiscard]] int number_of_tracking_days() const;

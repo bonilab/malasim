@@ -71,7 +71,7 @@ public:
   void process_config() override {}
 
   void process_config_using_number_of_locations(SpatialData* spatial_data,
-                                                int number_of_locations) {
+                                                size_t number_of_locations) {
     spdlog::info("Processing SeasonalitySettings");
     if (enable_) {
       spdlog::info("Seasonality enabled");

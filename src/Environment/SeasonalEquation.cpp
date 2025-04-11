@@ -13,7 +13,7 @@
 
 SeasonalEquation::SeasonalEquation() = default;
 
-void SeasonalEquation::build(int number_of_locations) {
+void SeasonalEquation::build(size_t number_of_locations) {
   if (raster_) { set_from_raster(); }
   if (A_.size() > 1 && A_.size() < number_of_locations) {
     spdlog::info("Only {} seasonal equation settings provided, but {} are needed for all locations",

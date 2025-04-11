@@ -31,7 +31,6 @@ bool Model::initialize() {
 
   genotype_db_ = std::make_unique<GenotypeDatabase>();
   drug_db_ = std::make_unique<DrugDatabase>();
-  spatial_data_ = std::make_unique<SpatialData>();
 
   if (utils::Cli::get_instance().get_input_path().empty()) {
     // spdlog::error("Input path is empty. Please provide a valid input path.");
@@ -138,7 +137,6 @@ void Model::release() {
   having_drug_update_function_.reset();
   clinical_update_function_.reset();
 
-  spatial_data_.reset();
   drug_db_.reset();
   genotype_db_.reset();
   mosquito_.reset();

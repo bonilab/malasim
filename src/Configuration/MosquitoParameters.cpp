@@ -2,7 +2,9 @@
 
 #include "Simulation/Model.h"
 
-void MosquitoParameters::process_config_using_locations(std::vector<Spatial::Location>& locations) {
+// the setting mode here is used to assign ifr and size to the population regardless
+// the population was created using grid based or location based.
+void MosquitoParameters::process_config_using_locations(std::vector<Spatial::Location> &locations) {
   spdlog::info("Processing MosquitoParameters");
   if (get_mosquito_config().get_mode() == SpatialSettings::GRID_BASED_MODE) {
     spdlog::info("Processing MosquitoParameters using grid based mode");

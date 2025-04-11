@@ -8,64 +8,77 @@ void SpatialSettings::process_config() {
   spdlog::info("Processing SpatialSettings");
   std::unique_ptr<ISpatialSettingsProcessor> processor = nullptr;
   if (mode_ == GRID_BASED_MODE) {
-    processor = std::make_unique<GridBasedProcessor>();
-    spdlog::info("Grid based");
-    /* Number of location, locations and spatial matrix are calculated in SpatialData class */
-    Model::get_spatial_data()->parse(node_);
+    processor = std::make_unique<GridBasedProcessor>(this);
   } else if (mode_ == LOCATION_BASED_MODE) {
-    processor = std::make_unique<LocationBasedProcessor>();
-    spdlog::info("Location based");
-    // process location_based
-    location_db_.clear();
-    // loop index based on location_based_.get_location_info()
-    for (const auto &location : location_based_.get_location_info()) {
-      auto new_location = location;
-      auto pop_index = (location.id >= location_based_.get_population_size_by_location().size()) ? 0 : location.id;
-      new_location.population_size = location_based_.get_population_size_by_location()[pop_index];
-
-      auto age_index = (location.id >= location_based_.get_age_distribution_by_location().size()) ? 0 : location.id;
-      new_location.age_distribution = location_based_.get_age_distribution_by_location()[age_index];
-
-      auto beta_index = (location.id >= location_based_.get_beta_by_location().size()) ? 0 : location.id;
-      new_location.beta = location_based_.get_beta_by_location()[beta_index];
-
-      auto p_treatment_under_5_index = (location.id >= location_based_.get_p_treatment_under_5_by_location().size()) ? 0 : location.id;
-      new_location.p_treatment_under_5 = location_based_.get_p_treatment_under_5_by_location()[p_treatment_under_5_index];
-
-      auto p_treatment_over_5_index = (location.id >= location_based_.get_p_treatment_over_5_by_location().size()) ? 0 : location.id;
-      new_location.p_treatment_over_5 = location_based_.get_p_treatment_over_5_by_location()[p_treatment_over_5_index];
-
-      location_db_.push_back(new_location);
-    }
-
-    // populate the distance matrix
-    number_of_location_ = location_db_.size();
-    spatial_distance_matrix_ =
-        std::vector<std::vector<double>>(static_cast<uint64_t>(number_of_location_));
-    for (auto from_location = 0; from_location < number_of_location_; from_location++) {
-      spatial_distance_matrix_[from_location].resize(static_cast<uint64_t>(number_of_location_));
-      for (auto to_location = 0; to_location < number_of_location_; to_location++) {
-        spatial_distance_matrix_[from_location][to_location] =
-            Spatial::Coordinate::calculate_distance_in_km(
-                location_db_[from_location].coordinate,
-                location_db_[to_location].coordinate);
-      }
-    }
-
-    // check if age distribution by location size is equal to number of locations
-    if (location_based_.get_age_distribution_by_location().size() != number_of_location_) {
-      throw std::runtime_error(
-          "Age distribution by location size should be equal to number of locations");
-    }
-    // check if age distribution by location size is equal to initial age structure size
-    for (const auto &age_distribution : location_based_.get_age_distribution_by_location()) {
-      if (age_distribution.size() <= 0) {
-        throw std::runtime_error("Number of age distribution by location should be greater than 0");
-      }
-    }
+    processor = std::make_unique<LocationBasedProcessor>(this);
   } else {
     throw std::runtime_error("Unknown mode in 'spatial_settings'.");
   }
-  processor->process_config(node_);
+  processor->process_config();
+}
+
+void SpatialSettings::cross_validate() {
+  // Check if mode is either grid_based or location_based
+  if (mode_ != "grid_based" && mode_ != "location_based") {
+    throw std::invalid_argument("Spatial mode should be either grid_based or location_based");
+  }
+  // If mode is grid_based, check if all raster file paths are provided
+  if (mode_ == "grid_based") {
+    const auto grid_based = node_.as<SpatialSettings::GridBased>();
+    if (grid_based.population_raster.empty() || grid_based.beta_raster.empty()
+        || grid_based.p_treatment_over_5_raster.empty()
+        || grid_based.p_treatment_under_5_raster.empty()) {
+      throw std::invalid_argument(
+          "All raster file paths should be provided for grid based spatial mode");
+    }
+    // Check if age_distribution_by_location size is different from 1
+    if (grid_based.age_distribution_by_location.size() != 1) {
+      throw std::invalid_argument(
+          "Age distribution using raster must be 1 location (to distribute equally)");
+    }
+    // Check if age_distribution_by_location size matched initial_age_structure size
+    if (grid_based.age_distribution_by_location[0].size()
+        != Model::get_config()->get_population_demographic().get_initial_age_structure().size()) {
+      throw std::invalid_argument(
+          "Age distribution by raster must have size match initial age structure size");
+    }
+  }
+  // Location based
+  if (mode_ == "location_based") {
+    const auto location_based = node_.as<SpatialSettings::LocationBased>();
+    if (location_based.population_size_by_location.empty() || location_based.locations.empty()
+        || location_based.age_distribution_by_location.empty()
+        || location_based.p_treatment_under_5_by_location.empty()
+        || location_based.p_treatment_over_5_by_location.empty()
+        || location_based.beta_by_location.empty()) {
+      throw std::invalid_argument(
+          "All locations should be provided for location based spatial mode");
+    }
+    // Check if all location sizes are equal
+    if (location_based.population_size_by_location.size() != location_based.locations.size()
+        || location_based.population_size_by_location.size()
+               != location_based.age_distribution_by_location.size()
+        || location_based.population_size_by_location.size()
+               != location_based.p_treatment_under_5_by_location.size()
+        || location_based.population_size_by_location.size()
+               != location_based.p_treatment_over_5_by_location.size()
+        || location_based.population_size_by_location.size()
+               != location_based.beta_by_location.size()) {
+      throw std::invalid_argument("All location sizes should be equal");
+    }
+    // Check if age_distribution_by_location size matched initial_age_structure size
+    for (auto i = 0; i < location_based.age_distribution_by_location.size(); i++) {
+      if (location_based.age_distribution_by_location[i].size()
+          != Model::get_config()->get_population_demographic().get_initial_age_structure().size()) {
+        spdlog::error("Age distribution by location size: {}",
+                      location_based.age_distribution_by_location.size());
+        spdlog::error(
+            "Initial age structure size: {}",
+            Model::get_config()->get_population_demographic().get_initial_age_structure().size());
+        throw std::invalid_argument(
+            "Age distribution by location size should match initial age structure size");
+      }
+    }
+  }
 }
 

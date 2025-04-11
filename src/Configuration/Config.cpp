@@ -173,7 +173,7 @@ bool Config::load(const std::string &filename) {
 
 size_t Config::number_of_parasite_types() { return Model::get_genotype_db()->size(); }
 
-int Config::number_of_locations() const { return spatial_settings_.get_number_of_locations(); }
+size_t Config::number_of_locations() const { return spatial_settings_.get_number_of_locations(); }
 
 int Config::number_of_age_classes() const {
   return population_demographic_.get_number_of_age_classes();
@@ -294,70 +294,7 @@ void Config::validate_all_cross_field_validations() {
   /*----------------------------
   Validate spatial settings
   ----------------------------*/
-  // Check if mode is either grid_based or location_based
-  if (spatial_settings_.get_mode() != "grid_based"
-      && spatial_settings_.get_mode() != "location_based") {
-    throw std::invalid_argument("Spatial mode should be either grid_based or location_based");
-  }
-  // If mode is grid_based, check if all raster file paths are provided
-  if (spatial_settings_.get_mode() == "grid_based") {
-    const SpatialSettings::GridBased &grid_based = spatial_settings_.get_grid_based();
-    if (grid_based.get_population_raster().empty() || grid_based.get_beta_raster().empty()
-        || grid_based.get_p_treatment_over_5_raster().empty()
-        || grid_based.get_p_treatment_under_5_raster().empty()) {
-      throw std::invalid_argument(
-          "All raster file paths should be provided for grid based spatial mode");
-    }
-    // Check if age_distribution_by_location size is different from 1
-    if (grid_based.get_age_distribution_by_location().size() != 1) {
-      throw std::invalid_argument(
-          "Age distribution using raster must be 1 location (to distribute equally)");
-    }
-    // Check if age_distribution_by_location size matched initial_age_structure size
-    if (grid_based.get_age_distribution_by_location()[0].size()
-        != population_demographic.get_initial_age_structure().size()) {
-      throw std::invalid_argument(
-          "Age distribution by raster must have size match initial age structure size");
-    }
-  }
-  // Location based
-  if (spatial_settings_.get_mode() == "location_based") {
-    const SpatialSettings::LocationBased &location_based = spatial_settings_.get_location_based();
-    if (location_based.get_population_size_by_location().empty()
-        || location_based.get_location_info().empty()
-        || location_based.get_age_distribution_by_location().empty()
-        || location_based.get_p_treatment_under_5_by_location().empty()
-        || location_based.get_p_treatment_over_5_by_location().empty()
-        || location_based.get_beta_by_location().empty()) {
-      throw std::invalid_argument(
-          "All locations should be provided for location based spatial mode");
-    }
-    // Check if all location sizes are equal
-    if (location_based.get_population_size_by_location().size()
-            != location_based.get_location_info().size()
-        || location_based.get_population_size_by_location().size()
-               != location_based.get_age_distribution_by_location().size()
-        || location_based.get_population_size_by_location().size()
-               != location_based.get_p_treatment_under_5_by_location().size()
-        || location_based.get_population_size_by_location().size()
-               != location_based.get_p_treatment_over_5_by_location().size()
-        || location_based.get_population_size_by_location().size()
-               != location_based.get_beta_by_location().size()) {
-      throw std::invalid_argument("All location sizes should be equal");
-    }
-    // Check if age_distribution_by_location size matched initial_age_structure size
-    for (auto i = 0; i < location_based.get_age_distribution_by_location().size(); i++) {
-      if (location_based.get_age_distribution_by_location()[i].size()
-          != population_demographic.get_initial_age_structure().size()) {
-        spdlog::error("Age distribution by location size: {}",
-                      location_based.get_age_distribution_by_location().size());
-        spdlog::error("Initial age structure size: {}",
-                      population_demographic.get_initial_age_structure().size());
-        throw std::invalid_argument(
-            "Age distribution by location size should match initial age structure size");
-      }
-    }
-  }
+  spatial_settings_.cross_validate();
 
   /*----------------------------
   Validate seasonality settings
@@ -378,7 +315,8 @@ void Config::validate_all_cross_field_validations() {
   }
   if (seasonality_settings_.get_enable() && seasonality_settings_.get_mode() == "equation") {
     if (seasonality_settings_.get_seasonal_equation()->get_raster()
-        && spatial_settings_.get_grid_based().get_ecoclimatic_raster().empty()) {
+        && spatial_settings_.spatial_data()->get_raster(SpatialData::SpatialFileType::ECOCLIMATIC)
+               != nullptr) {
       throw std::invalid_argument(
           "Ecoclimatic raster should be provided for equation based seasonality.");
     }
@@ -731,12 +669,8 @@ void Config::validate_all_cross_field_validations() {
           "All locations should be provided for location based mosquito mode");
     }
     // Check if all location sizes are equal
-    const SpatialSettings::LocationBased &spatial_location_based =
-        spatial_settings_.get_location_based();
     if (location_based.get_interrupted_feeding_rate().size()
-            != location_based.get_prmc_size().size()
-        && location_based.get_interrupted_feeding_rate().size()
-               != spatial_location_based.get_population_size_by_location().size()) {
+        != location_based.get_prmc_size().size()) {
       throw std::invalid_argument("All location sizes should be equal");
     }
   }

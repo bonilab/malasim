@@ -62,7 +62,6 @@ private:
 
   std::unique_ptr<GenotypeDatabase> genotype_db_{nullptr};
   std::unique_ptr<DrugDatabase> drug_db_{nullptr};
-  std::unique_ptr<SpatialData> spatial_data_{nullptr};
 
   std::vector<std::unique_ptr<Reporter>> reporters_;
   std::vector<std::unique_ptr<IStrategy>> strategy_db_;
@@ -82,15 +81,21 @@ public:
   void release();
 
   static Config* get_config() { return get_instance()->config_.get(); }
-  static void set_config(std::unique_ptr<Config> config) { get_instance()->config_ = std::move(config); }
+  static void set_config(std::unique_ptr<Config> config) {
+    get_instance()->config_ = std::move(config);
+  }
 
   static Scheduler* get_scheduler() { return get_instance()->scheduler_.get(); }
 
-  static void set_scheduler(std::unique_ptr<Scheduler> scheduler) { get_instance()->scheduler_ = std::move(scheduler); }
+  static void set_scheduler(std::unique_ptr<Scheduler> scheduler) {
+    get_instance()->scheduler_ = std::move(scheduler);
+  }
 
   static utils::Random* get_random() { return get_instance()->random_.get(); }
 
-  static void set_random(std::unique_ptr<utils::Random> random) { get_instance()->random_ = std::move(random); }
+  static void set_random(std::unique_ptr<utils::Random> random) {
+    get_instance()->random_ = std::move(random);
+  }
 
   static Population* get_population() { return get_instance()->population_.get(); }
   static void set_population(std::unique_ptr<Population> population) {
@@ -107,9 +112,8 @@ public:
     get_instance()->drug_db_ = std::move(value);
   }
 
-  static SpatialData* get_spatial_data() { return get_instance()->spatial_data_.get(); }
-  static void set_spatial_data(std::unique_ptr<SpatialData> spatial_data) {
-    get_instance()->spatial_data_ = std::move(spatial_data);
+  static SpatialData* get_spatial_data() {
+    return Model::get_config()->get_spatial_settings().spatial_data();
   }
 
   static std::vector<std::unique_ptr<Therapy>> &get_therapy_db() {

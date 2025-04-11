@@ -3,11 +3,20 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "Configuration/SpatialSettings/SpatialSettings.h"
 #include "ISpatialSettingsProcessor.h"
 
 class GridBasedProcessor : public ISpatialSettingsProcessor {
 public:
-  void process_config(const YAML::Node &node) override;
+  GridBasedProcessor(const GridBasedProcessor &) = default;
+  GridBasedProcessor(GridBasedProcessor &&) = delete;
+  GridBasedProcessor &operator=(const GridBasedProcessor &) = default;
+  GridBasedProcessor &operator=(GridBasedProcessor &&) = delete;
+  explicit GridBasedProcessor(SpatialSettings* spatial_settings)
+      : ISpatialSettingsProcessor(spatial_settings) {}
+
+  ~GridBasedProcessor() override = default;
+  void process_config() override;
 };
 
 #endif

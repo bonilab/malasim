@@ -4,200 +4,87 @@
 #include <spdlog/spdlog.h>
 #include <yaml-cpp/yaml.h>
 
+#include <cstddef>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
 #include "Configuration/IConfigData.h"
+#include "Spatial/GIS/SpatialData.h"
 #include "Spatial/Location/Location.h"
 
 // Class for SpatialSettings
 class SpatialSettings : public IConfigData {
 public:
   // Class for GridBased settings
-  class GridBased {
-  public:
-    class AdministativeBoundaries {
-    public:
+  struct GridBased {
+    struct AdministativeBoundaries {
       std::string name;
       std::string raster;
     };
-    // Getters and Setters for population_raster
-    [[nodiscard]] const std::string &get_population_raster() const { return population_raster_; }
-    void set_population_raster(const std::string &value) { population_raster_ = value; }
-
-    // Getters and Setters for p_treatment_under_5_raster
-    [[nodiscard]] const std::string &get_p_treatment_under_5_raster() const {
-      return p_treatment_under_5_raster_;
-    }
-    void set_p_treatment_under_5_raster(const std::string &value) {
-      p_treatment_under_5_raster_ = value;
-    }
-
-    // Getters and Setters for p_treatment_over_5_raster
-    [[nodiscard]] const std::string &get_p_treatment_over_5_raster() const {
-      return p_treatment_over_5_raster_;
-    }
-    void set_p_treatment_over_5_raster(const std::string &value) {
-      p_treatment_over_5_raster_ = value;
-    }
-
-    // Getters and Setters for beta_raster
-    [[nodiscard]] const std::string &get_beta_raster() const { return beta_raster_; }
-    void set_beta_raster(const std::string &value) { beta_raster_ = value; }
-
-    // Getters and Setters for cell_size
-    [[nodiscard]] double get_cell_size() const { return cell_size_; }
-    void set_cell_size(const double value) {
-      if (value <= 0) throw std::invalid_argument("cell_size must be greater than 0");
-      cell_size_ = value;
-    }
-
-    // Getters and Setters for age_distribution_by_location
-    [[nodiscard]] const std::vector<std::vector<double>> &get_age_distribution_by_location() const {
-      return age_distribution_by_location_;
-    }
-    void set_age_distribution_by_location(const std::vector<std::vector<double>> &value) {
-      age_distribution_by_location_ = value;
-    }
-
-    void set_number_of_location(const int value) { number_of_location_ = value; }
-
-    [[nodiscard]] int get_number_of_location() const { return number_of_location_; }
-
-    void set_locations(const std::vector<Spatial::Location> &value) { locations_ = value; }
-
-    [[nodiscard]] const std::vector<Spatial::Location> &get_locations() const { return locations_; }
-
-    [[nodiscard]] const std::string &get_ecoclimatic_raster() const { return ecoclimatic_raster_; }
-
-    void set_ecoclimatic_raster(const std::string &value) { ecoclimatic_raster_ = value; }
-
-    [[nodiscard]] std::vector<AdministativeBoundaries> get_administrative_boundaries() const {
-      return administrative_boundaries_;
-    }
-    void set_administrative_boundaries(const std::vector<AdministativeBoundaries> &value) {
-      administrative_boundaries_ = value;
-    }
-
-  private:
-    std::vector<Spatial::Location> locations_;
-    std::string population_raster_;
-    std::vector<AdministativeBoundaries> administrative_boundaries_;
-    std::string p_treatment_under_5_raster_;
-    std::string p_treatment_over_5_raster_;
-    std::string beta_raster_;
-    std::string ecoclimatic_raster_;
-    double cell_size_ = 0.0;
-    std::vector<std::vector<double>> age_distribution_by_location_;
-    int number_of_location_ = 0;
+    std::vector<Spatial::Location> locations;
+    std::string population_raster;
+    std::vector<AdministativeBoundaries> administrative_boundaries;
+    std::string p_treatment_under_5_raster;
+    std::string p_treatment_over_5_raster;
+    std::string beta_raster;
+    std::string ecoclimatic_raster;
+    double cell_size{0.0};
+    std::vector<std::vector<double>> age_distribution_by_location;
+    int number_of_location{0};
   };
 
   // Class for LocationBased settings
-  class LocationBased {
-  public:
-    // Getters and Setters for location_info
-    [[nodiscard]] const std::vector<Spatial::Location> &get_location_info() const {
-      return location_info_;
-    }
-    void set_location_info(const std::vector<Spatial::Location> &value) { location_info_ = value; }
-
-    // Getters and Setters for age_distribution_by_location
-    [[nodiscard]] const std::vector<std::vector<double>> &get_age_distribution_by_location() const {
-      return age_distribution_by_location_;
-    }
-    void set_age_distribution_by_location(const std::vector<std::vector<double>> &value) {
-      age_distribution_by_location_ = value;
-    }
-
-    // Getters and Setters for p_treatment_under_5_by_location
-    [[nodiscard]] const std::vector<double> &get_p_treatment_under_5_by_location() const {
-      return p_treatment_under_5_by_location_;
-    }
-    void set_p_treatment_under_5_by_location(const std::vector<double> &value) {
-      p_treatment_under_5_by_location_ = value;
-    }
-
-    // Getters and Setters for p_treatment_over_5_by_location
-    [[nodiscard]] const std::vector<double> &get_p_treatment_over_5_by_location() const {
-      return p_treatment_over_5_by_location_;
-    }
-    void set_p_treatment_over_5_by_location(const std::vector<double> &value) {
-      p_treatment_over_5_by_location_ = value;
-    }
-
-    // Getters and Setters for beta_by_location
-    [[nodiscard]] const std::vector<double> &get_beta_by_location() const {
-      return beta_by_location_;
-    }
-    void set_beta_by_location(const std::vector<double> &value) { beta_by_location_ = value; }
-
-    // Getters and Setters for population_size_by_location
-    [[nodiscard]] const std::vector<int> &get_population_size_by_location() const {
-      return population_size_by_location_;
-    }
-    void set_population_size_by_location(const std::vector<int> &value) {
-      population_size_by_location_ = value;
-    }
-
-    void set_number_of_locations(const int value) { number_of_locations_ = value; }
-
-    [[nodiscard]] int get_number_of_locations() const { return number_of_locations_; }
-
-  private:
-    std::vector<Spatial::Location> location_info_;
-    std::vector<std::vector<double>> age_distribution_by_location_;
-    std::vector<double> p_treatment_under_5_by_location_;
-    std::vector<double> p_treatment_over_5_by_location_;
-    std::vector<double> beta_by_location_;
-    std::vector<int> population_size_by_location_;
-    int number_of_locations_ = 0;
+  struct LocationBased {
+    std::vector<Spatial::Location> locations;
+    std::vector<std::vector<double>> age_distribution_by_location;
+    std::vector<double> p_treatment_under_5_by_location;
+    std::vector<double> p_treatment_over_5_by_location;
+    std::vector<double> beta_by_location;
+    std::vector<int> population_size_by_location;
+    int number_of_locations{0};
   };
 
   // Getters and Setters for mode
   [[nodiscard]] const std::string &get_mode() const { return mode_; }
   void set_mode(const std::string &value) { mode_ = value; }
 
-  // Getters and Setters for grid_based
-  [[nodiscard]] const GridBased &get_grid_based() const { return grid_based_; }
-  void set_grid_based(const GridBased &value) { grid_based_ = value; }
-
-  // Getters and Setters for location_based
-  [[nodiscard]] const LocationBased &get_location_based() const { return location_based_; }
-  void set_location_based(const LocationBased &value) { location_based_ = value; }
-
+  [[nodiscard]] std::vector<std::vector<double>> &get_spatial_distance_matrix() {
+    return spatial_distance_matrix_;
+  }
   void set_spatial_distance_matrix(const std::vector<std::vector<double>> &value) {
     spatial_distance_matrix_ = value;
   }
 
-  [[nodiscard]] std::vector<std::vector<double>> &get_spatial_distance_matrix() {
-    return spatial_distance_matrix_;
-  }
-
-  void set_number_of_locations(const int value) { number_of_location_ = value; }
-
-  [[nodiscard]] int get_number_of_locations() const { return number_of_location_; }
+  [[nodiscard]] size_t get_number_of_locations() const { return number_of_location_; }
+  void set_number_of_locations(const size_t value) { number_of_location_ = value; }
 
   void set_node(const YAML::Node &value) { node_ = value; }
+  [[nodiscard]] const YAML::Node &get_node() const { return node_; }
 
-  [[nodiscard]] YAML::Node &get_node() { return node_; }
+  [[nodiscard]] std::vector<Spatial::Location> &location_db() { return location_db_; }
+  void set_location_db(const std::vector<Spatial::Location> &value) { location_db_ = value; }
+
+  [[nodiscard]] SpatialData* spatial_data() { return spatial_data_.get(); }
+  void set_spatial_data(std::unique_ptr<SpatialData> value) { spatial_data_ = std::move(value); }
 
   void process_config() override;
 
-  [[nodiscard]] std::vector<Spatial::Location> &location_db() { return location_db_; }
+  void cross_validate();
 
   static constexpr std::string GRID_BASED_MODE = "grid_based";
   static constexpr std::string LOCATION_BASED_MODE = "location_based";
 
 private:
   std::string mode_;  // "grid_based" or "location_based"
-  GridBased grid_based_;
-  LocationBased location_based_;
+  // we have to store the yaml node as the process_config method will used it
+  // and combine with other data in the model to populate the right data
   YAML::Node node_;
 
   std::vector<std::vector<double>> spatial_distance_matrix_;
-  int number_of_location_ = 0;
+  size_t number_of_location_{0};
   std::vector<Spatial::Location> location_db_;
+  std::unique_ptr<SpatialData> spatial_data_{nullptr};
 };
 
 namespace YAML {
@@ -206,35 +93,53 @@ template <>
 struct convert<SpatialSettings::GridBased> {
   static Node encode(const SpatialSettings::GridBased &rhs) {
     Node node;
-    node["population_raster"] = rhs.get_population_raster();
-    node["p_treatment_under_5_raster"] = rhs.get_p_treatment_under_5_raster();
-    node["p_treatment_over_5_raster"] = rhs.get_p_treatment_over_5_raster();
-    node["beta_raster"] = rhs.get_beta_raster();
-    node["ecoclimatic_raster"] = rhs.get_ecoclimatic_raster();
-    node["cell_size"] = rhs.get_cell_size();
-    node["age_distribution_by_location"] = rhs.get_age_distribution_by_location();
-    for (int i = 0; i < rhs.get_administrative_boundaries().size(); i++) {
-      node["administrative_boundaries"][i]["name"] = rhs.get_administrative_boundaries()[i].name;
-      node["administrative_boundaries"][i]["raster"] =
-          rhs.get_administrative_boundaries()[i].raster;
+    node["population_raster"] = rhs.population_raster;
+    node["p_treatment_under_5_raster"] = rhs.p_treatment_under_5_raster;
+    node["p_treatment_over_5_raster"] = rhs.p_treatment_over_5_raster;
+    node["beta_raster"] = rhs.beta_raster;
+    node["ecoclimatic_raster"] = rhs.ecoclimatic_raster;
+    node["cell_size"] = rhs.cell_size;
+    node["age_distribution_by_location"] = rhs.age_distribution_by_location;
+    for (int i = 0; i < rhs.administrative_boundaries.size(); i++) {
+      node["administrative_boundaries"][i]["name"] = rhs.administrative_boundaries[i].name;
+      node["administrative_boundaries"][i]["raster"] = rhs.administrative_boundaries[i].raster;
     }
     return node;
   }
 
   static bool decode(const Node &node, SpatialSettings::GridBased &rhs) {
-    if (!node["population_raster"] || !node["administrative_boundaries"]
-        || !node["p_treatment_under_5_raster"] || !node["p_treatment_over_5_raster"]
-        || !node["beta_raster"] || !node["cell_size"] || !node["age_distribution_by_location"]) {
-      throw std::runtime_error("Missing required fields in grid-based settings.");
+    // make error message more specific
+    if (!node["population_raster"]) {
+      throw std::runtime_error("Missing 'population_raster' field in grid-based settings.");
+    }
+    if (!node["administrative_boundaries"]) {
+      throw std::runtime_error("Missing 'administrative_boundaries' field in grid-based settings.");
+    }
+    if (!node["p_treatment_under_5_raster"]) {
+      throw std::runtime_error(
+          "Missing 'p_treatment_under_5_raster' field in grid-based settings.");
+    }
+    if (!node["p_treatment_over_5_raster"]) {
+      throw std::runtime_error("Missing 'p_treatment_over_5_raster' field in grid-based settings.");
+    }
+    if (!node["beta_raster"]) {
+      throw std::runtime_error("Missing 'beta_raster' field in grid-based settings.");
+    }
+    if (!node["cell_size"]) {
+      throw std::runtime_error("Missing 'cell_size' field in grid-based settings.");
+    }
+    if (!node["age_distribution_by_location"]) {
+      throw std::runtime_error(
+          "Missing 'age_distribution_by_location' field in grid-based settings.");
     }
 
-    rhs.set_population_raster(node["population_raster"].as<std::string>());
-    rhs.set_p_treatment_under_5_raster(node["p_treatment_under_5_raster"].as<std::string>());
-    rhs.set_p_treatment_over_5_raster(node["p_treatment_over_5_raster"].as<std::string>());
-    rhs.set_beta_raster(node["beta_raster"].as<std::string>());
-    rhs.set_cell_size(node["cell_size"].as<double>());
+    rhs.population_raster = node["population_raster"].as<std::string>();
+    rhs.p_treatment_under_5_raster = node["p_treatment_under_5_raster"].as<std::string>();
+    rhs.p_treatment_over_5_raster = node["p_treatment_over_5_raster"].as<std::string>();
+    rhs.beta_raster = node["beta_raster"].as<std::string>();
+    rhs.cell_size = node["cell_size"].as<double>();
     if (node["ecoclimatic_raster"]) {
-      rhs.set_ecoclimatic_raster(node["ecoclimatic_raster"].as<std::string>());
+      rhs.ecoclimatic_raster = node["ecoclimatic_raster"].as<std::string>();
     }
     std::vector<SpatialSettings::GridBased::AdministativeBoundaries> admin_boundaries;
     for (auto i = 0; i < node["administrative_boundaries"].size(); i++) {
@@ -243,10 +148,10 @@ struct convert<SpatialSettings::GridBased> {
       admin_boundary.raster = node["administrative_boundaries"][i]["raster"].as<std::string>();
       admin_boundaries.push_back(admin_boundary);
     }
-    rhs.set_administrative_boundaries(admin_boundaries);
+    rhs.administrative_boundaries = admin_boundaries;
     /* use one age distribution for all locations */
-    rhs.set_age_distribution_by_location(
-        node["age_distribution_by_location"].as<std::vector<std::vector<double>>>());
+    rhs.age_distribution_by_location =
+        node["age_distribution_by_location"].as<std::vector<std::vector<double>>>();
     return true;
   }
 };
@@ -277,31 +182,50 @@ template <>
 struct convert<SpatialSettings::LocationBased> {
   static Node encode(const SpatialSettings::LocationBased &rhs) {
     Node node;
-    node["location_info"] = rhs.get_location_info();
-    node["age_distribution_by_location"] = rhs.get_age_distribution_by_location();
-    node["p_treatment_under_5_by_location"] = rhs.get_p_treatment_under_5_by_location();
-    node["p_treatment_over_5_by_location"] = rhs.get_p_treatment_over_5_by_location();
-    node["beta_by_location"] = rhs.get_beta_by_location();
-    node["population_size_by_location"] = rhs.get_population_size_by_location();
+    node["location_info"] = rhs.locations;
+    node["age_distribution_by_location"] = rhs.age_distribution_by_location;
+    node["p_treatment_under_5_by_location"] = rhs.p_treatment_under_5_by_location;
+    node["p_treatment_over_5_by_location"] = rhs.p_treatment_over_5_by_location;
+    node["beta_by_location"] = rhs.beta_by_location;
+    node["population_size_by_location"] = rhs.population_size_by_location;
     return node;
   }
 
   static bool decode(const Node &node, SpatialSettings::LocationBased &rhs) {
-    if (!node["location_info"] || !node["age_distribution_by_location"]
-        || !node["p_treatment_under_5_by_location"] || !node["p_treatment_over_5_by_location"]
-        || !node["beta_by_location"] || !node["population_size_by_location"]) {
-      throw std::runtime_error("Missing required fields in location-based settings.");
+    // make error message more specific
+    if (!node["location_info"]) {
+      throw std::runtime_error("Missing 'location_info' field in location-based settings.");
+    }
+    if (!node["age_distribution_by_location"]) {
+      throw std::runtime_error(
+          "Missing 'age_distribution_by_location' field in location-based settings.");
+    }
+    if (!node["p_treatment_under_5_by_location"]) {
+      throw std::runtime_error(
+          "Missing 'p_treatment_under_5_by_location' field in location-based settings.");
+    }
+    if (!node["p_treatment_over_5_by_location"]) {
+      throw std::runtime_error(
+          "Missing 'p_treatment_over_5_by_location' field in location-based settings.");
+    }
+    if (!node["beta_by_location"]) {
+      throw std::runtime_error("Missing 'beta_by_location' field in location-based settings.");
+    }
+    if (!node["population_size_by_location"]) {
+      throw std::runtime_error(
+          "Missing 'population_size_by_location' field in location-based settings.");
     }
 
-    rhs.set_location_info(node["location_info"].as<std::vector<Spatial::Location>>());
-    rhs.set_age_distribution_by_location(
-        node["age_distribution_by_location"].as<std::vector<std::vector<double>>>());
-    rhs.set_p_treatment_under_5_by_location(
-        node["p_treatment_under_5_by_location"].as<std::vector<double>>());
-    rhs.set_p_treatment_over_5_by_location(
-        node["p_treatment_over_5_by_location"].as<std::vector<double>>());
-    rhs.set_beta_by_location(node["beta_by_location"].as<std::vector<double>>());
-    rhs.set_population_size_by_location(node["population_size_by_location"].as<std::vector<int>>());
+    rhs.locations = std::move(node["location_info"].as<std::vector<Spatial::Location>>());
+    rhs.age_distribution_by_location =
+        std::move(node["age_distribution_by_location"].as<std::vector<std::vector<double>>>());
+    rhs.p_treatment_under_5_by_location =
+        std::move(node["p_treatment_under_5_by_location"].as<std::vector<double>>());
+    rhs.p_treatment_over_5_by_location =
+        std::move(node["p_treatment_over_5_by_location"].as<std::vector<double>>());
+    rhs.beta_by_location = std::move(node["beta_by_location"].as<std::vector<double>>());
+    rhs.population_size_by_location =
+        std::move(node["population_size_by_location"].as<std::vector<int>>());
     spdlog::info("Location based settings decoded successfully");
     return true;
   }
@@ -313,8 +237,7 @@ struct convert<SpatialSettings> {
   static Node encode(const SpatialSettings &rhs) {
     Node node;
     node["mode"] = rhs.get_mode();
-    node["grid_based"] = rhs.get_grid_based();
-    node["location_based"] = rhs.get_location_based();
+    node[rhs.get_mode()] = rhs.get_node();
     return node;
   }
 
@@ -324,28 +247,19 @@ struct convert<SpatialSettings> {
     auto mode = node["mode"].as<std::string>();
     rhs.set_mode(mode);
 
-    /* Here the configuration for spatial settings are parsed based on mode
-     * The GridBased and LocationBased classes are used to store the configuration
-     * for validation. The actual processing of the configuration is done in the
-     * SpatialData class for GridBased. For LocationBased, the processing is done
-     * in the process_config method of SpatialSettings class.
+    /* Here we only get the node for the mode specified in the configuration file
+     * the specific processor will convert the node to the appropriate class
+     * and process the configuration
      */
     if (mode != SpatialSettings::GRID_BASED_MODE && mode != SpatialSettings::LOCATION_BASED_MODE) {
       throw std::runtime_error("Unknown mode in 'spatial_settings'.");
     }
 
-    if (mode == SpatialSettings::GRID_BASED_MODE) {
-      if (!node[SpatialSettings::GRID_BASED_MODE]) { throw std::runtime_error("Missing 'grid_based' settings."); }
-      rhs.set_grid_based(node[SpatialSettings::GRID_BASED_MODE].as<SpatialSettings::GridBased>());
-      rhs.set_node(node[SpatialSettings::GRID_BASED_MODE]);
-    } else if (mode == SpatialSettings::LOCATION_BASED_MODE) {
-      if (!node[SpatialSettings::LOCATION_BASED_MODE]) {
-        throw std::runtime_error("Missing 'location_based' settings.");
-      }
-      rhs.set_location_based(node[SpatialSettings::LOCATION_BASED_MODE].as<SpatialSettings::LocationBased>());
-      rhs.set_node(node[SpatialSettings::LOCATION_BASED_MODE]);
-    }
-
+    auto node_name = mode == SpatialSettings::GRID_BASED_MODE
+                         ? SpatialSettings::GRID_BASED_MODE
+                         : SpatialSettings::LOCATION_BASED_MODE;
+    if (!node[node_name]) { throw std::runtime_error("Missing " + node_name + " settings."); }
+    rhs.set_node(node[node_name]);
     return true;
   }
 };

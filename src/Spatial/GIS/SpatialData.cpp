@@ -12,15 +12,14 @@
 #include <memory>
 #include <stdexcept>
 
-#include "Configuration/Config.h"
-#include "Simulation/Model.h"
+#include "Configuration/SpatialSettings/SpatialSettings.h"
 #include "Utils/Helpers/StringHelpers.h"
 
-SpatialData::SpatialData() = default;  // Array is zero-initialized by default
+SpatialData::SpatialData(SpatialSettings* spatial_settings):spatial_settings_(spatial_settings){}
 
 SpatialData::~SpatialData() = default;  // Let unique_ptr handle cleanup
 
-bool SpatialData::parse(const YAML::Node &node) {
+bool SpatialData::process_config(const YAML::Node &node) {
   // Validate required configuration
   if (!node["cell_size"]) {
     throw std::runtime_error("Missing required 'cell_size' configuration");
@@ -30,7 +29,8 @@ bool SpatialData::parse(const YAML::Node &node) {
   // Load and validate raster files
   load_files(node);
 
-  if (Model::get_config()->number_of_locations() != 0) {
+  // number of lcaitions is in Spatial Settings
+  if (spatial_settings_->get_number_of_locations() != 0) {
     throw std::runtime_error("Location database is not empty");
   }
 
@@ -149,8 +149,9 @@ bool SpatialData::check_catalog(std::string &errors) {
 }
 
 void SpatialData::generate_distances() const {
-  auto &db = Model::get_config()->location_db();
-  auto &distances = Model::get_config()->get_spatial_settings().get_spatial_distance_matrix();
+  // both db and distances belongs to spatial_settings
+  auto &db = spatial_settings_->location_db();
+  auto &distances = spatial_settings_->get_spatial_distance_matrix();
 
   auto locations = db.size();
   distances.resize(static_cast<uint64_t>(locations));
@@ -179,7 +180,8 @@ void SpatialData::generate_locations(AscFile* reference) {
     throw std::runtime_error("Raster Information is not initialized");
   }
   // Pre-allocate the location database
-  auto &db = Model::get_config()->location_db();
+  // location_db belongs to spatial settings
+  auto &db = spatial_settings_->location_db();
   db.clear();
 
   // Calculate maximum possible size (all cells valid)
@@ -205,12 +207,12 @@ void SpatialData::generate_locations(AscFile* reference) {
   db.shrink_to_fit();
 
   // Update the configured count
-  Model::get_config()->get_spatial_settings().set_number_of_locations(static_cast<int>(db.size()));
-  if (Model::get_config()->number_of_locations() == 0) {
+  spatial_settings_->set_number_of_locations(db.size());
+  if (spatial_settings_->get_number_of_locations() == 0) {
     // This error should be redundant since the ASC loader should catch it
     spdlog::error("Zero locations loaded while parsing ASC file.");
   }
-  const auto location_count = Model::get_config()->number_of_locations();
+  const auto location_count = spatial_settings_->get_number_of_locations();
 
   if (location_count == 0) {
     throw std::runtime_error(fmt::format("No valid locations found in raster"));
@@ -228,7 +230,7 @@ void SpatialData::load(const std::string &filename, SpatialFileType type) {
   data_.at(type) = std::unique_ptr<AscFile>(AscFileManager::read(filename));
 }
 
-void SpatialData::copy_raster_to_location_db(SpatialFileType type) {
+void SpatialData::populate_raster_data_to_location_db(SpatialFileType type) {
   // Verify that the raster data has been loaded
   if (!data_.at(type)) {
     throw std::runtime_error(fmt::format("{} called without raster, type id: {}", __FUNCTION__,
@@ -239,8 +241,8 @@ void SpatialData::copy_raster_to_location_db(SpatialFileType type) {
   AscFile* raster = data_.at(type).get();
 
   // Get a reference to the location database
-  auto &db = Model::get_config()->location_db();
-  auto count = Model::get_config()->number_of_locations();
+  auto &db = spatial_settings_->location_db();
+  auto count = spatial_settings_->get_number_of_locations();
 
   // Scan the data and update the values
   auto id = -1;
@@ -350,8 +352,8 @@ void SpatialData::load_age_distribution(const YAML::Node &node) {
     throw std::runtime_error("Missing required age distribution data");
   }
 
-  auto &location_db = Model::get_config()->location_db();
-  auto number_of_locations = Model::get_config()->number_of_locations();
+  auto &location_db = spatial_settings_->location_db();
+  auto number_of_locations = spatial_settings_->get_number_of_locations();
 
   for (auto loc = 0; loc < number_of_locations; loc++) {
     auto input_loc = node["age_distribution_by_location"].size() < number_of_locations ? 0 : loc;
@@ -367,12 +369,12 @@ void SpatialData::load_age_distribution(const YAML::Node &node) {
 }
 
 void SpatialData::load_treatment_data(const YAML::Node &node) {
-  auto &location_db = Model::get_config()->location_db();
-  auto number_of_locations = Model::get_config()->number_of_locations();
+  auto &location_db = spatial_settings_->location_db();
+  auto number_of_locations = spatial_settings_->get_number_of_locations();
 
   // Only load from YAML if raster not provided
   if (data_[SpatialFileType::PR_TREATMENT_UNDER5] != nullptr) {
-    copy_raster_to_location_db(SpatialFileType::PR_TREATMENT_UNDER5);
+    populate_raster_data_to_location_db(SpatialFileType::PR_TREATMENT_UNDER5);
   } else {
     if (!node["p_treatment_for_under_5_by_location"]) {
       throw std::runtime_error("Missing treatment rate data for under 5");
@@ -386,7 +388,7 @@ void SpatialData::load_treatment_data(const YAML::Node &node) {
   }
 
   if (data_[SpatialFileType::PR_TREATMENT_OVER5] != nullptr) {
-    copy_raster_to_location_db(SpatialFileType::PR_TREATMENT_OVER5);
+    populate_raster_data_to_location_db(SpatialFileType::PR_TREATMENT_OVER5);
   } else {
     if (!node["p_treatment_for_over_5_by_location"]) {
       throw std::runtime_error("Missing treatment rate data for over 5");
@@ -401,11 +403,11 @@ void SpatialData::load_treatment_data(const YAML::Node &node) {
 }
 
 void SpatialData::load_location_data(const YAML::Node &node) {
-  auto &location_db = Model::get_config()->location_db();
-  auto number_of_locations = Model::get_config()->number_of_locations();
+  auto &location_db = spatial_settings_->location_db();
+  auto number_of_locations = spatial_settings_->get_number_of_locations();
 
   if (data_[SpatialFileType::BETA] != nullptr) {
-    copy_raster_to_location_db(SpatialFileType::BETA);
+    populate_raster_data_to_location_db(SpatialFileType::BETA);
   } else {
     if (!node["beta_by_location"]) { throw std::runtime_error("Missing beta data"); }
     for (auto loc = 0; loc < number_of_locations; loc++) {
@@ -414,7 +416,7 @@ void SpatialData::load_location_data(const YAML::Node &node) {
     }
   }
   if (data_[SpatialFileType::POPULATION] != nullptr) {
-    copy_raster_to_location_db(SpatialFileType::POPULATION);
+    populate_raster_data_to_location_db(SpatialFileType::POPULATION);
   } else {
     if (!node["population_size_by_location"]) {
       throw std::runtime_error("Missing population data");
