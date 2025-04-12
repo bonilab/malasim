@@ -20,8 +20,6 @@ location_(location),fraction_(fraction), alleles_(alleles){
   set_time(execute_at);
 }
 
-IntroduceAmodiaquineMutantEvent::~IntroduceAmodiaquineMutantEvent() = default;
-
 void IntroduceAmodiaquineMutantEvent::do_execute() {
   auto* pi =
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>();

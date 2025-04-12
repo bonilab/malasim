@@ -36,7 +36,7 @@ public:
 
   // Prevent copying and moving
   Model(const Model &) = delete;
-  void operator=(const Model &) = delete;
+  Model& operator=(const Model &) = delete;
   Model(Model &&) = delete;
   Model &operator=(Model &&) = delete;
 

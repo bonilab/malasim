@@ -2,146 +2,145 @@
 
 This module implements the spatial modeling components of the malaria simulation, including geographic information systems, movement patterns, and location management.
 
-## Overview
+## Directory Structure
 
-The Spatial module provides:
-- Geographic information management
-- Population movement modeling
-- Location data handling
-- Spatial relationships
-- Movement patterns
-
-## Components
-
-### Core Systems
-- `SpatialModel`: Base spatial modeling
-  - Geographic relationships
+### Core Files
+- `SpatialModel.hxx`: Template-based spatial modeling implementation
+  - Geographic relationship management
   - Distance calculations
-  - Movement patterns
-  - Spatial interactions
-  - Region management
+  - Movement pattern handling
+  - Spatial interaction modeling
 
-### Submodules
+### Subdirectories
+- `GIS/`: Geographic Information System components
+  - Administrative boundary management
+  - Spatial data processing
+  - Geographic calculations
+  - Region definitions
 
-#### GIS (`GIS/`)
-- Administrative level management
-- Spatial data processing
-- Geographic calculations
-- Region definitions
-- Location mapping
+- `Location/`: Location management system
+  - Location class implementations
+  - Coordinate system handling
+  - Spatial relationship tracking
+  - Distance calculation utilities
 
-#### Movement (`Movement/`)
-- Population movement models
-- Migration patterns
-- Travel behavior
-- Movement rates
-- Spatial flows
+- `Movement/`: Population movement modeling
+  - Movement pattern implementations
+  - Migration handling
+  - Travel behavior modeling
+  - Flow rate calculations
 
-#### Location (`Location/`)
-- Location definitions
-- Coordinate management
-- Spatial relationships
-- Distance calculations
-- Region boundaries
+## Implementation Details
 
-## Implementation
-
-### Spatial Model
+### Spatial Model (`SpatialModel.hxx`)
 ```cpp
+template<typename LocationType>
 class SpatialModel {
-    // Core functionality
-    double calculate_distance(Location* loc1, Location* loc2);
-    vector<Location*> get_neighbors(Location* location);
-    bool is_connected(Location* loc1, Location* loc2);
+public:
+    // Disallow copy and move
+    SpatialModel(const SpatialModel&) = delete;
+    SpatialModel& operator=(const SpatialModel&) = delete;
     
-    // Movement patterns
-    double get_movement_rate(Location* from, Location* to);
-    void update_movement_patterns();
+    // Core functionality
+    [[nodiscard]] double calculate_distance(const LocationType* loc1,
+                                          const LocationType* loc2) const;
+    [[nodiscard]] std::vector<LocationType*> get_neighbors(const LocationType* location) const;
+    
+    // Movement handling
+    void update_movement_rates();
+    [[nodiscard]] double get_movement_rate(const LocationType* from,
+                                         const LocationType* to) const;
 };
 ```
 
-## Usage
-
-### Basic Operations
+### Location Management
 ```cpp
-// Initialize spatial model
-auto spatial_model = new SpatialModel();
-spatial_model->initialize();
-
-// Calculate spatial relationships
-double distance = spatial_model->calculate_distance(loc1, loc2);
-auto neighbors = spatial_model->get_neighbors(location);
-
-// Handle movement
-double rate = spatial_model->get_movement_rate(from, to);
-spatial_model->update_movement_patterns();
+class Location {
+public:
+    // Location properties
+    [[nodiscard]] const Coordinate& get_coordinate() const;
+    [[nodiscard]] const std::vector<Location*>& get_neighbors() const;
+    
+    // Population tracking
+    [[nodiscard]] size_t get_population() const;
+    void update_population();
+};
 ```
 
-## Key Features
+## Usage Examples
 
-### Geographic Management
-- Administrative hierarchies
-- Spatial relationships
-- Distance calculations
-- Region definitions
-- Boundary handling
+### Basic Spatial Operations
+```cpp
+// Initialize spatial model
+auto spatial_model = std::make_unique<SpatialModel<Location>>();
 
-### Movement Modeling
-- Population flows
-- Migration patterns
-- Travel behavior
-- Movement rates
-- Spatial interactions
+// Calculate distances and find neighbors
+auto distance = spatial_model->calculate_distance(location1, location2);
+auto neighbors = spatial_model->get_neighbors(location);
+
+// Update movement patterns
+spatial_model->update_movement_rates();
+auto rate = spatial_model->get_movement_rate(from_loc, to_loc);
+```
 
 ### Location Management
-- Coordinate systems
-- Region definitions
-- Distance metrics
-- Spatial queries
-- Boundary operations
+```cpp
+// Access location properties
+auto coord = location->get_coordinate();
+auto neighbors = location->get_neighbors();
+
+// Population tracking
+auto pop = location->get_population();
+location->update_population();
+```
+
+## Implementation Guidelines
+
+1. **Geographic Calculations**
+   - Use appropriate coordinate systems
+   - Handle boundary conditions
+   - Validate spatial relationships
+   - Optimize distance calculations
+
+2. **Movement Modeling**
+   - Ensure conservation of population
+   - Handle edge cases
+   - Track movement patterns
+   - Validate movement rates
+
+3. **Performance**
+   - Cache frequent calculations
+   - Use efficient data structures
+   - Optimize spatial queries
+   - Handle large datasets efficiently
+
+4. **Thread Safety**
+   - Protect shared resources
+   - Use appropriate synchronization
+   - Handle concurrent updates
+   - Maintain data consistency
 
 ## Dependencies
 
-### Core Components
-- `Config`
-- `Population`
-- `Model`
-- `Random`
+### Internal
+- `Model` system
+- `Population` management
+- `Random` number generation
+- Configuration system
 
-### Support Systems
-- GIS utilities
+### External
+- STL containers
 - Math libraries
-- File I/O
-- Statistics
+- Threading support
+- Logging system
 
 ## Notes
 
-### Implementation Guidelines
-- Validate spatial data
-- Handle edge cases
-- Check boundaries
-- Verify relationships
-- Document assumptions
-- Test thoroughly
-- Handle errors
-- Log operations
-
-### Performance Considerations
-- Cache calculations
-- Optimize queries
-- Manage memory
-- Handle large datasets
-- Profile operations
-- Validate inputs
-- Clean up resources
-- Document limitations
-
-### Movement Models
-- Validate patterns
-- Check connectivity
-- Monitor flows
-- Track changes
-- Update regularly
-- Log anomalies
-- Handle exceptions
-- Document behaviors
+- All spatial calculations must be validated
+- Thread safety is essential for movement updates
+- Performance optimization is critical
+- Memory efficiency is important
+- Documentation must be maintained
+- Unit tests are required
+- Error handling is crucial
+- Logging is necessary for debugging

@@ -4,7 +4,6 @@
  * Implement the environmental event builders.
  */
 #include "EnvironmentEventBuilder.h"
-
 #include <vector>
 
 #include "Configuration/Config.h"

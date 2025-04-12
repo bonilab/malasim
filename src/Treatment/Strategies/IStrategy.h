@@ -29,9 +29,9 @@ class IStrategy {
 
   static std::map<std::string, StrategyType> StrategyTypeMap;
 
-  //disallow copy and assign
+  // Disallow copy
   IStrategy(const IStrategy&) = delete;
-  void operator=(const IStrategy&) = delete;
+  IStrategy& operator=(const IStrategy&) = delete;
 
  public:
   int id{-1};

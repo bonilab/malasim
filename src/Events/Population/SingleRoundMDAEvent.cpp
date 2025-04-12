@@ -12,7 +12,11 @@
 #include "Utils/Random.h"
 #include "date/date.h"
 
-SingleRoundMDAEvent::SingleRoundMDAEvent(const int &execute_at) { set_time(execute_at); }
+SingleRoundMDAEvent::SingleRoundMDAEvent(const int& at_time) {
+    set_time(at_time);
+    days_to_complete_all_treatments = 14;
+    fraction_population_targeted = std::vector<double>();
+}
 
 void SingleRoundMDAEvent::do_execute() {
   spdlog::info("{}: executing Single Round MDA", Model::get_scheduler()->get_current_date_string());

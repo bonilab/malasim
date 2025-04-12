@@ -16,11 +16,13 @@ class Therapy;
 class ProgressToClinicalEvent : public PersonEvent {
   // OBJECTPOOL(ProgressToClinicalEvent)
 public:
-  // disallow copy, assign and move
-  ProgressToClinicalEvent(const ProgressToClinicalEvent &) = delete;
-  void operator=(const ProgressToClinicalEvent &) = delete;
-  ProgressToClinicalEvent(ProgressToClinicalEvent &&) = delete;
-  void operator=(ProgressToClinicalEvent &&) = delete;
+  // Disallow copy
+  ProgressToClinicalEvent(const ProgressToClinicalEvent&) = delete;
+  ProgressToClinicalEvent& operator=(const ProgressToClinicalEvent&) = delete;
+
+  // Disallow move
+  ProgressToClinicalEvent(ProgressToClinicalEvent&&) = delete;
+  ProgressToClinicalEvent& operator=(ProgressToClinicalEvent&&) = delete;
 
   explicit ProgressToClinicalEvent(Person* person) : PersonEvent(person) {}
 

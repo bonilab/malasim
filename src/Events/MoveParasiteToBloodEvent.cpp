@@ -10,6 +10,7 @@
 #include "Population/ImmuneSystem/ImmuneSystem.h"
 #include "Population/Person/Person.h"
 #include "Population/SingleHostClonalParasitePopulations.h"
+#include "Treatment/Therapies/Drug.h"
 
 //OBJECTPOOL_IMPL(MoveParasiteToBloodEvent)
 

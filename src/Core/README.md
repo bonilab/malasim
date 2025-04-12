@@ -2,71 +2,92 @@
 
 This module contains the core components and functionality that drive the malaria simulation system.
 
-## Overview
+## Directory Structure
 
-The Core module provides:
-- Fundamental simulation infrastructure
-- Core scheduling mechanisms
-- Basic simulation components
-- Essential system services
-- Core data structures
+### Core Components
+- `README.md`: This documentation file
 
-## Components
+### Subdirectories
+- `Scheduler/`: Event scheduling and time management system
+  - `Scheduler.h/cpp`: Main scheduler implementation
+  - `EventManager.h/cpp`: Event queue management
+  - `README.md`: Scheduler-specific documentation
 
-### Scheduler
-- Time management
-- Event scheduling
-- Simulation flow control
+## Key Components
+
+### Scheduler System
+The scheduler is the heart of the simulation, managing time progression and event execution:
+
+#### Scheduler (`Scheduler.h/cpp`)
+- Time management and progression
+- Event scheduling and execution
 - Calendar operations
-- Event execution
+- Simulation flow control
+- Thread-safe event handling
 
-## Key Features
-
-### Time Management
-- Simulation time tracking
-- Event timing control
-- Calendar-based operations
-- Time step management
-- Execution scheduling
-
-### Event Handling
+#### Event Manager (`EventManager.h/cpp`)
 - Event queue management
 - Priority-based scheduling
-- Event execution control
-- Event dependencies
-- Timing synchronization
+- Event dependency tracking
+- Efficient event storage and retrieval
+- Thread-safe operations
 
-### Core Services
-- Basic simulation services
-- Component initialization
-- Resource management
-- System coordination
-- Error handling
+## Implementation Guidelines
 
-## Implementation
+1. **Thread Safety**
+   - All core operations must be thread-safe
+   - Use appropriate synchronization mechanisms
+   - Avoid race conditions
+   - Handle concurrent access properly
 
-The Core module implements fundamental simulation functionality:
-- Time management systems
-- Event scheduling mechanisms
-- Core data structures
-- Basic service providers
-- System coordinators
+2. **Performance**
+   - Optimize critical paths
+   - Use efficient data structures
+   - Minimize memory allocations
+   - Profile and benchmark regularly
+
+3. **Error Handling**
+   - Comprehensive error checking
+   - Proper exception handling
+   - Detailed error reporting
+   - Graceful failure recovery
+
+4. **Memory Management**
+   - RAII principles
+   - Smart pointer usage
+   - Resource cleanup
+   - Memory leak prevention
 
 ## Dependencies
 
+### Internal Dependencies
+- Event system
 - Configuration system
-- Event management
-- Time utilities
-- Basic data structures
-- System services
+- Logging system
+
+### External Dependencies
+- Standard Template Library (STL)
+- Threading support
+- Date/time utilities
+
+## Usage Example
+
+```cpp
+// Initialize the scheduler
+auto scheduler = std::make_unique<Scheduler>();
+
+// Schedule an event
+scheduler->schedule_event(std::make_unique<MyEvent>());
+
+// Run the simulation
+scheduler->run();
+```
 
 ## Notes
 
-- Core components require careful maintenance
-- Performance is critical
+- Core components are fundamental to simulation stability
+- Changes require thorough testing
+- Performance optimizations are critical
 - Thread safety is essential
-- Error handling is crucial
 - Documentation must be maintained
-- Testing is vital
-- Backward compatibility important
-- Careful versioning needed
+- Backward compatibility is important

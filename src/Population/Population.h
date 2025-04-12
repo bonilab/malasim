@@ -20,7 +20,7 @@ public:
   Population &operator=(Population &&) = delete;
   // Disable copy and assignment
   Population(const Population &) = delete;
-  void operator=(const Population &) = delete;
+  Population& operator=(const Population &) = delete;
 
   Population();
 

@@ -29,7 +29,7 @@ class Person : public PersonIndexAllHandler,
 public:
   // day_that_last_trip_outside_district_was_initiated_sable copy and assignment
   Person(const Person &) = delete;
-  void operator=(const Person &) = delete;
+  Person& operator=(const Person &) = delete;
   Person(Person &&) = delete;
   Person &operator=(Person &&) = delete;
 

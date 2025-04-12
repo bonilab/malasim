@@ -18,11 +18,13 @@ class Genotype;
 class MoveParasiteToBloodEvent : public PersonEvent {
   //  OBJECTPOOL(MoveParasiteToBloodEvent)
 public:
-  // disallow copy and assign and move
-  MoveParasiteToBloodEvent(const MoveParasiteToBloodEvent &orig) = delete;
-  void operator=(const MoveParasiteToBloodEvent &orig) = delete;
-  MoveParasiteToBloodEvent(MoveParasiteToBloodEvent &&orig) = delete;
-  void operator=(MoveParasiteToBloodEvent &&orig) = delete;
+  // Disallow copy
+  MoveParasiteToBloodEvent(const MoveParasiteToBloodEvent&) = delete;
+  MoveParasiteToBloodEvent& operator=(const MoveParasiteToBloodEvent&) = delete;
+
+  // Disallow move
+  MoveParasiteToBloodEvent(MoveParasiteToBloodEvent&&) = delete;
+  MoveParasiteToBloodEvent& operator=(MoveParasiteToBloodEvent&&) = delete;
 
   explicit MoveParasiteToBloodEvent(Person* person) : PersonEvent(person) {}
   ~MoveParasiteToBloodEvent() override = default;

@@ -993,7 +993,7 @@ public:
   static const int NUMBER_OF_REPORTED_MOI = 8;
   // disallow copy and assign
   ModelDataCollector(const ModelDataCollector &) = delete;
-  void operator=(const ModelDataCollector &) = delete;
+  ModelDataCollector& operator=(const ModelDataCollector &) = delete;
   ModelDataCollector(ModelDataCollector &&) = delete;
   ModelDataCollector &operator=(ModelDataCollector &&) = delete;
 

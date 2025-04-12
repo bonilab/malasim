@@ -9,11 +9,13 @@
 template <typename EventType>
 class EventManager {
 public:
-  // Disallow copy and assign
-  EventManager(const EventManager &) = delete;
-  void operator=(const EventManager &) = delete;
-  EventManager(EventManager &&) = delete;
-  EventManager &operator=(EventManager &&) = delete;
+  // Disallow copy
+  EventManager(const EventManager&) = delete;
+  EventManager& operator=(const EventManager&) = delete;
+
+  // Disallow move
+  EventManager(EventManager&&) = delete;
+  EventManager& operator=(EventManager&&) = delete;
 
 private:
   std::multimap<int, std::unique_ptr<EventType>> events_;

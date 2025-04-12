@@ -2,65 +2,120 @@
 
 The Scheduler module is responsible for managing and executing events in the simulation system. It provides a robust framework for scheduling, managing, and executing time-based events in a simulation environment.
 
-## Overview
+## Directory Contents
 
-The `Scheduler` class is the core component that handles:
-- Event scheduling and execution
-- Time management
-- Calendar-based operations
-- Simulation control flow
+### Core Components
+- `Scheduler.h/cpp`: Main scheduler implementation
+  - Event scheduling and execution
+  - Time management
+  - Calendar operations
+  - Simulation control flow
 
-## Key Features
+- `EventManager.h/cpp`: Event queue management
+  - Priority-based event queue
+  - Event storage and retrieval
+  - Thread-safe operations
+  - Event dependency tracking
 
-### Time Management
-- Tracks current simulation time
-- Manages total available simulation time
-- Supports time step execution
-- Handles calendar-based date operations
+## Implementation Details
 
-### Event Management
-- Schedules population-level events
-- Manages event execution lists
-- Provides event cancellation capabilities
-- Supports clearing of all scheduled events
+### Scheduler Class
+The `Scheduler` class (`Scheduler.h/cpp`) provides:
 
-### Calendar Operations
-- Tracks current day and month in the year
-- Provides utilities for checking first/last days of:
+#### Time Management
+- Current simulation time tracking
+- Total simulation time management
+- Time step execution control
+- Calendar-based date operations
+- Thread-safe time updates
+
+#### Event Scheduling
+- Population event scheduling
+- Individual event scheduling
+- Event cancellation support
+- Event queue management
+- Thread-safe scheduling operations
+
+#### Calendar Operations
+- Current day/month/year tracking
+- First/last day checks for:
   - Month
   - Year
-- Supports daily updates
+  - Custom periods
+- Daily update support
 
-### Simulation Control
-- Initializes simulation with start and end dates
-- Manages simulation execution flow
-- Provides force stop capabilities
-- Handles time step begin/end operations
+### Event Manager Class
+The `EventManager` class (`EventManager.h/cpp`) handles:
 
-## Usage
+#### Event Queue
+- Priority-based event storage
+- Efficient event retrieval
+- Thread-safe queue operations
+- Event dependency management
 
-The Scheduler is typically used as follows:
+#### Event Processing
+- Event execution ordering
+- Event cancellation
+- Queue cleanup
+- Resource management
+
+## Usage Example
 
 ```cpp
 // Initialize the scheduler with start and end dates
-scheduler.initialize(start_date, end_date);
+auto scheduler = std::make_unique<Scheduler>();
+scheduler->initialize(start_date, end_date);
 
 // Schedule events
-scheduler.schedule_population_event(event);
+auto event = std::make_unique<MyEvent>(parameters);
+scheduler->schedule_event(std::move(event));
 
 // Run the simulation
-scheduler.run();
+scheduler->run();
+
+// Check simulation state
+auto current_time = scheduler->current_time();
+bool is_month_end = scheduler->is_last_day_of_month();
 ```
+
+## Implementation Guidelines
+
+1. **Thread Safety**
+   - All public methods are thread-safe
+   - Use appropriate synchronization
+   - Protect shared resources
+   - Handle concurrent access
+
+2. **Memory Management**
+   - Use smart pointers for events
+   - RAII for resource management
+   - Proper cleanup in destructors
+   - No memory leaks
+
+3. **Error Handling**
+   - Validate all inputs
+   - Handle edge cases
+   - Report errors through logging
+   - Maintain simulation stability
 
 ## Dependencies
 
-- Requires a `Model` instance for simulation context
-- Uses the `date` library for calendar operations
-- Relies on event-related types defined in `Utils/TypeDef.h`
+### Internal
+- Event system
+- Configuration system
+- Logging system
+- Model context
+
+### External
+- `date` library for calendar operations
+- STL for containers and algorithms
+- Threading support
 
 ## Notes
 
-- The Scheduler class is non-copyable and non-movable
-- It maintains a list of population events for execution
-- Supports dynamic extension of total simulation time
-- Provides various utility methods for time and date management
+- Non-copyable and non-movable design
+- Thread-safe operations
+- Exception-safe implementation
+- Comprehensive logging
+- Performance-optimized
+- Extensible design

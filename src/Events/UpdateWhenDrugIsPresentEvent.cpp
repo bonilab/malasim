@@ -7,7 +7,7 @@
 #include "Population/SingleHostClonalParasitePopulations.h"
 #include "Configuration/Config.h"
 #include "Simulation/Model.h"
-
+#include "Treatment/Therapies/Drug.h"
 //OBJECTPOOL_IMPL(UpdateWhenDrugIsPresentEvent)
 
 void UpdateWhenDrugIsPresentEvent::do_execute() {

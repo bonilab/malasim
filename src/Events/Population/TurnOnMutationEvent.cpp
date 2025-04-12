@@ -5,9 +5,9 @@
 #include "Simulation/Model.h"
 #include "Utils/Helpers/StringHelpers.h"
 
-TurnOnMutationEvent::TurnOnMutationEvent(const int &at_time, const double &mutation_probability) :
-  mutation_probability{mutation_probability} {
-  set_time(at_time);
+TurnOnMutationEvent::TurnOnMutationEvent(const int& at_time, const double& mutation_probability)
+    : mutation_probability(mutation_probability) {
+    set_time(at_time);
 }
 
 void TurnOnMutationEvent::do_execute() {

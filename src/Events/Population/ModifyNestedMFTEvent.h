@@ -7,11 +7,13 @@
 
 class ModifyNestedMFTEvent : public WorldEvent {
 public:
-  //disallow copy, assign and move
-  ModifyNestedMFTEvent(const ModifyNestedMFTEvent &) = delete;
-  void operator=(const ModifyNestedMFTEvent &) = delete;
-  ModifyNestedMFTEvent(ModifyNestedMFTEvent &&) = delete;
-  void operator=(ModifyNestedMFTEvent &&) = delete;
+  // Disallow copy
+  ModifyNestedMFTEvent(const ModifyNestedMFTEvent&) = delete;
+  ModifyNestedMFTEvent& operator=(const ModifyNestedMFTEvent&) = delete;
+
+  // Disallow move
+  ModifyNestedMFTEvent(ModifyNestedMFTEvent&&) = delete;
+  ModifyNestedMFTEvent& operator=(ModifyNestedMFTEvent&&) = delete;
 
 public:
   int strategy_id{-1};

@@ -6,30 +6,30 @@
 
 #include "Population/ClonalParasitePopulation.h"
 #include "Utils/TypeDef.h"
+
 class ClonalParasitePopulation;
-
 class Person;
-
 class DrugType;
-
 class DrugsInBlood;
-
 class ParasiteDensityUpdateFunction;
 
 class SingleHostClonalParasitePopulations {
   // OBJECTPOOL(SingleHostClonalParasitePopulations)
 public:
+  // Disallow copy
+  SingleHostClonalParasitePopulations(const SingleHostClonalParasitePopulations&) = delete;
+  SingleHostClonalParasitePopulations& operator=(const SingleHostClonalParasitePopulations&) = delete;
+
+  // Disallow move
+  SingleHostClonalParasitePopulations(SingleHostClonalParasitePopulations&&) = delete;
+  SingleHostClonalParasitePopulations& operator=(SingleHostClonalParasitePopulations&&) = delete;
+
   // Use constexpr for compile-time constant
   static constexpr double DEFAULT_LOG_DENSITY = ClonalParasitePopulation::LOG_ZERO_PARASITE_DENSITY;
 
   // Use explicit for single-parameter constructors
   explicit SingleHostClonalParasitePopulations(Person* person = nullptr);
 
-  SingleHostClonalParasitePopulations(SingleHostClonalParasitePopulations &&) = delete;
-  SingleHostClonalParasitePopulations &operator=(SingleHostClonalParasitePopulations &&) = delete;
-  // disallow copy and assign
-  SingleHostClonalParasitePopulations(const SingleHostClonalParasitePopulations &) = delete;
-  void operator=(const SingleHostClonalParasitePopulations &) = delete;
   // Mark destructor as default if it doesn't need special handling
   virtual ~SingleHostClonalParasitePopulations();
 

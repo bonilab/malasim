@@ -2,15 +2,18 @@
 #define MFTSTRATEGY_H
 
 #include "IStrategy.h"
+#include <vector>
 
 class Random;
 
 class Therapy;
 
 class MFTStrategy : public IStrategy {
-  //disallow copy and assign and move
+  // Disallow copy
   MFTStrategy(const MFTStrategy&) = delete;
-  void operator=(const MFTStrategy&) = delete;
+  MFTStrategy& operator=(const MFTStrategy&) = delete;
+
+  // Disallow move
   MFTStrategy(MFTStrategy&&) = delete;
   MFTStrategy& operator=(MFTStrategy&&) = delete;
 

@@ -1,6 +1,7 @@
 #ifndef DRUGDATABASE_H
 #define DRUGDATABASE_H
 
+#include <memory>
 #include "DrugType.h"
 
 using DrugTypePtrVector = std::vector<std::unique_ptr<DrugType>>;
