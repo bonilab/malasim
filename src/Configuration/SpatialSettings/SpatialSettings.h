@@ -72,8 +72,8 @@ public:
 
   void cross_validate();
 
-  static constexpr std::string GRID_BASED_MODE = "grid_based";
-  static constexpr std::string LOCATION_BASED_MODE = "location_based";
+  static constexpr char* GRID_BASED_MODE = "grid_based";
+  static constexpr char* LOCATION_BASED_MODE = "location_based";
 
 private:
   std::string mode_;  // "grid_based" or "location_based"
