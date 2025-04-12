@@ -72,8 +72,8 @@ public:
 
   void cross_validate();
 
-  static constexpr char* GRID_BASED_MODE = "grid_based";
-  static constexpr char* LOCATION_BASED_MODE = "location_based";
+  static constexpr std::string GRID_BASED_MODE = "grid_based";
+  static constexpr std::string LOCATION_BASED_MODE = "location_based";
 
 private:
   std::string mode_;  // "grid_based" or "location_based"
@@ -258,9 +258,7 @@ struct convert<SpatialSettings> {
     auto node_name = mode == SpatialSettings::GRID_BASED_MODE
                          ? SpatialSettings::GRID_BASED_MODE
                          : SpatialSettings::LOCATION_BASED_MODE;
-    if (!node[node_name]) {
-      throw std::runtime_error(std::string("Missing ") + node_name + " settings.");
-    }
+    if (!node[node_name]) { throw std::runtime_error("Missing " + node_name + " settings."); }
     rhs.set_node(node[node_name]);
     return true;
   }
