@@ -15,10 +15,14 @@
 
 namespace Spatial {
 class WesolowskiSM : public SpatialModel {
-  WesolowskiSM(const WesolowskiSM &) = delete;
-  void operator=(const WesolowskiSM &) = delete;
-  WesolowskiSM(WesolowskiSM &&) = delete;
-  WesolowskiSM &operator=(WesolowskiSM &&) = delete;
+public:
+    // Disallow copy
+    WesolowskiSM(const WesolowskiSM&) = delete;
+    WesolowskiSM& operator=(const WesolowskiSM&) = delete;
+
+    // Disallow move
+    WesolowskiSM(WesolowskiSM&&) = delete;
+    WesolowskiSM& operator=(WesolowskiSM&&) = delete;
 
   double kappa_;
   double alpha_;

@@ -122,8 +122,13 @@ public:
   // Add constant for the new admin boundaries configuration section
   constexpr static const std::string_view ADMIN_BOUNDARIES = "administrative_boundaries";
 
-  SpatialData(SpatialData &&) = delete;
-  SpatialData &operator=(SpatialData &&) = delete;
+  // Disallow copy
+  SpatialData(const SpatialData&) = delete;
+  SpatialData& operator=(const SpatialData&) = delete;
+
+  // Disallow move
+  SpatialData(SpatialData&&) = delete;
+  SpatialData& operator=(SpatialData&&) = delete;
 
   explicit SpatialData(SpatialSettings* spatial_settings);
   // Deconstructor
@@ -171,12 +176,6 @@ public:
 
   // Perform any clean-up operations after parsing the YAML file is complete
   void parse_complete();
-
-  // Not supported by singleton.
-  SpatialData(SpatialData const &) = delete;
-
-  // Not supported by singleton.
-  void operator=(SpatialData const &) = delete;
 
   // Return the raster header or the default structure if no raster are loaded
   [[nodiscard]] RasterInformation get_raster_header() const;

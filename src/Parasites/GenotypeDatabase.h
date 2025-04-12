@@ -13,11 +13,13 @@ using GenotypePtrVector = std::vector<std::unique_ptr<Genotype>>;
 
 class GenotypeDatabase : public GenotypePtrVector {
 public:
-  // disallow copy, assign and move
-  GenotypeDatabase(const GenotypeDatabase &) = delete;
-  void operator=(const GenotypeDatabase &) = delete;
-  GenotypeDatabase(GenotypeDatabase &&) = delete;
-  GenotypeDatabase &operator=(GenotypeDatabase &&) = delete;
+  // Disallow copy
+  GenotypeDatabase(const GenotypeDatabase&) = delete;
+  GenotypeDatabase& operator=(const GenotypeDatabase&) = delete;
+
+  // Disallow move
+  GenotypeDatabase(GenotypeDatabase&&) = delete;
+  GenotypeDatabase& operator=(GenotypeDatabase&&) = delete;
 
   GenotypeDatabase();
 

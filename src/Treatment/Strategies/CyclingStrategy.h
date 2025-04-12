@@ -4,9 +4,13 @@
 #include "IStrategy.h"
 
 class CyclingStrategy : public IStrategy {
-  //disallow copy and assign
+  // Disallow copy
   CyclingStrategy(const CyclingStrategy&) = delete;
-  void operator=(const CyclingStrategy&) = delete;
+  CyclingStrategy& operator=(const CyclingStrategy&) = delete;
+
+  // Disallow move
+  CyclingStrategy(CyclingStrategy&&) = delete;
+  CyclingStrategy& operator=(CyclingStrategy&&) = delete;
 
  public:
   std::vector<Therapy *> therapy_list;

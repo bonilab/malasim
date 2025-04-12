@@ -13,7 +13,7 @@ typedef std::pair<std::vector<std::pair<int,std::string>>,std::pair<int,int>> Mo
 class Mosquito {
 public:
   Mosquito(const Mosquito &) = delete;
-  void operator=(const Mosquito &) = delete;
+  Mosquito& operator=(const Mosquito &) = delete;
 
 public:
   Model *model { nullptr };

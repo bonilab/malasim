@@ -18,7 +18,7 @@ public:
   Logger &operator=(Logger &&) = delete;
   // Prevent copy and assignment
   Logger(const Logger &) = delete;
-  void operator=(const Logger &) = delete;
+  Logger& operator=(const Logger &) = delete;
 
 private:
   // Private constructor to prevent instantiation

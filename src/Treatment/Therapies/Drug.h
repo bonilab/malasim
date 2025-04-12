@@ -6,9 +6,13 @@
 class Drug {
     // OBJECTPOOL(Drug)
 
-    //disallow copy and assign
+    // Disallow copy
     Drug(const Drug&) = delete;
-    void operator=(const Drug&) = delete;
+    Drug& operator=(const Drug&) = delete;
+
+    // Disallow move
+    Drug(Drug&&) = delete;
+    Drug& operator=(Drug&&) = delete;
 
 private:
     int dosing_days_;

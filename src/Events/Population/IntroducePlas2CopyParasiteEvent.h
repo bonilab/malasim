@@ -1,37 +1,52 @@
-#ifndef PCMS_INTRODUCEPLAS2COPYPARASITEEVENT_H
-#define PCMS_INTRODUCEPLAS2COPYPARASITEEVENT_H
+#pragma once
 
 #include <string>
+#include <vector>
+#include <tuple>
 
 // #include "Core/ObjectPool.h"
 #include "Events/Event.h"
 
+/**
+ * @brief Event that introduces parasites with two copies of plasmepsin
+ */
 class IntroducePlas2CopyParasiteEvent : public WorldEvent {
-public:
-  //disallow copy, assign and move
-  IntroducePlas2CopyParasiteEvent(const IntroducePlas2CopyParasiteEvent &) = delete;
-  void operator=(const IntroducePlas2CopyParasiteEvent &) = delete;
-  IntroducePlas2CopyParasiteEvent(IntroducePlas2CopyParasiteEvent &&) = delete;
-  void operator=(IntroducePlas2CopyParasiteEvent &&) = delete;
-
-  // OBJECTPOOL(IntroducePlas2CopyParasiteEvent)
-
 private:
   int location_;
   double fraction_;
+  std::vector<std::tuple<int,int,char>> alleles_;
+
+  void do_execute() override;
 
 public:
-  explicit IntroducePlas2CopyParasiteEvent(const int &location = -1,
-                                           const int &execute_at = -1,
-                                           const double &fraction = 0);
+  // Disallow copy
+  IntroducePlas2CopyParasiteEvent(const IntroducePlas2CopyParasiteEvent&) = delete;
+  IntroducePlas2CopyParasiteEvent& operator=(const IntroducePlas2CopyParasiteEvent&) = delete;
+
+  // Disallow move
+  IntroducePlas2CopyParasiteEvent(IntroducePlas2CopyParasiteEvent&&) = delete;
+  IntroducePlas2CopyParasiteEvent& operator=(IntroducePlas2CopyParasiteEvent&&) = delete;
+
+  // OBJECTPOOL(IntroducePlas2CopyParasiteEvent)
+
+  /**
+   * @brief Constructs a new Introduce Plas2 Copy Parasite Event
+   * @param location The location to introduce the parasites
+   * @param execute_at The time at which to introduce the parasites
+   * @param fraction The fraction of the population to convert
+   * @param allele_map The alleles to introduce
+   */
+  explicit IntroducePlas2CopyParasiteEvent(
+    const int& location = -1,
+    const int& execute_at = -1,
+    const double& fraction = 0.0,
+    const std::vector<std::tuple<int,int,char>>& allele_map = {}
+  );
 
   //    ImportationEvent(const ImportationEvent& orig);
-  ~IntroducePlas2CopyParasiteEvent() override;
+  ~IntroducePlas2CopyParasiteEvent() override = default;
 
-  const std::string name() const override { return "ImportationEvent"; }
-
-private:
-  void do_execute() override;
+  [[nodiscard]] const std::string name() const override {
+    return "IntroducePlas2CopyParasiteEvent";
+  }
 };
-
-#endif  // PCMS_INTRODUCEPLAS2COPYPARASITEEVENT_H

@@ -12,16 +12,13 @@
 
 // OBJECTPOOL_IMPL(ImportationEvent)
 
-ImportationEvent::ImportationEvent(const int &location, const int &execute_at,
-                                   const int &genotype_id,
-                                   const int &number_of_cases)
-    : location_(location),
-      genotype_id_(genotype_id),
-      number_of_cases_(number_of_cases) {
-  set_time(execute_at);
+ImportationEvent::ImportationEvent(const int& location, const int& execute_at,
+                                 const int& genotype_id, const int& number_of_cases,
+                                 const std::vector<std::vector<double>>& allele_distributions)
+    : location_(location), genotype_id_(genotype_id),
+      number_of_cases_(number_of_cases), allele_distributions_(allele_distributions) {
+    set_time(execute_at);
 }
-
-ImportationEvent::~ImportationEvent() = default;
 
 void ImportationEvent::do_execute() {
   const auto number_of_importation_cases =

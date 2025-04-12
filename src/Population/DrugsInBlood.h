@@ -16,11 +16,13 @@ using DrugPtrMap = std::map<int, std::unique_ptr<Drug>>;
 
 class DrugsInBlood {
   // OBJECTPOOL(DrugsInBlood)
-  //disallow copy and assign
+  // Disallow copy
   DrugsInBlood(const DrugsInBlood&) = delete;
-  void operator=(const DrugsInBlood&) = delete;
-  DrugsInBlood(const DrugsInBlood&&) = delete;
-  DrugsInBlood& operator=(const DrugsInBlood&&) = delete;
+  DrugsInBlood& operator=(const DrugsInBlood&) = delete;
+
+  // Disallow move
+  DrugsInBlood(DrugsInBlood&&) = delete;
+  DrugsInBlood& operator=(DrugsInBlood&&) = delete;
 
  private:
   Person *person_{nullptr};

@@ -9,26 +9,26 @@
 
 class ChangeInterruptedFeedingRateEvent : public WorldEvent {
 public:
-  //disallow copy, assign and move
-  ChangeInterruptedFeedingRateEvent(const ChangeInterruptedFeedingRateEvent&) = delete;
-  void operator=(const ChangeInterruptedFeedingRateEvent&) = delete;
-  ChangeInterruptedFeedingRateEvent(ChangeInterruptedFeedingRateEvent&&) = delete;
-  void operator=(ChangeInterruptedFeedingRateEvent&&) = delete;
+    // Disallow copy
+    ChangeInterruptedFeedingRateEvent(const ChangeInterruptedFeedingRateEvent&) = delete;
+    ChangeInterruptedFeedingRateEvent& operator=(const ChangeInterruptedFeedingRateEvent&) = delete;
 
-public:
-  int location {-1};
-  double ifr {0.0};
-public:
-  explicit ChangeInterruptedFeedingRateEvent(const int &location = -1, const double &ifr = 0.0, const int &at_time = -1);
+    // Disallow move
+    ChangeInterruptedFeedingRateEvent(ChangeInterruptedFeedingRateEvent&&) = delete;
+    ChangeInterruptedFeedingRateEvent& operator=(ChangeInterruptedFeedingRateEvent&&) = delete;
 
-  ~ChangeInterruptedFeedingRateEvent() override = default;
+    explicit ChangeInterruptedFeedingRateEvent(const int &location = -1, const double &ifr = 0.0, const int &at_time = -1);
+    ~ChangeInterruptedFeedingRateEvent() override = default;
 
-  const std::string name() const override {
-    return "ChangeInterruptedFeedingRateEvent";
-  }
+    [[nodiscard]] const std::string name() const override {
+        return "ChangeInterruptedFeedingRateEvent";
+    }
+
+    int location{-1};
+    double ifr{0.0};
 
 private:
-  void do_execute() override;
+    void do_execute() override;
 };
 
 #endif  // POMS_CHANGEINTERRUPTEDFEEDINGRATEEVENT_H

@@ -2,6 +2,7 @@
 #define IMMUNESYSTEM_H
 
 #include <memory>
+#include <vector>
 
 #include "Utils/TypeDef.h"
 
@@ -18,11 +19,9 @@ class Config;
 class ImmuneSystem {
   // OBJECTPOOL(ImmuneSystem)
 public:
-  // disallow copy and assign
-  ImmuneSystem(ImmuneSystem &&) = delete;
-  ImmuneSystem &operator=(ImmuneSystem &&) = delete;
-  ImmuneSystem(const ImmuneSystem &) = delete;
-  void operator=(const ImmuneSystem &) = delete;
+  // Disallow copy
+  ImmuneSystem(const ImmuneSystem&) = delete;
+  ImmuneSystem& operator=(const ImmuneSystem&) = delete;
 
   explicit ImmuneSystem(Person* person = nullptr);
 

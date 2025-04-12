@@ -17,9 +17,9 @@ class EndClinicalEvent : public PersonEvent {
 public:
   // disallow copy, assign and move
   EndClinicalEvent(const EndClinicalEvent &) = delete;
-  void operator=(const EndClinicalEvent &) = delete;
+  EndClinicalEvent& operator=(const EndClinicalEvent &) = delete;
   EndClinicalEvent(EndClinicalEvent &&) = delete;
-  void operator=(EndClinicalEvent &&) = delete;
+  EndClinicalEvent& operator=(EndClinicalEvent &&) = delete;
   explicit EndClinicalEvent(Person* person) : PersonEvent(person) {}
   ~EndClinicalEvent() override = default;
 

@@ -25,11 +25,8 @@ Drug::~Drug() = default;
 
 void Drug::update() {
   const auto current_time = Model::get_scheduler()->current_time();
-  spdlog::info("abc");
   last_update_value_ = get_current_drug_concentration(current_time);
-  spdlog::info("abc");
   last_update_time_ = current_time;
-  spdlog::info("abc");
 }
 
 double Drug::get_current_drug_concentration(int current_time) {

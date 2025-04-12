@@ -16,9 +16,9 @@ class ReceiveTherapyEvent : public PersonEvent {
 public:
   // disallow copy and assign and move
   ReceiveTherapyEvent(const ReceiveTherapyEvent &) = delete;
-  void operator=(const ReceiveTherapyEvent &) = delete;
+  ReceiveTherapyEvent& operator=(const ReceiveTherapyEvent &) = delete;
   ReceiveTherapyEvent(ReceiveTherapyEvent &&) = delete;
-  void operator=(ReceiveTherapyEvent &&) = delete;
+  ReceiveTherapyEvent& operator=(ReceiveTherapyEvent &&) = delete;
   explicit ReceiveTherapyEvent(Person* person) : PersonEvent(person) {}
   ~ReceiveTherapyEvent() override = default;
 

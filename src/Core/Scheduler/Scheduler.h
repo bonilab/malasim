@@ -14,7 +14,7 @@ class Scheduler {
 public:
   // Disable copy and assignment
   Scheduler(const Scheduler &) = delete;
-  void operator=(const Scheduler &) = delete;
+  Scheduler& operator=(const Scheduler &) = delete;
   Scheduler(Scheduler &&) = delete;
   Scheduler &operator=(Scheduler &&) = delete;
 

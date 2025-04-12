@@ -10,26 +10,26 @@ class Person;
 
 class BirthdayEvent : public PersonEvent {
 public:
-  //disallow copy and assignment
-  BirthdayEvent(const BirthdayEvent& other) = delete;
-  void operator=(const BirthdayEvent& other) = delete;
-  BirthdayEvent(BirthdayEvent&& other) = delete;
-  BirthdayEvent& operator=(BirthdayEvent&& other) = delete;
+    // Disallow copy
+    BirthdayEvent(const BirthdayEvent&) = delete;
+    BirthdayEvent& operator=(const BirthdayEvent&) = delete;
 
-  // OBJECTPOOL(BirthdayEvent)
+    // Disallow move
+    BirthdayEvent(BirthdayEvent&&) = delete;
+    BirthdayEvent& operator=(BirthdayEvent&&) = delete;
 
-  // DELETE_COPY_AND_MOVE(BirthdayEvent)
+    explicit BirthdayEvent(Person* person) : PersonEvent(person) {}
+    ~BirthdayEvent() override = default;
+
+    // OBJECTPOOL(BirthdayEvent)
+
+    // DELETE_COPY_AND_MOVE(BirthdayEvent)
 
 public:
-  BirthdayEvent(Person* person) : PersonEvent(person) {}
-
-  //    BirthdayEvent(const BirthdayEvent& orig);
-  virtual ~BirthdayEvent() = default;
-
-  const std::string name() const override { return "Birthday Event"; }
+    [[nodiscard]] const std::string name() const override { return "Birthday Event"; }
 
 private:
-  void do_execute() override;
+    void do_execute() override;
 };
 
 #endif /* BIRTHDAYEVENT_H */

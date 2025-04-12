@@ -23,11 +23,13 @@ const std::string extension = "csv";
 
 class Reporter {
 public:
-  //disallow copy and assign and move
-  Reporter(const Reporter &orig) = delete;
-  void operator=(const Reporter &orig) = delete;
-  Reporter(Reporter &&orig) = delete;
-  void operator=(Reporter &&orig) = delete;
+  // Disallow copy
+  Reporter(const Reporter&) = delete;
+  Reporter& operator=(const Reporter&) = delete;
+
+  // Disallow move
+  Reporter(Reporter&&) = delete;
+  Reporter& operator=(Reporter&&) = delete;
 
 public:
   Model *model{};

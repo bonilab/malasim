@@ -5,11 +5,13 @@
 
 class Event {
 public:
-  // Disable copy and assignment
-  Event(const Event &) = delete;
-  void operator=(const Event &) = delete;
-  Event(Event &&) = delete;
-  Event &operator=(Event &&) = delete;
+  // Disallow copy
+  Event(const Event&) = delete;
+  Event& operator=(const Event&) = delete;
+
+  // Disallow move
+  Event(Event&&) = delete;
+  Event& operator=(Event&&) = delete;
 
   Event() = default;
   virtual ~Event() = default;

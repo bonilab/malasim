@@ -11,12 +11,11 @@
 #include "Utils/Helpers/StringHelpers.h"
 
 IntroducePlas2CopyParasiteEvent::IntroducePlas2CopyParasiteEvent(
-    const int &location, const int &execute_at, const double &fraction)
-    : location_(location), fraction_(fraction) {
-  set_time(execute_at);
+    const int& location, const int& execute_at, const double& fraction,
+    const std::vector<std::tuple<int,int,char>>& allele_map)
+    : location_(location), fraction_(fraction), alleles_(allele_map) {
+    set_time(execute_at);
 }
-
-IntroducePlas2CopyParasiteEvent::~IntroducePlas2CopyParasiteEvent() = default;
 
 void IntroducePlas2CopyParasiteEvent::do_execute() {
   auto* pi =

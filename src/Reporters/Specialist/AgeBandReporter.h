@@ -20,11 +20,13 @@ class logger;
 
 class AgeBandReporter : public Reporter {
 public:
-  //disallow copy and move
-  AgeBandReporter(const AgeBandReporter &) = delete;
-  void operator=(const AgeBandReporter &) = delete;
-  AgeBandReporter(AgeBandReporter &&) = delete;
-  void operator=(AgeBandReporter &&) = delete;
+  // Disallow copy
+  AgeBandReporter(const AgeBandReporter&) = delete;
+  AgeBandReporter& operator=(const AgeBandReporter&) = delete;
+
+  // Disallow move
+  AgeBandReporter(AgeBandReporter&&) = delete;
+  AgeBandReporter& operator=(AgeBandReporter&&) = delete;
 
 private:
   // When to start logging the data

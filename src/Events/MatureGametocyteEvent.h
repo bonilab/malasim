@@ -16,9 +16,9 @@ class MatureGametocyteEvent : public PersonEvent {
 public:
   // disallow copy, assign and move
   MatureGametocyteEvent(const MatureGametocyteEvent &) = delete;
-  void operator=(const MatureGametocyteEvent &) = delete;
+  MatureGametocyteEvent& operator=(const MatureGametocyteEvent &) = delete;
   MatureGametocyteEvent(MatureGametocyteEvent &&) = delete;
-  void operator=(MatureGametocyteEvent &&) = delete;
+  MatureGametocyteEvent& operator=(MatureGametocyteEvent &&) = delete;
   explicit MatureGametocyteEvent(Person* person) : PersonEvent(person) {}
 
   ClonalParasitePopulation* blood_parasite() { return blood_parasite_; }

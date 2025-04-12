@@ -24,9 +24,9 @@ class TestTreatmentFailureEvent : public PersonEvent {
 public:
   // disallow copy, assign and move
   TestTreatmentFailureEvent(const TestTreatmentFailureEvent &) = delete;
-  void operator=(const TestTreatmentFailureEvent &) = delete;
+  TestTreatmentFailureEvent& operator=(const TestTreatmentFailureEvent &) = delete;
   TestTreatmentFailureEvent(TestTreatmentFailureEvent &&) = delete;
-  void operator=(TestTreatmentFailureEvent &&) = delete;
+  TestTreatmentFailureEvent& operator=(TestTreatmentFailureEvent &&) = delete;
 
   explicit TestTreatmentFailureEvent(Person* person) : PersonEvent(person) {}
   ~TestTreatmentFailureEvent() override = default;

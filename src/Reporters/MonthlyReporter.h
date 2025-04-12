@@ -9,11 +9,10 @@ class MonthlyReporter : public Reporter {
 public:
   // Disable copy, assignment, and move
   MonthlyReporter(const MonthlyReporter &) = delete;
-  void operator=(const MonthlyReporter &) = delete;
+  MonthlyReporter& operator=(const MonthlyReporter &) = delete;
   MonthlyReporter(MonthlyReporter &&) = delete;
-  void operator=(MonthlyReporter &&) = delete;
+  MonthlyReporter& operator=(MonthlyReporter &&) = delete;
 
-public:
   const std::string group_sep = "-1111\t";
   const std::string sep = "\t";
 
