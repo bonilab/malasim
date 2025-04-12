@@ -2,6 +2,7 @@
 #define INTPARASITEDATABASE_H
 
 #include <map>
+#include <memory>
 
 #include "Utils/TypeDef.h"
 
