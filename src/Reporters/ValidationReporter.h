@@ -10,11 +10,10 @@ class ValidationReporter : public Reporter {
 public:
   // Disable copy, assignment, and move
   ValidationReporter(const ValidationReporter &) = delete;
-  void operator=(const ValidationReporter &) = delete;
+  ValidationReporter& operator=(const ValidationReporter &) = delete;
   ValidationReporter(ValidationReporter &&) = delete;
-  void operator=(ValidationReporter &&) = delete;
+  ValidationReporter& operator=(ValidationReporter &&) = delete;
 
-public:
   const std::string group_sep = "-1111\t";
   const std::string sep = "\t";
 

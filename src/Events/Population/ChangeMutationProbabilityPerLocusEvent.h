@@ -9,26 +9,25 @@
 
 class ChangeMutationProbabilityPerLocusEvent : public WorldEvent {
 public:
-    //disallow copy, assign and move
+    // Disallow copy
     ChangeMutationProbabilityPerLocusEvent(const ChangeMutationProbabilityPerLocusEvent&) = delete;
-    void operator=(const ChangeMutationProbabilityPerLocusEvent&) = delete;
+    ChangeMutationProbabilityPerLocusEvent& operator=(const ChangeMutationProbabilityPerLocusEvent&) = delete;
+
+    // Disallow move
     ChangeMutationProbabilityPerLocusEvent(ChangeMutationProbabilityPerLocusEvent&&) = delete;
-    void operator=(ChangeMutationProbabilityPerLocusEvent&&) = delete;
+    ChangeMutationProbabilityPerLocusEvent& operator=(ChangeMutationProbabilityPerLocusEvent&&) = delete;
 
-public:
-    double value {0.001};
-public:
     explicit ChangeMutationProbabilityPerLocusEvent(const double &value = 0.0, const int &at_time = -1);
-
     ~ChangeMutationProbabilityPerLocusEvent() override = default;
 
-    const std::string name() const override {
+    [[nodiscard]] const std::string name() const override {
         return "ChangeMutationProbabilityPerLocusEvent";
     }
+
+    double value{0.001};
 
 private:
     void do_execute() override;
 };
-
 
 #endif //POMS_ChangeMutationProbabilityPerLocusEVENT_H

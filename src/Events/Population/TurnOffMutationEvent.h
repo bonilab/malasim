@@ -6,23 +6,23 @@
 
 class TurnOffMutationEvent : public WorldEvent {
 public:
-  // Disable copy and assignment and move
-  TurnOffMutationEvent(const TurnOffMutationEvent&) = delete;
-  void operator=(const TurnOffMutationEvent&) = delete;
-  TurnOffMutationEvent(TurnOffMutationEvent&&) = delete;
-  void operator=(TurnOffMutationEvent&&) = delete;
+    // Disallow copy
+    TurnOffMutationEvent(const TurnOffMutationEvent&) = delete;
+    TurnOffMutationEvent& operator=(const TurnOffMutationEvent&) = delete;
 
- public:
-  explicit TurnOffMutationEvent(const int &at_time);
+    // Disallow move
+    TurnOffMutationEvent(TurnOffMutationEvent&&) = delete;
+    TurnOffMutationEvent& operator=(TurnOffMutationEvent&&) = delete;
 
-  virtual ~TurnOffMutationEvent() = default;
+    explicit TurnOffMutationEvent(const int& at_time = -1);
+    ~TurnOffMutationEvent() override = default;
 
-  const std::string name() const override {
-    return "TurnOffMutationEvent";
-  }
+    [[nodiscard]] const std::string name() const override {
+        return "TurnOffMutationEvent";
+    }
 
- private:
-  void do_execute() override;
+private:
+    void do_execute() override;
 };
 
 #endif // TURNOFFMUTATIONEVENT_H

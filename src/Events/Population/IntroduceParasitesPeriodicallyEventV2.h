@@ -8,47 +8,49 @@
 
 class Scheduler;
 
-class IntroduceParasitesPeriodicallyEventV2  : public WorldEvent {
+class IntroduceParasitesPeriodicallyEventV2 : public WorldEvent {
 public:
-  //disallow copy and assign
-  IntroduceParasitesPeriodicallyEventV2(const IntroduceParasitesPeriodicallyEventV2&) = delete;
-  void operator=(const IntroduceParasitesPeriodicallyEventV2&) = delete;
-  IntroduceParasitesPeriodicallyEventV2(IntroduceParasitesPeriodicallyEventV2&&) = delete;
-  void operator=(IntroduceParasitesPeriodicallyEventV2&&) = delete;
+    // Disallow copy
+    IntroduceParasitesPeriodicallyEventV2(const IntroduceParasitesPeriodicallyEventV2&) = delete;
+    IntroduceParasitesPeriodicallyEventV2& operator=(const IntroduceParasitesPeriodicallyEventV2&) = delete;
 
-  // OBJECTPOOL(IntroduceParasitesPeriodicallyEventV2)
+    // Disallow move
+    IntroduceParasitesPeriodicallyEventV2(IntroduceParasitesPeriodicallyEventV2&&) = delete;
+    IntroduceParasitesPeriodicallyEventV2& operator=(IntroduceParasitesPeriodicallyEventV2&&) = delete;
+
+    // OBJECTPOOL(IntroduceParasitesPeriodicallyEventV2)
 private:
-  int location_;
-  int duration_;
-  int number_of_cases_;
+    int location_;
+    int duration_;
+    int number_of_cases_;
 public:
-  int location(){return location_;}
-  void set_location(int location){location_ = location;}
-  int duration(){return duration_;}
-  void set_duration(int duration){duration_ = duration;}
-  int number_of_cases(){return number_of_cases_;}
-  void set_number_of_cases(int number_of_cases){number_of_cases_ = number_of_cases;}
-
-public:
-  std::vector<std::vector<double>> allele_distributions;
-  int start_day;
-  int end_day;
+    [[nodiscard]] int location() const { return location_; }
+    void set_location(int location) { location_ = location; }
+    [[nodiscard]] int duration() const { return duration_; }
+    void set_duration(int duration) { duration_ = duration; }
+    [[nodiscard]] int number_of_cases() const { return number_of_cases_; }
+    void set_number_of_cases(int number_of_cases) { number_of_cases_ = number_of_cases; }
 
 public:
-  IntroduceParasitesPeriodicallyEventV2( const std::vector<std::vector<double>> & allele_distributions_in = std::vector<std::vector<double>>(),
-                                         const int &location = -1, const int &duration = -1,
-                                        const int &number_of_cases = -1, const int &start_day_in = -1,
-                                         const int & end_day_in = -1);
+    std::vector<std::vector<double>> allele_distributions;
+    int start_day;
+    int end_day;
 
-  //    ImportationEvent(const ImportationEvent& orig);
-  virtual ~IntroduceParasitesPeriodicallyEventV2();
+public:
+    IntroduceParasitesPeriodicallyEventV2(const std::vector<std::vector<double>>& allele_distributions_in = std::vector<std::vector<double>>(),
+                                         const int& location = -1, const int& duration = -1,
+                                         const int& number_of_cases = -1, const int& start_day_in = -1,
+                                         const int& end_day_in = -1);
 
-  const std::string name() const override {
-    return "IntroduceParasitesPeriodicallyEventV2";
-  }
+    //    ImportationEvent(const ImportationEvent& orig);
+    ~IntroduceParasitesPeriodicallyEventV2() override;
+
+    [[nodiscard]] const std::string name() const override {
+        return "IntroduceParasitesPeriodicallyEventV2";
+    }
 
 private:
-  void do_execute() override;
+    void do_execute() override;
 
 };
 

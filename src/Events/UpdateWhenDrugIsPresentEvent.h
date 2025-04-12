@@ -15,11 +15,13 @@ class Person;
 class UpdateWhenDrugIsPresentEvent : public PersonEvent {
   // OBJECTPOOL(UpdateWhenDrugIsPresentEvent)
 public:
-  // disallow copy and assign
-  UpdateWhenDrugIsPresentEvent(const UpdateWhenDrugIsPresentEvent &) = delete;
-  void operator=(const UpdateWhenDrugIsPresentEvent &) = delete;
-  UpdateWhenDrugIsPresentEvent(UpdateWhenDrugIsPresentEvent &&) = delete;
-  void operator=(UpdateWhenDrugIsPresentEvent &&) = delete;
+  // Disallow copy
+  UpdateWhenDrugIsPresentEvent(const UpdateWhenDrugIsPresentEvent&) = delete;
+  UpdateWhenDrugIsPresentEvent& operator=(const UpdateWhenDrugIsPresentEvent&) = delete;
+
+  // Disallow move
+  UpdateWhenDrugIsPresentEvent(UpdateWhenDrugIsPresentEvent&&) = delete;
+  UpdateWhenDrugIsPresentEvent& operator=(UpdateWhenDrugIsPresentEvent&&) = delete;
 
   explicit UpdateWhenDrugIsPresentEvent(Person* person) : PersonEvent(person) {}
 

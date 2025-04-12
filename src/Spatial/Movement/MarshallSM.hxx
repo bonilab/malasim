@@ -14,10 +14,14 @@
 
 namespace Spatial {
 class MarshallSM : public SpatialModel {
-  MarshallSM(const MarshallSM &) = delete;
-  void operator=(const MarshallSM &) = delete;
-  MarshallSM(MarshallSM &&) = delete;
-  MarshallSM &operator=(MarshallSM &&) = delete;
+public:
+  // Disallow copy
+  MarshallSM(const MarshallSM&) = delete;
+  MarshallSM& operator=(const MarshallSM&) = delete;
+
+  // Disallow move
+  MarshallSM(MarshallSM&&) = delete;
+  MarshallSM& operator=(MarshallSM&&) = delete;
 
   [[nodiscard]] double get_tau() const { return tau_; }
   void set_tau(const double &value) { tau_ = value; }
@@ -54,7 +58,6 @@ class MarshallSM : public SpatialModel {
     }
   }
 
-public:
   explicit MarshallSM(double tau, double alpha, double log_rho,
                       int number_of_locations,
                       std::vector<std::vector<double>> spatial_distance_matrix)

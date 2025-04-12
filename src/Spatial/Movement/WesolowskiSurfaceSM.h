@@ -17,10 +17,14 @@
 
 namespace Spatial {
 class WesolowskiSurfaceSM : public SpatialModel {
-  WesolowskiSurfaceSM(const WesolowskiSurfaceSM &) = delete;
-  void operator=(const WesolowskiSurfaceSM &) = delete;
-  WesolowskiSurfaceSM(WesolowskiSurfaceSM &&) = delete;
-  WesolowskiSurfaceSM &operator=(WesolowskiSurfaceSM &&) = delete;
+public:
+    // Disallow copy
+    WesolowskiSurfaceSM(const WesolowskiSurfaceSM&) = delete;
+    WesolowskiSurfaceSM& operator=(const WesolowskiSurfaceSM&) = delete;
+
+    // Disallow move
+    WesolowskiSurfaceSM(WesolowskiSurfaceSM&&) = delete;
+    WesolowskiSurfaceSM& operator=(WesolowskiSurfaceSM&&) = delete;
 
   double kappa_;
   double alpha_;
@@ -30,7 +34,6 @@ class WesolowskiSurfaceSM : public SpatialModel {
   // Travel surface, computed when the prepare method is called
   std::vector<double> travel;
 
-public:
   [[nodiscard]] double get_kappa() const { return kappa_; }
   void set_kappa(const double &value) { kappa_ = value; }
 

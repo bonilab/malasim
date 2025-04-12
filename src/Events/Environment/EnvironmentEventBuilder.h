@@ -8,6 +8,7 @@
 #define ENVIRONMENTEVENTBUILDER_H
 
 #include <vector>
+#include <memory>
 
 #include "Events/Event.h"
 

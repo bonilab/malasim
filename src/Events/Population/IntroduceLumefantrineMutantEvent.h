@@ -8,11 +8,14 @@
 #include "Events/Event.h"
 
 class IntroduceLumefantrineMutantEvent : public WorldEvent {
-  //disallow copy, assign and move
-  IntroduceLumefantrineMutantEvent(const IntroduceLumefantrineMutantEvent &) = delete;
-  void operator=(const IntroduceLumefantrineMutantEvent &) = delete;
-  IntroduceLumefantrineMutantEvent(IntroduceLumefantrineMutantEvent &&) = delete;
-  void operator=(IntroduceLumefantrineMutantEvent &&) = delete;
+public:
+    // Disallow copy
+    IntroduceLumefantrineMutantEvent(const IntroduceLumefantrineMutantEvent&) = delete;
+    IntroduceLumefantrineMutantEvent& operator=(const IntroduceLumefantrineMutantEvent&) = delete;
+
+    // Disallow move
+    IntroduceLumefantrineMutantEvent(IntroduceLumefantrineMutantEvent&&) = delete;
+    IntroduceLumefantrineMutantEvent& operator=(IntroduceLumefantrineMutantEvent&&) = delete;
 
   // OBJECTPOOL(IntroduceLumefantrineMutantEvent)
 

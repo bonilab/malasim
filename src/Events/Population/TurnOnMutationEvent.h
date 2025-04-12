@@ -6,23 +6,23 @@
 
 class TurnOnMutationEvent : public WorldEvent {
 public:
-  // Disable copy and assignment and move
+  // Disallow copy
   TurnOnMutationEvent(const TurnOnMutationEvent&) = delete;
-  void operator=(const TurnOnMutationEvent&) = delete;
+  TurnOnMutationEvent& operator=(const TurnOnMutationEvent&) = delete;
+
+  // Disallow move
   TurnOnMutationEvent(TurnOnMutationEvent&&) = delete;
-  void operator=(TurnOnMutationEvent&&) = delete;
+  TurnOnMutationEvent& operator=(TurnOnMutationEvent&&) = delete;
 
-  double mutation_probability = 0.0;
-  int drug_id = -1;
-
-public:
-  explicit TurnOnMutationEvent(const int &at_time, const double &mutation_probability);
-
+  explicit TurnOnMutationEvent(const int& at_time, const double& mutation_probability);
   ~TurnOnMutationEvent() override = default;
 
-  const std::string name() const override {
+  [[nodiscard]] const std::string name() const override {
     return "TurnOnMutationEvent";
   }
+
+  double mutation_probability{0.0};
+  int drug_id{-1};
 
 private:
   void do_execute() override;

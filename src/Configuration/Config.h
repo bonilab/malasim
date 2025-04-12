@@ -24,11 +24,13 @@
 
 class Config {
 public:
-  // disallow copy, assign and move
-  Config(const Config &) = delete;
-  void operator=(const Config &) = delete;
-  Config(Config &&) = delete;
-  Config &operator=(Config &&) = delete;
+  // Disallow copy
+  Config(const Config&) = delete;
+  Config& operator=(const Config&) = delete;
+
+  // Disallow move
+  Config(Config&&) = delete;
+  Config& operator=(Config&&) = delete;
 
   // Constructor and Destructor
   Config() = default;

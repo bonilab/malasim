@@ -17,11 +17,13 @@
 namespace Spatial {
 class BarabasiSM : public SpatialModel {
 public:
-  // delete copy and move operators
-  BarabasiSM(const BarabasiSM &) = delete;
-  void operator=(const BarabasiSM &) = delete;
-  BarabasiSM(BarabasiSM &&) = delete;
-  BarabasiSM &operator=(BarabasiSM &&) = delete;
+  // Disallow copy
+  BarabasiSM(const BarabasiSM&) = delete;
+  BarabasiSM& operator=(const BarabasiSM&) = delete;
+
+  // Disallow move
+  BarabasiSM(BarabasiSM&&) = delete;
+  BarabasiSM& operator=(BarabasiSM&&) = delete;
 
   double r_g_0_;
   double beta_r_;

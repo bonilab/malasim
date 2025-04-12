@@ -15,10 +15,13 @@
 namespace Spatial {
 class SpatialModel {
 public:
-  SpatialModel(SpatialModel const &) = delete;
-  void operator=(SpatialModel const &) = delete;
-  SpatialModel(SpatialModel &&) = delete;
-  SpatialModel &operator=(SpatialModel &&) = delete;
+  // Disallow copy
+  SpatialModel(const SpatialModel&) = delete;
+  SpatialModel& operator=(const SpatialModel&) = delete;
+
+  // Disallow move
+  SpatialModel(SpatialModel&&) = delete;
+  SpatialModel& operator=(SpatialModel&&) = delete;
 
 protected:
   // Prepare the travel raster for the movement model

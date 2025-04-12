@@ -9,11 +9,13 @@ class PersonIndexByLocationStateAgeClass;
 
 class TACTReporter : public Reporter {
 public:
-  //disallow copy, assign and move
-  TACTReporter(const TACTReporter &) = delete;
-  void operator=(const TACTReporter &) = delete;
-  TACTReporter(TACTReporter &&) = delete;
-  void operator=(TACTReporter &&) = delete;
+  // Disallow copy
+  TACTReporter(const TACTReporter&) = delete;
+  TACTReporter& operator=(const TACTReporter&) = delete;
+
+  // Disallow move
+  TACTReporter(TACTReporter&&) = delete;
+  TACTReporter& operator=(TACTReporter&&) = delete;
 
 public:
 

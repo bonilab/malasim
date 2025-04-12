@@ -230,11 +230,11 @@ std::vector<std::unique_ptr<WorldEvent>> PopulationEventBuilder::build_single_ro
     for (std::size_t loc = 0; loc < config->number_of_locations(); loc++) {
       auto input_loc =
           entry["fraction_population_targeted"].size() < config->number_of_locations() ? 0 : loc;
-      event->fraction_population_targeted.push_back(
+      event->add_fraction_population_targeted(
           entry["fraction_population_targeted"][input_loc].as<double>());
     }
 
-    event->days_to_complete_all_treatments = entry["days_to_complete_all_treatments"].as<int>();
+    event->set_days_to_complete(entry["days_to_complete_all_treatments"].as<int>());
     events.push_back(std::move(event));
   }
 

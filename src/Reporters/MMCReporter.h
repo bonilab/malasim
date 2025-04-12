@@ -1,4 +1,3 @@
-
 #ifndef MMCREPORTER_H
 #define MMCREPORTER_H
 
@@ -9,11 +8,13 @@ class PersonIndexByLocationStateAgeClass;
 
 class MMCReporter : public Reporter {
 public:
-  //disallow copy, assign and move
-  MMCReporter(const MMCReporter &) = delete;
-  void operator=(const MMCReporter &) = delete;
-  MMCReporter(MMCReporter &&) = delete;
-  void operator=(MMCReporter &&) = delete;
+  // Disallow copy
+  MMCReporter(const MMCReporter&) = delete;
+  MMCReporter& operator=(const MMCReporter&) = delete;
+
+  // Disallow move
+  MMCReporter(MMCReporter&&) = delete;
+  MMCReporter& operator=(MMCReporter&&) = delete;
 
 public:
   std::stringstream ss;

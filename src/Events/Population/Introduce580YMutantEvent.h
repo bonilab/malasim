@@ -1,17 +1,21 @@
 #ifndef PCMS_INTRODUCE580YPARASITEEVENT_H
 #define PCMS_INTRODUCE580YPARASITEEVENT_H
 
-
 //#include "Core/ObjectPool.h"
 #include "Events/Event.h"
 #include <string>
+#include <vector>
+#include <tuple>
 
 class Introduce580YMutantEvent : public WorldEvent {
-  //disallow copy and assign
-  Introduce580YMutantEvent(const Introduce580YMutantEvent&) = delete;
-  void operator=(const Introduce580YMutantEvent&) = delete;
-  Introduce580YMutantEvent(Introduce580YMutantEvent&&) = delete;
-  void operator=(Introduce580YMutantEvent&&) = delete;
+public:
+    // Disallow copy
+    Introduce580YMutantEvent(const Introduce580YMutantEvent&) = delete;
+    Introduce580YMutantEvent& operator=(const Introduce580YMutantEvent&) = delete;
+
+    // Disallow move
+    Introduce580YMutantEvent(Introduce580YMutantEvent&&) = delete;
+    Introduce580YMutantEvent& operator=(Introduce580YMutantEvent&&) = delete;
 
 //    OBJECTPOOL(Introduce580YMutantEvent)
 private:
@@ -27,7 +31,7 @@ public:
   //    ImportationEvent(const ImportationEvent& orig);
   ~Introduce580YMutantEvent() override;
 
-  const std::string name() const override {
+  [[nodiscard]] const std::string name() const override {
     return "580YImportationEvent";
   }
 

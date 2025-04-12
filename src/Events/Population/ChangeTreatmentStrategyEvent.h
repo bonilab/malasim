@@ -7,23 +7,24 @@
 
 class ChangeTreatmentStrategyEvent : public WorldEvent {
 public:
-  //disallow copy and move
-  ChangeTreatmentStrategyEvent(const ChangeTreatmentStrategyEvent&) = delete;
-  void operator=(const ChangeTreatmentStrategyEvent&) = delete;
-  ChangeTreatmentStrategyEvent(ChangeTreatmentStrategyEvent&&) = delete;
-  void operator=(ChangeTreatmentStrategyEvent&&) = delete;
+    // Disallow copy
+    ChangeTreatmentStrategyEvent(const ChangeTreatmentStrategyEvent&) = delete;
+    ChangeTreatmentStrategyEvent& operator=(const ChangeTreatmentStrategyEvent&) = delete;
 
-public:
-  int strategy_id{-1};
+    // Disallow move
+    ChangeTreatmentStrategyEvent(ChangeTreatmentStrategyEvent&&) = delete;
+    ChangeTreatmentStrategyEvent& operator=(ChangeTreatmentStrategyEvent&&) = delete;
 
-  ChangeTreatmentStrategyEvent(const int &at_time, const int &strategy_id);
+    explicit ChangeTreatmentStrategyEvent(const int& strategy_id = 0, const int& at_time = -1);
+    ~ChangeTreatmentStrategyEvent() override = default;
 
-  virtual ~ChangeTreatmentStrategyEvent() = default;
-
-  const std::string name() const override { return "ChangeStrategyEvent"; }
+    [[nodiscard]] const std::string name() const override {
+        return "ChangeTreatmentStrategyEvent";
+    }
 
 private:
-  void do_execute() override;
+    int strategy_id_;
+    void do_execute() override;
 };
 
 #endif  // CHANGESTRATEGYEVENT_H

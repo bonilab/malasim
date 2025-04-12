@@ -5,11 +5,13 @@
 
 class ConsoleReporter : public Reporter {
 public:
-  //disallow copy, assign and move
-  ConsoleReporter(const ConsoleReporter &) = delete;
-  void operator=(const ConsoleReporter &) = delete;
-  ConsoleReporter(ConsoleReporter &&) = delete;
-  void operator=(ConsoleReporter &&) = delete;
+  // Disallow copy
+  ConsoleReporter(const ConsoleReporter&) = delete;
+  ConsoleReporter& operator=(const ConsoleReporter&) = delete;
+
+  // Disallow move
+  ConsoleReporter(ConsoleReporter&&) = delete;
+  ConsoleReporter& operator=(ConsoleReporter&&) = delete;
 
  public:
   ConsoleReporter();

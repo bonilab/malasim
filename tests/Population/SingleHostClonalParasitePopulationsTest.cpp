@@ -9,6 +9,7 @@
 #include "Population/DrugsInBlood.h"
 #include "Population/Person/Person.h"
 #include "Population/SingleHostClonalParasitePopulations.h"
+#include "Treatment/Therapies/Drug.h"
 
 // Mock Person class
 class MockPerson : public Person {
