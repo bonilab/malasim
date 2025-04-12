@@ -258,7 +258,9 @@ struct convert<SpatialSettings> {
     auto node_name = mode == SpatialSettings::GRID_BASED_MODE
                          ? SpatialSettings::GRID_BASED_MODE
                          : SpatialSettings::LOCATION_BASED_MODE;
-    if (!node[node_name]) { throw std::runtime_error("Missing " + node_name + " settings."); }
+    if (!node[node_name]) {
+      throw std::runtime_error(std::string("Missing ") + node_name + " settings.");
+    }
     rhs.set_node(node[node_name]);
     return true;
   }
