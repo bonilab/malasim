@@ -23,8 +23,8 @@ void PersonIndexByLocationMovingLevel::Initialize(const int &no_location, const 
 }
 
 void PersonIndexByLocationMovingLevel::add(Person* person) {
-  assert(vPerson_.size() > p->get_location() && p->get_location() >= 0);
-  assert(vPerson_[p->get_location()].size() > p->get_moving_level());
+  assert(vPerson_.size() > person->get_location() && person->get_location() >= 0);
+  assert(vPerson_[person->get_location()].size() > person->get_moving_level());
   add(person, person->get_location(), person->get_moving_level());
 }
 

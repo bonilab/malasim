@@ -1,4 +1,4 @@
-#include "SQLiteMonthlyReporter.h"
+#include "SQLiteValidationReporter.h"
 
 #include <fmt/printf.h>
 
@@ -13,7 +13,7 @@
 
 // Initialize the reporter
 // Sets up the database and prepares it for data entry
-void SQLiteMonthlyReporter::initialize(int jobNumber, const std::string &path) {
+void SQLiteValidationReporter::initialize(int jobNumber, const std::string &path) {
   int admin_level_count =
       Model::get_spatial_data()->get_admin_level_manager()->get_level_names().size();
 
@@ -25,15 +25,15 @@ void SQLiteMonthlyReporter::initialize(int jobNumber, const std::string &path) {
   // Inform the user of the reporter type
   if (enable_cell_level_reporting) {
     spdlog::info(
-        "Using SQLiteMonthlyReporter with aggregation at cell/pixel level AND multiple admin "
+        "Using SQLiteValidationReporter with aggregation at cell/pixel level AND multiple admin "
         "levels.");
   } else {
     spdlog::info(
-        "Using SQLiteMonthlyReporter with aggregation at multiple admin levels, cell level "
+        "Using SQLiteValidationReporter with aggregation at multiple admin levels, cell level "
         "reporting is disabled.");
   }
 
-  SQLiteDbReporter::initialize(jobNumber, path);
+  SQLiteDbReporter::initialize(jobNumber, path + "validation_");
 
   // Add +1 for cell level
   monthly_site_data_by_level.resize(admin_level_count + 1);
@@ -41,7 +41,7 @@ void SQLiteMonthlyReporter::initialize(int jobNumber, const std::string &path) {
   CELL_LEVEL_ID = admin_level_count;
 }
 
-void SQLiteMonthlyReporter::count_infections_for_location(int level_id, int location_id) {
+void SQLiteValidationReporter::count_infections_for_location(int level_id, int location_id) {
   auto unit_id = (level_id == CELL_LEVEL_ID)
                      ? location_id
                      : Model::get_spatial_data()->get_admin_unit(level_id, location_id);
@@ -60,7 +60,7 @@ void SQLiteMonthlyReporter::count_infections_for_location(int level_id, int loca
   }
 }
 
-void SQLiteMonthlyReporter::calculate_and_build_up_site_data_insert_values(int monthId,
+void SQLiteValidationReporter::calculate_and_build_up_site_data_insert_values(int monthId,
                                                                            int level_id) {
   int min_unit_id = 0;
   int max_unit_id = 0;
@@ -130,7 +130,7 @@ void SQLiteMonthlyReporter::calculate_and_build_up_site_data_insert_values(int m
 // Collect and store monthly site data
 // Aggregates data related to various site metrics and stores them in the
 // database
-void SQLiteMonthlyReporter::monthly_report_site_data(int monthId) {
+void SQLiteValidationReporter::monthly_report_site_data(int monthId) {
   TransactionGuard transaction{db.get()};
 
   // Handle all levels including cell level in a single loop
@@ -171,7 +171,7 @@ void SQLiteMonthlyReporter::monthly_report_site_data(int monthId) {
   }
 }
 
-void SQLiteMonthlyReporter::collect_site_data_for_location(int location_id, int level_id) {
+void SQLiteValidationReporter::collect_site_data_for_location(int location_id, int level_id) {
   // Get admin unit for this location at this level
   auto unit_id = (level_id == CELL_LEVEL_ID)
                      ? location_id
@@ -229,7 +229,7 @@ void SQLiteMonthlyReporter::collect_site_data_for_location(int location_id, int 
   }
 }
 
-void SQLiteMonthlyReporter::collect_genome_data_for_location(size_t location_id, int level_id) {
+void SQLiteValidationReporter::collect_genome_data_for_location(size_t location_id, int level_id) {
   auto unit_id = (level_id == CELL_LEVEL_ID)
                      ? location_id
                      : Model::get_spatial_data()->get_admin_unit(level_id, location_id);
@@ -248,7 +248,7 @@ void SQLiteMonthlyReporter::collect_genome_data_for_location(size_t location_id,
   }
 }
 
-void SQLiteMonthlyReporter::reset_site_data_structures(int level_id, int vector_size,
+void SQLiteValidationReporter::reset_site_data_structures(int level_id, int vector_size,
                                                        size_t numAgeClasses) {
   // reset the data structures
   monthly_site_data_by_level[level_id].eir.assign(vector_size, 0);
@@ -267,7 +267,7 @@ void SQLiteMonthlyReporter::reset_site_data_structures(int level_id, int vector_
   monthly_site_data_by_level[level_id].infections_by_unit.assign(vector_size, 0);
 }
 
-void SQLiteMonthlyReporter::reset_genome_data_structures(int level_id, int vector_size,
+void SQLiteValidationReporter::reset_genome_data_structures(int level_id, int vector_size,
                                                          size_t numGenotypes) {
   // reset the data structures
   monthly_genome_data_by_level[level_id].occurrences.assign(vector_size,
@@ -282,7 +282,7 @@ void SQLiteMonthlyReporter::reset_genome_data_structures(int level_id, int vecto
       vector_size, std::vector<double>(numGenotypes, 0));
 }
 
-void SQLiteMonthlyReporter::collect_genome_data_for_a_person(Person* person, int unit_id,
+void SQLiteValidationReporter::collect_genome_data_for_a_person(Person* person, int unit_id,
                                                              int level_id) {
   const auto numGenotypes = Model::get_config()->number_of_parasite_types();
   auto individual = std::vector<int>(numGenotypes, 0);
@@ -319,7 +319,7 @@ void SQLiteMonthlyReporter::collect_genome_data_for_a_person(Person* person, int
   }
 }
 
-void SQLiteMonthlyReporter::build_up_genome_data_insert_values(int monthId, int level_id) {
+void SQLiteValidationReporter::build_up_genome_data_insert_values(int monthId, int level_id) {
   auto numGenotypes = Model::get_config()->number_of_parasite_types();
 
   int min_unit_id = 0;
@@ -359,7 +359,7 @@ void SQLiteMonthlyReporter::build_up_genome_data_insert_values(int monthId, int 
   }
 }
 
-void SQLiteMonthlyReporter::monthly_report_genome_data(int monthId) {
+void SQLiteValidationReporter::monthly_report_genome_data(int monthId) {
   TransactionGuard transaction{db.get()};
 
   // Get admin levels count
@@ -408,6 +408,6 @@ void SQLiteMonthlyReporter::monthly_report_genome_data(int monthId) {
   }
 }
 
-void SQLiteMonthlyReporter::after_run() {
+void SQLiteValidationReporter::after_run() {
   SQLiteDbReporter::after_run();
 }
