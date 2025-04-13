@@ -1,23 +1,23 @@
 /*
- * SQLiteMonthlyReporter.h
+ * SQLiteValidationReporter.h
  *
  * Override the base DbReporter and log genotype information at the monthly
  * level.
  */
-#ifndef SQLITEMONTHLYREPORTER_H
-#define SQLITEMONTHLYREPORTER_H
+#ifndef SQLITEVALIDATIONREPORTER_H
+#define SQLITEVALIDATIONREPORTER_H
 
 #include "Reporters/SQLiteDbReporter.h"
 
 class Person;
 
-class SQLiteMonthlyReporter : public SQLiteDbReporter {
+class SQLiteValidationReporter : public SQLiteDbReporter {
 public:
   //disallow copy and move
-  SQLiteMonthlyReporter(const SQLiteMonthlyReporter &orig) = delete;
-  void operator=(const SQLiteMonthlyReporter &orig) = delete;
-  SQLiteMonthlyReporter(SQLiteMonthlyReporter &&orig) = delete;
-  void operator=(SQLiteMonthlyReporter &&orig) = delete;
+  SQLiteValidationReporter(const SQLiteValidationReporter &orig) = delete;
+  void operator=(const SQLiteValidationReporter &orig) = delete;
+  SQLiteValidationReporter(SQLiteValidationReporter &&orig) = delete;
+  void operator=(SQLiteValidationReporter &&orig) = delete;
 
 
   void monthly_report_genome_data(int monthId) override;
@@ -60,8 +60,8 @@ private:
   void build_up_genome_data_insert_values(int monthId, int level_id);
 
 public:
-  SQLiteMonthlyReporter(bool cell_level_reporting = false) : enable_cell_level_reporting(cell_level_reporting) {}
-  ~SQLiteMonthlyReporter() override = default;
+  SQLiteValidationReporter(bool cell_level_reporting = false) : enable_cell_level_reporting(cell_level_reporting) {}
+  ~SQLiteValidationReporter() override = default;
 
   // Initialize the reporter with job number and path
   void initialize(int job_number, const std::string &path) override;

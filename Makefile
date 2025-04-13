@@ -55,6 +55,11 @@ generate-ninja gn:
 	cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DENABLE_TRAVEL_TRACKING=$(ENABLE_TRAVEL_TRACKING) -DBUILD_TESTS=$(BUILD_TESTS) $(TOOLCHAIN_ARG) .
 	cp $(PWD)build/compile_commands.json $(PWD)
 
+generate-gcc-12-owlsnest gog12:
+	cmake -DCMAKE_CXX_COMPILER=/gpfs/opt/tools/gcc-12.2.0/bin/g++ -DCMAKE_C_COMPILER=/gpfs/opt/tools/gcc-12.2.0/bin/gcc  -DCMAKE_EXE_LINKER_FLAGS="-L/path/to/gcc-12.2.0/lib64" \
+	-Bbuild -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DENABLE_TRAVEL_TRACKING=$(ENABLE_TRAVEL_TRACKING) -DBUILD_TESTS=$(BUILD_TESTS) -DENABLE_COVERAGE=$(ENABLE_COVERAGE) $(TOOLCHAIN_ARG) .
+	cp $(PWD)build/compile_commands.json $(PWD)
+
 coverage:
 	rm -rf coverage-html
 	./build/bin/malasim_test

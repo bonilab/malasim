@@ -88,7 +88,9 @@ public:
   void before_run() override {}
   void begin_time_step() override {}
   void monthly_report() override;
-  void after_run() override {}
+  void after_run() override {
+    populate_genotype_table();
+  }
 
   // Set batch size for database operations
   void set_batch_size(int size) { batch_size = size > 0 ? size : DEFAULT_BATCH_SIZE; }

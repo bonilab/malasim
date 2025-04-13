@@ -410,10 +410,10 @@ public:
     }
 
     assert(static_cast<unsigned>(get_circulation_info().get_number_of_moving_levels())
-           == v_moving_level_density.size());
+           == v_moving_level_density_.size());
     assert(static_cast<unsigned>(get_circulation_info().get_number_of_moving_levels())
-           == v_moving_level_value.size());
-    assert(fabs(t - 1) < 0.0001);
+           == v_moving_level_value_.size());
+    assert(fabs(prob_sum - 1) < 0.0001);
 
     const auto stay_variance = get_circulation_info().get_length_of_stay().get_sd()
                                * get_circulation_info().get_length_of_stay().get_sd();

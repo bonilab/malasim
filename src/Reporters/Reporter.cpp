@@ -6,6 +6,7 @@
 #include "MonthlyReporter.h"
 #include "NovelDrugReporter.h"
 #include "SQLiteMonthlyReporter.h"
+#include "SQLiteValidationReporter.h"
 #include "TACTReporter.h"
 #include "ValidationReporter.h"
 #include "Configuration/Config.h"
@@ -26,6 +27,7 @@ std::map<std::string, Reporter::ReportType> Reporter::ReportTypeMap{
     {"SeasonalImmunity", SEASONAL_IMMUNITY},
     {"AgeBand", AGE_BAND_REPORTER},
     {"SQLiteMonthlyReporter", SQLITE_MONTHLY_REPORTER},
+    {"SQLiteValidationReporter", SQLITE_VALIDATION_REPORTER},
 #ifdef ENABLE_TRAVEL_TACKING
         {"TravelTrackingReporter", TRAVEL_TRACKING_REPORTER},
 #endif
@@ -61,6 +63,10 @@ std::unique_ptr<Reporter> Reporter::MakeReport(ReportType report_type) {
   case SQLITE_MONTHLY_REPORTER: {
     auto cell_level_reporting = Model::get_config()->get_model_settings().get_cell_level_reporting();
     return std::make_unique<SQLiteMonthlyReporter>(cell_level_reporting);
+  }
+  case SQLITE_VALIDATION_REPORTER: {
+    auto cell_level_reporting = Model::get_config()->get_model_settings().get_cell_level_reporting();
+    return std::make_unique<SQLiteValidationReporter>();
   }
 #ifdef ENABLE_TRAVEL_TRACKING
     case TRAVEL_TRACKING_REPORTER:
