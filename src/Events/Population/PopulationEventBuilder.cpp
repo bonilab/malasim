@@ -211,7 +211,7 @@ PopulationEventBuilder::build_change_treatment_strategy_event(const YAML::Node &
       exit(-1);
     }
 
-    auto event = std::make_unique<ChangeTreatmentStrategyEvent>(time, strategy_id);
+    auto event = std::make_unique<ChangeTreatmentStrategyEvent>(strategy_id,time);
     events.push_back(std::move(event));
   }
 

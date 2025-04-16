@@ -1,38 +1,35 @@
-/*
- * SQLiteValidationReporter.h
- *
- * Override the base DbReporter and log genotype information at the monthly
- * level.
- */
 #ifndef SQLITEVALIDATIONREPORTER_H
 #define SQLITEVALIDATIONREPORTER_H
 
 #include "Reporters/SQLiteDbReporter.h"
-
 class Person;
 
 class SQLiteValidationReporter : public SQLiteDbReporter {
 public:
-  //disallow copy and move
   SQLiteValidationReporter(const SQLiteValidationReporter &orig) = delete;
   void operator=(const SQLiteValidationReporter &orig) = delete;
   SQLiteValidationReporter(SQLiteValidationReporter &&orig) = delete;
   void operator=(SQLiteValidationReporter &&orig) = delete;
 
+  SQLiteValidationReporter(bool cell_level_reporting = false)
+      : enable_cell_level_reporting(cell_level_reporting) {}
+  ~SQLiteValidationReporter() override = default;
 
+  void initialize(int job_number, const std::string &path) override;
   void monthly_report_genome_data(int monthId) override;
   void monthly_report_site_data(int monthId) override;
   void after_run() override;
 
+  void set_cell_level_reporting(bool enable) { enable_cell_level_reporting = enable; }
+  bool is_cell_level_reporting_enabled() const { return enable_cell_level_reporting; }
+
 protected:
-  // Flag to enable cell-level reporting
   bool enable_cell_level_reporting{false};
 
   struct MonthlySiteData {
     std::vector<double> eir, pfpr_under5, pfpr2to10, pfpr_all;
-    std::vector<int> population, clinical_episodes, treatments,
-        treatment_failures, nontreatment, treatments_under5, treatments_over5,
-        infections_by_unit;
+    std::vector<int> population, clinical_episodes, treatments, treatment_failures,
+                    nontreatment, treatments_under5, treatments_over5, infections_by_unit;
     std::vector<std::vector<int>> clinical_episodes_by_age_class;
   };
 
@@ -46,7 +43,6 @@ protected:
 
   std::vector<MonthlySiteData> monthly_site_data_by_level;
   std::vector<MonthlyGenomeData> monthly_genome_data_by_level;
-
   std::vector<std::string> insert_values;
 
 private:
@@ -58,17 +54,6 @@ private:
   void collect_genome_data_for_location(size_t location, int level_id);
   void collect_genome_data_for_a_person(Person* person, int unit_id, int level_id);
   void build_up_genome_data_insert_values(int monthId, int level_id);
-
-public:
-  SQLiteValidationReporter(bool cell_level_reporting = false) : enable_cell_level_reporting(cell_level_reporting) {}
-  ~SQLiteValidationReporter() override = default;
-
-  // Initialize the reporter with job number and path
-  void initialize(int job_number, const std::string &path) override;
-  
-  // Set the flag to enable cell-level reporting
-  void set_cell_level_reporting(bool enable) { enable_cell_level_reporting = enable; }
-  bool is_cell_level_reporting_enabled() const { return enable_cell_level_reporting; }
 };
 
 #endif

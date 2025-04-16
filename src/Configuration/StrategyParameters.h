@@ -122,10 +122,10 @@ public:
     void set_strategy_db_raw(const std::map<int, StrategyInfo>& value) { strategy_db_raw_ = value; }
 
     [[nodiscard]] int get_initial_strategy_id() const { return initial_strategy_id_; }
-    void set_initial_strategy_id(const int value) { initial_strategy_id_ = value; }
+    void set_initial_strategy_id(const int &value) { initial_strategy_id_ = value; }
 
     [[nodiscard]] int get_recurrent_therapy_id() const { return recurrent_therapy_id_; }
-    void set_recurrent_therapy_id(const int value) { recurrent_therapy_id_ = value; }
+    void set_recurrent_therapy_id(const int &value) { recurrent_therapy_id_ = value; }
 
     [[nodiscard]] MassDrugAdministration get_mda() const { return mass_drug_administration_; }
     void set_mass_drug_administration(const MassDrugAdministration& value) { mass_drug_administration_ = value; }

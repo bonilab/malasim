@@ -248,6 +248,7 @@ IStrategy* Model::get_treatment_strategy() { return get_instance()->treatment_st
 
 void Model::set_treatment_strategy(const int &strategy_id) {
   treatment_strategy_ = strategy_id == -1 ? nullptr : Model::get_strategy_db()[strategy_id].get();
+  assert(treatment_strategy_ != nullptr);
   treatment_strategy_->adjust_started_time_point(Model::get_scheduler()->current_time());
 }
 
