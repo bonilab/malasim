@@ -23,12 +23,9 @@ public:
     full_compliance_ = full_compliance;
   }
 
-public:
   int artemisinin_id;
   std::vector<int> dosing_day;
   std::vector<double> pr_completed_days;
-
-public:
 
   SCTherapy()
       : Therapy(),

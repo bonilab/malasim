@@ -1,6 +1,5 @@
 #ifndef DRUGPARAMETERS_H
 #define DRUGPARAMETERS_H
-#include <spdlog/spdlog.h>
 #include <yaml-cpp/yaml.h>
 
 #include <map>
