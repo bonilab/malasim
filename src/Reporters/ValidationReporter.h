@@ -26,6 +26,9 @@ public:
   std::shared_ptr<spdlog::logger> monthly_mutation_logger;
   std::shared_ptr<spdlog::logger> mosquito_res_count_logger;
 
+  std::string monthly_mutation_path = "";
+  std::string mosquito_res_count_path = "";
+
 public:
   ValidationReporter();
   ~ValidationReporter() override = default;

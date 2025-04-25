@@ -30,44 +30,52 @@ void ValidationReporter::initialize(int job_number, const std::string &path) {
   std::string summary_data_path = fmt::format("{}/validation_summary_{}.txt", path, job_number);
   std::string gene_freq_path = fmt::format("{}/validation_gene_freq_{}.txt", path, job_number);
   std::string gene_db_path = fmt::format("{}/validation_gene_db_{}.txt", path, job_number);
-  // std::string prmc_freq_path = fmt::format("{}/validation_prmc_freq_{}.txt", path, job_number);
-  // std::string prmc_db_path = fmt::format("{}/validation_prmc_db_{}.txt", path, job_number);
-  std::string monthly_mutation_path =
-      fmt::format("{}/validation_monthly_mutation_{}.txt", path, job_number);
-  std::string mosquito_res_count_path =
-      fmt::format("{}/validation_mosquito_res_count_{}.txt", path, job_number);
 
   // Remove old files if they exist
   fs::remove(monthly_data_path);
   fs::remove(summary_data_path);
   fs::remove(gene_freq_path);
   fs::remove(gene_db_path);
-  // fs::remove(prmc_freq_path);
-  // fs::remove(prmc_db_path);
-  fs::remove(monthly_mutation_path);
-  fs::remove(mosquito_res_count_path);
+
+  if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()) {
+    // std::string prmc_freq_path = fmt::format("{}/validation_prmc_freq_{}.txt", path, job_number);
+    // std::string prmc_db_path = fmt::format("{}/validation_prmc_db_{}.txt", path, job_number);
+    monthly_mutation_path =
+        fmt::format("{}/validation_monthly_mutation_{}.txt", path, job_number);
+    mosquito_res_count_path =
+      fmt::format("{}/validation_mosquito_res_count_{}.txt", path, job_number);
+    // fs::remove(prmc_freq_path);
+    // fs::remove(prmc_db_path);
+    fs::remove(monthly_mutation_path);
+    fs::remove(mosquito_res_count_path);
+  }
 
   // Create separate loggers for each report type
   monthly_data_logger = spdlog::basic_logger_mt("validation_monthly_data", monthly_data_path);
   summary_data_logger = spdlog::basic_logger_mt("validation_summary", summary_data_path);
   gene_freq_logger = spdlog::basic_logger_mt("validation_gene_freq", gene_freq_path);
   gene_db_logger = spdlog::basic_logger_mt("validation_gene_db", gene_db_path);
-  // prmc_freq_logger = spdlog::basic_logger_mt("validation_prmc_freq", prmc_freq_path);
-  // prmc_db_logger = spdlog::basic_logger_mt("validation_prmc_db", prmc_db_path);
-  monthly_mutation_logger =
-      spdlog::basic_logger_mt("validation_monthly_mutation", monthly_mutation_path);
-  mosquito_res_count_logger =
-      spdlog::basic_logger_mt("validation_mosquito_res_count", mosquito_res_count_path);
+
+  if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()){
+    // prmc_freq_logger = spdlog::basic_logger_mt("validation_prmc_freq", prmc_freq_path);
+    // prmc_db_logger = spdlog::basic_logger_mt("validation_prmc_db", prmc_db_path);
+    monthly_mutation_logger =
+        spdlog::basic_logger_mt("validation_monthly_mutation", monthly_mutation_path);
+    mosquito_res_count_logger =
+        spdlog::basic_logger_mt("validation_mosquito_res_count", mosquito_res_count_path);
+  }
 
   // Set log pattern to only include the raw message (removes timestamps and log levels)
   monthly_data_logger->set_pattern("%v");
   summary_data_logger->set_pattern("%v");
   gene_freq_logger->set_pattern("%v");
   gene_db_logger->set_pattern("%v");
-  // prmc_freq_logger->set_pattern("%v");
-  // prmc_db_logger->set_pattern("%v");
-  monthly_mutation_logger->set_pattern("%v");
-  mosquito_res_count_logger->set_pattern("%v");
+  if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()) {
+    // prmc_freq_logger->set_pattern("%v");
+    // prmc_db_logger->set_pattern("%v");
+    monthly_mutation_logger->set_pattern("%v");
+    mosquito_res_count_logger->set_pattern("%v");
+  }
 
   // Set up a default console logger
   auto console_logger = spdlog::stdout_color_mt("console");
@@ -79,10 +87,12 @@ void ValidationReporter::initialize(int job_number, const std::string &path) {
   summary_data_logger->flush_on(spdlog::level::info);
   gene_freq_logger->flush_on(spdlog::level::info);
   gene_db_logger->flush_on(spdlog::level::info);
-  // prmc_freq_logger->flush_on(spdlog::level::info);
-  // prmc_db_logger->flush_on(spdlog::level::info);
-  monthly_mutation_logger->flush_on(spdlog::level::info);
-  mosquito_res_count_logger->flush_on(spdlog::level::info);
+  if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()) {
+    // prmc_freq_logger->flush_on(spdlog::level::info);
+    // prmc_db_logger->flush_on(spdlog::level::info);
+    monthly_mutation_logger->flush_on(spdlog::level::info);
+    mosquito_res_count_logger->flush_on(spdlog::level::info);
+  }
 }
 
 void ValidationReporter::before_run() {}
@@ -294,43 +304,47 @@ void ValidationReporter::monthly_report() {
   gene_freq_logger->info(gene_freq_ss.str());
   // prmc_freq_logger->info(prmc_freq_ss.str());
 
-  ss.str("");
-  int sum = 0;
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    sum += static_cast<int>(Model::get_mdc()->mutation_tracker[loc].size());
-    for (auto &yearly_data : Model::get_mdc()->mutation_tracker[loc]) {
-      ss << std::get<0>(yearly_data) << sep;
-      ss << std::get<1>(yearly_data) << sep;
-      ss << std::get<2>(yearly_data) << sep;
-      ss << std::get<3>(yearly_data) << sep;
-      ss << std::get<4>(yearly_data) << sep;
-      ss << std::get<5>(yearly_data) << '\n';
-    }
-  }
-  if (sum > 0) {
-    monthly_mutation_logger->info(ss.str());
-    for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-      Model::get_mdc()->mutation_tracker[loc].clear();
-    }
-  }
 
   ss.str("");
-  sum = 0;
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    sum += static_cast<int>(
-        Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].size());
-    for (auto &genotype_tracked :
-         Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc]) {
-      ss << std::get<0>(genotype_tracked) << sep;
-      ss << std::get<1>(genotype_tracked) << sep;
-      ss << std::get<2>(genotype_tracked) << sep;
-      ss << std::get<3>(genotype_tracked) << '\n';
-    }
-  }
-  if (sum > 0) {
-    mosquito_res_count_logger->info(ss.str());
+
+  if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()){
+    int sum = 0;
     for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-      Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].clear();
+      sum += static_cast<int>(Model::get_mdc()->mutation_tracker[loc].size());
+      for (auto &yearly_data : Model::get_mdc()->mutation_tracker[loc]) {
+        ss << std::get<0>(yearly_data) << sep;
+        ss << std::get<1>(yearly_data) << sep;
+        ss << std::get<2>(yearly_data) << sep;
+        ss << std::get<3>(yearly_data) << sep;
+        ss << std::get<4>(yearly_data) << sep;
+        ss << std::get<5>(yearly_data) << '\n';
+      }
+    }
+    if (sum > 0) {
+      monthly_mutation_logger->info(ss.str());
+      for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+        Model::get_mdc()->mutation_tracker[loc].clear();
+      }
+    }
+
+    ss.str("");
+    sum = 0;
+    for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+      sum += static_cast<int>(
+          Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].size());
+      for (auto &genotype_tracked :
+           Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc]) {
+        ss << std::get<0>(genotype_tracked) << sep;
+        ss << std::get<1>(genotype_tracked) << sep;
+        ss << std::get<2>(genotype_tracked) << sep;
+        ss << std::get<3>(genotype_tracked) << '\n';
+           }
+    }
+    if (sum > 0) {
+      mosquito_res_count_logger->info(ss.str());
+      for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+        Model::get_mdc()->mosquito_recombined_resistant_genotype_tracker[loc].clear();
+      }
     }
   }
 }
@@ -407,50 +421,52 @@ void ValidationReporter::after_run() {
   }
   summary_data_logger->info(ss.str());
 
-  for (const auto &genotype : *(Model::get_genotype_db())) {
-    gene_db_logger->info("{}{}{}", genotype->genotype_id(), sep, genotype->aa_sequence);
-    // prmc_db_logger->info("{}{}{}",g_id,sep,genotype->aa_sequence);
-  }
-
-  for (const auto &genotype : *(Model::get_genotype_db())) {
-    spdlog::debug("{}:{}", genotype->aa_sequence, genotype->daily_fitness_multiple_infection);
-  }
-  for (int resistant_drug_pair_id = 0;
-       resistant_drug_pair_id < Model::get_mosquito()->resistant_drug_list.size();
-       resistant_drug_pair_id++) {
-    auto drugs = Model::get_mosquito()->resistant_drug_list[resistant_drug_pair_id].second;
+  if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()) {
     for (const auto &genotype : *(Model::get_genotype_db())) {
-      if (resistant_drug_pair_id < 3) {
-        spdlog::debug(fmt::format(
-            "resistant_drug_pair_id: {} {}\tR-0: {}\tR-1: {}\tEC50-0: {}\tEC50-1: {}\tminEC50-0: "
-            "{}\tminEC50-1: {}",
-            resistant_drug_pair_id, genotype->aa_sequence,
-            genotype->resist_to(Model::get_drug_db()->at(drugs[0]).get()),
-            genotype->resist_to(Model::get_drug_db()->at(drugs[1]).get()),
-            genotype->EC50_power_n[drugs[0]], genotype->EC50_power_n[drugs[1]],
-            pow(Model::get_drug_db()->at(drugs[0])->base_EC50,
-                Model::get_drug_db()->at(drugs[0])->n()),
-            pow(Model::get_drug_db()->at(drugs[1])->base_EC50,
-                Model::get_drug_db()->at(drugs[1])->n())));
-      } else {
-        spdlog::debug(fmt::format(
-            "resistant_drug_pair_id: {} {}\tR-0: {}\tR-1: {}\tR-2: {}\tEC50-0: {}\tEC50-1: "
-            "{}\tEC50-2: {}\tminEC50-0: {}\tminEC50-1: {}\tminEC50-2: {}",
-            resistant_drug_pair_id, genotype->aa_sequence,
-            genotype->resist_to(Model::get_drug_db()->at(drugs[0]).get()),
-            genotype->resist_to(Model::get_drug_db()->at(drugs[1]).get()),
-            genotype->resist_to(Model::get_drug_db()->at(drugs[2]).get()),
-            genotype->EC50_power_n[drugs[0]], genotype->EC50_power_n[drugs[1]],
-            genotype->EC50_power_n[drugs[2]],
-            pow(Model::get_drug_db()->at(drugs[0])->base_EC50,
-                Model::get_drug_db()->at(drugs[0])->n()),
-            pow(Model::get_drug_db()->at(drugs[1])->base_EC50,
-                Model::get_drug_db()->at(drugs[1])->n()),
-            pow(Model::get_drug_db()->at(drugs[1])->base_EC50,
-                Model::get_drug_db()->at(drugs[2])->n())));
-      }
+      gene_db_logger->info("{}{}{}", genotype->genotype_id(), sep, genotype->aa_sequence);
+      // prmc_db_logger->info("{}{}{}",g_id,sep,genotype->aa_sequence);
     }
-    spdlog::debug("###############");
+
+    for (const auto &genotype : *(Model::get_genotype_db())) {
+      spdlog::debug("{}:{}", genotype->aa_sequence, genotype->daily_fitness_multiple_infection);
+    }
+    for (int resistant_drug_pair_id = 0;
+         resistant_drug_pair_id < Model::get_mosquito()->resistant_drug_list.size();
+         resistant_drug_pair_id++) {
+      auto drugs = Model::get_mosquito()->resistant_drug_list[resistant_drug_pair_id].second;
+      for (const auto &genotype : *(Model::get_genotype_db())) {
+        if (resistant_drug_pair_id < 3) {
+          spdlog::debug(fmt::format(
+              "resistant_drug_pair_id: {} {}\tR-0: {}\tR-1: {}\tEC50-0: {}\tEC50-1: {}\tminEC50-0: "
+              "{}\tminEC50-1: {}",
+              resistant_drug_pair_id, genotype->aa_sequence,
+              genotype->resist_to(Model::get_drug_db()->at(drugs[0]).get()),
+              genotype->resist_to(Model::get_drug_db()->at(drugs[1]).get()),
+              genotype->EC50_power_n[drugs[0]], genotype->EC50_power_n[drugs[1]],
+              pow(Model::get_drug_db()->at(drugs[0])->base_EC50,
+                  Model::get_drug_db()->at(drugs[0])->n()),
+              pow(Model::get_drug_db()->at(drugs[1])->base_EC50,
+                  Model::get_drug_db()->at(drugs[1])->n())));
+        } else {
+          spdlog::debug(fmt::format(
+              "resistant_drug_pair_id: {} {}\tR-0: {}\tR-1: {}\tR-2: {}\tEC50-0: {}\tEC50-1: "
+              "{}\tEC50-2: {}\tminEC50-0: {}\tminEC50-1: {}\tminEC50-2: {}",
+              resistant_drug_pair_id, genotype->aa_sequence,
+              genotype->resist_to(Model::get_drug_db()->at(drugs[0]).get()),
+              genotype->resist_to(Model::get_drug_db()->at(drugs[1]).get()),
+              genotype->resist_to(Model::get_drug_db()->at(drugs[2]).get()),
+              genotype->EC50_power_n[drugs[0]], genotype->EC50_power_n[drugs[1]],
+              genotype->EC50_power_n[drugs[2]],
+              pow(Model::get_drug_db()->at(drugs[0])->base_EC50,
+                  Model::get_drug_db()->at(drugs[0])->n()),
+              pow(Model::get_drug_db()->at(drugs[1])->base_EC50,
+                  Model::get_drug_db()->at(drugs[1])->n()),
+              pow(Model::get_drug_db()->at(drugs[1])->base_EC50,
+                  Model::get_drug_db()->at(drugs[2])->n())));
+        }
+      }
+      spdlog::debug("###############");
+    }
   }
 }
 
