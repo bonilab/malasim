@@ -58,6 +58,11 @@ jobs:
 
           # Extract raw VERSION line
           RAW_VERSION_LINE=$(grep 'const char\* VERSION' src/malasim/version.h)
+          
+          if [ -z "$RAW_VERSION_LINE" ]; then
+            echo "ERROR: VERSION line not found in src/malasim/version.h!"
+            exit 1
+          fi
 
           # Replace #BRANCH# and #COMMIT#
           NEW_VERSION_LINE=$(echo "$RAW_VERSION_LINE" | sed "s|#BRANCH#|${FULL_BRANCH_INFO}|" | sed "s|#COMMIT#|${COMMIT_ID}|")
@@ -76,6 +81,23 @@ jobs:
           echo "CI Version Summary:"
           echo "Branch: ${FULL_BRANCH_INFO}"
           echo "Commit: ${COMMIT_ID}"
+
+      - name: Commit and Push version_generated.h (safe push)
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          echo "Safe to push. Proceeding."
+
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+          git add src/malasim/version_generated.h
+          git commit -m "CI: Update version_generated.h [skip ci]" || echo "Nothing to commit"
+          git push origin HEAD:${GITHUB_REF##*/}
+
+      - name: Skip push for external PR
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          echo "External Pull Request detected. Skipping push to protect repository."
 
       - name: Configure, Build, and Test using Presets
         uses: lukka/run-cmake@v10
