@@ -1,2 +1,2 @@
 #pragma once
-const char* VERSION = "6.0.1 (branch: KienTTran/malasim/main, commit: 8a6c403)";
+const char* VERSION = "6.0.1 (branch: bonilab/malasim-v6-SURF/main, commit: 652922d)";
