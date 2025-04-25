@@ -88,22 +88,29 @@ jobs:
           echo "Branch: ${FULL_BRANCH_INFO}"
           echo "Commit: ${COMMIT_ID}"
 
-      - name: Commit and Push version_generated.h (safe push)
-        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+      - name: Commit and Push version_generated.h (only after successful build)
         run: |
-          echo "Safe to push. Proceeding."
-
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-
-          git checkout ${{ github.head_ref }}
-
+      
+          # Determine the correct branch name
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BRANCH_NAME="${{ github.head_ref }}"
+          else
+            BRANCH_NAME="${GITHUB_REF##*/}"
+          fi
+      
+          echo "Checking out branch: $BRANCH_NAME"
+          git fetch origin "$BRANCH_NAME"
+          git checkout "$BRANCH_NAME"
+      
           # Extract the commit ID from version_generated.h
           COMMIT_ID=$(grep -oE 'commit: [a-f0-9]+' src/malasim/version_generated.h | awk '{print $2}')
-
+      
           git add src/malasim/version_generated.h
-          git commit -m "CI: Update version info (using commit: ${COMMIT_ID})" || echo "Nothing to commit"
-          git push origin HEAD:${GITHUB_REF##*/}
+          git commit -m "CI: Update version info (using test passed commit: ${COMMIT_ID} ✅)" || echo "Nothing to commit"
+          git push origin HEAD:"$BRANCH_NAME"
+
 
       - name: Skip push for external PR
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
