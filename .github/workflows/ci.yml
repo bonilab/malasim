@@ -11,6 +11,9 @@ env:
   VCPKG_DEFAULT_TRIPLET: x64-linux
   VCPKG_DEFAULT_HOST_TRIPLET: x64-linux
 
+permissions:
+  contents: write
+  
 jobs:
   build-and-test:
     name: Build and Test
@@ -22,6 +25,9 @@ jobs:
 
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: true
 
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
@@ -95,6 +101,8 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
+
+          git checkout ${{ github.head_ref }}
 
           # Extract the commit ID from version_generated.h
           COMMIT_ID=$(grep -oE 'commit: [a-f0-9]+' src/malasim/version_generated.h | awk '{print $2}')
