@@ -11,6 +11,9 @@ env:
   VCPKG_DEFAULT_TRIPLET: x64-linux
   VCPKG_DEFAULT_HOST_TRIPLET: x64-linux
 
+permissions:
+  contents: write
+  
 jobs:
   build-and-test:
     name: Build and Test
