@@ -6,5 +6,17 @@
  */
 #pragma once
 
-const char* VERSION = "6.0.1 (branch: #BRANCH#, commit: #COMMIT#)";
+#ifndef GIT_REPO_INFO
+#define GIT_REPO_INFO "unknown/unknown"
+#endif
+
+#ifndef GIT_BRANCH_NAME
+#define GIT_BRANCH_NAME "unknown"
+#endif
+
+#ifndef GIT_COMMIT_HASH
+#define GIT_COMMIT_HASH "unknown"
+#endif
+
+const char* VERSION = "6.0.1 (branch: " GIT_REPO_INFO "/" GIT_BRANCH_NAME ", commit: " GIT_COMMIT_HASH ")";
 

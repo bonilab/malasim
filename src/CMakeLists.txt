@@ -93,6 +93,39 @@ target_link_libraries(MalaSim PRIVATE
 
 set_property(TARGET MalaSim PROPERTY CXX_STANDARD 20)
 
+# Get full GitHub repository path (e.g., username/repo-name)
+execute_process(
+        COMMAND git config --get remote.origin.url
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_REMOTE_URL
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Parse username and repo name
+string(REGEX REPLACE ".*github.com[:/](.+)\\.git" "\\1" GIT_REPO_INFO "${GIT_REMOTE_URL}")
+
+# Get current Git branch
+execute_process(
+        COMMAND git rev-parse --abbrev-ref HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_BRANCH_NAME
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Get current Git commit hash (short)
+execute_process(
+        COMMAND git rev-parse --short HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_COMMIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Define macros
+add_definitions(-DGIT_REPO_INFO="${GIT_REPO_INFO}")
+add_definitions(-DGIT_BRANCH_NAME="${GIT_BRANCH_NAME}")
+add_definitions(-DGIT_COMMIT_HASH="${GIT_COMMIT_HASH}")
+
+
 
 
 

@@ -87,12 +87,18 @@ public:
     within_host_induced_free_recombination_ = value;
   }
 
+  [[nodiscard]] bool get_record_recombination_events() const {
+    return record_recombination_events_;
+  }
+    void set_record_recombination_events(bool value) { record_recombination_events_ = value; }
+
   void process_config() override {}
   void process_config_using_locations(std::vector<Spatial::Location>& locations);
 
 private:
   MosquitoConfig mosquito_config_;
   bool within_host_induced_free_recombination_ = true;
+  bool record_recombination_events_ = false;
 };
 
 namespace YAML {
@@ -177,16 +183,26 @@ struct convert<MosquitoParameters> {
     node["mosquito_config"] = rhs.get_mosquito_config();
     node["within_host_induced_free_recombination"] =
         rhs.get_within_host_induced_free_recombination();
+    node["record_recombination_events"] = rhs.get_record_recombination_events();
     return node;
   }
 
   static bool decode(const Node &node, MosquitoParameters &rhs) {
-    if (!node["mosquito_config"] || !node["within_host_induced_free_recombination"]) {
+    if (!node["mosquito_config"]) {
       throw std::runtime_error("Missing 'mosquito_config' field in MosquitoParameters");
+    }
+    if (!node["within_host_induced_free_recombination"]) {
+      throw std::runtime_error("Missing 'within_host_induced_free_recombination' field in MosquitoParameters");
     }
     rhs.set_mosquito_config(node["mosquito_config"].as<MosquitoParameters::MosquitoConfig>());
     rhs.set_within_host_induced_free_recombination(
         node["within_host_induced_free_recombination"].as<bool>());
+    if (node["record_recombination_events"]) {
+      if (node["record_recombination_events"].as<bool>()) {
+        spdlog::info("Record recombination events enabled");
+      }
+      rhs.set_record_recombination_events( node["record_recombination_events"].as<bool>());
+    }
     return true;
   }
 };
