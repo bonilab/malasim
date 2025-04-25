@@ -168,6 +168,8 @@ public:
   void monthly_report();
   void report_begin_of_time_step();
   void add_reporter(std::unique_ptr<Reporter> reporter);
+
+  std::vector<std::unique_ptr<Reporter>>& get_reporters();
 };
 
 #endif  // MODEL_H

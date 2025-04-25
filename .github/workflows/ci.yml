@@ -31,6 +31,77 @@ jobs:
       - name: Setup vcpkg (no install yet)
         uses: lukka/run-vcpkg@v11
 
+      - name: Generate version_generated.h from version.h
+        run: |
+          # Extract GitHub environment info
+          USERNAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f1)
+          REPO_NAME=$(echo "${GITHUB_REPOSITORY}" | cut -d'/' -f2)
+
+          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
+            BRANCH_NAME="${GITHUB_HEAD_REF}"
+          else
+            BRANCH_NAME="${GITHUB_REF##*/}"
+          fi
+
+          COMMIT_ID=$(git rev-parse --short HEAD)
+
+          FULL_BRANCH_INFO="${USERNAME}/${REPO_NAME}/${BRANCH_NAME}"
+
+          echo ""
+          echo "----------------------------------------"
+          echo "Generating Version Info"
+          echo "User/Repo : ${USERNAME}/${REPO_NAME}"
+          echo "Branch    : ${BRANCH_NAME}"
+          echo "Commit ID : ${COMMIT_ID}"
+          echo "----------------------------------------"
+          echo ""
+
+          # Extract raw VERSION line
+          RAW_VERSION_LINE=$(grep 'const char\* VERSION' src/malasim/version.h)
+          
+          if [ -z "$RAW_VERSION_LINE" ]; then
+            echo "ERROR: VERSION line not found in src/malasim/version.h!"
+            exit 1
+          fi
+
+          # Replace #BRANCH# and #COMMIT#
+          NEW_VERSION_LINE=$(echo "$RAW_VERSION_LINE" | sed "s|#BRANCH#|${FULL_BRANCH_INFO}|" | sed "s|#COMMIT#|${COMMIT_ID}|")
+
+          # Write version_generated.h
+          echo "#pragma once" > src/malasim/version_generated.h
+          echo "$NEW_VERSION_LINE" >> src/malasim/version_generated.h
+
+          echo ""
+          echo "Successfully generated src/malasim/version_generated.h:"
+          echo "----------------------------------------"
+          cat src/malasim/version_generated.h
+          echo "----------------------------------------"
+          echo ""
+
+          echo "CI Version Summary:"
+          echo "Branch: ${FULL_BRANCH_INFO}"
+          echo "Commit: ${COMMIT_ID}"
+
+      - name: Commit and Push version_generated.h (safe push)
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          echo "Safe to push. Proceeding."
+
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+          # Extract the commit ID from version_generated.h
+          COMMIT_ID=$(grep -oE 'commit: [a-f0-9]+' src/malasim/version_generated.h | awk '{print $2}')
+
+          git add src/malasim/version_generated.h
+          git commit -m "CI: Update version info (using commit: ${COMMIT_ID})" || echo "Nothing to commit"
+          git push origin HEAD:${GITHUB_REF##*/}
+
+      - name: Skip push for external PR
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          echo "External Pull Request detected. Skipping push to protect repository."
+
       - name: Configure, Build, and Test using Presets
         uses: lukka/run-cmake@v10
         with:

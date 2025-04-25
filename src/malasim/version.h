@@ -4,5 +4,7 @@
  * This file exposes the simulation version so that it can be retrieved by other
  * scripts.
  */
+#pragma once
 
-const char* VERSION = "6.0.0-dev";
+const char* VERSION = "6.0.1 (branch: #BRANCH#, commit: #COMMIT#)";
+

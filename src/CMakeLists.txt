@@ -27,6 +27,13 @@ file(GLOB_RECURSE MALASIM_CORE_SOURCES
   "${PROJECT_SOURCE_DIR}/src/*.h"
 )
 
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/malasim/version_generated.h")
+  message(STATUS "Using generated version_generated.h")
+else()
+  message(STATUS "Using default version.h")
+endif()
+
+
 # remove malasim/main.cpp from list
 list(FILTER MALASIM_CORE_SOURCES EXCLUDE REGEX "${PROJECT_SOURCE_DIR}/src/malasim/main\\.cpp$")
 
@@ -85,6 +92,7 @@ target_link_libraries(MalaSim PRIVATE
 )
 
 set_property(TARGET MalaSim PROPERTY CXX_STANDARD 20)
+
 
 
 
