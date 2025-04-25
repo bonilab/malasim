@@ -6,5 +6,5 @@
  */
 #pragma once
 
-const char* VERSION = "6.0.1 (branch: #NAME#, commit: #COMMIT#)";
+const char* VERSION = "6.0.1 (branch: #BRANCH#, commit: #COMMIT#)";
 
