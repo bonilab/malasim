@@ -933,6 +933,10 @@ mosquito_parameters:
   # Within-host induced free recombination
   within_host_induced_free_recombination: true
 
+  # Record recombination events (only for Validation Reporter)
+  # Note: this will generate a lot of data
+  record_recombination_events: true
+
 # ---------------------------------------------------------------
 # 16. Population Events (all events are optional)
 # ---------------------------------------------------------------
