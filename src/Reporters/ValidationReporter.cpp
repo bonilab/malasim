@@ -421,12 +421,12 @@ void ValidationReporter::after_run() {
   }
   summary_data_logger->info(ss.str());
 
-  if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()) {
-    for (const auto &genotype : *(Model::get_genotype_db())) {
-      gene_db_logger->info("{}{}{}", genotype->genotype_id(), sep, genotype->aa_sequence);
-      // prmc_db_logger->info("{}{}{}",g_id,sep,genotype->aa_sequence);
-    }
+  for (const auto &genotype : *(Model::get_genotype_db())) {
+    gene_db_logger->info("{}{}{}", genotype->genotype_id(), sep, genotype->aa_sequence);
+    // prmc_db_logger->info("{}{}{}",g_id,sep,genotype->aa_sequence);
+  }
 
+  if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()) {
     for (const auto &genotype : *(Model::get_genotype_db())) {
       spdlog::debug("{}:{}", genotype->aa_sequence, genotype->daily_fitness_multiple_infection);
     }
