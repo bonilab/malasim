@@ -38,14 +38,10 @@ void ValidationReporter::initialize(int job_number, const std::string &path) {
   fs::remove(gene_db_path);
 
   if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()) {
-    // std::string prmc_freq_path = fmt::format("{}/validation_prmc_freq_{}.txt", path, job_number);
-    // std::string prmc_db_path = fmt::format("{}/validation_prmc_db_{}.txt", path, job_number);
     monthly_mutation_path =
         fmt::format("{}/validation_monthly_mutation_{}.txt", path, job_number);
     mosquito_res_count_path =
       fmt::format("{}/validation_mosquito_res_count_{}.txt", path, job_number);
-    // fs::remove(prmc_freq_path);
-    // fs::remove(prmc_db_path);
     fs::remove(monthly_mutation_path);
     fs::remove(mosquito_res_count_path);
   }
@@ -57,8 +53,6 @@ void ValidationReporter::initialize(int job_number, const std::string &path) {
   gene_db_logger = spdlog::basic_logger_mt("validation_gene_db", gene_db_path);
 
   if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()){
-    // prmc_freq_logger = spdlog::basic_logger_mt("validation_prmc_freq", prmc_freq_path);
-    // prmc_db_logger = spdlog::basic_logger_mt("validation_prmc_db", prmc_db_path);
     monthly_mutation_logger =
         spdlog::basic_logger_mt("validation_monthly_mutation", monthly_mutation_path);
     mosquito_res_count_logger =
@@ -71,8 +65,6 @@ void ValidationReporter::initialize(int job_number, const std::string &path) {
   gene_freq_logger->set_pattern("%v");
   gene_db_logger->set_pattern("%v");
   if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()) {
-    // prmc_freq_logger->set_pattern("%v");
-    // prmc_db_logger->set_pattern("%v");
     monthly_mutation_logger->set_pattern("%v");
     mosquito_res_count_logger->set_pattern("%v");
   }
@@ -88,8 +80,6 @@ void ValidationReporter::initialize(int job_number, const std::string &path) {
   gene_freq_logger->flush_on(spdlog::level::info);
   gene_db_logger->flush_on(spdlog::level::info);
   if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()) {
-    // prmc_freq_logger->flush_on(spdlog::level::info);
-    // prmc_db_logger->flush_on(spdlog::level::info);
     monthly_mutation_logger->flush_on(spdlog::level::info);
     mosquito_res_count_logger->flush_on(spdlog::level::info);
   }
@@ -291,14 +281,20 @@ void ValidationReporter::monthly_report() {
     }
     ss << group_sep;  /// 747
   }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (int age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->total_immune_by_location_age()[loc][age]
+         << sep;
+    }
+    ss << group_sep;  /// 666
+  }
   monthly_data_logger->info(ss.str());
 
   std::stringstream gene_freq_ss;
   //    ReporterUtils::output_genotype_frequency3(gene_freq_ss, Model::get_genotype_db()->size(),
   //                                              Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
-  std::stringstream prmc_freq_ss;
-  ReporterUtils::output_genotype_frequency4(
-      gene_freq_ss, prmc_freq_ss, static_cast<int>(Model::get_genotype_db()->size()),
+  ReporterUtils::output_genotype_frequency3(
+      gene_freq_ss, static_cast<int>(Model::get_genotype_db()->size()),
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
 
   gene_freq_logger->info(gene_freq_ss.str());

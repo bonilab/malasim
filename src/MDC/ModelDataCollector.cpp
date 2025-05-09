@@ -83,6 +83,9 @@ void ModelDataCollector::initialize() {
     total_immune_by_location_age_class_ =
         DoubleVector2(Model::get_config()->number_of_locations(),
                       DoubleVector(Model::get_config()->number_of_age_classes(), 0.0));
+    total_immune_by_location_age_ =
+        DoubleVector2(Model::get_config()->number_of_locations(),
+                      DoubleVector(100, 0.0));
 
     total_number_of_bites_by_location_ = LongVector(Model::get_config()->number_of_locations(), 0);
     total_number_of_bites_by_location_year_ =
@@ -316,6 +319,7 @@ void ModelDataCollector::perform_population_statistic() {
           double immune_value = person->get_immune_system()->get_lastest_immune_value();
           total_immune_by_location_[loc] += immune_value;
           total_immune_by_location_age_class_[loc][ac] += immune_value;
+          total_immune_by_location_age_[loc][person->get_age()] += immune_value;
           //                    popsize_by_location_age_class_[loc][ac] += 1;
           int ac1 = (person->get_age() > 70) ? 14 : person->get_age() / 5;
           popsize_by_location_age_class_by_5_[loc][ac1] += 1;
@@ -1081,6 +1085,7 @@ void ModelDataCollector::zero_population_statistics() {
   zero_fill_matrix_2d(popsize_by_location_hoststate_);
   zero_fill_matrix_3d(popsize_by_location_hoststate_age_class_);
   zero_fill_matrix_2d(total_immune_by_location_age_class_);
+  zero_fill_matrix_2d(total_immune_by_location_age_);
   zero_fill_matrix_2d(total_parasite_population_by_location_age_group_);
   zero_fill_matrix_2d(number_of_positive_by_location_age_group_);
   zero_fill_matrix_2d(number_of_clinical_by_location_age_group_);

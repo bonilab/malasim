@@ -50,6 +50,17 @@ public:
   }
 
 private:
+  DoubleVector2 total_immune_by_location_age_;
+
+public:
+  DoubleVector2 &total_immune_by_location_age() {
+    return total_immune_by_location_age_;
+  }
+  void set_total_immune_by_location_age(const DoubleVector2 &value) {
+    total_immune_by_location_age_ = value;
+  }
+
+private:
   IntVector popsize_by_location_;
 
 public:

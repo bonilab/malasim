@@ -935,7 +935,7 @@ mosquito_parameters:
 
   # Record recombination events (only for Validation Reporter)
   # Note: this will generate a lot of data
-  record_recombination_events: true
+  record_recombination_events: false
 
 # ---------------------------------------------------------------
 # 16. Population Events (all events are optional)

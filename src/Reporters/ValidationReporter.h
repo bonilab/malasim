@@ -21,8 +21,6 @@ public:
   std::shared_ptr<spdlog::logger> summary_data_logger;
   std::shared_ptr<spdlog::logger> gene_db_logger;
   std::shared_ptr<spdlog::logger> gene_freq_logger;
-  // std::shared_ptr<spdlog::logger> prmc_db_logger;
-  // std::shared_ptr<spdlog::logger> prmc_freq_logger;
   std::shared_ptr<spdlog::logger> monthly_mutation_logger;
   std::shared_ptr<spdlog::logger> mosquito_res_count_logger;
 
