@@ -93,7 +93,7 @@ void ModelDataCollector::initialize() {
     person_days_by_location_year_ = LongVector(Model::get_config()->number_of_locations(), 0);
 
     eir_by_location_year_ =
-        DoubleVector2(Model::get_config()->number_of_locations(), DoubleVector());
+        DoubleVector2(Model::get_config()->number_of_locations());
     eir_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
 
     cumulative_clinical_episodes_by_location_ =
@@ -105,7 +105,7 @@ void ModelDataCollector::initialize() {
                     LongVector(Model::get_config()->number_of_age_classes(), 0));
 
     average_number_biten_by_location_person_ =
-        DoubleVector2(Model::get_config()->number_of_locations(), DoubleVector());
+        DoubleVector2(Model::get_config()->number_of_locations());
     percentage_bites_on_top_20_by_location_ =
         DoubleVector(Model::get_config()->number_of_locations(), 0.0);
 
