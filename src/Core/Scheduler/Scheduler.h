@@ -72,6 +72,9 @@ public:
   [[nodiscard]] std::string get_current_date_string() const {
     return StringHelpers::date_as_string(date::year_month_day{calendar_date_});
   }
+  [[nodiscard]] std::string get_current_date_seperated_string() const {
+    return StringHelpers::date_as_seperated_string(date::year_month_day{calendar_date_});
+  }
   // Access to event manager
   EventManager<WorldEvent> &get_world_events() { return world_events_; }
   [[nodiscard]] const EventManager<WorldEvent> &get_world_events() const { return world_events_; }

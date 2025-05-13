@@ -171,9 +171,9 @@ void ModelDataCollector::initialize() {
         DoubleVector2(Model::get_config()->number_of_locations(), DoubleVector(10, 0.0));
     last_10_fraction_positive_that_are_clinical_by_location_ =
         DoubleVector2(Model::get_config()->number_of_locations(), DoubleVector(10, 0.0));
-    last_10_fraction_positive_that_are_clinical_by_location_age_class_ = DoubleVector3(
-        Model::get_config()->number_of_locations(),
-        DoubleVector2(Model::get_config()->number_of_age_classes(), DoubleVector(10, 0.0)));
+    // last_10_fraction_positive_that_are_clinical_by_location_age_class_ = DoubleVector3(
+    //     Model::get_config()->number_of_locations(),
+    //     DoubleVector2(Model::get_config()->number_of_age_classes(), DoubleVector(10, 0.0)));
     // last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_ = DoubleVector3(
     //     Model::get_config()->number_of_locations(),
     //     DoubleVector2(Model::get_config()->number_of_age_classes(), DoubleVector(10, 0.0)));
@@ -426,11 +426,11 @@ void ModelDataCollector::perform_population_statistic() {
         fraction_of_positive_that_are_clinical_by_location_[loc];
 
     for (int ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
-      last_10_fraction_positive_that_are_clinical_by_location_age_class_[loc][ac][report_index] =
-          (blood_slide_prevalence_by_location_age_group_[loc][ac] == 0)
-              ? 0
-              : number_of_clinical_by_location_age_group_[loc][ac]
-                    / static_cast<double>(blood_slide_prevalence_by_location_age_group_[loc][ac]);
+      // last_10_fraction_positive_that_are_clinical_by_location_age_class_[loc][ac][report_index] =
+      //     (blood_slide_prevalence_by_location_age_group_[loc][ac] == 0)
+      //         ? 0
+      //         : number_of_clinical_by_location_age_group_[loc][ac]
+      //               / static_cast<double>(blood_slide_prevalence_by_location_age_group_[loc][ac]);
       // last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_
       //     [loc][ac][report_index] = (number_of_blood_slide_positive == 0)
       //                                   ? 0

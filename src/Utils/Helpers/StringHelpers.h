@@ -78,6 +78,13 @@ public:
     return ss.str();
   }
 
+  static std::string date_as_seperated_string(date::year_month_day date) {
+    std::stringstream ss;
+    ss << date.year() << "\t" << static_cast<unsigned int>(date.month()) << "\t"
+       << date.day();
+    return ss.str();
+  }
+
   static void replace_all(std::string &str, const std::string &from,
                           const std::string &to) {
     size_t start_pos = 0;

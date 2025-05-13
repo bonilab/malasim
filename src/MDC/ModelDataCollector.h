@@ -589,18 +589,18 @@ public:
   void set_last_10_fraction_positive_that_are_clinical_by_location(const DoubleVector2 &value) {
     last_10_fraction_positive_that_are_clinical_by_location_ = value;
   }
-
-private:
-  DoubleVector3 last_10_fraction_positive_that_are_clinical_by_location_age_class_;
-
-public:
-  DoubleVector3 &last_10_fraction_positive_that_are_clinical_by_location_age_class() {
-    return last_10_fraction_positive_that_are_clinical_by_location_age_class_;
-  }
-  void set_last_10_fraction_positive_that_are_clinical_by_location_age_class(
-      const DoubleVector3 &value) {
-    last_10_fraction_positive_that_are_clinical_by_location_age_class_ = value;
-  }
+//
+// private:
+//   DoubleVector3 last_10_fraction_positive_that_are_clinical_by_location_age_class_;
+//
+// public:
+//   DoubleVector3 &last_10_fraction_positive_that_are_clinical_by_location_age_class() {
+//     return last_10_fraction_positive_that_are_clinical_by_location_age_class_;
+//   }
+//   void set_last_10_fraction_positive_that_are_clinical_by_location_age_class(
+//       const DoubleVector3 &value) {
+//     last_10_fraction_positive_that_are_clinical_by_location_age_class_ = value;
+//   }
 
 // private:
 //   DoubleVector3 last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_;
@@ -1000,7 +1000,7 @@ public:
   std::vector<std::vector<RecombinedResistantGenotypeInfo>>
       mosquito_recombined_resistant_genotype_tracker;
 
-  static const int NUMBER_OF_REPORTED_MOI = 8;
+  static const int NUMBER_OF_REPORTED_MOI = 10;
   // disallow copy and assign
   ModelDataCollector(const ModelDataCollector &) = delete;
   ModelDataCollector& operator=(const ModelDataCollector &) = delete;

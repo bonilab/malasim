@@ -94,7 +94,7 @@ void ValidationReporter::monthly_report() {
 
   ss << Model::get_scheduler()->current_time() << sep;
   ss << Model::get_scheduler()->get_unix_time() << sep;
-  ss << Model::get_scheduler()->get_current_date_string() << sep;
+  ss << Model::get_scheduler()->get_current_date_seperated_string() << sep;
   ss << Model::get_config()->get_seasonality_settings().get_seasonal_factor(
       Model::get_scheduler()->get_calendar_date(), 0)
      << sep;
@@ -227,14 +227,59 @@ void ValidationReporter::monthly_report() {
     ss << Model::get_mdc()->cumulative_ntf_by_location()[loc] << sep;
     ss << group_sep;  // 343
   }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    ss << Model::get_mdc()->monthly_number_of_tf_by_location()[loc] << sep;
+    ss << group_sep;  // 345
+  } // 417
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    ss << Model::get_mdc()->cumulative_number_treatments_by_location()[loc] << sep;
+    ss << group_sep;  // 347
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    ss << Model::get_mdc()->cumulative_tf_by_location()[loc] << sep;
+    ss << group_sep;  // 349
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
+    ss << group_sep;  // 351
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (int age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->number_of_untreated_cases_by_location_age_year()[loc][age] << sep;
+    }
+    ss << group_sep;  /// 432
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (int age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->number_of_deaths_by_location_age_year()[loc][age] << sep;
+    }
+    ss << group_sep;  /// 513
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (int age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->number_of_malaria_deaths_treated_by_location_age_year()[loc][age]
+         << sep;
+    }
+    ss << group_sep;  /// 594
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (int age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->number_of_malaria_deaths_non_treated_by_location_age_year()[loc][age]
+         << sep;
+    }
+    ss << group_sep;  /// 675
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (int age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->total_immune_by_location_age()[loc][age]
+         << sep;
+    }
+    ss << group_sep;  /// 756
+  }
   for (auto tf_by_therapy : Model::get_mdc()->current_tf_by_therapy()) {
     ss << tf_by_therapy << sep;
   }
-  ss << group_sep;  // 358
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->monthly_number_of_tf_by_location()[loc] << sep;
-    ss << group_sep;  // 360
-  }
+  ss << group_sep;  // 772
   for (int t_id = 0; t_id < Model::get_therapy_db().size(); t_id++) {
     int n_treaments = Model::get_mdc()->number_of_treatments_with_therapy_id()[t_id];
     int n_success = Model::get_mdc()->number_of_treatments_success_with_therapy_id()[t_id];
@@ -242,51 +287,13 @@ void ValidationReporter::monthly_report() {
     double p_success = (n_treaments == 0) ? 0 : n_success * 100.0 / n_treaments;
     ss << n_treaments << sep << n_success << sep << n_fail << sep << p_success << sep;
   }
-  ss << group_sep;  // 417
+  ss << group_sep; // 833
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->cumulative_number_treatments_by_location()[loc] << sep;
-    ss << group_sep;  // 419
-  }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->cumulative_tf_by_location()[loc] << sep;
-    ss << group_sep;  // 421
-  }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
-    ss << group_sep;  // 423
-  }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    for (int age = 0; age < 80; age++) {
-      ss << Model::get_mdc()->number_of_untreated_cases_by_location_age_year()[loc][age] << sep;
-    }
-    ss << group_sep;  /// 504
-  }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    for (int age = 0; age < 80; age++) {
-      ss << Model::get_mdc()->number_of_deaths_by_location_age_year()[loc][age] << sep;
-    }
-    ss << group_sep;  /// 585
-  }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    for (int age = 0; age < 80; age++) {
-      ss << Model::get_mdc()->number_of_malaria_deaths_treated_by_location_age_year()[loc][age]
+    for (auto age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->cumulative_clinical_episodes_by_location_age()[loc][age]
          << sep;
     }
-    ss << group_sep;  /// 666
-  }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    for (int age = 0; age < 80; age++) {
-      ss << Model::get_mdc()->number_of_malaria_deaths_non_treated_by_location_age_year()[loc][age]
-         << sep;
-    }
-    ss << group_sep;  /// 747
-  }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    for (int age = 0; age < 80; age++) {
-      ss << Model::get_mdc()->total_immune_by_location_age()[loc][age]
-         << sep;
-    }
-    ss << group_sep;  /// 666
+    ss << group_sep;  // 914
   }
   monthly_data_logger->info(ss.str());
 
