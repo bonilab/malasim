@@ -602,17 +602,16 @@ public:
     last_10_fraction_positive_that_are_clinical_by_location_age_class_ = value;
   }
 
-private:
-  DoubleVector3 last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_;
-
-public:
-  DoubleVector3 &last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5() {
-    return last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_;
-  }
-  void set_last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5(
-      const DoubleVector3 &value) {
-    last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_ = value;
-  }
+// private:
+//   DoubleVector3 last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_;
+// public:
+//   DoubleVector3 &last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5() {
+//     return last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_;
+//   }
+//   void set_last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5(
+//       const DoubleVector3 &value) {
+//     last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_ = value;
+//   }
 
 private:
   IntVector total_parasite_population_by_location_;

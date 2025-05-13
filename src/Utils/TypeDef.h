@@ -20,7 +20,7 @@ class IStrategy;
 
 class Therapy;
 
-using Ul = uint64_t;
+using Ul = unsigned int;
 
 using DoubleVector = std::vector<double>;
 using DoubleVector2 = std::vector<DoubleVector>;
