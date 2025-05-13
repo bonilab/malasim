@@ -62,7 +62,8 @@ void ConsoleReporter::after_run() {
 
   std::cout << "Number of clinical episodes:" << '\n';
   for (int location = 0; location < Model::get_config()->number_of_locations(); location++) {
-    std::cout << Model::get_mdc()->cumulative_clinical_episodes_by_location()[location] << "\t";
+    // std::cout << Model::get_mdc()->cumulative_clinical_episodes_by_location()[location] << "\t";
+    std::cout << 0 << "\t";
   }
   std::cout << '\n';
 

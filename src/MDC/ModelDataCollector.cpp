@@ -96,13 +96,13 @@ void ModelDataCollector::initialize() {
         DoubleVector2(Model::get_config()->number_of_locations());
     eir_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
 
-    cumulative_clinical_episodes_by_location_ =
-        LongVector(Model::get_config()->number_of_locations(), 0);
-    cumulative_clinical_episodes_by_location_age_ =
-        LongVector2(Model::get_config()->number_of_locations(), LongVector(100, 0));
-    cumulative_clinical_episodes_by_location_age_group_ =
-        LongVector2(Model::get_config()->number_of_locations(),
-                    LongVector(Model::get_config()->number_of_age_classes(), 0));
+    // cumulative_clinical_episodes_by_location_ =
+    //     LongVector(Model::get_config()->number_of_locations(), 0);
+    // cumulative_clinical_episodes_by_location_age_ =
+    //     LongVector2(Model::get_config()->number_of_locations(), LongVector(100, 0));
+    // cumulative_clinical_episodes_by_location_age_group_ =
+    //     LongVector2(Model::get_config()->number_of_locations(),
+    //                 LongVector(Model::get_config()->number_of_age_classes(), 0));
 
     average_number_biten_by_location_person_ =
         DoubleVector2(Model::get_config()->number_of_locations());
@@ -512,19 +512,17 @@ void ModelDataCollector::collect_1_clinical_episode(const int &location, const i
 
   if (Model::get_scheduler()->current_time()
       >= Model::get_config()->get_simulation_timeframe().get_start_of_comparison_period()) {
-    cumulative_clinical_episodes_by_location_[location]++;
-
-    if (age < 100) {
-      cumulative_clinical_episodes_by_location_age_[location][age]++;
-    } else {
-      cumulative_clinical_episodes_by_location_age_[location][99]++;
-    }
-
-    cumulative_clinical_episodes_by_location_age_group_[location][age_class]++;
+    // cumulative_clinical_episodes_by_location_[location]++;
+    // if (age < 100) {
+    //   cumulative_clinical_episodes_by_location_age_[location][age]++;
+    // } else {
+    //   cumulative_clinical_episodes_by_location_age_[location][99]++;
+    // }
+    // cumulative_clinical_episodes_by_location_age_group_[location][age_class]++;
   }
 
   if (!recording_) { return; }
-  cumulative_clinical_episodes_by_location_[location]++;
+  // cumulative_clinical_episodes_by_location_[location]++;
   monthly_number_of_clinical_episode_by_location_[location]++;
   monthly_number_of_clinical_episode_by_location_age_class_[location][age_class]++;
 }

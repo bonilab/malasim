@@ -243,38 +243,38 @@ public:
   DoubleVector &eir_by_location() { return eir_by_location_; }
   void set_eir_by_location(const DoubleVector &value) { eir_by_location_ = value; }
 
-private:
-  LongVector cumulative_clinical_episodes_by_location_;
-
-public:
-  LongVector &cumulative_clinical_episodes_by_location() {
-    return cumulative_clinical_episodes_by_location_;
-  }
-  void set_cumulative_clinical_episodes_by_location(const LongVector &value) {
-    cumulative_clinical_episodes_by_location_ = value;
-  }
-
-private:
-  LongVector2 cumulative_clinical_episodes_by_location_age_;
-
-public:
-  LongVector2 &cumulative_clinical_episodes_by_location_age() {
-    return cumulative_clinical_episodes_by_location_age_;
-  }
-  void set_cumulative_clinical_episodes_by_location_age(const LongVector2 &value) {
-    cumulative_clinical_episodes_by_location_age_ = value;
-  }
-
-private:
-  LongVector2 cumulative_clinical_episodes_by_location_age_group_;
-
-public:
-  LongVector2 &cumulative_clinical_episodes_by_location_age_group() {
-    return cumulative_clinical_episodes_by_location_age_group_;
-  }
-  void set_cumulative_clinical_episodes_by_location_age_group(const LongVector2 &value) {
-    cumulative_clinical_episodes_by_location_age_group_ = value;
-  }
+// private:
+//   LongVector cumulative_clinical_episodes_by_location_;
+//
+// public:
+//   LongVector &cumulative_clinical_episodes_by_location() {
+//     return cumulative_clinical_episodes_by_location_;
+//   }
+//   void set_cumulative_clinical_episodes_by_location(const LongVector &value) {
+//     cumulative_clinical_episodes_by_location_ = value;
+//   }
+//
+// private:
+//   LongVector2 cumulative_clinical_episodes_by_location_age_;
+//
+// public:
+//   LongVector2 &cumulative_clinical_episodes_by_location_age() {
+//     return cumulative_clinical_episodes_by_location_age_;
+//   }
+//   void set_cumulative_clinical_episodes_by_location_age(const LongVector2 &value) {
+//     cumulative_clinical_episodes_by_location_age_ = value;
+//   }
+//
+// private:
+//   LongVector2 cumulative_clinical_episodes_by_location_age_group_;
+//
+// public:
+//   LongVector2 &cumulative_clinical_episodes_by_location_age_group() {
+//     return cumulative_clinical_episodes_by_location_age_group_;
+//   }
+//   void set_cumulative_clinical_episodes_by_location_age_group(const LongVector2 &value) {
+//     cumulative_clinical_episodes_by_location_age_group_ = value;
+//   }
 
 private:
   DoubleVector2 average_number_biten_by_location_person_;
