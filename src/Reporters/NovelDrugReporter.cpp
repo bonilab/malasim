@@ -115,7 +115,7 @@ void NovelDrugReporter::after_run() {
     ss << Model::get_treatment_coverage()->p_treatment_under_5[0] << sep;
     ss << Model::get_mdc()->cumulative_number_treatments_by_location()[loc] << sep;
     ss << Model::get_mdc()->cumulative_tf_by_location()[loc] << sep;
-    // ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
+    ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
     ss << std::to_string(
         dynamic_cast<NovelDrugIntroductionStrategy*>(Model::get_treatment_strategy())
             ->newly_introduced_strategy_id)

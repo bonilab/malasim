@@ -143,7 +143,7 @@ void MMCReporter::after_run() {
 
   ss << Model::get_mdc()->cumulative_number_treatments_by_location()[0] << sep;
   ss << Model::get_mdc()->cumulative_tf_by_location()[0] << sep;
-  // ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[0] << sep;
+  ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[0] << sep;
 
   ss << group_sep;
   // print # mutation events of first 10 years

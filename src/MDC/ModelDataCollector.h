@@ -22,14 +22,6 @@ class ClonalParasitePopulation;
 
 class ModelDataCollector {
 private:
-  Model* model_{nullptr};
-
-public:
-  [[nodiscard]] Model* model() const { return model_; }
-  void set_model(Model* value) { model_ = value; }
-
-  // Property References
-private:
   DoubleVector total_immune_by_location_;
 
 public:
@@ -243,38 +235,38 @@ public:
   DoubleVector &eir_by_location() { return eir_by_location_; }
   void set_eir_by_location(const DoubleVector &value) { eir_by_location_ = value; }
 
-// private:
-//   LongVector cumulative_clinical_episodes_by_location_;
-//
-// public:
-//   LongVector &cumulative_clinical_episodes_by_location() {
-//     return cumulative_clinical_episodes_by_location_;
-//   }
-//   void set_cumulative_clinical_episodes_by_location(const LongVector &value) {
-//     cumulative_clinical_episodes_by_location_ = value;
-//   }
-//
-// private:
-//   LongVector2 cumulative_clinical_episodes_by_location_age_;
-//
-// public:
-//   LongVector2 &cumulative_clinical_episodes_by_location_age() {
-//     return cumulative_clinical_episodes_by_location_age_;
-//   }
-//   void set_cumulative_clinical_episodes_by_location_age(const LongVector2 &value) {
-//     cumulative_clinical_episodes_by_location_age_ = value;
-//   }
-//
-// private:
-//   LongVector2 cumulative_clinical_episodes_by_location_age_group_;
-//
-// public:
-//   LongVector2 &cumulative_clinical_episodes_by_location_age_group() {
-//     return cumulative_clinical_episodes_by_location_age_group_;
-//   }
-//   void set_cumulative_clinical_episodes_by_location_age_group(const LongVector2 &value) {
-//     cumulative_clinical_episodes_by_location_age_group_ = value;
-//   }
+private:
+  LongVector cumulative_clinical_episodes_by_location_;
+
+public:
+  LongVector &cumulative_clinical_episodes_by_location() {
+    return cumulative_clinical_episodes_by_location_;
+  }
+  void set_cumulative_clinical_episodes_by_location(const LongVector &value) {
+    cumulative_clinical_episodes_by_location_ = value;
+  }
+
+private:
+  LongVector2 cumulative_clinical_episodes_by_location_age_;
+
+public:
+  LongVector2 &cumulative_clinical_episodes_by_location_age() {
+    return cumulative_clinical_episodes_by_location_age_;
+  }
+  void set_cumulative_clinical_episodes_by_location_age(const LongVector2 &value) {
+    cumulative_clinical_episodes_by_location_age_ = value;
+  }
+
+private:
+  LongVector2 cumulative_clinical_episodes_by_location_age_group_;
+
+public:
+  LongVector2 &cumulative_clinical_episodes_by_location_age_group() {
+    return cumulative_clinical_episodes_by_location_age_group_;
+  }
+  void set_cumulative_clinical_episodes_by_location_age_group(const LongVector2 &value) {
+    cumulative_clinical_episodes_by_location_age_group_ = value;
+  }
 
 private:
   DoubleVector2 average_number_biten_by_location_person_;
@@ -589,29 +581,29 @@ public:
   void set_last_10_fraction_positive_that_are_clinical_by_location(const DoubleVector2 &value) {
     last_10_fraction_positive_that_are_clinical_by_location_ = value;
   }
-//
-// private:
-//   DoubleVector3 last_10_fraction_positive_that_are_clinical_by_location_age_class_;
-//
-// public:
-//   DoubleVector3 &last_10_fraction_positive_that_are_clinical_by_location_age_class() {
-//     return last_10_fraction_positive_that_are_clinical_by_location_age_class_;
-//   }
-//   void set_last_10_fraction_positive_that_are_clinical_by_location_age_class(
-//       const DoubleVector3 &value) {
-//     last_10_fraction_positive_that_are_clinical_by_location_age_class_ = value;
-//   }
 
-// private:
-//   DoubleVector3 last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_;
-// public:
-//   DoubleVector3 &last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5() {
-//     return last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_;
-//   }
-//   void set_last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5(
-//       const DoubleVector3 &value) {
-//     last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_ = value;
-//   }
+private:
+  DoubleVector3 last_10_fraction_positive_that_are_clinical_by_location_age_class_;
+
+public:
+  DoubleVector3 &last_10_fraction_positive_that_are_clinical_by_location_age_class() {
+    return last_10_fraction_positive_that_are_clinical_by_location_age_class_;
+  }
+  void set_last_10_fraction_positive_that_are_clinical_by_location_age_class(
+      const DoubleVector3 &value) {
+    last_10_fraction_positive_that_are_clinical_by_location_age_class_ = value;
+  }
+
+private:
+  DoubleVector3 last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_;
+public:
+  DoubleVector3 &last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5() {
+    return last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_;
+  }
+  void set_last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5(
+      const DoubleVector3 &value) {
+    last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_ = value;
+  }
 
 private:
   IntVector total_parasite_population_by_location_;
@@ -1007,7 +999,7 @@ public:
   ModelDataCollector(ModelDataCollector &&) = delete;
   ModelDataCollector &operator=(ModelDataCollector &&) = delete;
 
-  explicit ModelDataCollector(Model* model = nullptr);
+  explicit ModelDataCollector();
 
   //    Statistic(const Statistic& orig);
   virtual ~ModelDataCollector();
@@ -1263,6 +1255,14 @@ private:
   bool recording_ = false;
   void update_average_number_bitten(const int &location, const int &birthday,
                                     const int &number_of_times_bitten);
+
+public:
+  struct ProgressToClinicalCounter {
+    long long total{0};
+    long long new_infection{0};
+    long long recrudescence{0};
+  };
+  ProgressToClinicalCounter progress_to_clinical_in_7d_counter;
 };
 
 #endif /* MODELDATACOLLECTOR_H */

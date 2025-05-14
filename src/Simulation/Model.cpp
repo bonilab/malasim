@@ -20,8 +20,8 @@ bool Model::initialize() {
   random_ = std::make_unique<utils::Random>(nullptr, -1);
   scheduler_ = std::make_unique<Scheduler>();
   population_ = std::make_unique<Population>();
-  mdc_ = std::make_unique<ModelDataCollector>(this);
-  mosquito_ = std::make_unique<Mosquito>(this);
+  mdc_ = std::make_unique<ModelDataCollector>();
+  mosquito_ = std::make_unique<Mosquito>();
 
   progress_to_clinical_update_function_ = std::make_unique<ClinicalUpdateFunction>(this);
   immunity_clearance_update_function_ = std::make_unique<ImmunityClearanceUpdateFunction>(this);

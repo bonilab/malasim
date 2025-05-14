@@ -1,0 +1,7 @@
+FROM ubuntu-dev-env
+
+# Set working directory to where the binary will be mounted
+WORKDIR /home/dev/malasim/cmake-build-debug-docker/bin
+
+# Default command when container runs
+CMD ["./MalaSim", "--input=/home/dev/malasim/cmake-build-debug-docker/input/input_6test.yml", "--reporter=ValidationReporter"]

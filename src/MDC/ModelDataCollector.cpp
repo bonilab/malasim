@@ -27,12 +27,11 @@
 
 class PersonIndexByLocationStateAgeClass;
 
-ModelDataCollector::ModelDataCollector(Model* model) : model_(model) {}
+ModelDataCollector::ModelDataCollector(){}
 
 ModelDataCollector::~ModelDataCollector() = default;
 
 void ModelDataCollector::initialize() {
-  if (model_ != nullptr) {
     births_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
     deaths_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
     malaria_deaths_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
@@ -96,13 +95,13 @@ void ModelDataCollector::initialize() {
         DoubleVector2(Model::get_config()->number_of_locations());
     eir_by_location_ = DoubleVector(Model::get_config()->number_of_locations(), 0.0);
 
-    // cumulative_clinical_episodes_by_location_ =
-    //     LongVector(Model::get_config()->number_of_locations(), 0);
-    // cumulative_clinical_episodes_by_location_age_ =
-    //     LongVector2(Model::get_config()->number_of_locations(), LongVector(100, 0));
-    // cumulative_clinical_episodes_by_location_age_group_ =
-    //     LongVector2(Model::get_config()->number_of_locations(),
-    //                 LongVector(Model::get_config()->number_of_age_classes(), 0));
+    cumulative_clinical_episodes_by_location_ =
+        LongVector(Model::get_config()->number_of_locations(), 0);
+    cumulative_clinical_episodes_by_location_age_ =
+        LongVector2(Model::get_config()->number_of_locations(), LongVector(100, 0));
+    cumulative_clinical_episodes_by_location_age_group_ =
+        LongVector2(Model::get_config()->number_of_locations(),
+                    LongVector(Model::get_config()->number_of_age_classes(), 0));
 
     average_number_biten_by_location_person_ =
         DoubleVector2(Model::get_config()->number_of_locations());
@@ -171,12 +170,12 @@ void ModelDataCollector::initialize() {
         DoubleVector2(Model::get_config()->number_of_locations(), DoubleVector(10, 0.0));
     last_10_fraction_positive_that_are_clinical_by_location_ =
         DoubleVector2(Model::get_config()->number_of_locations(), DoubleVector(10, 0.0));
-    // last_10_fraction_positive_that_are_clinical_by_location_age_class_ = DoubleVector3(
-    //     Model::get_config()->number_of_locations(),
-    //     DoubleVector2(Model::get_config()->number_of_age_classes(), DoubleVector(10, 0.0)));
-    // last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_ = DoubleVector3(
-    //     Model::get_config()->number_of_locations(),
-    //     DoubleVector2(Model::get_config()->number_of_age_classes(), DoubleVector(10, 0.0)));
+    last_10_fraction_positive_that_are_clinical_by_location_age_class_ = DoubleVector3(
+        Model::get_config()->number_of_locations(),
+        DoubleVector2(Model::get_config()->number_of_age_classes(), DoubleVector(10, 0.0)));
+    last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_ = DoubleVector3(
+        Model::get_config()->number_of_locations(),
+        DoubleVector2(Model::get_config()->number_of_age_classes(), DoubleVector(10, 0.0)));
     total_parasite_population_by_location_ =
         IntVector(Model::get_config()->number_of_locations(), 0);
     number_of_positive_by_location_ = IntVector(Model::get_config()->number_of_locations(), 0);
@@ -291,7 +290,6 @@ void ModelDataCollector::initialize() {
         Model::get_config()->number_of_locations(), IntVector(Model::get_therapy_db().size(), 0));
     current_number_of_mutation_events_ = 0;
     number_of_mutation_events_by_year_ = LongVector();
-  }
 }
 
 void ModelDataCollector::perform_population_statistic() {
@@ -319,7 +317,9 @@ void ModelDataCollector::perform_population_statistic() {
           double immune_value = person->get_immune_system()->get_lastest_immune_value();
           total_immune_by_location_[loc] += immune_value;
           total_immune_by_location_age_class_[loc][ac] += immune_value;
-          total_immune_by_location_age_[loc][person->get_age()] += immune_value;
+          int age = static_cast<int>(person->get_age());
+          int age_clamp = (age < 80) ? age : 79;
+          total_immune_by_location_age_[loc][age_clamp] += immune_value;
           //                    popsize_by_location_age_class_[loc][ac] += 1;
           int ac1 = (person->get_age() > 70) ? 14 : person->get_age() / 5;
           popsize_by_location_age_class_by_5_[loc][ac1] += 1;
@@ -332,11 +332,7 @@ void ModelDataCollector::perform_population_statistic() {
               blood_slide_prevalence_by_location_[loc] += 1;
               blood_slide_number_by_location_age_group_[loc][ac] += 1;
               blood_slide_number_by_location_age_group_by_5_[loc][ac1] += 1;
-              if (person->get_age() < 79) {
-                blood_slide_number_by_location_age_[loc][person->get_age()] += 1;
-              } else {
-                blood_slide_number_by_location_age_[loc][79] += 1;
-              }
+              blood_slide_number_by_location_age_[loc][age_clamp] += 1;
             }
           } else if (hs == Person::CLINICAL) {
             number_of_positive_by_location_[loc]++;
@@ -346,11 +342,7 @@ void ModelDataCollector::perform_population_statistic() {
             blood_slide_number_by_location_age_group_by_5_[loc][ac1] += 1;
             number_of_clinical_by_location_age_group_[loc][ac] += 1;
             number_of_clinical_by_location_age_group_by_5_[loc][ac1] += 1;
-            if (person->get_age() < 79) {
-              blood_slide_number_by_location_age_[loc][person->get_age()] += 1;
-            } else {
-              blood_slide_number_by_location_age_[loc][79] += 1;
-            }
+            blood_slide_number_by_location_age_[loc][age_clamp] += 1;
           }
 
           int moi = static_cast<int>(person->get_all_clonal_parasite_populations()->size());
@@ -366,12 +358,7 @@ void ModelDataCollector::perform_population_statistic() {
             total_parasite_population_by_location_[loc] += moi;
             total_parasite_population_by_location_age_group_[loc][person->get_age_class()] += moi;
           }
-
-          if (person->get_age() < 79) {
-            popsize_by_location_age_[loc][person->get_age()] += 1;
-          } else {
-            popsize_by_location_age_[loc][79] += 1;
-          }
+          popsize_by_location_age_[loc][age_clamp] += 1;
         }
       }
     }
@@ -426,16 +413,16 @@ void ModelDataCollector::perform_population_statistic() {
         fraction_of_positive_that_are_clinical_by_location_[loc];
 
     for (int ac = 0; ac < Model::get_config()->number_of_age_classes(); ac++) {
-      // last_10_fraction_positive_that_are_clinical_by_location_age_class_[loc][ac][report_index] =
-      //     (blood_slide_prevalence_by_location_age_group_[loc][ac] == 0)
-      //         ? 0
-      //         : number_of_clinical_by_location_age_group_[loc][ac]
-      //               / static_cast<double>(blood_slide_prevalence_by_location_age_group_[loc][ac]);
-      // last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_
-      //     [loc][ac][report_index] = (number_of_blood_slide_positive == 0)
-      //                                   ? 0
-      //                                   : number_of_clinical_by_location_age_group_by_5_[loc][ac]
-      //                                         / static_cast<double>(blood_slide_number_by_location_age_group_by_5_[loc][ac]);
+      last_10_fraction_positive_that_are_clinical_by_location_age_class_[loc][ac][report_index] =
+          (blood_slide_prevalence_by_location_age_group_[loc][ac] == 0)
+              ? 0
+              : number_of_clinical_by_location_age_group_[loc][ac]
+                    / static_cast<double>(blood_slide_prevalence_by_location_age_group_[loc][ac]);
+      last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_
+          [loc][ac][report_index] = (number_of_blood_slide_positive == 0)
+                                        ? 0
+                                        : number_of_clinical_by_location_age_group_by_5_[loc][ac]
+                                              / static_cast<double>(blood_slide_number_by_location_age_group_by_5_[loc][ac]);
       blood_slide_prevalence_by_location_age_group_[loc][ac] =
           blood_slide_number_by_location_age_group_[loc][ac]
           / static_cast<double>(popsize_by_location_age_class_[loc][ac]);
@@ -512,17 +499,17 @@ void ModelDataCollector::collect_1_clinical_episode(const int &location, const i
 
   if (Model::get_scheduler()->current_time()
       >= Model::get_config()->get_simulation_timeframe().get_start_of_comparison_period()) {
-    // cumulative_clinical_episodes_by_location_[location]++;
-    // if (age < 100) {
-    //   cumulative_clinical_episodes_by_location_age_[location][age]++;
-    // } else {
-    //   cumulative_clinical_episodes_by_location_age_[location][99]++;
-    // }
-    // cumulative_clinical_episodes_by_location_age_group_[location][age_class]++;
+    cumulative_clinical_episodes_by_location_[location]++;
+    if (age < 100) {
+      cumulative_clinical_episodes_by_location_age_[location][age]++;
+    } else {
+      cumulative_clinical_episodes_by_location_age_[location][99]++;
+    }
+    cumulative_clinical_episodes_by_location_age_group_[location][age_class]++;
   }
 
   if (!recording_) { return; }
-  // cumulative_clinical_episodes_by_location_[location]++;
+  cumulative_clinical_episodes_by_location_[location]++;
   monthly_number_of_clinical_episode_by_location_[location]++;
   monthly_number_of_clinical_episode_by_location_age_class_[location][age_class]++;
 }
@@ -536,11 +523,8 @@ void ModelDataCollector::record_1_death(const int &location, const int &birthday
         location, -(Constants::DAYS_IN_YEAR - Model::get_scheduler()->get_current_day_in_year()));
     update_average_number_bitten(location, birthday, number_of_times_bitten);
     number_of_death_by_location_age_group_[location][age_group] += 1;
-    if (age < 79) {
-      number_of_deaths_by_location_age_year_[location][age] += 1;
-    } else {
-      number_of_deaths_by_location_age_year_[location][79] += 1;
-    }
+    int age_clamp = (age < 80) ? age : 79;
+    number_of_deaths_by_location_age_year_[location][age_clamp] += 1;
     if (!recording_) { return; }
     deaths_by_location_[location]++;
     update_person_days_by_years(
@@ -553,17 +537,9 @@ void ModelDataCollector::record_1_death(const int &location, const int &birthday
 void ModelDataCollector::record_1_malaria_death(const int &location, const int &age, bool treated) {
   if (Model::get_scheduler()->current_time()
       >= Model::get_config()->get_simulation_timeframe().get_start_collect_data_day()) {
-    if (age < 79) {
-      if (treated)
-        number_of_malaria_deaths_treated_by_location_age_year_[location][age] += 1;
-      else
-        number_of_malaria_deaths_non_treated_by_location_age_year_[location][age] += 1;
-    } else {
-      if (treated)
-        number_of_malaria_deaths_treated_by_location_age_year_[location][79] += 1;
-      else
-        number_of_malaria_deaths_non_treated_by_location_age_year_[location][79] += 1;
-    }
+    int age_clamp = (age < 80) ? age : 79;
+    number_of_malaria_deaths_treated_by_location_age_year_[location][age_clamp] += 1;
+    number_of_malaria_deaths_non_treated_by_location_age_year_[location][age_clamp] += 1;
   }
 }
 

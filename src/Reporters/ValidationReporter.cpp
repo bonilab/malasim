@@ -240,8 +240,7 @@ void ValidationReporter::monthly_report() {
     ss << group_sep;  // 349
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    // ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
-    ss << 0 << sep;
+    ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
     ss << group_sep;  // 351
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
@@ -288,14 +287,17 @@ void ValidationReporter::monthly_report() {
     double p_success = (n_treaments == 0) ? 0 : n_success * 100.0 / n_treaments;
     ss << n_treaments << sep << n_success << sep << n_fail << sep << p_success << sep;
   }
-  // ss << group_sep; // 833
-  // for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-  //   for (auto age = 0; age < 80; age++) {
-  //     ss << Model::get_mdc()->cumulative_clinical_episodes_by_location_age()[loc][age]
-  //        << sep;
-  //   }
-  //   ss << group_sep;  // 914
-  // }
+  ss << group_sep; // 833
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (auto age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->cumulative_clinical_episodes_by_location_age()[loc][age]
+         << sep;
+    }
+    ss << group_sep;  // 914
+  }
+  ss << Model::get_mdc()->progress_to_clinical_in_7d_counter.total << sep;
+  ss << Model::get_mdc()->progress_to_clinical_in_7d_counter.recrudescence << sep;
+  ss << Model::get_mdc()->progress_to_clinical_in_7d_counter.new_infection << sep;
   monthly_data_logger->info(ss.str());
 
   std::stringstream gene_freq_ss;
@@ -378,8 +380,7 @@ void ValidationReporter::after_run() {
   ss << (sum_ntf * 100 / static_cast<double>(pop_size)) / total_time_in_years << sep;
   ss << group_sep;  // 12
   for (int loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    // ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
-    ss << 0 << sep;
+    ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
     ss << group_sep;  // 14
   }
   for (int loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
@@ -396,15 +397,15 @@ void ValidationReporter::after_run() {
     //        std::cout << location_NTF << "\t";
     ss << group_sep;  // 18
   }
-  // for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-  //   for (auto age = 0; age < 80; age++) {
-  //     ss << static_cast<double>(
-  //               Model::get_mdc()->cumulative_clinical_episodes_by_location_age()[loc][age])
-  //               / total_time_in_years / Model::get_mdc()->popsize_by_location_age()[loc][age]
-  //        << sep;
-  //   }
-  //   ss << group_sep;  // 99
-  // }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (auto age = 0; age < 80; age++) {
+      ss << static_cast<double>(
+                Model::get_mdc()->cumulative_clinical_episodes_by_location_age()[loc][age])
+                / total_time_in_years / Model::get_mdc()->popsize_by_location_age()[loc][age]
+         << sep;
+    }
+    ss << group_sep;  // 99
+  }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
     ss << Model::get_mdc()->cumulative_number_treatments_by_location()[loc] << sep;
     ss << group_sep;  // 101
@@ -414,8 +415,7 @@ void ValidationReporter::after_run() {
     ss << group_sep;  // 103
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    // ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
-    ss << 0 << sep;
+    ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
     ss << group_sep;  // 105
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {

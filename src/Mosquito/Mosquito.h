@@ -29,7 +29,7 @@ public:
                                                             };
 
 public:
-  explicit Mosquito(Model *model = nullptr);
+  explicit Mosquito();
   virtual ~Mosquito() = default;
 
   void initialize(Config *config);
@@ -47,8 +47,6 @@ public:
   // this function will populate values for both parasite densities and genotypes that carried by a person
   void get_genotypes_profile_from_person(Person *person, std::vector<Genotype *> &sampling_genotypes,
                                          std::vector<double> &relative_infectivity_each_pp);
-
-  std::vector<std::string> split_string(std::string str, char delimiter);
 
   std::string get_old_genotype_string(std::string new_genotype);
     std::string get_old_genotype_string2(std::string new_genotype);
