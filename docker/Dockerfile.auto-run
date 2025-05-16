@@ -4,4 +4,4 @@ FROM ubuntu-dev-env
 WORKDIR /home/dev/malasim/cmake-build-debug-docker/bin
 
 # Default command when container runs
-CMD ["./MalaSim", "--input=/home/dev/malasim/cmake-build-debug-docker/input/input_6test.yml", "--reporter=ValidationReporter"]
+CMD ["./MalaSim", "--input=/home/dev/malasim/cmake-build-debug-docker/input/input_0.yml", "--reporter=ValidationReporter"]

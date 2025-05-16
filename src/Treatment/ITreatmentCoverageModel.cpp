@@ -69,6 +69,10 @@ std::unique_ptr<ITreatmentCoverageModel> ITreatmentCoverageModel::build_inflated
 std::unique_ptr<ITreatmentCoverageModel> ITreatmentCoverageModel::build_linear_tcm(
     const YAML::Node &node, Config* config) {
   auto result = std::make_unique<LinearTCM>();
+  if (!result) {
+    throw std::runtime_error("LinearTCM is nullptr");
+  }
+
   const auto starting_date = node["from_date"].as<date::year_month_day>();
   const auto to_date = node["to_date"].as<date::year_month_day>();
   result->starting_time = (date::sys_days{starting_date}
@@ -89,15 +93,39 @@ std::unique_ptr<ITreatmentCoverageModel> ITreatmentCoverageModel::build_linear_t
                    config->number_of_locations());
   result->type = node["type"].as<std::string>();
 
+  if (!result) {
+    throw std::runtime_error("LinearTCM is nullptr");
+  }
+
+  spdlog::info("Treatment coverage model: {}", result->type);
+  spdlog::info("Start time: {}", result->starting_time);
+  spdlog::info("End time: {}", result->end_time);
+  spdlog::info("p_treatment_under_5_by_location_from: {}",
+           result->p_treatment_under_5.front());
+  spdlog::info("p_treatment_under_5_by_location_to: {}",
+           result->p_treatment_under_5_to.front());
+  spdlog::info("p_treatment_over_5_by_location_from: {}",
+           result->p_treatment_over_5.front());
+  spdlog::info("p_treatment_over_5_by_location_to: {}",
+           result->p_treatment_over_5_to.front());
+
+  if (!result) {
+    throw std::runtime_error("LinearTCM is nullptr");
+  }
+
   return result;
 }
 
 std::unique_ptr<ITreatmentCoverageModel> ITreatmentCoverageModel::build(const YAML::Node &node,
                                                                         Config* config) {
   const auto type = node["type"].as<std::string>();
+
   if (type == "SteadyTCM") { return build_steady_tcm(node, config); }
   if (type == "InflatedTCM") { return build_inflated_tcm(node, config); }
-  if (type == "LinearTCM") { return build_linear_tcm(node, config); }
+  if (type == "LinearTCM") {
+    spdlog::info("LinearTCM model built for type: {}", type);
+    return build_linear_tcm(node, config);
+  }
 
   return nullptr;
 }

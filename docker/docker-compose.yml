@@ -8,6 +8,6 @@ services:
     container_name: malasim-auto
     volumes:
       - /Users/ktt/CLionProjects/malasim:/home/dev/malasim
-      - /Users/ktt/plot/malasim_v6/Calibration/Run_1_v6_calibrate_z_kappa_test_5/input:/home/dev/malasim/cmake-build-debug-docker/input
+      - /Users/ktt/CLionProjects/malasim/cmake-build-debug/input:/home/dev/malasim/cmake-build-debug-docker/input
     working_dir: /home/dev/malasim/cmake-build-debug-docker/bin
     tty: true

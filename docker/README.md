@@ -30,3 +30,29 @@ docker run --rm -it \
   ubuntu-dev-env \
   ./MalaSim --input=/home/dev/malasim/cmake-build-debug-docker/input/input_6.yml --reporter=ValidationReporter
 ```
+
+To run docker container and debug on docker desktop:
+
+```
+docker compose -f docker-compose.yml build
+docker-compose up -d
+```
+then see log in docker desktop
+
+To access docker and debug:
+
+```
+docker run --rm -it ubuntu-dev-env bash
+```
+
+or 
+
+```
+docker run --rm -it \
+  -v /Users/ktt/CLionProjects/malasim:/home/dev/malasim \
+  -v /Users/ktt/plot/malasim_v6/.../input:/home/dev/malasim/cmake-build-debug-docker/input \
+  -w /home/dev/malasim/cmake-build-debug-docker/bin \
+  ubuntu-dev-env \
+  bash
+
+```
