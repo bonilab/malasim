@@ -10,7 +10,8 @@
 #include "Utils/Random.h"
 #include "Utils/TypeDef.h"
 
-Mosquito::Mosquito(Model* model) : model{model} {}
+Mosquito::Mosquito() {
+}
 
 void Mosquito::initialize(Config* config) {
   genotypes_table.clear();
@@ -259,20 +260,12 @@ void Mosquito::get_genotypes_profile_from_person(
   }
 }
 
-std::vector<std::string> Mosquito::split_string(std::string str, char delimiter) {
-  std::vector<std::string> internal;
-  std::stringstream ss(str);  // Turn the string into a stream.
-  std::string tok;
-  while (getline(ss, tok, delimiter)) { internal.push_back(tok); }
-  return internal;
-}
-
 /*
  * For DxG
  */
 
 std::string Mosquito::get_old_genotype_string(std::string new_genotype) {
-  std::vector<std::string> pattern_chr = split_string(new_genotype, '|');
+  std::vector<std::string> pattern_chr = StringHelpers::split(new_genotype, '|');
   std::string old_chr_7 = pattern_chr[6].substr(0, 7);
   const std::string &old_chr_5 = pattern_chr[4];
   std::string old_chr_13 = pattern_chr[12].substr(0, 13);
@@ -282,7 +275,7 @@ std::string Mosquito::get_old_genotype_string(std::string new_genotype) {
 }
 
 std::string Mosquito::get_old_genotype_string2(std::string new_genotype) {
-  std::vector<std::string> pattern_chr = split_string(new_genotype, '|');
+  std::vector<std::string> pattern_chr = StringHelpers::split(new_genotype, '|');
   std::string old_chr_7 = pattern_chr[6].substr(0, 7);
   const std::string &old_chr_5 = pattern_chr[4];
   std::string old_chr_13 = pattern_chr[12].substr(0, 13);

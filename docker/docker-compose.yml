@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  malasim-runner:
+    build:
+      context: .                # folder with Dockerfile.auto-run
+      dockerfile: Dockerfile.auto-run
+    image: malasim-runner
+    container_name: malasim-auto
+    volumes:
+      - /Users/ktt/CLionProjects/malasim:/home/dev/malasim
+      - /Users/ktt/CLionProjects/malasim/cmake-build-debug/input:/home/dev/malasim/cmake-build-debug-docker/input
+    working_dir: /home/dev/malasim/cmake-build-debug-docker/bin
+    tty: true

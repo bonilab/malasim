@@ -8,8 +8,13 @@
 ChangeTreatmentCoverageEvent::ChangeTreatmentCoverageEvent(
     std::unique_ptr<ITreatmentCoverageModel> tcm)
     : treatment_coverage_model{std::move(tcm)} {
-  set_time(tcm->starting_time);
+  if (!treatment_coverage_model) {
+    throw std::runtime_error("ChangeTreatmentCoverageEvent: received null treatment model");
+  }
+
+  set_time(treatment_coverage_model->starting_time);
 }
+
 
 ChangeTreatmentCoverageEvent::~ChangeTreatmentCoverageEvent() = default;
 

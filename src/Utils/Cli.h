@@ -79,17 +79,17 @@ public:
       if (isDxG) {
         create_dxg_cli_options(app_, dxg_input_);
         app_.parse(argc, argv);
-        // Optional: add validation for dxg_input_
-        spdlog::info("DxG mode parsed successfully");
       } else {
         create_cli_options(app_, cli_input_);
         app_.parse(argc, argv);
         validate_config(cli_input_);
       }
     } catch (const CLI::ParseError &e) {
-      std::exit(app_.exit(e));
+      spdlog::error("CLI parsing failed: {}", e.what());
+      throw;  // or return false if you refactor to use a return value
     }
   }
+
 
 
   // Accessors for parameters

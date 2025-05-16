@@ -38,14 +38,10 @@ void ValidationReporter::initialize(int job_number, const std::string &path) {
   fs::remove(gene_db_path);
 
   if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()) {
-    // std::string prmc_freq_path = fmt::format("{}/validation_prmc_freq_{}.txt", path, job_number);
-    // std::string prmc_db_path = fmt::format("{}/validation_prmc_db_{}.txt", path, job_number);
     monthly_mutation_path =
         fmt::format("{}/validation_monthly_mutation_{}.txt", path, job_number);
     mosquito_res_count_path =
       fmt::format("{}/validation_mosquito_res_count_{}.txt", path, job_number);
-    // fs::remove(prmc_freq_path);
-    // fs::remove(prmc_db_path);
     fs::remove(monthly_mutation_path);
     fs::remove(mosquito_res_count_path);
   }
@@ -57,8 +53,6 @@ void ValidationReporter::initialize(int job_number, const std::string &path) {
   gene_db_logger = spdlog::basic_logger_mt("validation_gene_db", gene_db_path);
 
   if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()){
-    // prmc_freq_logger = spdlog::basic_logger_mt("validation_prmc_freq", prmc_freq_path);
-    // prmc_db_logger = spdlog::basic_logger_mt("validation_prmc_db", prmc_db_path);
     monthly_mutation_logger =
         spdlog::basic_logger_mt("validation_monthly_mutation", monthly_mutation_path);
     mosquito_res_count_logger =
@@ -71,8 +65,6 @@ void ValidationReporter::initialize(int job_number, const std::string &path) {
   gene_freq_logger->set_pattern("%v");
   gene_db_logger->set_pattern("%v");
   if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()) {
-    // prmc_freq_logger->set_pattern("%v");
-    // prmc_db_logger->set_pattern("%v");
     monthly_mutation_logger->set_pattern("%v");
     mosquito_res_count_logger->set_pattern("%v");
   }
@@ -88,8 +80,6 @@ void ValidationReporter::initialize(int job_number, const std::string &path) {
   gene_freq_logger->flush_on(spdlog::level::info);
   gene_db_logger->flush_on(spdlog::level::info);
   if (Model::get_config()->get_mosquito_parameters().get_record_recombination_events()) {
-    // prmc_freq_logger->flush_on(spdlog::level::info);
-    // prmc_db_logger->flush_on(spdlog::level::info);
     monthly_mutation_logger->flush_on(spdlog::level::info);
     mosquito_res_count_logger->flush_on(spdlog::level::info);
   }
@@ -104,7 +94,7 @@ void ValidationReporter::monthly_report() {
 
   ss << Model::get_scheduler()->current_time() << sep;
   ss << Model::get_scheduler()->get_unix_time() << sep;
-  ss << Model::get_scheduler()->get_current_date_string() << sep;
+  ss << Model::get_scheduler()->get_current_date_seperated_string() << sep;
   ss << Model::get_config()->get_seasonality_settings().get_seasonal_factor(
       Model::get_scheduler()->get_calendar_date(), 0)
      << sep;
@@ -237,14 +227,59 @@ void ValidationReporter::monthly_report() {
     ss << Model::get_mdc()->cumulative_ntf_by_location()[loc] << sep;
     ss << group_sep;  // 343
   }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    ss << Model::get_mdc()->monthly_number_of_tf_by_location()[loc] << sep;
+    ss << group_sep;  // 345
+  } // 417
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    ss << Model::get_mdc()->cumulative_number_treatments_by_location()[loc] << sep;
+    ss << group_sep;  // 347
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    ss << Model::get_mdc()->cumulative_tf_by_location()[loc] << sep;
+    ss << group_sep;  // 349
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
+    ss << group_sep;  // 351
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (int age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->number_of_untreated_cases_by_location_age_year()[loc][age] << sep;
+    }
+    ss << group_sep;  /// 432
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (int age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->number_of_deaths_by_location_age_year()[loc][age] << sep;
+    }
+    ss << group_sep;  /// 513
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (int age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->number_of_malaria_deaths_treated_by_location_age_year()[loc][age]
+         << sep;
+    }
+    ss << group_sep;  /// 594
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (int age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->number_of_malaria_deaths_non_treated_by_location_age_year()[loc][age]
+         << sep;
+    }
+    ss << group_sep;  /// 675
+  }
+  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+    for (int age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->total_immune_by_location_age()[loc][age]
+         << sep;
+    }
+    ss << group_sep;  /// 756
+  }
   for (auto tf_by_therapy : Model::get_mdc()->current_tf_by_therapy()) {
     ss << tf_by_therapy << sep;
   }
-  ss << group_sep;  // 358
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->monthly_number_of_tf_by_location()[loc] << sep;
-    ss << group_sep;  // 360
-  }
+  ss << group_sep;  // 772
   for (int t_id = 0; t_id < Model::get_therapy_db().size(); t_id++) {
     int n_treaments = Model::get_mdc()->number_of_treatments_with_therapy_id()[t_id];
     int n_success = Model::get_mdc()->number_of_treatments_success_with_therapy_id()[t_id];
@@ -252,53 +287,24 @@ void ValidationReporter::monthly_report() {
     double p_success = (n_treaments == 0) ? 0 : n_success * 100.0 / n_treaments;
     ss << n_treaments << sep << n_success << sep << n_fail << sep << p_success << sep;
   }
-  ss << group_sep;  // 417
+  ss << group_sep; // 833
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->cumulative_number_treatments_by_location()[loc] << sep;
-    ss << group_sep;  // 419
-  }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->cumulative_tf_by_location()[loc] << sep;
-    ss << group_sep;  // 421
-  }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
-    ss << group_sep;  // 423
-  }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    for (int age = 0; age < 80; age++) {
-      ss << Model::get_mdc()->number_of_untreated_cases_by_location_age_year()[loc][age] << sep;
-    }
-    ss << group_sep;  /// 504
-  }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    for (int age = 0; age < 80; age++) {
-      ss << Model::get_mdc()->number_of_deaths_by_location_age_year()[loc][age] << sep;
-    }
-    ss << group_sep;  /// 585
-  }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    for (int age = 0; age < 80; age++) {
-      ss << Model::get_mdc()->number_of_malaria_deaths_treated_by_location_age_year()[loc][age]
+    for (auto age = 0; age < 80; age++) {
+      ss << Model::get_mdc()->cumulative_clinical_episodes_by_location_age()[loc][age]
          << sep;
     }
-    ss << group_sep;  /// 666
+    ss << group_sep;  // 914
   }
-  for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    for (int age = 0; age < 80; age++) {
-      ss << Model::get_mdc()->number_of_malaria_deaths_non_treated_by_location_age_year()[loc][age]
-         << sep;
-    }
-    ss << group_sep;  /// 747
-  }
+  ss << Model::get_mdc()->progress_to_clinical_in_7d_counter.total << sep;
+  ss << Model::get_mdc()->progress_to_clinical_in_7d_counter.recrudescence << sep;
+  ss << Model::get_mdc()->progress_to_clinical_in_7d_counter.new_infection << sep;
   monthly_data_logger->info(ss.str());
 
   std::stringstream gene_freq_ss;
   //    ReporterUtils::output_genotype_frequency3(gene_freq_ss, Model::get_genotype_db()->size(),
   //                                              Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
-  std::stringstream prmc_freq_ss;
-  ReporterUtils::output_genotype_frequency4(
-      gene_freq_ss, prmc_freq_ss, static_cast<int>(Model::get_genotype_db()->size()),
+  ReporterUtils::output_genotype_frequency3(
+      gene_freq_ss, static_cast<int>(Model::get_genotype_db()->size()),
       Model::get_population()->get_person_index<PersonIndexByLocationStateAgeClass>());
 
   gene_freq_logger->info(gene_freq_ss.str());
@@ -375,8 +381,6 @@ void ValidationReporter::after_run() {
   ss << group_sep;  // 12
   for (int loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
     ss << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] << sep;
-    //        std::cout << Model::get_mdc()->cumulative_clinical_episodes_by_location()[loc] <<
-    //        "\t";
     ss << group_sep;  // 14
   }
   for (int loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {

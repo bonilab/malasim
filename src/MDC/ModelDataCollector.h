@@ -22,14 +22,6 @@ class ClonalParasitePopulation;
 
 class ModelDataCollector {
 private:
-  Model* model_{nullptr};
-
-public:
-  [[nodiscard]] Model* model() const { return model_; }
-  void set_model(Model* value) { model_ = value; }
-
-  // Property References
-private:
   DoubleVector total_immune_by_location_;
 
 public:
@@ -47,6 +39,17 @@ public:
   }
   void set_total_immune_by_location_age_class(const DoubleVector2 &value) {
     total_immune_by_location_age_class_ = value;
+  }
+
+private:
+  DoubleVector2 total_immune_by_location_age_;
+
+public:
+  DoubleVector2 &total_immune_by_location_age() {
+    return total_immune_by_location_age_;
+  }
+  void set_total_immune_by_location_age(const DoubleVector2 &value) {
+    total_immune_by_location_age_ = value;
   }
 
 private:
@@ -593,7 +596,6 @@ public:
 
 private:
   DoubleVector3 last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_;
-
 public:
   DoubleVector3 &last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5() {
     return last_10_fraction_positive_that_are_clinical_by_location_age_class_by_5_;
@@ -990,14 +992,14 @@ public:
   std::vector<std::vector<RecombinedResistantGenotypeInfo>>
       mosquito_recombined_resistant_genotype_tracker;
 
-  static const int NUMBER_OF_REPORTED_MOI = 8;
+  static const int NUMBER_OF_REPORTED_MOI = 10;
   // disallow copy and assign
   ModelDataCollector(const ModelDataCollector &) = delete;
   ModelDataCollector& operator=(const ModelDataCollector &) = delete;
   ModelDataCollector(ModelDataCollector &&) = delete;
   ModelDataCollector &operator=(ModelDataCollector &&) = delete;
 
-  explicit ModelDataCollector(Model* model = nullptr);
+  explicit ModelDataCollector();
 
   //    Statistic(const Statistic& orig);
   virtual ~ModelDataCollector();
@@ -1253,6 +1255,14 @@ private:
   bool recording_ = false;
   void update_average_number_bitten(const int &location, const int &birthday,
                                     const int &number_of_times_bitten);
+
+public:
+  struct ProgressToClinicalCounter {
+    long long total{0};
+    long long new_infection{0};
+    long long recrudescence{0};
+  };
+  ProgressToClinicalCounter progress_to_clinical_in_7d_counter;
 };
 
 #endif /* MODELDATACOLLECTOR_H */

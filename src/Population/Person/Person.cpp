@@ -820,18 +820,49 @@ void Person::schedule_progress_to_clinical_event(ClonalParasitePopulation* paras
   schedule_basic_event(std::move(event));
 }
 
+// void Person::schedule_clinical_recurrence_event(ClonalParasitePopulation* parasite) {
+//   // assumming the onset of clinical symptoms is day 14 to 63 and end of
+//   // clinical symptom is day 7.
+//   // Clinical recurrence occurs between days 7-54, normally distributed around day 14
+//   int days_to_clinical = Model::get_random()->random_normal_int(14, 5);
+//   days_to_clinical = std::min(std::max(days_to_clinical, 7), 54);
+//
+//   auto event = std::make_unique<ProgressToClinicalEvent>(this);
+//   event->set_time(calculate_future_time(days_to_clinical));
+//   event->set_clinical_caused_parasite(parasite);
+//   schedule_basic_event(std::move(event));
+// }
+
 void Person::schedule_clinical_recurrence_event(ClonalParasitePopulation* parasite) {
-  // assumming the onset of clinical symptoms is day 14 to 63 and end of
-  // clinical symptom is day 7.
   // Clinical recurrence occurs between days 7-54, normally distributed around day 14
   int days_to_clinical = Model::get_random()->random_normal_int(14, 5);
   days_to_clinical = std::min(std::max(days_to_clinical, 7), 54);
 
+  int new_event_time = calculate_future_time(days_to_clinical);
+
+  // Log if similar event is already scheduled within ±7 days
+  for (const auto& [time, existing_event] : get_events()) {
+    auto* existing_progress_event = dynamic_cast<ProgressToClinicalEvent*>(existing_event.get());
+    if (existing_progress_event) {
+      int existing_time = existing_progress_event->get_time();
+      if (std::abs(existing_time - new_event_time) <= 7) {
+        Model::get_mdc()->progress_to_clinical_in_7d_counter.total++;
+        if (existing_progress_event->clinical_caused_parasite() == parasite) {
+          Model::get_mdc()->progress_to_clinical_in_7d_counter.recrudescence++;
+        }
+        else {
+          Model::get_mdc()->progress_to_clinical_in_7d_counter.new_infection++;
+        }
+      }
+    }
+  }
+  // Schedule the new event
   auto event = std::make_unique<ProgressToClinicalEvent>(this);
-  event->set_time(calculate_future_time(days_to_clinical));
+  event->set_time(new_event_time);
   event->set_clinical_caused_parasite(parasite);
   schedule_basic_event(std::move(event));
 }
+
 
 void Person::schedule_test_treatment_failure_event(ClonalParasitePopulation* parasite,
                                                    int testing_day, int therapy_id) {
