@@ -390,20 +390,10 @@ void Person::determine_symptomatic_recrudescence(
     ClonalParasitePopulation* clinical_caused_parasite) {
   const auto random_p = Model::get_random()->random_flat(0.0, 1.0);
 
-  // TODO: cache pfpr2_10 to avoid recalculating it
-  // const auto pfpr =
-  //     Model::MAIN_DATA_COLLECTOR->get_blood_slide_prevalence(location(), 2,
-  //     10)
-  //     * 100;
-
-  const auto pfpr = Model::get_mdc()->blood_slide_prevalence_by_location()[location_] * 100;
-
-  const auto is_young_children = get_age() <= 6;
-
-  const auto probability_develop_symptom =
-      calculate_symptomatic_recrudescence_probability(pfpr, is_young_children);
-
-  if (random_p <= probability_develop_symptom) {
+  /* Instead of getting prob. from the calculate_symptomatic_recrudescence_probability
+   * which is depends on pfpr, use the one from immunity.
+   */
+  if (random_p <= get_probability_progress_to_clinical()) {
     // The last clinical caused parasite is going to relapse
     // regardless whether the induvidual are under treatment or not
     // Set the update function to progress to clinical
