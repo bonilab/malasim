@@ -73,19 +73,30 @@ void SQLiteDbReporter::populate_admin_level_table() {
 void SQLiteDbReporter::create_all_reporting_tables() {
   auto admin_levels = Model::get_spatial_data()->get_admin_level_manager()->get_level_names();
 
-  std::string ageClassColumnDefinitions;
+  std::string age_class_column_definitions;
   for (auto ndx = 0; ndx < Model::get_config()->age_structure().size(); ndx++) {
-    auto agFrom = ndx == 0 ? 0 : Model::get_config()->age_structure()[ndx - 1];
-    auto agTo = Model::get_config()->age_structure()[ndx];
-    ageClassColumnDefinitions +=
-        fmt::format("clinical_episodes_by_age_class_{}_{} INTEGER, ", agFrom, agTo);
+    auto ag_from = ndx == 0 ? 0 : Model::get_config()->age_structure()[ndx - 1];
+    auto ag_to = Model::get_config()->age_structure()[ndx];
+    age_class_column_definitions +=
+        fmt::format("clinical_episodes_by_age_class_{}_{} INTEGER, ", ag_from, ag_to);
   }
 
-  std::string ageClassColumns;
+  std::string age_class_columns;
   for (auto ndx = 0; ndx < Model::get_config()->age_structure().size(); ndx++) {
-    auto agFrom = ndx == 0 ? 0 : Model::get_config()->age_structure()[ndx - 1];
-    auto agTo = Model::get_config()->age_structure()[ndx];
-    ageClassColumns += fmt::format("clinical_episodes_by_age_class_{}_{}, ", agFrom, agTo);
+    auto ag_from = ndx == 0 ? 0 : Model::get_config()->age_structure()[ndx - 1];
+    auto ag_to = Model::get_config()->age_structure()[ndx];
+    age_class_columns += fmt::format("clinical_episodes_by_age_class_{}_{}, ", ag_from, ag_to);
+  }
+
+  std::string age_column_definitions;
+  for (auto age = 0; age < 80; age++) {
+    age_column_definitions +=
+        fmt::format("clinical_episodes_by_age_{} INTEGER, ", age);
+  }
+
+  std::string age_columns;
+  for (auto age = 0; age < 80; age++) {
+    age_columns += fmt::format("clinical_episodes_by_age_{}, ", age);
   }
 
   // // Include cell level in the number of levels
@@ -97,13 +108,18 @@ void SQLiteDbReporter::create_all_reporting_tables() {
 
   // Now create tables for each admin level including cell level
   for (size_t level_id = 0; level_id < admin_levels.size() + 1; level_id++) {
-    create_reporting_tables_for_level(level_id, ageClassColumnDefinitions, ageClassColumns);
+    create_reporting_tables_for_level(level_id,
+      age_class_column_definitions, age_class_columns,
+      age_column_definitions,
+      age_columns);
   }
 }
 
 void SQLiteDbReporter::create_reporting_tables_for_level(
-    int level_id, const std::string &ageClassColumnDefinitions,
-    const std::string &ageClassColumns) {
+    int level_id, const std::string &age_class_column_definitions,
+    const std::string &age_class_columns,
+    const std::string &age_column_definitions,
+    const std::string &age_columns) {
   // Generate table names for this level
   std::string site_table_name = get_site_table_name(level_id);
   std::string genome_table_name = get_genome_table_name(level_id);
@@ -112,14 +128,15 @@ void SQLiteDbReporter::create_reporting_tables_for_level(
   std::string location_id_column = (level_id == CELL_LEVEL_ID) ? "location_id" : "unit_id";
 
   // Create site data table for this level
-  std::string createSiteDataTable = fmt::format(R""""(
+  std::string create_site_data_table = fmt::format(R""""(
       CREATE TABLE IF NOT EXISTS {} (
           monthly_data_id INTEGER NOT NULL,
           {} INTEGER NOT NULL,
           population INTEGER NOT NULL,
           clinical_episodes INTEGER NOT NULL, )"""",
                                                 site_table_name, location_id_column)
-                                    + ageClassColumnDefinitions
+                                    + age_class_column_definitions
+                                    + age_column_definitions
                                     + fmt::format(R""""(
           treatments INTEGER NOT NULL,
           treatment_failures INTEGER NOT NULL,
@@ -138,7 +155,7 @@ void SQLiteDbReporter::create_reporting_tables_for_level(
                                                   location_id_column);
 
   // Create genome data table for this level
-  std::string createGenomeDataTable =
+  std::string create_genome_data_table =
       fmt::format(R""""(
       CREATE TABLE IF NOT EXISTS {} (
           monthly_data_id INTEGER NOT NULL,
@@ -157,8 +174,8 @@ void SQLiteDbReporter::create_reporting_tables_for_level(
                   genome_table_name, location_id_column, location_id_column);
   try {
     // Execute the creation queries
-    db->execute(createSiteDataTable);
-    db->execute(createGenomeDataTable);
+    db->execute(create_site_data_table);
+    db->execute(create_genome_data_table);
 
     // Determine index for query prefixes
     int prefix_index =
@@ -168,7 +185,7 @@ void SQLiteDbReporter::create_reporting_tables_for_level(
     insert_site_query_prefixes_[prefix_index] =
       fmt::format("INSERT INTO {} (monthly_data_id, {}, "
         "population, clinical_episodes, ", site_table_name, location_id_column)
-      + ageClassColumns +
+      + age_class_columns + age_columns +
       " treatments, eir, pfpr_under5, pfpr_2to10, pfpr_all, infected_individuals, treatment_failures,"
       " non_treatment, under5_treatment, over5_treatment) VALUES";
 
