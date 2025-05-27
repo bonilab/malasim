@@ -32,7 +32,8 @@ protected:
                     nontreatment, treatments_under5, treatments_over5, infections_by_unit;
     std::vector<std::vector<int>> clinical_episodes_by_age_class;
     std::vector<std::vector<int>> clinical_episodes_by_age;
-
+    std::vector<std::vector<int>> population_by_age;
+    std::vector<std::vector<double>> total_immune_by_age;
   };
 
   struct MonthlyGenomeData {

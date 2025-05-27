@@ -94,9 +94,25 @@ void SQLiteDbReporter::create_all_reporting_tables() {
         fmt::format("clinical_episodes_by_age_{} INTEGER, ", age);
   }
 
+  for (auto age = 0; age < 80; age++) {
+    age_column_definitions +=
+        fmt::format("population_by_age_{} INTEGER, ", age);
+  }
+
+  for (auto age = 0; age < 80; age++) {
+    age_column_definitions +=
+        fmt::format("total_immune_by_age_{} INTEGER, ", age);
+  }
+
   std::string age_columns;
   for (auto age = 0; age < 80; age++) {
     age_columns += fmt::format("clinical_episodes_by_age_{}, ", age);
+  }
+  for (auto age = 0; age < 80; age++) {
+    age_columns += fmt::format("population_by_age_{}, ", age);
+  }
+  for (auto age = 0; age < 80; age++) {
+    age_columns += fmt::format("total_immune_by_age_{}, ", age);
   }
 
   // // Include cell level in the number of levels
