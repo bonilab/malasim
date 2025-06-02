@@ -392,8 +392,15 @@ void Person::determine_symptomatic_recrudescence(
 
   /* Instead of getting prob. from the calculate_symptomatic_recrudescence_probability
    * which is depends on pfpr, use the one from immunity.
-   */
-  if (random_p <= get_probability_progress_to_clinical()) {
+  */
+  const auto pfpr = Model::get_mdc()->blood_slide_prevalence_by_location()[location_] * 100;
+
+  const auto is_young_children = get_age() <= 6;
+
+  const auto probability_develop_symptom =
+      calculate_symptomatic_recrudescence_probability(pfpr, is_young_children);
+
+  if (random_p <= probability_develop_symptom) {
     // The last clinical caused parasite is going to relapse
     // regardless whether the induvidual are under treatment or not
     // Set the update function to progress to clinical
@@ -836,12 +843,12 @@ void Person::schedule_clinical_recurrence_event(ClonalParasitePopulation* parasi
     if (existing_progress_event) {
       int existing_time = existing_progress_event->get_time();
       if (std::abs(existing_time - new_event_time) <= 7) {
-        Model::get_mdc()->progress_to_clinical_in_7d_counter.total++;
+        Model::get_mdc()->progress_to_clinical_in_7d_counter[location_].total++;
         if (existing_progress_event->clinical_caused_parasite() == parasite) {
-          Model::get_mdc()->progress_to_clinical_in_7d_counter.recrudescence++;
+          Model::get_mdc()->progress_to_clinical_in_7d_counter[location_].recrudescence++;
         }
         else {
-          Model::get_mdc()->progress_to_clinical_in_7d_counter.new_infection++;
+          Model::get_mdc()->progress_to_clinical_in_7d_counter[location_].new_infection++;
         }
       }
     }
