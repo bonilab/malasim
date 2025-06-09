@@ -148,7 +148,33 @@ void ProgressToClinicalEvent::transition_to_clinical_state(Person* person) {
   // on one hand we don't what an individual have multiple clinical episodes
   // consecutively, on the other hand we don't want all the other clinical
   // episode to be cancled (i.e recrudescence epidsodes)
+  int count = 0;
+  // std::string event_time;
+  // for (const auto& pair : person->get_events()) {
+  //   if ( typeid(*(pair.second)).name() == typeid(ProgressToClinicalEvent).name()
+  //     && pair.second->is_executable()) {
+  //     event_time += std::to_string(pair.first) + " ";
+  //     count++;
+  //   }
+  // }
+  // if (count > 1) {
+  //   spdlog::warn("Person {} has {} ProgressToClinicalEvent, time {}, cancel all but this one",
+  //                person->get_age(), count, event_time);
+  // }
   person->cancel_all_other_progress_to_clinical_events_except(this);
+  count = 0;
+  std::string event_time = "";
+  for (const auto& pair : person->get_events()) {
+    if ( typeid(*(pair.second)).name() == typeid(ProgressToClinicalEvent).name()
+     && pair.second->is_executable()) {
+      event_time += std::to_string(pair.first) + " ";
+      count++;
+     }
+  }
+  if (count > 1) {
+    spdlog::warn("Person {} has {} ProgressToClinicalEvent, time {} after canceling",
+      person->get_age(), count, event_time);
+  }
 
   person->change_all_parasite_update_function(
       Model::get_instance()->progress_to_clinical_update_function(),

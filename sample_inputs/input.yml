@@ -14,7 +14,7 @@ model_settings:
   days_between_stdout_output: 30
 
   # Initial seed number for random number generator; set to -1 to use a random seed
-  initial_seed_number: 0
+  initial_seed_number: 1749432646424906
 
   # Record the genomic data (set to true for a real run)
   record_genome_db: true
