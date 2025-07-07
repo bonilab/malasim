@@ -41,9 +41,7 @@ jobs:
         run: |
           pwd
           ls -al
-          ls -al sample_inputs
-          ls -al build/ci/sample_inputs
-
+          ls -al ${{ github.workspace }}
 
       - name: Configure, Build, and Test using Presets
         uses: lukka/run-cmake@v10
