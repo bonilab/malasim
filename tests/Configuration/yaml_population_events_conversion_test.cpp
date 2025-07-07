@@ -2,12 +2,14 @@
 #include <yaml-cpp/yaml.h>
 #include "Configuration/PopulationEvents.h"  // Assuming this is the correct include path
 #include "Simulation/Model.h"
+#include "Utils/Cli.h"
 
 class PopulationEventsTest : public ::testing::Test {
 protected:
     PopulationEvents population_events;
 
     void SetUp() override {
+        utils::Cli::get_instance().set_input_path("../../sample_inputs/input.yml");
         Model::get_instance()->initialize();
         // Set up default PopulationEvents
 

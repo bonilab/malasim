@@ -7,6 +7,8 @@ class PopulationTest : public ::testing::Test {
 protected:
     void SetUp() override {
         population = std::make_unique<Population>();
+        population->set_popsize_by_location({0});
+
     }
     std::unique_ptr<Population> population;
 };
