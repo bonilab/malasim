@@ -23,11 +23,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up sample inputs
-        run: |
-          mkdir -p build/ci/sample_inputs
-          cp -r sample_inputs/* build/ci/sample_inputs/
-
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
         with:
@@ -35,6 +30,20 @@ jobs:
 
       - name: Setup vcpkg (no install yet)
         uses: lukka/run-vcpkg@v11
+
+      - name: Ensure sample_inputs at repo root
+        run: |
+          if [ ! -d "${{ github.workspace }}/sample_inputs" ]; then
+            cp -r build/ci/sample_inputs ${{ github.workspace }}/sample_inputs
+          fi
+
+      - name: List files for debugging
+        run: |
+          pwd
+          ls -al
+          ls -al sample_inputs
+          ls -al build/ci/sample_inputs
+
 
       - name: Configure, Build, and Test using Presets
         uses: lukka/run-cmake@v10
