@@ -40,3 +40,11 @@ jobs:
           buildPresetAdditionalArgs: "[]"
           testPreset: "ci-release"
           testPresetAdditionalArgs: "[]"
+
+      - name: Upload CTest log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LastTest-log
+          path: ${{ github.workspace }}/build/ci/Testing/Temporary/LastTest.log
+
