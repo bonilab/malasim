@@ -40,7 +40,7 @@ public:
 
   virtual void update();
 
-  [[nodiscard]] virtual double get_lastest_immune_value() const;
+  [[nodiscard]] virtual double get_latest_immune_value() const;
 
   virtual void set_latest_immune_value(double value);
 

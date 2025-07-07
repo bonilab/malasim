@@ -73,7 +73,6 @@ public:
     void set_person_drugs(DrugsInBlood *value) {
         person_drugs_ = value;
     }
-
  public:
   explicit Drug(DrugType *drug_type = nullptr);
 

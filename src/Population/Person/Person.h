@@ -60,7 +60,7 @@ public:
   void initialize();
 
   // Delegate event management methods to event_manager_
-  void schedule_basic_event(std::unique_ptr<PersonEvent> event);
+  PersonEvent* schedule_basic_event(std::unique_ptr<PersonEvent> event);
   void update_events(int time) { event_manager_.execute_events(time); }
 
   template <typename T>

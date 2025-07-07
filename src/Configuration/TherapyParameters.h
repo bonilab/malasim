@@ -58,8 +58,8 @@ public:
 
   std::unique_ptr<Therapy> read_therapy(const YAML::Node &n, const int &therapy_id) {
     const auto t_id = NumberHelpers::number_to_string<int>(therapy_id);
-    auto t = TherapyBuilder::build(n[t_id], therapy_id);
-    return t;
+    auto therapy = TherapyBuilder::build(n[t_id], therapy_id);
+    return therapy;
   }
 
   void process_config() override; 

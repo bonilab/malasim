@@ -106,6 +106,7 @@ void ProgressToClinicalEvent::apply_therapy(Person* person, Therapy* therapy,
 }
 
 void ProgressToClinicalEvent::do_execute() {
+  // spdlog::info("ProgressToClinicalEvent::do_execute");
   auto* person = get_person();
 
   if (person == nullptr) { throw std::runtime_error("Person is nullptr"); }
@@ -116,10 +117,12 @@ void ProgressToClinicalEvent::do_execute() {
 
   // if the clinical_caused_parasite eventually removed then do nothing
   if (!person->get_all_clonal_parasite_populations()->contain(clinical_caused_parasite_)) {
+    // spdlog::info("ProgressToClinicalEvent::do_execute: parasite removed");
     return;
   }
 
   if (person->get_host_state() == Person::CLINICAL) {
+    // spdlog::info("ProgressToClinicalEvent::do_execute: Person is already Clinical");
     clinical_caused_parasite_->set_update_function(
         Model::get_instance()->immunity_clearance_update_function());
     return;

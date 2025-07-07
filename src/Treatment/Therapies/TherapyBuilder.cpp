@@ -12,12 +12,13 @@
 std::unique_ptr<Therapy> TherapyBuilder::build(const YAML::Node &ns, const int &t_id) {
   if (ns["drug_ids"]) {
     return create_simple(ns, t_id);
-  } else if (ns["therapy_ids"]) {
-    return create_complex(ns, t_id);
-  } else {
-    throw std::invalid_argument(
-        "The therapy does not appear to be a simple or complex type.");
   }
+  if (ns["therapy_ids"]) {
+    return create_complex(ns, t_id);
+  }
+  throw std::invalid_argument(
+        "The therapy does not appear to be a simple or complex type.");
+
 }
 
 std::unique_ptr<Therapy> TherapyBuilder::create_complex(const YAML::Node &ns, const int &t_id) {
