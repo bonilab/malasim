@@ -34,8 +34,7 @@ jobs:
       - name: Copy test input files
         run: |
           mkdir -p build/ci/sample_inputs
-          cp sample_inputs/input.yml build/ci/sample_inputs/
-      
+          cp sample_inputs/* build/ci/sample_inputs/     
 
       - name: List files for debugging
         run: |
