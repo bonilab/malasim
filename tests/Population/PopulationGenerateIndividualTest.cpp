@@ -10,6 +10,7 @@
 #include "Population/DrugsInBlood.h"
 #include "Treatment/Therapies/DrugType.h"
 #include "Treatment/Therapies/SCTherapy.h"
+#include "Treatment/Therapies/Drug.h"
 #include "Utils/Cli.h"
 #include "Utils/Constants.h"
 
