@@ -323,7 +323,7 @@ void ModelDataCollector::perform_population_statistic() {
           //                    assert(p->has_birthday_event());
           //                    assert(p->get_age_class() == ac);
           // this immune value will include maternal immunity value of the infants
-          double immune_value = person->get_immune_system()->get_lastest_immune_value();
+          double immune_value = person->get_immune_system()->get_latest_immune_value();
           total_immune_by_location_[loc] += immune_value;
           total_immune_by_location_age_class_[loc][ac] += immune_value;
           int age = static_cast<int>(person->get_age());

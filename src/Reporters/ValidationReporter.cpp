@@ -296,19 +296,23 @@ void ValidationReporter::monthly_report() {
     ss << group_sep;  // 914
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->progress_to_clinical_in_7d_counter[loc].total;
+    ss << Model::get_mdc()->progress_to_clinical_in_7d_counter[loc].total
+         << sep;
     ss << group_sep;  // 916
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->progress_to_clinical_in_7d_counter[loc].recrudescence;
+    ss << Model::get_mdc()->progress_to_clinical_in_7d_counter[loc].recrudescence
+         << sep;
     ss << group_sep;  // 918
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->progress_to_clinical_in_7d_counter[loc].new_infection;
+    ss << Model::get_mdc()->progress_to_clinical_in_7d_counter[loc].new_infection
+         << sep;
     ss << group_sep;  // 920
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-    ss << Model::get_mdc()->monthly_number_of_recrudescence_treatment_by_location()[loc];
+    ss << Model::get_mdc()->monthly_number_of_recrudescence_treatment_by_location()[loc]
+         << sep;
     ss << group_sep;  // 922
   }
   for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {

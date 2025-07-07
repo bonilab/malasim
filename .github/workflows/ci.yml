@@ -31,6 +31,17 @@ jobs:
       - name: Setup vcpkg (no install yet)
         uses: lukka/run-vcpkg@v11
 
+      - name: Copy test input files
+        run: |
+          mkdir -p build/ci/sample_inputs
+          cp sample_inputs/* build/ci/sample_inputs/     
+
+      - name: List files for debugging
+        run: |
+          pwd
+          ls -al
+          ls -al ${{ github.workspace }}
+
       - name: Configure, Build, and Test using Presets
         uses: lukka/run-cmake@v10
         with:
@@ -40,3 +51,10 @@ jobs:
           buildPresetAdditionalArgs: "[]"
           testPreset: "ci-release"
           testPresetAdditionalArgs: "[]"
+
+      - name: Upload CTest log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LastTest-log
+          path: ${{ github.workspace }}/build/ci/Testing/Temporary/LastTest.log

@@ -17,6 +17,7 @@ file(GLOB_RECURSE MALASIM_TEST_SOURCES
   "GIS/SpatialDataTest/*.cpp"
   "Population/*.cpp"
   "Population/Person/*.cpp"
+  "Parasites/*.cpp"
   "Utils/*.cpp"
 )
 
@@ -44,5 +45,11 @@ target_link_libraries(malasim_test PRIVATE
 
 set_property(TARGET malasim_test PROPERTY CXX_STANDARD 20)
 
-# Add tests
-add_test(NAME malasim_test COMMAND ${CMAKE_BINARY_DIR}/bin/malasim_test)
+# Copy sample_inputs folder to binary dir for tests needing input files
+add_custom_command(TARGET malasim_test POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/sample_inputs
+        $<TARGET_FILE_DIR:malasim_test>/sample_inputs)
+
+add_test(NAME malasim_test COMMAND $<TARGET_FILE:malasim_test>)
+set_tests_properties(malasim_test PROPERTIES WORKING_DIRECTORY $<TARGET_FILE_DIR:malasim_test>)

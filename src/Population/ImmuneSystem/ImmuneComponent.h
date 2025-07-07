@@ -26,7 +26,7 @@ public:
   [[nodiscard]] double latest_value() const { return latest_value_; }
   void set_latest_value(double latest_value) { latest_value_ = latest_value; }
 
-  void update();
+  virtual void update();
 
   virtual void draw_random_immune();
 

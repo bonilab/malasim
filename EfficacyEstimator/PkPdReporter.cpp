@@ -40,7 +40,7 @@ void PkPdReporter::begin_time_step() {
       ss << sep << Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_cured();
     }
     if(appInput->is_print_immunity_level){
-      ss << sep << p_person->get_immune_system()->get_lastest_immune_value();
+      ss << sep << p_person->get_immune_system()->get_latest_immune_value();
     }
   }
 

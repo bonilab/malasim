@@ -25,7 +25,7 @@ void ImmuneSystem::set_immune_component(std::unique_ptr<ImmuneComponent> value) 
 
 void ImmuneSystem::draw_random_immune() { immune_component_->draw_random_immune(); }
 
-double ImmuneSystem::get_lastest_immune_value() const { return immune_component_->latest_value(); }
+double ImmuneSystem::get_latest_immune_value() const { return immune_component_->latest_value(); }
 
 void ImmuneSystem::set_latest_immune_value(double value) {
   immune_component_->set_latest_value(value);
@@ -36,7 +36,7 @@ double ImmuneSystem::get_current_value() const { return immune_component_->get_c
 double ImmuneSystem::get_parasite_size_after_t_days(const int &duration,
                                                     const double &original_size,
                                                     const double &fitness) const {
-  const auto last_immune_level = get_lastest_immune_value();
+  const auto last_immune_level = get_latest_immune_value();
   const auto temp =
       (Model::get_config()->get_immune_system_parameters().c_max * (1 - last_immune_level))
       + (Model::get_config()->get_immune_system_parameters().c_min * last_immune_level);

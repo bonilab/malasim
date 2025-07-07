@@ -9,11 +9,13 @@
 #include "Simulation/Model.h"
 #include "Treatment/Therapies/Drug.h"
 #include "Treatment/Therapies/DrugType.h"
+#include "Utils/Cli.h"
 
 class DrugsInBloodTest : public ::testing::Test {
 protected:
   void SetUp() override {
     Model::get_instance()->release();
+    utils::Cli::get_instance().set_input_path("../../sample_inputs/input.yml");
     Model::get_instance()->initialize();
     person_ = std::make_unique<Person>();
     drugs_in_blood_ = std::make_unique<DrugsInBlood>(person_.get());

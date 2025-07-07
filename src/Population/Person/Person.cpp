@@ -464,8 +464,10 @@ void Person::determine_symptomatic_recrudescence(
 
 void Person::determine_clinical_or_not(ClonalParasitePopulation* clinical_caused_parasite) {
   if (all_clonal_parasite_populations_->contain(clinical_caused_parasite)) {
+    // spdlog::info("Person::determine_clinical_or_not: Person has the parasite");
     const auto prob = Model::get_random()->random_flat(0.0, 1.0);
     if (prob <= get_probability_progress_to_clinical()) {
+      // spdlog::info("Person::determine_clinical_or_not: Person will progress to clinical");
       // progress to clinical after several days
       clinical_caused_parasite->set_update_function(Model::progress_to_clinical_update_function());
       clinical_caused_parasite->set_last_update_log10_parasite_density(
@@ -475,6 +477,7 @@ void Person::determine_clinical_or_not(ClonalParasitePopulation* clinical_caused
               .get_log_parasite_density_asymptomatic());
       schedule_progress_to_clinical_event(clinical_caused_parasite);
     } else {
+      // spdlog::info("Person::determine_clinical_or_not: Person will progress to clearance");
       // progress to clearance
       clinical_caused_parasite->set_update_function(Model::immunity_clearance_update_function());
     }
@@ -765,10 +768,11 @@ double Person::age_in_floating(int simulation_time) const {
 
 void Person::increase_age_by_1_year() { set_age(age_ + 1); }
 
-void Person::schedule_basic_event(std::unique_ptr<PersonEvent> event) {
+PersonEvent* Person::schedule_basic_event(std::unique_ptr<PersonEvent> event) {
   event->set_person(this);
   if (event->get_time() < Model::get_scheduler()->current_time()) {
-    spdlog::error("Event time is less than current time");
+    spdlog::error("Event time is less than current time {} < {}",
+      event->get_time(), Model::get_scheduler()->current_time());
     throw std::invalid_argument("Event time is less than current time");
   }
 
@@ -784,6 +788,7 @@ void Person::schedule_basic_event(std::unique_ptr<PersonEvent> event) {
 
   // schedule and transfer ownership of the event to the event_manager
   event_manager_.schedule_event(std::move(event));
+  return event_manager_.get_events().begin()->second.get();
 }
 
 void Person::schedule_update_by_drug_event(ClonalParasitePopulation* parasite) {
@@ -839,10 +844,21 @@ void Person::schedule_clinical_recurrence_event(ClonalParasitePopulation* parasi
 
   // Log if similar event is already scheduled within ±7 days
   for (const auto& [time, existing_event] : get_events()) {
+    auto* end_clinical_event = dynamic_cast<EndClinicalEvent*>(existing_event.get());
+    if (end_clinical_event != nullptr) {
+      int end_clinical_existing_time = end_clinical_event->get_time();
+      if (new_event_time <= end_clinical_existing_time) {
+        spdlog::info(
+            "Model time {}, schedule recurrence event at time {}, clinical end event at time {}",
+            Model::get_scheduler()->current_time(),new_event_time,end_clinical_existing_time);
+      }
+    }
     auto* existing_progress_event = dynamic_cast<ProgressToClinicalEvent*>(existing_event.get());
-    if (existing_progress_event) {
+    if (existing_progress_event != nullptr) {
       int existing_time = existing_progress_event->get_time();
-      if (std::abs(existing_time - new_event_time) <= 7) {
+      if (std::abs(existing_time - new_event_time) <= 7
+        && (new_event_time != existing_time)
+        && existing_progress_event->is_executable()) {
         Model::get_mdc()->progress_to_clinical_in_7d_counter[location_].total++;
         if (existing_progress_event->clinical_caused_parasite() == parasite) {
           Model::get_mdc()->progress_to_clinical_in_7d_counter[location_].recrudescence++;
