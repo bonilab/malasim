@@ -51,5 +51,5 @@ add_custom_command(TARGET malasim_test POST_BUILD
         ${PROJECT_SOURCE_DIR}/sample_inputs
         $<TARGET_FILE_DIR:malasim_test>/sample_inputs)
 
-# Add tests
-add_test(NAME malasim_test COMMAND ${CMAKE_BINARY_DIR}/bin/malasim_test)
+add_test(NAME malasim_test COMMAND $<TARGET_FILE:malasim_test>)
+set_tests_properties(malasim_test PROPERTIES WORKING_DIRECTORY $<TARGET_FILE_DIR:malasim_test>)

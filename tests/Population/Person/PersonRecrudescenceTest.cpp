@@ -174,24 +174,78 @@ TEST_F(PersonRecrudescenceTest, RecrudescenceWithDrugs) {
 
 // Test high parasite density adjustment for asymptomatic cases
 TEST_F(PersonRecrudescenceTest, AsymptomaticDensityAdjustment) {
-    // Setup
-    setupPerson(30, false); // 30 year old, no drugs
+    // Track outcomes and density adjustments
+    int symptomatic_count = 0;
+    int asymptomatic_count = 0;
+    int asymptomatic_density_adjusted_count = 0;
+    const int test_iterations = 100;
     
-    // Set high parasite density
-    const double high_density = Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_asymptomatic() + 2.0;
-    clinical_parasite_->set_last_update_log10_parasite_density(high_density);
-    
-    // Execute
-    person_->determine_symptomatic_recrudescence(clinical_parasite_.get());
-    
-    // Verify density was adjusted if asymptomatic
-    if (person_->get_recurrence_status() == Person::RecurrenceStatus::WITHOUT_SYMPTOM) {
-        // Density should be reduced to asymptomatic level or below
-        EXPECT_LE(
-            clinical_parasite_->last_update_log10_parasite_density(),
-            Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_asymptomatic()
-        );
+    for (int i = 0; i < test_iterations; i++) {
+        // Setup
+        setupPerson(30, false); // 30 year old, no drugs
+        
+        // Set high parasite density - DEFINITELY above asymptomatic threshold
+        const double asymptomatic_threshold = Model::get_config()->get_parasite_parameters()
+            .get_parasite_density_levels().get_log_parasite_density_asymptomatic();
+        const double high_density = asymptomatic_threshold + 2.0;
+        
+        // Verify our test setup is correct
+        ASSERT_GT(high_density, asymptomatic_threshold) << "Test setup error: High density should be above threshold";
+        
+        clinical_parasite_->set_last_update_log10_parasite_density(high_density);
+        
+        // Store original density for comparison
+        const double original_density = clinical_parasite_->last_update_log10_parasite_density();
+        
+        // Execute
+        person_->determine_symptomatic_recrudescence(clinical_parasite_.get());
+        
+        // Track outcomes
+        if (person_->get_recurrence_status() == Person::RecurrenceStatus::WITHOUT_SYMPTOM) {
+            asymptomatic_count++;
+            
+            // Density should be reduced to asymptomatic level or below for ALL asymptomatic cases
+            // since we set it well above the threshold
+            const double new_density = clinical_parasite_->last_update_log10_parasite_density();
+            
+            if (new_density < original_density) {
+                asymptomatic_density_adjusted_count++;
+                
+                // The density is adjusted using random_normal_truncated with mean=asymptomatic_threshold and std_dev=0.1,
+                // so values can be slightly above or below the threshold. We'll allow a reasonable range.
+                EXPECT_NEAR(new_density, asymptomatic_threshold, 0.3) 
+                    << "Adjusted density should be close to asymptomatic threshold (within 0.3)";
+            } else {
+                // This should never happen in our test - log detailed info if it does
+                std::cout << "ERROR: Density not adjusted for asymptomatic case in iteration " << i << std::endl;
+                std::cout << "  Original density: " << original_density << std::endl;
+                std::cout << "  New density: " << new_density << std::endl;
+                std::cout << "  Asymptomatic threshold: " << asymptomatic_threshold << std::endl;
+            }
+        } else if (person_->get_recurrence_status() == Person::RecurrenceStatus::WITH_SYMPTOM) {
+            symptomatic_count++;
+        }
+        
+        // Reset between iterations
+        person_->set_recurrence_status(Person::RecurrenceStatus::NONE);
+        clinical_parasite_->set_update_function(nullptr); // Reset the update function
     }
+    
+    // Log results
+    std::cout << "AsymptomaticDensityAdjustment results after " << test_iterations << " iterations:" << std::endl;
+    std::cout << "  Symptomatic: " << symptomatic_count << " (" 
+              << (static_cast<double>(symptomatic_count) / test_iterations) * 100.0 << "%)" << std::endl;
+    std::cout << "  Asymptomatic: " << asymptomatic_count << " ("
+              << (static_cast<double>(asymptomatic_count) / test_iterations) * 100.0 << "%)" << std::endl;
+    std::cout << "  Asymptomatic with density adjusted: " << asymptomatic_density_adjusted_count << " ("
+              << (asymptomatic_count > 0 ? (static_cast<double>(asymptomatic_density_adjusted_count) / asymptomatic_count) * 100.0 : 0) << "%)" << std::endl;
+    
+    // Verify we got at least some asymptomatic cases to test the density adjustment
+    EXPECT_GT(asymptomatic_count, 0) << "Expected some asymptomatic cases to test density adjustment";
+    
+    // For all asymptomatic cases, verify the density was properly adjusted
+    EXPECT_EQ(asymptomatic_count, asymptomatic_density_adjusted_count) 
+        << "All asymptomatic cases should have their parasite density adjusted";
 }
 
 // Test treatment failure handling during recrudescence
