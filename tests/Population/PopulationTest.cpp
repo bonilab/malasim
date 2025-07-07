@@ -7,7 +7,7 @@ class PopulationTest : public ::testing::Test {
 protected:
     void SetUp() override {
         population = std::make_unique<Population>();
-        population->set_popsize_by_location({0});
+        population->set_popsize_by_location({0,0});
 
     }
     std::unique_ptr<Population> population;
@@ -16,6 +16,7 @@ protected:
 TEST_F(PopulationTest, ConstructionAndDestruction) {
     EXPECT_NE(population, nullptr);
 }
+
 
 TEST_F(PopulationTest, AddAndSize) {
     EXPECT_EQ(population->size(), 0u);
