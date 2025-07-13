@@ -121,9 +121,7 @@ TEST_F(SCTherapyTest, CalculateMaxDosingDaySingle) {
 TEST_F(SCTherapyTest, GetMaxDosingDayBeforeCalculation) {
   // For death tests, we need to match the assertion message pattern
   // The pattern varies by platform/compiler, but this should catch both GCC and MSVC formats
-  EXPECT_DEATH({
-    sc_therapy->get_max_dosing_day();
-  }, ".*[Aa]ssert.*|.*max_dosing_day != -1.*");
+  EXPECT_THROW(sc_therapy->get_max_dosing_day(), std::runtime_error);
   
   // Set dosing days
   sc_therapy->dosing_day = {3};
