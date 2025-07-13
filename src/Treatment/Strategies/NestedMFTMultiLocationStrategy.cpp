@@ -1,4 +1,5 @@
 #include <sstream>
+#include <algorithm> // For std::min and std::max
 #include "NestedMFTMultiLocationStrategy.h"
 #include "Simulation/Model.h"
 #include "Configuration/Config.h"
@@ -70,20 +71,32 @@ void NestedMFTMultiLocationStrategy::adjust_distribution(const int& time) {
   } else {
     // increasing linearly
     if (time <= starting_time + peak_after) {
-      if (distribution[0][0] < 1) {
-        for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
-          for (auto i = 0; i < distribution[loc].size(); i++) {
-
-            auto dist = peak_after == 0 ? peak_distribution[loc][i] :
-                        (peak_distribution[loc][i] - start_distribution[loc][i]) * (time - starting_time) /
-                        peak_after + start_distribution[loc][i];
-            dist = dist > peak_distribution[loc][i] ? peak_distribution[loc][i] : dist;
-            distribution[loc][i] = dist;
-          }
+      // Calculate fraction of progress towards peak (0.0 to 1.0)
+      double progress_fraction = (time - starting_time) / static_cast<double>(peak_after);
+      
+      for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+        for (auto i = 0; i < distribution[loc].size(); i++) {
+          // Linear interpolation between start and peak distribution
+          double dist = start_distribution[loc][i] + 
+                      (peak_distribution[loc][i] - start_distribution[loc][i]) * progress_fraction;
+          
+          // Ensure we don't exceed peak values
+          dist = peak_distribution[loc][i] > start_distribution[loc][i] ? 
+                std::min(dist, peak_distribution[loc][i]) : 
+                std::max(dist, peak_distribution[loc][i]);
+          
+          distribution[loc][i] = dist;
+        }
+      }
+    } else {
+      // After peak, use peak distribution
+      for (auto loc = 0; loc < Model::get_config()->number_of_locations(); loc++) {
+        for (auto i = 0; i < distribution[loc].size(); i++) {
+          distribution[loc][i] = peak_distribution[loc][i];
         }
       }
     }
-  } //    std::cout << to_string() << std::endl;
+  }
 }
 
 void NestedMFTMultiLocationStrategy::adjust_started_time_point(const int& current_time) {
