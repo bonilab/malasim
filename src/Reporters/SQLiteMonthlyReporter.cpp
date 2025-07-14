@@ -14,6 +14,7 @@
 // Initialize the reporter
 // Sets up the database and prepares it for data entry
 void SQLiteMonthlyReporter::initialize(int jobNumber, const std::string &path) {
+  // TODO: fix this for location based
   int admin_level_count =
       Model::get_spatial_data()->get_admin_level_manager()->get_level_names().size();
 

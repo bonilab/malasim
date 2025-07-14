@@ -15,7 +15,7 @@
 #include "Configuration/SpatialSettings/SpatialSettings.h"
 #include "Utils/Helpers/StringHelpers.h"
 
-SpatialData::SpatialData(SpatialSettings* spatial_settings):spatial_settings_(spatial_settings){}
+SpatialData::SpatialData(SpatialSettings* spatial_settings) : spatial_settings_(spatial_settings) {}
 
 SpatialData::~SpatialData() = default;  // Let unique_ptr handle cleanup
 
@@ -127,6 +127,8 @@ bool SpatialData::check_catalog(std::string &errors) {
   AscFile* ref_raster = nullptr;
   for (const auto &raster : data_) {
     if (!raster) { continue; }
+    // spdlog::info("Checking raster: {}x{} with cell size: {}", raster->ncols, raster->nrows,
+    //              raster->cellsize);
     if (ref_raster == nullptr) {
       ref_raster = raster.get();
       continue;
@@ -135,8 +137,9 @@ bool SpatialData::check_catalog(std::string &errors) {
     for (int row = 0; row < raster->nrows; row++) {
       for (int col = 0; col < raster->ncols; col++) {
         if (raster->data[row][col] == raster->nodata_value) {
-          if (ref_raster->data[row][col] != raster->nodata_value) {
+          if (ref_raster->data[row][col] != ref_raster->nodata_value) {
             errors = fmt::format("NODATA_VALUE mismatch: {}", raster->nodata_value);
+            spdlog::error("Row {}, Col {}", row, col);
             spdlog::error("Raster error: {}", raster->nodata_value);
             return true;
           }
