@@ -20,7 +20,9 @@ void SCTherapy::calculate_max_dosing_day() {
 
 int SCTherapy::get_max_dosing_day() const {
   // The calculate_max_dosing_day must be called before this function
-  assert(max_dosing_day != -1);
+  if(max_dosing_day == -1) {
+    throw std::runtime_error("Max dosing day has not been calculated. Call calculate_max_dosing_day first.");
+  }
 
   return max_dosing_day;
 }

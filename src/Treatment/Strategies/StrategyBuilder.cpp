@@ -103,7 +103,13 @@ std::unique_ptr<IStrategy> StrategyBuilder::build_mft_strategy(const YAML::Node 
   result->id = strategy_id;
   result->name = ns["name"].as<std::string>();
 
-  add_distributions(ns["distribution"], result->distribution);
+  // Check for both "distributions" (plural, used in tests) and "distribution" (singular)
+  if (ns["distributions"]) {
+    add_distributions(ns["distributions"], result->distribution);
+  } else if (ns["distribution"]) {
+    add_distributions(ns["distribution"], result->distribution);
+  }
+  
   add_therapies(ns, result.get());
   return result;
 }
@@ -405,4 +411,3 @@ std::unique_ptr<IStrategy> StrategyBuilder::build_mft_age_based_strategy(const Y
 
   return result;
 }
-
