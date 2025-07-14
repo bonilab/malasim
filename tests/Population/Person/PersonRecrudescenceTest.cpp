@@ -20,6 +20,7 @@
 #include "Events/MoveParasiteToBloodEvent.h"
 #include "Events/ReceiveTherapyEvent.h"
 #include "Events/ProgressToClinicalEvent.h"
+#include "Utils/Constants.h"
 
 /**
  * Test class for testing the recrudescence functionality in the Person class.
@@ -40,7 +41,7 @@ protected:
 
         // Initialize the clinical parasite - use proper constructors based on API
         // First create genotype with proper constructor
-        std::string test_sequence = "ACGTACGTACGT"; // Test sequence
+        std::string test_sequence = "||||YF1||TTHFIMG,x||||||FNCMYRIPRPCRA|1"; // Test sequence
         genotype_ = std::make_unique<Genotype>(test_sequence);
 
         // Create parasite population with just the genotype
@@ -59,24 +60,71 @@ protected:
     
     // Helper method to set up a person with specific age and drugs
     void setupPerson(int age, bool hasDrugs) {
-        person_->set_age(age);
-        
-        // Handle drugs in blood
-        if (hasDrugs) {
-          // Create a therapy
-          auto& therapy = Model::get_therapy_db().at(6);
+    // Initialize the person first
+    person_->initialize();
 
-          // Create and schedule a receive therapy event
-          auto event = std::make_unique<ReceiveTherapyEvent>(person_.get());
-          event->set_received_therapy(therapy.get());
-          event->set_clinical_caused_parasite(clinical_parasite_.get());
-          event->set_time(Model::get_scheduler()->current_time()); // Execute immediately
-          event->set_is_part_of_mac_therapy(false);
-          person_->schedule_basic_event(std::move(event));
+    // Set basic properties
+    person_->set_age(age);
+    person_->set_host_state(Person::SUSCEPTIBLE);
+    person_->set_location(0);  // Or pass a location parameter if needed
+    person_->set_residence_location(0);
 
-          person_->update_events(Model::get_scheduler()->current_time());
-        }
+    // Set up birthday related properties
+    auto days_to_next_birthday =
+        static_cast<int>(Model::get_random()->random_uniform((Constants::DAYS_IN_YEAR))) + 1;
+    auto ymd = Model::get_scheduler()->get_ymd_after_days(days_to_next_birthday)
+             - date::years(person_->get_age() + 1);
+    auto simulation_time_birthday = Model::get_scheduler()->get_days_to_ymd(ymd);
+    person_->set_birthday(simulation_time_birthday);
+    person_->schedule_birthday_event(days_to_next_birthday);
+
+    // Set immune component at 6 months
+    if (simulation_time_birthday + Constants::DAYS_IN_YEAR / 2 >= 0) {
+        if (person_->get_age() > 0) { spdlog::error("Error in calculating simulation_time_birthday"); }
+        person_->get_immune_system()->set_immune_component(std::make_unique<InfantImmuneComponent>());
+        // schedule for switch
+        person_->schedule_switch_immune_component_event(simulation_time_birthday
+                                                     + (Constants::DAYS_IN_YEAR / 2));
+    } else {
+        person_->get_immune_system()->set_immune_component(std::make_unique<NonInfantImmuneComponent>());
     }
+
+    // Set immune values
+    auto immune_value = Model::get_random()->random_beta(
+        Model::get_config()->get_immune_system_parameters().alpha_immune,
+        Model::get_config()->get_immune_system_parameters().beta_immune);
+    person_->get_immune_system()->immune_component()->set_latest_value(immune_value);
+    person_->get_immune_system()->set_increase(false);
+
+    // Set biting rate related properties
+    person_->set_innate_relative_biting_rate(
+        Person::draw_random_relative_biting_rate(Model::get_random(), Model::get_config()));
+    person_->update_relative_biting_rate();
+
+    // Set moving level
+    auto& movement_settings = Model::get_config()->get_movement_settings();
+    person_->set_moving_level(
+        movement_settings.get_moving_level_generator().draw_random_level(Model::get_random()));
+
+    person_->set_latest_update_time(0);
+    person_->generate_prob_present_at_mda_by_age();
+
+    // Handle drugs in blood
+    if (hasDrugs) {
+        // Create a therapy
+        auto& therapy = Model::get_therapy_db().at(6);
+
+        // Create and schedule a receive therapy event
+        auto event = std::make_unique<ReceiveTherapyEvent>(person_.get());
+        event->set_received_therapy(therapy.get());
+        event->set_clinical_caused_parasite(clinical_parasite_.get());
+        event->set_time(Model::get_scheduler()->current_time()); // Execute immediately
+        event->set_is_part_of_mac_therapy(false);
+        person_->schedule_basic_event(std::move(event));
+
+        person_->update_events(Model::get_scheduler()->current_time());
+    }
+}
 
     std::unique_ptr<Person> person_;
     std::unique_ptr<Genotype> genotype_;
@@ -93,6 +141,15 @@ TEST_F(PersonRecrudescenceTest, SymptomaticRecrudescenceYoungChild) {
     clinical_parasite_->set_last_update_log10_parasite_density(
         Model::get_config()->get_parasite_parameters().get_parasite_density_levels().get_log_parasite_density_asymptomatic()
     );
+
+    // Create and schedule a move parasite to blood event
+    auto event = std::make_unique<MoveParasiteToBloodEvent>(person_.get());
+    event->set_time(Model::get_scheduler()->current_time()); // Execute immediately
+    event->set_infection_genotype(genotype_.get());
+    person_->schedule_basic_event(std::move(event));
+
+    // Execute events at current time
+    person_->update_events(Model::get_scheduler()->current_time());
     
     // Execute determine_symptomatic_recrudescence
     person_->determine_symptomatic_recrudescence(clinical_parasite_.get());
