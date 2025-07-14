@@ -176,7 +176,7 @@ TEST_F(PersonInternalEventTest, MatureGametocyteEventTest) {
 
 // Test ProgressToClinicalEvent
 TEST_F(PersonInternalEventTest, ProgressToClinicalEventTest) {
-  int test_counts = 100;
+  int test_counts = 1000;
   int clinical_counts = 0;
   for (int i = 0; i < test_counts; i++) {
     // Create a genotype
@@ -219,7 +219,6 @@ TEST_F(PersonInternalEventTest, ProgressToClinicalEventTest) {
   spdlog::info("Clinical counts: {}", clinical_counts);
   // Verify host state changed to clinical
   ASSERT_GT(clinical_counts,0);
-
 }
 
 // Test EndClinicalEvent

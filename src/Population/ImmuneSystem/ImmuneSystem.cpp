@@ -52,8 +52,6 @@ double ImmuneSystem::get_parasite_size_after_t_days(const int &duration,
   return value;
 }
 
-const double MID_POINT = 0.25;
-
 double ImmuneSystem::get_clinical_progression_probability() const {
   const auto immune = get_current_value();
 
@@ -66,7 +64,7 @@ double ImmuneSystem::get_clinical_progression_probability() const {
 
   const auto p_clinical =
       isf.max_clinical_probability
-      / (1 + pow((immune / MID_POINT), isf.immune_effect_on_progression_to_clinical));
+      / (1 + pow((immune / isf.midpoint), isf.immune_effect_on_progression_to_clinical));
 
   // spdlog::info(
   //     "ImmuneSystem::get_clinical_progression_probability: immune: {}, PClinical: {}, max
